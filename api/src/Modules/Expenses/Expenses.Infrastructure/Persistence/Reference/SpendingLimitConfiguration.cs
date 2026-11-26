@@ -1,3 +1,4 @@
+using Expenses.Application.Features.Budget.Commands.CreateSpendingLimit;
 using Expenses.Domain.Budget;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -16,6 +17,7 @@ internal sealed class SpendingLimitConfiguration : IEntityTypeConfiguration<Spen
         builder.Property(l => l.Amount).HasColumnName("amount").HasPrecision(12, 2);
         builder.Property(l => l.SortOrder).HasColumnName("sort_order");
         builder.Property(l => l.Version).IsRowVersion();
+        builder.HasIndex(l => l.SortOrder).IsUnique().HasDatabaseName(CreateSpendingLimitHandler.SortOrderIndex);
 
         // A plain uuid[] column: the ids point at categories of the same schema, read as a set, never joined on.
         builder.Ignore(l => l.CategoryIds);

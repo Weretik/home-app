@@ -15,7 +15,8 @@ export type GiftRequest = Schema<'GiftRequest'>;
 export type GiftVariantRequest = Schema<'GiftVariantRequest'>;
 
 /** A gift write changes both tabs and the home summary. */
-const giftQueries = [giftKeys.items, giftKeys.summary];
+/** Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. */
+const giftQueries = [giftKeys.all];
 
 const giftWriter: Writer<GiftRequest> = {
   keys: giftQueries,

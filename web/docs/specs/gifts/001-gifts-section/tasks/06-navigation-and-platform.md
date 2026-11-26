@@ -36,8 +36,9 @@ The tab cases pass and `/gifts` no longer shows «Раздел скоро поя
 - **Covers:** SC-021, SC-022
 - **Depends on:** EN-001
 - **Exact paths:** `web/src/features/home/gifts-summary/data/{summary-api.ts,labels.ts,money.ts}`;
-  `web/src/features/home/gifts-summary/view/{GiftsSummary.tsx,RecipientCards.tsx,TopWishesCard.tsx,OccasionsCard.tsx,DetailsCard.tsx}`;
-  `web/src/features/home/page/summary-sections.ts`; tests `data/money.test.ts`, `view/GiftsSummary.test.tsx`,
+  `web/src/features/home/gifts-summary/overview/{GiftsSummary.tsx,SummaryContent.tsx,NoWishes.tsx}`,
+  `web/src/features/home/gifts-summary/cards/{SummaryCard.tsx,FigureCard.tsx,RecipientCards.tsx,TopWishesCard.tsx,OccasionsCard.tsx,DetailsCard.tsx}`;
+  `web/src/features/home/page/summary-sections.ts`; tests `data/money.test.ts`, `overview/GiftsSummary.test.tsx`,
   `web/src/features/home/page/HomePage.test.tsx`
 - **Test level:** unit + page
 - **Baseline:** [web ADR 0008](../../../../decisions/0008-home-page-as-a-registry-of-section-summaries.md) (own labels,

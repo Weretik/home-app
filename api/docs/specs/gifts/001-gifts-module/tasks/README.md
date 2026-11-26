@@ -25,7 +25,7 @@ regression set → evidence. `EN-*` tasks without behaviour of their own name a 
 | TS-009 | 03 | `GetGiftsSummary` and `Report/` records | SC-010 | TS-006, TS-008 | `Features/Summary/**` | integration |
 | TS-010 | 04 | Endpoints with `WithName`, `WithSummary`, `Produces*`, `PublicWrite`, `If-Match`, `Idempotency-Key`; `GiftsModule`; OpenAPI regenerated | SC-011 | TS-004…TS-009 | `Gifts.Api/**`, `docs/contracts/openapi.json` | architecture (OpenAPI tests), integration |
 | TS-011 | 04 | Integration tests; split `IntegrationTests/Api` by module (folder rule) | SC-001…SC-010 | TS-010 | `tests/IntegrationTests/Api/Gifts/*`, `tests/IntegrationTests/Api/Expenses/*` | integration |
-| TS-012 | 05 | Contract schema names unique across modules (found during delivery: `CategoryItem` and `CreatedEntry` merged with Expenses' schemas) | SC-011 | TS-010 | `tests/ArchitectureTests/Conventions/ContractSchemaNameTests.cs` | architecture |
+| TS-012 | 05 | Contract schema names unique across modules (found during delivery: `CategoryItem` and `CreatedEntry` merged with Expenses' schemas) | SC-011 | TS-010 | `tests/ArchitectureTests/Http/ContractSchemaNameTests.cs` | architecture |
 | EN-004 | 05 | Docs: module page, ADRs 0021–0026, C4, architecture README, API README, AGENTS.md, deploy.md, specs index | — | TS-010 | `docs/**`, `../AGENTS.md`, `../docs/deploy.md` | review |
 
 ## Evidence

@@ -24,10 +24,31 @@ export default tseslint.config(
         'error',
         { name: 'fetch', message: 'Call the API through src/platform/api.ts.' },
       ],
+      // No other HTTP client, and the openapi-fetch client is made only in src/api-client (docs/rules.md, "API").
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'axios',
+              message: 'Call the API through src/platform/api.ts.',
+            },
+            {
+              name: 'openapi-fetch',
+              message:
+                'Only src/api-client builds the client; use src/platform/api.ts.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
     files: ['src/api-client/**', '**/*.{test,spec}.{ts,tsx}'],
     rules: { 'no-restricted-globals': 'off' },
+  },
+  {
+    files: ['src/api-client/**'],
+    rules: { 'no-restricted-imports': 'off' },
   },
 );

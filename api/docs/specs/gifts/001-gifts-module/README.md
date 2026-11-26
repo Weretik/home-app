@@ -56,7 +56,7 @@ and its explanation live on the module page [docs/modules/gifts.md](../../../mod
 | `src/Host/Host.Api/Program.cs`, `Composition/MediatorSetup.cs`, `Host.Api.csproj`, `HomeApp.slnx` | existing, changed | register the module | EN-001 |
 | `tests/UnitTests/Gifts/Domain/`, `tests/UnitTests/Gifts/Input/` | planned → existing | domain rules and validators | TS-001…TS-009 |
 | `tests/IntegrationTests/Api/Gifts/` | planned → existing | end-to-end API checks on PostgreSQL | TS-011 |
-| `tests/ArchitectureTests/Conventions/ContractSchemaNameTests.cs` | added during delivery | HTTP record names unique across modules (OpenAPI schema clash) | TS-012 |
+| `tests/ArchitectureTests/Http/ContractSchemaNameTests.cs` | added during delivery | HTTP record names unique across modules (OpenAPI schema clash) | TS-012 |
 | `tests/IntegrationTests/Api/Expenses/` | existing, moved | the four Expenses API test classes, moved out of `Api/` so that no folder holds more than six code files | TS-011 |
 | `.github/workflows/api.yml` | existing, changed | the `gifts` migration bundle | EN-003 |
 

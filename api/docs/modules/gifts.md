@@ -99,7 +99,7 @@ Summary rules (`Features/Summary/`):
 | `Features/Items` | `CreateGift`, `UpdateGift`, `DeleteGift`, `ChangeGiftStatus` | `ListGifts` |
 | `Features/Categories` | `CreateCategory`, `RenameCategory`, `DeleteCategory` | `ListCategories` |
 | `Features/Details` | `CreateDetail`, `UpdateDetail`, `DeleteDetail` | `ListDetails` |
-| `Features/Summary` | | `GetGiftsSummary` (its response records in `Summary/Report/`) |
+| `Features/Summary` | | `GetGiftsSummary` (the arithmetic in the pure `SummaryFigures` beside the handler, its response records in `Summary/Report/`) |
 
 - **Creates** (gift, category, detail) take an `Idempotency-Key`; the key, the kind (`gift`, `category`, `detail`), a
   SHA-256 fingerprint and the new id are saved in `gifts.create_requests` in the same transaction
@@ -174,7 +174,10 @@ ids, the seeded category ids, `ON CONFLICT DO NOTHING` on every insert, variants
 ## Tests
 
 - Unit: `tests/UnitTests/Gifts/Domain` (gift rules, variants, status and the Kyiv day, categories and details) and
-  `tests/UnitTests/Gifts/Input` (validators): `dotnet test tests/UnitTests --filter "FullyQualifiedName~UnitTests.Gifts"`.
-- Integration (PostgreSQL): `tests/IntegrationTests/Api/Gifts` (`GiftsApiTests`, `GiftsSettingsApiTests`):
+  `tests/UnitTests/Gifts/Input` (validators), `tests/UnitTests/Gifts/Summary` (the summary's counts, sums, 🔥 wishes and
+  upcoming occasions with a fixed "today"): `dotnet test tests/UnitTests --filter "FullyQualifiedName~UnitTests.Gifts"`.
+- Integration (PostgreSQL): `tests/IntegrationTests/Api/Gifts` (`GiftsApiTests`, `GiftsSettingsApiTests`, and
+  `GiftsRaceApiTests`: an edit, a status change and a detail edit raced by another edit, a category delete raced by a
+  new gift in it, each a `409` through `TestHost/RacingGiftsDb`):
   `dotnet test tests/IntegrationTests --filter "FullyQualifiedName~Gifts"`.
 - Architecture: covered by every test in `tests/ArchitectureTests`, which find the module by its folder.

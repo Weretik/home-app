@@ -18,6 +18,7 @@ internal sealed class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
         builder.Property(e => e.Amount).HasColumnName("amount").HasPrecision(12, 2);
         builder.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasConversion<string>().HasMaxLength(20);
         builder.Property(e => e.Comment).HasColumnName("comment").HasMaxLength(EntryRules.MaxCommentLength);
+        builder.Property(e => e.OutsideLimits).HasColumnName("outside_limits");
         builder.Property(e => e.ImportKey).HasColumnName("import_key").HasMaxLength(EntryRules.MaxImportKeyLength);
         builder.Property(e => e.CreatedAtUtc).HasColumnName("created_at_utc");
         builder.Property(e => e.Version).IsRowVersion();

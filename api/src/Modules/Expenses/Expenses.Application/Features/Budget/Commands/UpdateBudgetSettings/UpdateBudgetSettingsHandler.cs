@@ -1,5 +1,6 @@
 using Expenses.Application;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Budget;
 using Expenses.Domain.Entries;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,11 @@ public sealed class UpdateBudgetSettingsHandler(IExpensesDbContext db) : IComman
     {
         var settings = await db.BudgetSettings.FirstOrDefaultAsync(cancellationToken);
         if (settings is null)
-            return EntryErrors.NotFound("budget_settings", Domain.Budget.BudgetSettings.SingletonId);
+            return BudgetErrors.SettingsNotFound;
         if (settings.Version != c.Version)
             return EntryErrors.ChangedMeanwhile;
 
-        var updated = settings.Update(c.MonthlyLimit, c.SavingsGoal);
+        var updated = settings.Update(c.MonthlyLimit, c.SavingsGoal, c.LimitsFrom ?? settings.LimitsFrom);
         if (updated.IsFailure)
             return updated;
 

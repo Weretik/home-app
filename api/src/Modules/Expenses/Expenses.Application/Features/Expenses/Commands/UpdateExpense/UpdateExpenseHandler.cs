@@ -20,7 +20,7 @@ public sealed class UpdateExpenseHandler(IExpensesDbContext db) : ICommandHandle
         if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
             return CategoryErrors.NotFoundById(c.CategoryId);
 
-        var updated = entry.Update(c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment);
+        var updated = entry.Update(c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment, c.OutsideLimits);
         if (updated.IsFailure)
             return updated;
 

@@ -17,6 +17,7 @@ internal static class MediatorSetup
             options.Assemblies =
             [
                 typeof(Expenses.Application.ExpensesApplicationRegistration).Assembly,
+                typeof(Shopping.Application.ShoppingApplicationRegistration).Assembly,
                 typeof(Gifts.Application.GiftsApplicationRegistration).Assembly,
                 typeof(Todos.Application.TodosApplicationRegistration).Assembly,
             ];

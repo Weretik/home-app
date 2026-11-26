@@ -64,9 +64,8 @@ public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
     /// <summary>The first day of the month or quarter that contains <paramref name="day"/>, and the day after its end.</summary>
     public (DateOnly Start, DateOnly End) PeriodAround(DateOnly day)
     {
-        var firstMonth = Period == LimitPeriod.Quarter ? ((day.Month - 1) / 3 * 3) + 1 : day.Month;
-        var start = new DateOnly(day.Year, firstMonth, 1);
-        return (start, start.AddMonths(Period == LimitPeriod.Quarter ? 3 : 1));
+        var start = LimitCarryOver.PeriodStart(Period, day);
+        return (start, start.AddMonths(LimitCarryOver.Months(Period)));
     }
 
     internal static bool IsMoney(decimal amount) =>

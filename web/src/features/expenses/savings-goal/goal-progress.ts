@@ -7,9 +7,17 @@ export interface GoalProgress {
   done: boolean;
 }
 
+/**
+ * How much of the savings goal the jar holds, in whole percent rounded down (100 only once the goal is reached), never
+ * below 0, 0 without a goal. The home summary's «Копилка» card uses the same rule (`goalPercentOf` in
+ * `home/expenses-summary/data/money.ts`); features never import each other, so both sides test the same cases.
+ */
+export const goalPercent = (balance: number, goal: number) =>
+  goal > 0 ? Math.max(0, Math.floor((balance / goal) * 100)) : 0;
+
 /** Progress of `balance` towards a goal above zero. */
 export function goalProgress(balance: number, goal: number): GoalProgress {
-  const percent = Math.max(0, Math.floor((balance / goal) * 100));
+  const percent = goalPercent(balance, goal);
   const remaining = Math.max(0, Math.round((goal - balance) * 100) / 100);
   return { percent, remaining, done: balance >= goal };
 }

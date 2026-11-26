@@ -14,7 +14,7 @@ export interface Section {
 /** The main sections: the phone's bottom bar and the top group of the side menu. Keep it at five. */
 export const mainSections: Section[] = [
   { path: '/', label: 'Главная', icon: DashboardOutlinedIcon },
-  { path: '/expenses', label: 'Расходы', icon: ReceiptLongOutlinedIcon },
+  { path: '/expenses', label: 'Бюджет', icon: ReceiptLongOutlinedIcon },
   { path: '/shopping', label: 'Покупки', icon: ShoppingCartOutlinedIcon },
   { path: '/todos', label: 'Дела', icon: ChecklistOutlinedIcon },
   { path: '/gifts', label: 'Подарки', icon: CardGiftcardOutlinedIcon },

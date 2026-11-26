@@ -14,7 +14,7 @@ internal static class GetMonthSummaryEndpoint
     {
         group.MapGet("/summary", HandleAsync)
             .WithName("getMonthSummary")
-            .WithSummary("One month at a glance: incomes, expenses, the month's result, the savings jar, limits and top categories.")
+            .WithSummary("One month at a glance: incomes, expenses, the month's result, the savings jar, limits with carry-over, top categories and the forecast.")
             .Produces<MonthSummary>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
         return group;
