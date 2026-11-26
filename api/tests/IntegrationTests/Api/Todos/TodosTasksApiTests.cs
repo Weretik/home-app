@@ -119,6 +119,52 @@ public sealed class TodosTasksApiTests(ApiFactory api)
     }
 
     [SkippableFact]
+    public async Task The_Due_Filter_Keeps_APeriod_OrTheTasksWithoutADueDate()
+    {
+        Skip.If(api.Unavailable is not null, api.Unavailable);
+        using var client = api.CreateHttpsClient();
+        var tag = Tag();
+
+        await CreateTaskAsync(client, $"past {tag}", new { dueDate = "2026-11-20" });
+        await CreateTaskAsync(client, $"monday {tag}", new { dueDate = "2026-11-30" });
+        await CreateTaskAsync(client, $"sunday {tag}", new { dueDate = "2026-12-06" });
+        await CreateTaskAsync(client, $"later {tag}", new { dueDate = "2026-12-07" });
+        await CreateTaskAsync(client, $"none {tag}");
+
+        IEnumerable<string> Words(JsonElement list) => Titles(list).Select(t => t.Split(' ')[0]).Order();
+
+        Assert.Equal(["monday", "sunday"], Words(await ListAsync(client, $"search={tag}&dueFrom=2026-11-30&dueTo=2026-12-06")));
+        Assert.Equal(["monday", "past"], Words(await ListAsync(client, $"search={tag}&dueTo=2026-11-30")));
+        Assert.Equal(["none"], Words(await ListAsync(client, $"search={tag}&withoutDueDate=true")));
+
+        var both = await client.GetAsync($"/api/todos/tasks?search={tag}&dueFrom=2026-11-30&withoutDueDate=true");
+        Assert.Equal(HttpStatusCode.BadRequest, both.StatusCode);
+        var backwards = await client.GetAsync($"/api/todos/tasks?search={tag}&dueFrom=2026-12-01&dueTo=2026-11-30");
+        Assert.Equal(HttpStatusCode.BadRequest, backwards.StatusCode);
+    }
+
+    [SkippableFact]
+    public async Task The_Archive_Filters_ByTheKyivDay_OfCompletion()
+    {
+        Skip.If(api.Unavailable is not null, api.Unavailable);
+        using var client = api.CreateHttpsClient();
+        var tag = Tag();
+        var id = await CreateTaskAsync(client, $"done {tag}");
+        var version = (await GetTaskAsync(client, id)).GetProperty("version").GetUInt32();
+        Assert.Equal(HttpStatusCode.NoContent, (await SendAsync(client, HttpMethod.Put, $"/api/todos/tasks/{id}/status", version, new { status = "Done" })).StatusCode);
+
+        var today = DateOnly.FromDateTime(global::Todos.Application.KyivCalendar.ToKyiv(DateTimeOffset.UtcNow).DateTime);
+        var day = today.ToString("yyyy-MM-dd");
+        var yesterday = today.AddDays(-1).ToString("yyyy-MM-dd");
+
+        Assert.Single(Titles(await ListAsync(client, $"view=archive&search={tag}&completedFrom={day}&completedTo={day}")));
+        Assert.Empty(Titles(await ListAsync(client, $"view=archive&search={tag}&completedTo={yesterday}")));
+
+        var activeView = await client.GetAsync($"/api/todos/tasks?search={tag}&completedFrom={day}");
+        Assert.Equal(HttpStatusCode.BadRequest, activeView.StatusCode);
+    }
+
+    [SkippableFact]
     public async Task A_Stale_Version_IsAConflict_ForEditStatusAndDelete()
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);

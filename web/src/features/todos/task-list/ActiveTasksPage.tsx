@@ -22,16 +22,16 @@ import { useDoneTick } from './use-done-tick';
 type Open = { item: TodoTaskItem } | { title: string } | null;
 
 /**
- * «Задачи»: the filters, quick add, and the active tasks in their due groups (FR-001…FR-004). A tick marks a task done
+ * «Задачи»: the filters, quick add, and the active tasks by due day (FR-001…FR-004). A tick marks a task done
  * at once with «Отменить»; a tap opens it.
  */
 export function ActiveTasksPage() {
-  const filterState = useTodoFilters();
+  const filterState = useTodoFilters('active');
   const { filters } = filterState;
-  const query = useTasks('active', toTaskQuery(filters));
+  const today = kyivToday();
+  const query = useTasks('active', toTaskQuery(filters, 'active', today));
   const done = useDoneTick();
   const [open, setOpen] = useState<Open>(null);
-  const today = kyivToday();
   const assignee = quickAddAssignee(filters.who);
 
   const pages = query.data?.pages ?? [];
@@ -40,7 +40,7 @@ export function ActiveTasksPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <TaskFilters state={filterState} />
+      <TaskFilters view="active" state={filterState} />
       <Card>
         <QuickAdd
           assignee={assignee}

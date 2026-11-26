@@ -406,6 +406,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shopping/items/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Suggests names ever added to the list whose normalised name, or one of its words, starts with the query: names starting with it first, then the most bought, then the most recently added. */
+        get: operations["listShoppingNameSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shopping/summary": {
         parameters: {
             query?: never;
@@ -696,7 +713,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat. */
+        /** Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat; dueFrom/dueTo (both included) or withoutDueDate narrow by due date; in the archive completedFrom/completedTo (Kyiv days, both included) narrow by completion day. */
         get: operations["listTodoTasks"];
         put?: never;
         /** Adds a task with its first steps. Send a new Idempotency-Key per task; a repeat returns the first id. */
@@ -1347,6 +1364,19 @@ export interface components {
             limits: components["schemas"]["LimitUsage"][];
             topCategories: components["schemas"]["CategoryAmount"][];
             forecast: components["schemas"]["MonthForecast"];
+        };
+        /** @description A name ever added to the list, in its latest spelling and department, for the quick add to suggest while typing. */
+        NameSuggestion: {
+            name: string;
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: string;
+            departmentIcon: string;
+            /** Format: int32 */
+            timesBought: number;
+            /** Format: date-time */
+            lastAddedAtUtc: string;
+            inList: boolean;
         };
         /**
          * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
@@ -3383,6 +3413,38 @@ export interface operations {
             };
         };
     };
+    listShoppingNameSuggestions: {
+        parameters: {
+            query?: {
+                query?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NameSuggestion"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
     getShoppingSummary: {
         parameters: {
             query?: never;
@@ -4642,6 +4704,11 @@ export interface operations {
                 categoryId?: string;
                 withoutCategory?: boolean;
                 search?: string;
+                dueFrom?: string;
+                dueTo?: string;
+                withoutDueDate?: boolean;
+                completedFrom?: string;
+                completedTo?: string;
                 page?: number;
                 pageSize?: number;
             };

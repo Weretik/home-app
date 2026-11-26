@@ -2102,6 +2102,58 @@
         }
       }
     },
+    "/api/shopping/items/suggestions": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Suggests names ever added to the list whose normalised name, or one of its words, starts with the query: names starting with it first, then the most bought, then the most recently added.",
+        "operationId": "listShoppingNameSuggestions",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 8
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NameSuggestion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/shopping/summary": {
       "get": {
         "tags": [
@@ -3666,7 +3718,7 @@
         "tags": [
           "Todos"
         ],
-        "summary": "Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat.",
+        "summary": "Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat; dueFrom/dueTo (both included) or withoutDueDate narrow by due date; in the archive completedFrom/completedTo (Kyiv days, both included) narrow by completion day.",
         "operationId": "listTodoTasks",
         "parameters": [
           {
@@ -3706,6 +3758,45 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "dueFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dueTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "withoutDueDate",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "completedFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "completedTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           },
           {
@@ -6160,6 +6251,45 @@
           }
         },
         "description": "One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they\nbelong to, the month's result after the savings jar, the jar itself, the spending limits with their carry-over,\nthe top categories and the forecast with the planned expenses."
+      },
+      "NameSuggestion": {
+        "required": [
+          "name",
+          "departmentId",
+          "departmentName",
+          "departmentIcon",
+          "timesBought",
+          "lastAddedAtUtc",
+          "inList"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "departmentName": {
+            "type": "string"
+          },
+          "departmentIcon": {
+            "type": "string"
+          },
+          "timesBought": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastAddedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "inList": {
+            "type": "boolean"
+          }
+        },
+        "description": "A name ever added to the list, in its latest spelling and department, for the quick add to suggest while typing."
       },
       "NotificationChatItem": {
         "required": [

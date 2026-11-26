@@ -51,7 +51,7 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 | `/expenses/forecast` | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»                 | `expenses/forecast-page` |
 | `/expenses/settings` | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                                   | `expenses/settings-page` |
 | `/shopping`          | Покупки, Список: quick add, ⭐ Частые, groups by department, ticks, «В корзине»                                       | `shopping/list-page`     |
-| `/shopping/history`  | История: bought items by day, «Вернуть в список», delete                                                              | `shopping/history-page`  |
+| `/shopping/history`  | История: bought items by month and day, «Вернуть в список», delete                                                    | `shopping/history-page`  |
 | `/shopping/settings` | Настройки (the gear): departments and their order, keywords, cart hours and the frequent window                       | `shopping/settings-page` |
 | `/gifts`             | Список: wanted gifts in a block per person, recipient, category and priority filters, add / edit / delete, «Подарено» | `gifts/pages`            |
 | `/gifts/archive`     | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                              | `gifts/pages`            |
@@ -99,7 +99,7 @@ home/
     top-wishes/      «🔥 Очень хочу»: a tinted block per person (side by side from md), PersonWishes
   todos-summary/
     data/            todos-summary-api.ts (GET /api/todos/summary, the in-place done tick), labels and due dates
-    view/            TodosSummary (states, «Сделано за неделю», «Открыть дела»), the three assignee cards, «В фокусе»
+    view/            TodosSummary (states, «Сделано за неделю», «Открыть дела»), the three assignee cards, «На сегодня»
 ```
 
 - `summary-sections.ts` lists every section with its summary component, or `null` while it has none: the switcher
@@ -122,8 +122,9 @@ home/
 - «Покупки» shows the list at a glance: three figure cards, the departments with needed items, up to eight next items
   (urgent first), the five most bought, and «Открыть список». An empty list says «Список пуст 🎉».
 - «Дела» (`?s=todos`): a card per Маша, Виталий, Общее with the active count, «просрочено N» in red and «сегодня N»;
-  «Сделано за неделю»; «В фокусе», up to eight tasks from the summary's `focus`, each ticked done in place (struck
-  through while saving). Its query key is `['todos', 'summary']`, so every Todos write refreshes it.
+  «Сделано за неделю»; «На сегодня», up to eight overdue, today's and urgent tasks from the summary's `focus`, each
+  ticked done in place (struck through while saving), with «Все на сегодня» (`/todos?when=today`); the card is left out
+  when there are none. Its query key is `['todos', 'summary']`, so every Todos write refreshes it.
 
 ## Expenses (`src/features/expenses`)
 
@@ -204,20 +205,27 @@ expenses/
 
 The shared shopping list of the old «🛒 Список покупок» sheet and its bot, as tabs Список and История plus the
 «Настройки» gear ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)); live for two people
-([ADR 0012](decisions/0012-live-shared-list-with-optimistic-ticks-and-polling.md)). Specification:
-[docs/specs/shopping/001-shopping-list](specs/shopping/001-shopping-list/README.md).
+([ADR 0012](decisions/0012-live-shared-list-with-optimistic-ticks-and-polling.md)). Specifications:
+[docs/specs/shopping/001-shopping-list](specs/shopping/001-shopping-list/README.md),
+[002-name-suggestions](specs/shopping/002-name-suggestions/README.md),
+[003-history-by-month](specs/shopping/003-history-by-month/README.md).
 
 ```
 shopping/
-  data/                 shopping-api.ts (the list with 20 s polling, ⭐ Частые, department match), item-writes-api.ts
-                        (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo, the shared write hook),
+  data/                 shopping-api.ts (the list with 20 s polling, ⭐ Частые, department match, name suggestions),
+                        item-writes-api.ts (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo,
+                        the shared write hook),
                         status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Russian text), labels
   section/              ShoppingSection (title with counts, «Я», tabs, gear, <Outlet />), the page list, use-me.ts
-  quick-add/            the sticky field with «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
+  quick-add/
+    entry/              the sticky card: field, «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
+    name-suggestions/   the field as a free-text Autocomplete suggesting names for the segment being typed, its
+                        option, name-segment.ts (pure), the debounced query hooks
   list-page/            «Список»: department cards in store order, item rows, «В корзине», the grouping
   item-editing/         the item dialog (name, quantity, note, department, Срочно, Удалить) and its form
   page-parts/           form and confirm dialogs, the «⋮» menu, loading / error / offline / empty states
-  history-page/         «История»: days, «Вернуть в список», delete, «Показать ещё»
+  history-page/         «История»: months («Ноябрь 2026 · 38 покупок») with day cards, «Вернуть в список», delete,
+                        «Показать ещё», history-groups.ts (pure day and month grouping)
   settings-page/        «Настройки»: the page and the «Список» card (cart hours, frequent days)
   department-settings/  «Отделы»: order with up / down, add / rename / delete
   keyword-settings/     «Слова для отделов»: search, department filter, add / edit / delete, «выучено»
@@ -228,6 +236,11 @@ shopping/
 - Needed items are grouped by department in its sort order, urgent first, then oldest added; the cart is newest
   bought first. Moving an item to another department in the dialog teaches the dictionary on the server.
 - «Я» (Виталий / Маша) is per device and is the author of adds and ticks.
+- The quick add suggests names from everything ever added (`GET /api/shopping/items/suggestions`, key
+  `['shopping', 'suggestions', query]`) for the text after the last `,` `;` or new line, 200 ms after typing pauses;
+  a choice replaces only that segment and adds nothing, Enter without a highlighted option adds the text.
+- History months are local to the browser like the day groups; a month's count is of the loaded rows, «N+ покупок»
+  while the next page may hold more of it (no API change).
 
 ## Gifts (`src/features/gifts`)
 
@@ -329,11 +342,13 @@ todos/
 
 - Query keys: `['todos', 'tasks', view, query]`, `['todos', 'task', id]`, `['todos', 'categories']`; the home
   summary's `['todos', 'summary']`. Every write invalidates `['todos']`.
-- Groups (FR-001): «Просрочено», «Сегодня», «Скоро» (next 7 days), «Позже», «Без срока»; empty ones hidden; today is
-  the Kyiv date. Lists load 50 tasks a page with «Показать ещё».
+- Day headings (FR-001, `data/day-groups.ts`): «Просрочено», «Сегодня», «Завтра», one per later due day («Пн, 30
+  ноября»), «Без срока»; the archive by the Kyiv day of completion («Сегодня», «Вчера», …). Today is the Kyiv date. Lists load 50 tasks a page with «Показать ещё».
 - Filters: «Маша» and «Виталий» send `assignee` twice (the person and `Shared`), «Общее» only `Shared`; the category is
-  an id or `none` (`withoutCategory=true`); the search reaches the URL 300 ms after typing stops. Switching tabs keeps
-  them; the gear drops them.
+  an id or `none` (`withoutCategory=true`); the search reaches the URL 300 ms after typing stops. The date filter
+  (`url-state/date-filter.ts`, `?when=&from=&to=`) is «Срок» on the active list (`dueFrom` / `dueTo` /
+  `withoutDueDate`) and «Когда сделано» in the archive (`completedFrom` / `completedTo`). Switching tabs keeps «Кому»,
+  category and search, not the date choice; the gear drops them all.
 - Quick add creates a task for the chosen «Кому» («Общее» for «Все»), Обычно, no date, with an `Idempotency-Key`
   renewed after each success; the field clears and keeps focus. The pencil opens the full form with the typed title.
 - The done tick and «Вернуть» are optimistic: the row leaves its list at once and comes back with the reason if the

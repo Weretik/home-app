@@ -98,3 +98,17 @@ No backend defect found. AF-012 (no `Idempotency-Key` on category create) is a d
 - `npm run build` — pass (chunk-size warning, AF-014)
 - Smoke run repeated after the fixes: all four configurations clean (only AF-015 warnings); the 409 run reloaded the
   form and the retry saved.
+
+## Follow-up audit: day headings, date filter, «На сегодня» (2026-11-26)
+
+Scope: `data/day-groups.ts`, `url-state/date-filter.ts`, `task-filters/DateFilter.tsx`, `archive/ArchiveGroups.tsx`,
+the changed list pages, the home `todos-summary` card. Checked against `web/docs/rules.md`, `design.md` and
+`npm run architecture:structure` (15 rules green).
+
+- Structure: new pure logic sits in `data/` and `url-state/` with Vitest tests; components stay under 150 lines and one
+  per file; no feature imports another (the home card keeps its own API call).
+- Contract: the new parameters come from the regenerated client; `TaskQuery` mirrors them.
+- URL state: `?when=` outside the list's choices is ignored, a broken `from` / `to` is dropped and a reversed period
+  is swapped, so a hand-edited link never sends a request the API refuses.
+- AF-NOTE-1 (Low, recorded): the active list pages by priority (50 per page), so with more than 50 active tasks a
+  later page can add rows to a day heading already shown. Today the family has 9 active tasks; revisit if lists grow.

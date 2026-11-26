@@ -42,3 +42,12 @@ read by due date instead.
   again), so a later «Сохранить» does not report a conflict for it; edits of the fields themselves still conflict.
 - The todos feature keeps its own small list states, snackbar and delete confirmation instead of the Expenses ones,
   because features never import each other.
+
+## Amendment (2026-11-26): day headings and a date filter
+
+The coarse groups «Скоро» and «Позже» hid which day a task is due, so the active list now has a heading per day:
+«Просрочено», «Сегодня», «Завтра», then one heading per later due day, «Без срока» last. The archive is grouped the
+same way by the Kyiv day of completion («Сегодня», «Вчера», dates). Both lists get a date filter in the URL
+(`?when=&from=&to=`): «Срок» on the active list reads the due date, «Когда сделано» in the archive reads the completion
+day (API `completedFrom` / `completedTo`, R-017). The date choice is not kept across the tabs, since its meaning differs
+per list. On the home page the focus list is called «На сегодня» and is shown only when it has tasks.

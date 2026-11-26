@@ -4,9 +4,9 @@ import {
   useIdempotencyKey,
   useUndoAdd,
   type AddItemsResult,
-} from '../data/item-writes-api';
-import { describeWriteError } from '../data/write-failure-api';
-import { useMe } from '../section/use-me';
+} from '../../data/item-writes-api';
+import { describeWriteError } from '../../data/write-failure-api';
+import { useMe } from '../../section/use-me';
 
 export interface AddOptions {
   /** Puts every item in this department instead of matching (a ⭐ chip knows its department). */

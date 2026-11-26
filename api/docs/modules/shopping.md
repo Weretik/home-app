@@ -5,8 +5,9 @@ The shared shopping list of Masha and Vitaliy. It replaces the Google Sheet «�
 departments, ticking items off in the shop, a cart that empties itself, history and «⭐ Частые». On top it has notes,
 «Срочно», editable departments and keywords, a history page and a summary for the home page. The module was added in
 [ADR 0031](../decisions/0031-shopping-module-model.md); text parsing and department matching are
-[ADR 0032](../decisions/0032-text-parsing-and-department-matching.md). Specification:
-[specs/shopping/001-shopping-list](../specs/shopping/001-shopping-list/README.md).
+[ADR 0032](../decisions/0032-text-parsing-and-department-matching.md). Specifications:
+[specs/shopping/001-shopping-list](../specs/shopping/001-shopping-list/README.md),
+[002-name-suggestions](../specs/shopping/002-name-suggestions/README.md) (names suggested while typing).
 
 Code: [`src/Modules/Shopping`](../../src/Modules/Shopping). Schema: `shopping`.
 
@@ -95,12 +96,18 @@ Rules (in `Shopping.Domain`, tested in `tests/UnitTests/Shopping`):
 - **Departments**: name 1–40 (unique), icon up to 8 characters. A new one goes just before the fallback. Deleting one
   moves its items (list and history) and keywords to the fallback. The order is set by sending every id once.
 - **Keywords**: stored normalised, 2–60 characters, unique.
+- **Suggestions** (`ListSuggestions`): the query is normalised like names (1–80 characters, `limit` 1–20, default 8);
+  a name matches when its normalised form or one of its words starts with it (escaped `LIKE`,
+  `SearchPattern.StartsWith` / `WordStartsWith`). All rows count (list, cart, history), one suggestion per normalised
+  name, in the spelling and department of the row added last; `timesBought` counts its `Bought` rows, `inList` says
+  whether a row of it is in the list now. Order: names starting with the query, then the most bought, then the most
+  recently added, then alphabetically.
 
 ## Use cases
 
 | Area | Commands | Queries |
 | --- | --- | --- |
-| `Features/Items` | `AddItems`, `UpdateItem`, `SetItemStatus`, `DeleteItem`, `ClearCart` | `ListItems`, `ListHistory`, `ListFrequent`, `GetSummary` |
+| `Features/Items` | `AddItems`, `UpdateItem`, `SetItemStatus`, `DeleteItem`, `ClearCart` | `ListItems`, `ListHistory`, `ListFrequent`, `ListSuggestions`, `GetSummary` |
 | `Features/Departments` | `CreateDepartment`, `UpdateDepartment`, `DeleteDepartment`, `ReorderDepartments` | `ListDepartments`, `MatchDepartment` |
 | `Features/Keywords` | `CreateKeyword`, `UpdateKeyword`, `DeleteKeyword` | `ListKeywords` |
 | `Features/Settings` | `UpdateSettings` | `GetSettings` |
@@ -133,7 +140,9 @@ frequent statistics) and `Features/Dictionary/` (the matcher loaded in store ord
 ## Database
 
 Schema `shopping`, migration history in `shopping.__ef_migrations_history`. Migration: `Initial`. No database extension: the production server does not let the migration create
-`pg_trgm`, and the keyword search scans about 400 rows, so it needs no trigram index.
+`pg_trgm`, and the keyword search scans about 400 rows, so it needs no trigram index. The name suggestions scan
+`shopping_items` too (a prefix or word-start `LIKE` cannot use the btree index on `normalized_name`): a few thousand
+rows, well under 10 ms; a `text_pattern_ops` index would serve prefixes if the table ever grows by orders of magnitude.
 
 | Table | Columns | Indexes and keys |
 | --- | --- | --- |
@@ -165,6 +174,7 @@ answer `429`. Errors are problem responses with `code`.
 | `deleteShoppingItem` | `DELETE /items/{id}` | `If-Match`. `204`; list or history row. |
 | `clearShoppingCart` | `POST /items/clear-cart` | `200` `{ cleared }`. |
 | `listShoppingHistory` | `GET /history?page&pageSize` | Newest bought first, `{ items, page, pageSize, totalCount }`, `pageSize` 1–100 (default 50). |
+| `listShoppingNameSuggestions` | `GET /items/suggestions?query&limit` | Up to `limit` (1–20, default 8) `{ name, departmentId, departmentName, departmentIcon, timesBought, lastAddedAtUtc, inList }`; an empty query is `400`. |
 | `listFrequentItems` | `GET /frequent` | Up to 20 `{ name, departmentId, departmentName, departmentIcon, timesBought, lastBoughtAtUtc }`. |
 | `getShoppingSummary` | `GET /summary` | `neededCount`, `urgentCount`, `inCartCount`, `boughtLast7Days`, `boughtLast30Days`, `departments` (with needed items, store order), `nextItems` (≤8, urgent first), `topFrequent` (≤5 `{ name, timesBought }`). |
 | `listShoppingDepartments` | `GET /departments` | `{ id, name, icon, sortOrder, isFallback, keywordCount, neededCount, version }` in store order. |
@@ -191,10 +201,11 @@ example `sheet:<ID column>`) with `ON CONFLICT DO NOTHING` makes a second run ch
 ## Tests
 
 - Unit: `dotnet test tests/UnitTests --filter "FullyQualifiedName~UnitTests.Shopping"` — parser, normaliser, matcher,
-  seed, item, cart window, department, keyword, settings rules, validators, and the summary's arithmetic
+  seed, item, cart window, department, keyword, settings rules, validators (with the suggestions'), and the summary's arithmetic
   (`Summary/`: `GetSummary/SummaryFigures`, the pure type beside the handler).
 - Integration (Docker): `dotnet test tests/IntegrationTests --filter "FullyQualifiedName~Shopping"` —
-  `Api/Shopping/ShoppingItemsApiTests`, `ShoppingDictionaryApiTests`, `ShoppingSettingsApiTests`, and
+  `Api/Shopping/ShoppingItemsApiTests`, `ShoppingSuggestionsApiTests`, `ShoppingDictionaryApiTests`,
+  `ShoppingSettingsApiTests`, and
   `ShoppingRaceApiTests` (an item edit raced by another edit, a department delete raced by a new item in it, each a
   `409` through `TestHost/RacingShoppingDb`).
 - Architecture: the module is found by its folder; `ModuleBoundaryTests.Every_Module_IsComposedByTheHost` checks it is

@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import List from '@mui/material/List';
 import { useState } from 'react';
 import { kyivToday } from '../data/due-date';
 import { useTasks, type TodoTaskItem } from '../data/todos-api';
@@ -13,20 +12,21 @@ import { isFiltered, toTaskQuery } from '../url-state/filters';
 import { useTodoFilters } from '../url-state/use-todo-filters';
 import { describeWriteError } from '../writes/failures-api';
 import { useMoveTask } from '../writes/status-api';
-import { ArchiveRow } from './ArchiveRow';
+import { ArchiveGroups } from './ArchiveGroups';
 
 /**
- * «Архив»: done and cancelled tasks, the latest completion first, with the same filters and «Показать ещё» (FR-006).
+ * «Архив»: done and cancelled tasks by the day they were completed, the latest first, with the same filters (the
+ * date filter reads the completion day) and «Показать ещё» (FR-006).
  * «Вернуть» makes a task «Ждёт» again; it leaves the archive at once.
  */
 export function ArchivePage() {
-  const filterState = useTodoFilters();
+  const filterState = useTodoFilters('archive');
   const { filters } = filterState;
-  const query = useTasks('archive', toTaskQuery(filters));
+  const today = kyivToday();
+  const query = useTasks('archive', toTaskQuery(filters, 'archive', today));
   const move = useMoveTask();
   const [message, setMessage] = useState<ResultMessage | null>(null);
   const [open, setOpen] = useState<TodoTaskItem | null>(null);
-  const today = kyivToday();
 
   const pages = query.data?.pages ?? [];
   const items = pages.flatMap((page) => page.items);
@@ -49,7 +49,7 @@ export function ArchivePage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <TaskFilters state={filterState} />
+      <TaskFilters view="archive" state={filterState} />
       <Card>
         <ListStatus
           isPending={query.isPending}
@@ -64,18 +64,12 @@ export function ArchivePage() {
           onRetry={() => void query.refetch()}
           onResetFilters={filterState.clear}
         >
-          <List disablePadding aria-label="Архив задач">
-            {items.map((task, index) => (
-              <ArchiveRow
-                key={task.id}
-                task={task}
-                today={today}
-                divider={index < items.length - 1}
-                onOpen={setOpen}
-                onReturn={giveBack}
-              />
-            ))}
-          </List>
+          <ArchiveGroups
+            items={items}
+            today={today}
+            onOpen={setOpen}
+            onReturn={giveBack}
+          />
           {query.hasNextPage && first && (
             <LoadMoreButton
               shown={items.length}

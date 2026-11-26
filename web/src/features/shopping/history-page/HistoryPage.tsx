@@ -9,12 +9,12 @@ import type { ShoppingItem } from '../data/shopping-api';
 import { describeWriteError } from '../data/write-failure-api';
 import { ConfirmDialog } from '../page-parts/ConfirmDialog';
 import { PageStatus } from '../page-parts/PageStatus';
-import { HistoryDay } from './HistoryDay';
-import { groupByDay } from './history-days';
+import { HistoryMonth } from './HistoryMonth';
+import { groupByMonth } from './history-groups';
 import { useShoppingHistory } from './history-api';
 import { useReturnItem } from './use-return-item';
 
-/** «История»: bought items by day, «Вернуть в список», delete, «Показать ещё» (R-10, R-15). */
+/** «История»: bought items by month and day (SDD 003), «Вернуть в список», delete, «Показать ещё» (R-10, R-15). */
 export function HistoryPage() {
   const history = useShoppingHistory();
   const remove = useDeleteItem();
@@ -42,10 +42,10 @@ export function HistoryPage() {
         }}
         onRetry={() => void history.refetch()}
       >
-        {groupByDay(items).map((day) => (
-          <HistoryDay
-            key={day.key}
-            day={day}
+        {groupByMonth(items, new Date(), history.hasNextPage).map((month) => (
+          <HistoryMonth
+            key={month.key}
+            month={month}
             returning={back.returning}
             onReturn={back.returnItem}
             onDelete={setDeleting}
