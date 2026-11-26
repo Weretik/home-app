@@ -147,6 +147,12 @@ Computer (md, 900px and wider)              Phone (below md)
   `aria-hidden`), the rounded amount as `h4` («95 024 ₴», no kopecks), one caption line, an optional thin progress bar.
   The value is `text.primary`, except a result that is good or bad: `success` from zero up, `error` below.
 - **Section card**: a light card with a tinted icon tile, a title, one line of caption and a chevron; a link.
+- **Wish card** (`gifts/gift-card/GiftCard.tsx`): a gift is too rich for a list row, so the Gifts tabs show cards in a
+  grid (one column on a phone, two from `md`, three from `xl`), grouped under a person's name with the count. The
+  name (`subtitle1` 600) and the price on the right («цена не указана» in `text.secondary`, never 0), chips (where it
+  ended up, priority, category, occasion with its date), notes, «N вариантов» unfolding the variant links, then the
+  shop link, the status button («Подарено» contained, «Вернуть в список» outlined) and «⋮». «🔥 Очень хочу» is a
+  `secondary` outlined chip: the second accent, not a status; the emoji carries the meaning too.
 - Empty and loading states are designed, not blank: say what will appear and how to add the first item.
 
 ## Icons and shape

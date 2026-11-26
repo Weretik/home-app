@@ -14,7 +14,11 @@ internal static class MediatorSetup
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;
             // Each module adds its Application assembly here: typeof(<Module>.Application.<Module>ApplicationRegistration).Assembly.
-            options.Assemblies = [typeof(Expenses.Application.ExpensesApplicationRegistration).Assembly];
+            options.Assemblies =
+            [
+                typeof(Expenses.Application.ExpensesApplicationRegistration).Assembly,
+                typeof(Gifts.Application.GiftsApplicationRegistration).Assembly,
+            ];
             options.PipelineBehaviors = [typeof(LoggingBehavior<,>), typeof(ValidationBehavior<,>)];
         });
         return services;

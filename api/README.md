@@ -3,13 +3,15 @@
 A .NET 10 modular monolith on PostgreSQL, built on
 [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). One deployable API (`Host.Api`)
 hosts the modules; each module owns its own schema, its own use cases and its own public surface. Modules so far:
-[Expenses](docs/modules/expenses.md).
+[Expenses](docs/modules/expenses.md), [Gifts](docs/modules/gifts.md).
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
 - [Rules](docs/rules.md): the conventions every change follows; most are checked by tests.
 - [Decisions](docs/decisions/README.md): why it is built this way.
-- [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints).
+- [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints):
+  [Expenses](docs/modules/expenses.md), [Gifts](docs/modules/gifts.md).
+- [Feature specifications](docs/specs/README.md): the SDD of each feature, with its traceability and audit.
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
 ## Layout
@@ -17,14 +19,14 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 ```
 src/
   BuildingBlocks/   Result and Error, validation pipeline, outbox, persistence helpers, problem responses
-  Modules/          one folder per module, five projects each (Expenses)
+  Modules/          one folder per module, five projects each (Expenses, Gifts)
     <Name>/         <Name>.Api, .Application, .Contracts, .Domain, .Infrastructure
   Host/Host.Api/    Composition only: registers modules, middleware, OpenAPI
 tests/
   UnitTests/          domain rules and handlers, no database
   ArchitectureTests/  boundaries, layer dependencies, folder and naming rules, OpenAPI rules
   IntegrationTests/   the real API against PostgreSQL in Testcontainers
-docs/
+docs/               architecture, rules, decisions, modules, specs, contracts
 ```
 
 Package versions live in `Directory.Packages.props`, shared build settings in `Directory.Build.props` (nullable

@@ -17,6 +17,13 @@
     <Project Path="src/Modules/Expenses/Expenses.Domain/Expenses.Domain.csproj" />
     <Project Path="src/Modules/Expenses/Expenses.Infrastructure/Expenses.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Gifts/">
+    <Project Path="src/Modules/Gifts/Gifts.Api/Gifts.Api.csproj" />
+    <Project Path="src/Modules/Gifts/Gifts.Application/Gifts.Application.csproj" />
+    <Project Path="src/Modules/Gifts/Gifts.Contracts/Gifts.Contracts.csproj" />
+    <Project Path="src/Modules/Gifts/Gifts.Domain/Gifts.Domain.csproj" />
+    <Project Path="src/Modules/Gifts/Gifts.Infrastructure/Gifts.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
     <Project Path="tests/IntegrationTests/IntegrationTests.csproj" />
