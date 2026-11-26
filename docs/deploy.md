@@ -23,7 +23,9 @@ Settings → Secrets and variables → Actions:
 | `VITE_API_URL` | variable, optional | the API address; when not set, the address above is used |
 
 The API deploys through OIDC: GitHub gets a short-lived Azure token, with no passwords or publish profile (basic auth on
-the App Service is off, and that is fine). Sign-in is allowed only from this repository's `production` environment.
+the App Service is off, and that is fine). Sign-in is allowed only from this repository's `production` environment. GitHub puts the owner and repository ids into
+the token subject (`repo:Weretik@37252385/home-app@1473327384:...`), so the federated credential must use that exact
+form; a plain `repo:Weretik/home-app:...` subject fails with `AADSTS700213`.
 
 ### Once: sign-in from GitHub to Azure
 
@@ -38,7 +40,7 @@ az role assignment create --assignee "$APP_ID" --role "Website Contributor" \
 az ad app federated-credential create --id "$APP_ID" --parameters '{
   "name": "github-home-app-production",
   "issuer": "https://token.actions.githubusercontent.com",
-  "subject": "repo:Weretik/home-app:environment:production",
+  "subject": "repo:Weretik@37252385/home-app@1473327384:environment:production",
   "audiences": ["api://AzureADTokenExchange"]
 }'
 echo "AZURE_CLIENT_ID=$APP_ID"
