@@ -1,11 +1,11 @@
-# Решения (ADR)
+# Decisions (ADRs)
 
-Короткие записи о решениях, которые дорого менять. Формат свободный: контекст, решение, последствия, полстраницы.
-Новый файл: `NNNN-короткое-имя.md`, следующий номер по порядку.
+Short records of decisions that are expensive to change. Free format: context, decision, consequences, half a page.
+New file: `NNNN-short-name.md`, next number in order.
 
-| № | Решение | Статус |
+| # | Decision | Status |
 | --- | --- | --- |
-| [0001](0001-monorepo-simple-api.md) | Один репозиторий, API одним проектом | Принято |
-| [0002](0002-azure-free-hosting.md) | Хостинг на бесплатных тарифах Azure, деплой из GitHub Actions | Принято |
-| — | База данных: PostgreSQL, провайдер (Neon, Supabase, Azure) | Не решено |
-| — | Авторизация для двух пользователей | Не решено |
+| [0001](0001-monorepo-simple-api.md) | One repository, the API as a single project | Accepted |
+| [0002](0002-azure-free-hosting.md) | Hosting on Azure free tiers, deployment from GitHub Actions | Accepted |
+| — | Database: PostgreSQL, provider (Neon, Supabase, Azure) | Open |
+| — | Authentication for two users | Open |

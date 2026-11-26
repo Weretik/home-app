@@ -1,51 +1,53 @@
-# AGENTS.md: домашний сайт
+# AGENTS.md: home website
 
-Короткая точка входа для ИИ-агентов. Это маленький семейный проект: делай просто, без церемоний рабочих проектов.
-Фактическое устройство определяют код и `docs/`; читай только то, что нужно для задачи.
+A short entry point for AI agents. This is a small family project: keep things simple, without the ceremony of work
+projects. The code and `docs/` define how things actually work; read only what the task needs.
 
-## Продукт
+## Product
 
-Сайт для двух человек (Маша и Виталий) вместо Google Таблиц и Telegram-ботов: расходы, список покупок, дела
-(Маша / Виталий / Общее), список подарков. Пока есть только `/health` и страница проверки; авторизации и базы ещё нет,
-провайдер PostgreSQL не выбран. Сайт не публичный: не индексируется, SEO не нужно.
+A website for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping list,
+to-dos (Masha / Vitaliy / Shared), gift wishlist. So far there is only `/health` and a status page; there is no
+authentication or database yet, and the PostgreSQL provider is not chosen. The site is private: not indexed, no SEO.
 
-## Где что
+## Where things are
 
-- [Архитектура](docs/architecture.md): папки, как фронт ходит в API, конфигурация.
-- [Деплой](docs/deploy.md): Azure, workflow, какие секреты где лежат.
-- [Решения (ADR)](docs/decisions/README.md): почему так. Новое долгоживущее решение (база, авторизация, хостинг,
-  новая библиотека состояния) получает короткий ADR в той же правке.
+- [Architecture](docs/architecture.md): folders, how the front calls the API, configuration.
+- [Deployment](docs/deploy.md): Azure, workflows, which secrets live where.
+- [Decisions (ADRs)](docs/decisions/README.md): why things are the way they are. A new lasting decision (database,
+  authentication, hosting, a new state library) gets a short ADR in the same change.
 
-## Команды
+## Commands
 
-- API: `cd api && dotnet build HomeApp.slnx && dotnet test HomeApp.slnx` (быстро, без Docker).
-- Фокусный тест: `dotnet test HomeApp.slnx --filter "FullyQualifiedName~<Имя>"`.
-- Web: `cd web && npm run typecheck && npm test && npm run format:check`; `npm run format` чинит стиль.
+- API: `cd api && dotnet build HomeApp.slnx && dotnet test HomeApp.slnx` (fast, no Docker).
+- Focused test: `dotnet test HomeApp.slnx --filter "FullyQualifiedName~<Name>"`.
+- Web: `cd web && npm run typecheck && npm test && npm run format:check`; `npm run format` fixes style.
 
-## Правила
+## Rules
 
-**API (`api/`).** Один проект `HomeApp.Api`. Код делится по фичам: `Features/<Область>/` (`Expenses`, `Shopping`,
-`Todos`, `Gifts`), внутри эндпоинты, модель и работа с базой рядом. Общая обвязка (CORS, health, база) в `Platform/`.
-Minimal API, эндпоинты группируются через `MapGroup("/api/<область>")`. Ошибки отдаются как ProblemDetails.
-Модулей с пятью проектами, медиатора, outbox и Result-типов здесь нет; добавлять их только если станет реально нужно,
-с ADR.
+**Language.** All documentation, comments and commit messages are in English. User-facing UI text is in Russian.
 
-**Web (`web/`).** Код по фичам: `src/features/<область>/`, обвязка приложения в `src/app/`, клиент API и окружение
-в `src/platform/`. В API ходим только через `src/platform/api-client.ts`, без прямого `fetch` в компонентах. Никаких
-секретов во фронте: всё из `VITE_*` попадает в сборку. Сборка остаётся обычной статикой Vite без привязки к Azure.
+**API (`api/`).** One project, `HomeApp.Api`. Code is split by feature: `Features/<Area>/` (`Expenses`, `Shopping`,
+`Todos`, `Gifts`), with endpoints, model and data access side by side. Shared wiring (CORS, health, database) lives in
+`Platform/`. Minimal APIs, endpoints grouped with `MapGroup("/api/<area>")`. Errors are returned as ProblemDetails.
+There are no five-project modules, mediator, outbox or Result types here; add them only when truly needed, with an ADR.
 
-**Папки.** Не больше 6 файлов кода в папке (тесты рядом не считаются); седьмой файл значит, что папку пора разделить
-по смыслу. Без папок-свалок `utils`, `helpers`, `common`, `shared`; называй файлы по тому, что они делают.
+**Web (`web/`).** Code by feature: `src/features/<area>/`, app wiring in `src/app/`, the API client and environment in
+`src/platform/`. Call the API only through `src/platform/api-client.ts`, never with a raw `fetch` in components. No
+secrets in the front: everything in `VITE_*` ends up in the build. The build stays a plain Vite static build with no
+ties to Azure.
 
-**Конфигурация и секреты.** Настройки через `appsettings.json` и переменные окружения (`Cors__Origins__0`,
-`ConnectionStrings__Default`). Секреты: локально `dotnet user-secrets`, в Azure переменные App Service, в CI секреты
-GitHub Actions. В репозиторий секреты не коммитятся.
+**Folders.** At most 6 code files per folder (tests next to them do not count); a seventh file means the folder should
+be split by meaning. No dump folders such as `utils`, `helpers`, `common`, `shared`; name files after what they do.
 
-**Тесты.** На каждый эндпоинт хотя бы один тест через `WebApplicationFactory`; на логику фронта тест на Vitest и
-Testing Library. Полный E2E не нужен.
+**Configuration and secrets.** Settings come from `appsettings.json` and environment variables (`Cors__Origins__0`,
+`ConnectionStrings__Default`). Secrets: locally in `dotnet user-secrets`, in Azure as App Service environment variables,
+in CI as GitHub Actions secrets. Secrets are never committed.
 
-**Объём работы.** Маленькая правка, которая чинит поведение, не требует спецификации: поправь, прогони тест, коротко
-опиши. Для новой области (например, «расходы») сначала короткий план в задаче или PR, отдельный SDD не нужен.
+**Tests.** Every endpoint has at least one test through `WebApplicationFactory`; front logic is tested with Vitest and
+Testing Library. No full E2E suite.
 
-**Git.** Коммиты, push, ветки и PR только по прямой просьбе. Чужие незакоммиченные изменения не трогай. Деплой идёт
-автоматически из `main`, поэтому в `main` попадает только то, что проходит проверки.
+**Scope of work.** A small fix that restores behavior needs no spec: fix it, run the test, describe it briefly. A new
+area (for example, "expenses") starts with a short plan in the task or PR; no separate SDD.
+
+**Git.** Commits, pushes, branches and PRs only on direct request. Leave other people's uncommitted changes alone.
+`main` deploys automatically, so only changes that pass the checks go to `main`.

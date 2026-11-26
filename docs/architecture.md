@@ -1,48 +1,48 @@
-# Архитектура
+# Architecture
 
 ```mermaid
 flowchart LR
-  browser[Браузер] -->|статика| swa[Azure Static Web App<br/>web/dist]
+  browser[Browser] -->|static files| swa[Azure Static Web App<br/>web/dist]
   browser -->|fetch VITE_API_URL| api[Azure App Service<br/>HomeApp.Api]
-  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>провайдер не выбран)]
+  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>provider not chosen)]
 ```
 
-Фронт и API живут на разных адресах. Фронт собирается в статику и вызывает API по полному адресу из `VITE_API_URL`
-(подставляется при сборке). API разрешает этот origin через CORS (`Cors:Origins`). Бесплатный Static Web App не умеет
-проксировать запросы в отдельный App Service, поэтому так.
+The front and the API live on different hosts. The front is built into static files and calls the API by the full
+address from `VITE_API_URL` (substituted at build time). The API allows that origin through CORS (`Cors:Origins`). A
+free Static Web App cannot proxy requests to a separate App Service, which is why it works this way.
 
 ## API (`api/`)
 
 ```
 api/
-  HomeApp.slnx, global.json, Directory.*.props   один SDK и версии пакетов на всё решение
-  compose.yaml                                     локальный PostgreSQL
+  HomeApp.slnx, global.json, Directory.*.props   one SDK and package versions for the whole solution
+  compose.yaml                                     local PostgreSQL
   src/HomeApp.Api/
-    Program.cs                                     сборка приложения
-    Platform/                                      CORS, health, проверка базы
-    Features/<Область>/                            появится с первой фичей
-  tests/HomeApp.Api.Tests/                         тесты через WebApplicationFactory
+    Program.cs                                     application setup
+    Platform/                                      CORS, health, database check
+    Features/<Area>/                               appears with the first feature
+  tests/HomeApp.Api.Tests/                         tests through WebApplicationFactory
 ```
 
-`GET /health` отдаёт JSON: `status`, `version` (версия сборки с коммитом), `environment` и `checks`. Проверка базы
-включается, только если задан `ConnectionStrings:Default`; без строки подключения API работает и считается здоровым.
-OpenAPI-документ доступен на `/openapi/v1.json` только в Development.
+`GET /health` returns JSON: `status`, `version` (build version with the commit), `environment` and `checks`. The
+database check is on only when `ConnectionStrings:Default` is set; without a connection string the API works and
+reports healthy. The OpenAPI document is served at `/openapi/v1.json` in Development only.
 
 ## Web (`web/`)
 
 ```
 web/
-  src/main.tsx                 точка входа
-  src/app/                     App, глобальные стили
-  src/platform/api-client.ts   единственное место, где фронт делает fetch к API
-  src/features/health/         проверка связи с API
-  public/staticwebapp.config.json   fallback на index.html для SPA (на другом хостинге просто игнорируется)
+  src/main.tsx                 entry point
+  src/app/                     App, global styles
+  src/platform/api-client.ts   the only place where the front fetches from the API
+  src/features/health/         API connection check
+  public/staticwebapp.config.json   SPA fallback to index.html (other hosts simply ignore it)
 ```
 
-## Конфигурация
+## Configuration
 
-| Настройка | Где задаётся | Пример |
+| Setting | Where it is set | Example |
 | --- | --- | --- |
-| `Cors:Origins` | `appsettings.Development.json`, в Azure `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` |
-| `ConnectionStrings:Default` | локально `appsettings.Development.json` или user-secrets, в Azure переменная App Service | `Host=...;Database=home;Username=...;Password=...` |
-| `VITE_API_URL` | `web/.env.local`, в CI переменная репозитория (по умолчанию адрес API) | `http://localhost:5000` |
+| `Cors:Origins` | `appsettings.Development.json`, in Azure `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` |
+| `ConnectionStrings:Default` | locally `appsettings.Development.json` or user-secrets, in Azure an App Service variable | `Host=...;Database=home;Username=...;Password=...` |
+| `VITE_API_URL` | `web/.env.local`; in CI a repository variable or secret (defaults to the API address) | `http://localhost:5000` |

@@ -1,49 +1,50 @@
-# Дом
+# Home
 
-Семейный сайт вместо таблиц Google и ботов на Apps Script: расходы, список покупок, дела (Маша, Виталий, общее) и
-список подарков. Сейчас в репозитории только каркас: API с `/health` и страница, которая его вызывает.
+A family website that replaces Google Sheets and Apps Script Telegram bots: expenses, shopping list, to-dos (Masha,
+Vitaliy, shared) and a gift wishlist. For now the repository holds only the scaffold: an API with `/health` and a page
+that calls it.
 
-**Стек:** .NET 10 · ASP.NET Core · PostgreSQL (провайдер ещё не выбран) · React 19 · Vite · TypeScript
+**Stack:** .NET 10 · ASP.NET Core · PostgreSQL (provider not chosen yet) · React 19 · Vite · TypeScript
 
 ```
-api/    ASP.NET Core API, один проект, фичи по папкам (api/src/HomeApp.Api/Features/<Область>/)
-web/    React + Vite, обычная статическая сборка в web/dist
-docs/   Архитектура, деплой, решения (ADR)
+api/    ASP.NET Core API, one project, features in folders (api/src/HomeApp.Api/Features/<Area>/)
+web/    React + Vite, a plain static build into web/dist
+docs/   Architecture, deployment, decisions (ADRs)
 ```
 
-`api/` и `web/` не зависят друг от друга: фронт знает только адрес API (`VITE_API_URL`), API разрешает origin фронта
-через CORS. У каждой половины свой workflow, он запускается только когда меняется её папка.
+`api/` and `web/` do not depend on each other: the front only knows the API address (`VITE_API_URL`), and the API
+allows the front's origin through CORS. Each half has its own workflow that runs only when its folder changes.
 
-| | Где |
+| | Where |
 | --- | --- |
-| Как устроено | [docs/architecture.md](docs/architecture.md) |
-| Деплой и секреты | [docs/deploy.md](docs/deploy.md) |
-| Решения | [docs/decisions/README.md](docs/decisions/README.md) |
-| Правила для ИИ-агентов | [AGENTS.md](AGENTS.md) |
+| How it works | [docs/architecture.md](docs/architecture.md) |
+| Deployment and secrets | [docs/deploy.md](docs/deploy.md) |
+| Decisions | [docs/decisions/README.md](docs/decisions/README.md) |
+| Rules for AI agents | [AGENTS.md](AGENTS.md) |
 
-## Запуск локально
+## Run locally
 
-Нужны .NET 10 SDK, Node.js 22 и Docker (для базы).
+You need the .NET 10 SDK, Node.js 22 and Docker (for the database).
 
 ```bash
-# База (необязательно: без неё /health покажет database: Unhealthy)
+# Database (optional: without it /health reports database: Unhealthy)
 cd api
 docker compose up -d
 
-# API на http://localhost:5000
+# API on http://localhost:5000
 dotnet run --project src/HomeApp.Api
 
-# Фронт на http://localhost:5173 (во втором терминале)
+# Front on http://localhost:5173 (in a second terminal)
 cd web
 cp .env.example .env.local
 npm ci
 npm run dev
 ```
 
-Секреты локально хранятся в `dotnet user-secrets` (`cd api/src/HomeApp.Api && dotnet user-secrets set "Ключ" "значение"`),
-в репозиторий они не попадают.
+Local secrets live in `dotnet user-secrets` (`cd api/src/HomeApp.Api && dotnet user-secrets set "Key" "value"`) and
+never reach the repository.
 
-## Проверки
+## Checks
 
 ```bash
 cd api && dotnet test HomeApp.slnx

@@ -1,18 +1,19 @@
-# 0002. Хостинг на бесплатных тарифах Azure
+# 0002. Hosting on Azure free tiers
 
-**Статус:** принято, 2026-11-26
+**Status:** accepted, 2026-11-26
 
-## Решение
+## Decision
 
 - API: App Service F1 Linux `vitaliy-home-api` (Poland Central), .NET 10.
-- Фронт: Static Web App Free `home-web`.
-- Деплой из GitHub Actions: API через OIDC (`azure/login`, без паролей), фронт через deployment token.
-- Фронт вызывает API по полному адресу (`VITE_API_URL`), API разрешает origin фронта через CORS: бесплатный Static Web
-  App не умеет связываться с отдельным App Service.
-- Секреты: переменные App Service и секреты GitHub Actions, локально `dotnet user-secrets`.
+- Front: Static Web App Free `home-web`.
+- Deployment from GitHub Actions: the API through OIDC (`azure/login`, no passwords), the front through a deployment
+  token.
+- The front calls the API by its full address (`VITE_API_URL`) and the API allows the front's origin through CORS: a
+  free Static Web App cannot link to a separate App Service.
+- Secrets: App Service variables and GitHub Actions secrets, locally `dotnet user-secrets`.
 
-## Последствия
+## Consequences
 
-Платить ничего не нужно. Цена: холодный старт API после простоя, лимит CPU в сутки, деплой без слотов. Фронт не
-использует ничего специфичного для Azure, кроме `staticwebapp.config.json`, поэтому его можно перенести на любой
-статический хостинг, поменяв только workflow.
+Nothing to pay. The cost: a cold start of the API after idle time, a daily CPU limit, and deployments without slots.
+The front uses nothing Azure-specific except `staticwebapp.config.json`, so it can move to any static host by changing
+only the workflow.
