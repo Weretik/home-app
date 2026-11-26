@@ -64,7 +64,7 @@ export function AppLayout() {
             },
           }}
         >
-          <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+          <Box sx={{ maxWidth: 1600 }}>
             <Outlet />
           </Box>
         </Box>
