@@ -48,6 +48,23 @@ export function GiftTableRow({
         >
           <GiftName gift={gift} />
         </TableCell>
+        <TableCell>
+          {count > 0 && (
+            <Button
+              size="small"
+              aria-label={`Варианты: ${count}`}
+              aria-expanded={open}
+              aria-controls={open ? variantsId : undefined}
+              onClick={() => setOpen((value) => !value)}
+              endIcon={
+                open ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />
+              }
+              sx={{ minWidth: 0 }}
+            >
+              {count}
+            </Button>
+          )}
+        </TableCell>
         <TableCell>{gift.categoryName}</TableCell>
         {isActive && (
           <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -69,23 +86,6 @@ export function GiftTableRow({
           {isActive
             ? formatOccasion(gift.occasion, gift.occasionDate)
             : formatOutcome(gift)}
-        </TableCell>
-        <TableCell>
-          {count > 0 && (
-            <Button
-              size="small"
-              aria-label={`Варианты: ${count}`}
-              aria-expanded={open}
-              aria-controls={open ? variantsId : undefined}
-              onClick={() => setOpen((value) => !value)}
-              endIcon={
-                open ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />
-              }
-              sx={{ minWidth: 0 }}
-            >
-              {count}
-            </Button>
-          )}
         </TableCell>
         <TableCell padding="checkbox" sx={{ pr: 1 }}>
           <GiftActions

@@ -60,11 +60,11 @@ describe('GiftTable', () => {
     renderTable();
     expect(headers()).toEqual([
       'Подарок',
+      'Варианты',
       'Категория',
       'Приоритет',
       'Цена',
       'Повод',
-      'Варианты',
       '',
     ]);
     const row = screen.getByRole('row', { name: /Серьги с топазом/ });
@@ -180,10 +180,10 @@ describe('GiftTable', () => {
     });
     expect(headers()).toEqual([
       'Подарок',
+      'Варианты',
       'Категория',
       'Цена',
       'Итог',
-      'Варианты',
       '',
     ]);
     expect(screen.getByText('Подарено 26 ноября 2026')).toBeInTheDocument();

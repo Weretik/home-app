@@ -231,7 +231,7 @@ Given gifted and dropped wishes
 When the person opens «Подаренные»
 Then the gifts show in a block per person like «Список», the newest gifted first in a block, each gifted one shows
 its date in «Итог», dropped ones are marked «Не актуально»
-And the recipient and category filters work like in «Список»; an empty archive says «Здесь появятся подаренные
+And the recipient, category and priority filters work like in «Список»; an empty archive says «Здесь появятся подаренные
 подарки»
 
 ### SC-017 — Looking through variants
@@ -250,7 +250,7 @@ And tapping again folds it
 
 Given «Список» filtered to «Маша»
 When the person switches to «Подаренные»
-Then the recipient and category filters stay
+Then the recipient, category and priority filters stay
 And the gear «Настройки» at the end of the tabs opens the settings, tinted while open, without filters
 
 ### SC-019 — «Нюансы» in the settings

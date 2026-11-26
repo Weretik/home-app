@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import type { Recipient } from '../data/gifts-api';
+import type { GiftPriority, Recipient } from '../data/gifts-api';
 import { parseFilters, type GiftFilters } from './gift-filters';
 
 export interface GiftFilterState {
@@ -7,12 +7,13 @@ export interface GiftFilterState {
   isFiltered: boolean;
   setRecipient: (value: Recipient | undefined) => void;
   setCategory: (value: string | undefined) => void;
-  /** Removes both filters and keeps any other param. */
+  setPriority: (value: GiftPriority | undefined) => void;
+  /** Removes all the filters and keeps any other param. */
   clear: () => void;
 }
 
 /**
- * The list filters in the URL (`?recipient=&category=`), so a link, a reload or «Назад» keeps them (web ADR 0006).
+ * The list filters in the URL (`?recipient=&category=&priority=`), so a link, a reload or «Назад» keeps them (web ADR 0006).
  * A change replaces the history entry instead of adding one. `categoryIds` drops a category that does not exist.
  */
 export function useGiftFilters(
@@ -36,9 +37,17 @@ export function useGiftFilters(
 
   return {
     filters,
-    isFiltered: Boolean(filters.recipient || filters.categoryId),
+    isFiltered: Boolean(
+      filters.recipient || filters.categoryId || filters.priority,
+    ),
     setRecipient: (value) => update({ recipient: value }),
     setCategory: (value) => update({ category: value }),
-    clear: () => update({ recipient: undefined, category: undefined }),
+    setPriority: (value) => update({ priority: value }),
+    clear: () =>
+      update({
+        recipient: undefined,
+        category: undefined,
+        priority: undefined,
+      }),
   };
 }

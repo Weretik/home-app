@@ -138,8 +138,8 @@ Changes against the first plan:
 - Theme «Синий плащ», tokens only, light and dark both designed ([design rules](../../../../design.md)).
 - Gift lists (design.md «Gift lists», changed 2026-11-26 after the first review: cards were inconvenient): the tabs
   follow the Expenses pattern, a table from `md` and a compact list below it, each row ending with «⋮». Table columns:
-  Подарок (name, link icon, notes), Категория, Приоритет («Список»), Цена, Повод or Итог, Варианты (count → a sub-row
-  with the links), the quick status button and «⋮». Phone: name and price, the category, small chips (priority or
+  Подарок (name, link icon, notes), Варианты (count → a sub-row with the links; moved next to the name on review),
+  Категория, Приоритет («Список»), Цена, Повод or Итог, the quick status button and «⋮». Phone: name and price, the category, small chips (priority or
   outcome, occasion), «N вариантов» → a `Collapse`; every action in «⋮».
 - Person colours (design.md «Person colours», an explicit exception to «info is status only», like signed amounts):
   Виталий `primary`, Маша `secondary`, Вместе `info`, in `gifts/display/recipient-tones.ts`; the home summary keeps its
