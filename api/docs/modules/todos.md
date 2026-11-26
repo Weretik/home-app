@@ -109,8 +109,9 @@ Schema `todos`, migration history in `todos.__ef_migrations_history`. Migration:
 Enum values are stored exactly as the C# names above (`Maria`, `InProgress`, `Urgent`, …).
 
 The `Initial` migration creates `pg_trgm` (`CREATE EXTENSION IF NOT EXISTS`; it is a trusted extension, so the
-database owner may create it). If the host refuses, the migration logs a notice and skips the trigram index; the
-search still works, without the index.
+database owner may create it). If the host refuses for any reason (the production database answered
+`3F000 no schema has been selected to create in` to the Shopping migration), the migration logs a notice and skips the
+trigram index; the search still works, without the index.
 
 Seeded categories (fixed ids, `CategorySeed`):
 
