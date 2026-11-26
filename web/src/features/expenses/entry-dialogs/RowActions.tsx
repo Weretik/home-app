@@ -6,17 +6,31 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+
+/** One more step a row offers before «Изменить» and «Удалить»: «Записать как расход». */
+export interface RowAction {
+  label: string;
+  icon: ReactNode;
+  onClick: () => void;
+}
 
 interface RowActionsProps {
   /** What the row is, for the button's label: «Продукты, 1 234,50 ₴». */
   label: string;
   onEdit: () => void;
   onDelete: () => void;
+  /** Shown first in the menu. */
+  extra?: RowAction;
 }
 
-/** The «⋮» button of a list row with «Изменить» and «Удалить». */
-export function RowActions({ label, onEdit, onDelete }: RowActionsProps) {
+/** The «⋮» button of a list row with «Изменить» and «Удалить», and an optional step of its own first. */
+export function RowActions({
+  label,
+  onEdit,
+  onDelete,
+  extra,
+}: RowActionsProps) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const pick = (action: () => void) => () => {
     setAnchor(null);
@@ -41,6 +55,12 @@ export function RowActions({ label, onEdit, onDelete }: RowActionsProps) {
         open={Boolean(anchor)}
         onClose={() => setAnchor(null)}
       >
+        {extra && (
+          <MenuItem onClick={pick(extra.onClick)}>
+            <ListItemIcon>{extra.icon}</ListItemIcon>
+            {extra.label}
+          </MenuItem>
+        )}
         <MenuItem onClick={pick(onEdit)}>
           <ListItemIcon>
             <EditOutlinedIcon fontSize="small" />

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ExpensesPage } from '../../features/expenses/expense-list/ExpensesPage';
+import { ForecastPage } from '../../features/expenses/forecast-page/ForecastPage';
 import { IncomesPage } from '../../features/expenses/income-list/IncomesPage';
 import { SavingsPage } from '../../features/expenses/savings-page/SavingsPage';
 import { ExpensesSection } from '../../features/expenses/section/ExpensesSection';
@@ -18,6 +19,7 @@ export function App() {
           <Route index element={<ExpensesPage />} />
           <Route path="incomes" element={<IncomesPage />} />
           <Route path="savings" element={<SavingsPage />} />
+          <Route path="forecast" element={<ForecastPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
         <Route path="/shopping" element={<ComingSoonPage title="Покупки" />} />

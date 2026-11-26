@@ -3,15 +3,12 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { useId, useState } from 'react';
-import { formatAmount } from '../data/formatting';
-import { formatMonth, type Month } from '../data/month';
+import type { Month } from '../data/month';
 import type { SavingsMonthSummary } from '../data/savings-api';
-import { SignedAmount } from './SignedAmount';
+import { SavingsMonthRow } from './SavingsMonthRow';
 
 /** Months shown before «Показать все». */
 const FIRST_MONTHS = 12;
@@ -71,55 +68,14 @@ export function SavingsMonthsCard({
         </Typography>
       ) : (
         <List disablePadding aria-label="Копилка по месяцам">
-          {shown.map((month) => {
-            const isOpen =
-              month.year === open.year && month.month === open.month;
-            return (
-              <ListItemButton
-                key={`${month.year}-${month.month}`}
-                selected={isOpen}
-                aria-current={isOpen ? 'true' : undefined}
-                onClick={() => onOpen({ year: month.year, month: month.month })}
-                sx={{ gap: 2, alignItems: 'flex-start' }}
-              >
-                <ListItemText
-                  sx={{ my: 0 }}
-                  primary={formatMonth(month)}
-                  secondary={
-                    <Box
-                      component="span"
-                      sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}
-                    >
-                      <SignedAmount
-                        component="span"
-                        variant="body2"
-                        value={month.deposits}
-                      />
-                      <SignedAmount
-                        component="span"
-                        variant="body2"
-                        value={-month.withdrawals}
-                      />
-                    </Box>
-                  }
-                />
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    на конец
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {formatAmount(month.balanceAtEnd)}
-                  </Typography>
-                </Box>
-              </ListItemButton>
-            );
-          })}
+          {shown.map((month) => (
+            <SavingsMonthRow
+              key={`${month.year}-${month.month}`}
+              month={month}
+              isOpen={month.year === open.year && month.month === open.month}
+              onOpen={onOpen}
+            />
+          ))}
         </List>
       )}
       {!showAll && months && months.length > FIRST_MONTHS && (

@@ -18,9 +18,11 @@ export interface ExpenseFormValues {
   amount: string;
   paymentMethod: PaymentMethod;
   comment: string;
+  /** «Не в лимиты»: counts in the month's totals, not in any limit or carry-over. */
+  outsideLimits: boolean;
 }
 
-/** The form of an existing expense, or a new one: shared, by card, on `newDate` (the page's default date). */
+/** The form of an existing expense, or a new one: shared, by card, within the limits, on `newDate` (the page's default date). */
 export function expenseFormValues(
   item: ExpenseItem | undefined,
   newDate: string,
@@ -33,6 +35,7 @@ export function expenseFormValues(
         amount: amountText(item.amount),
         paymentMethod: item.paymentMethod,
         comment: item.comment ?? '',
+        outsideLimits: item.outsideLimits,
       }
     : {
         date: newDate,
@@ -41,6 +44,7 @@ export function expenseFormValues(
         amount: '',
         paymentMethod: 'Card',
         comment: '',
+        outsideLimits: false,
       };
 }
 
@@ -61,5 +65,6 @@ export function toExpenseRequest(values: ExpenseFormValues): ExpenseRequest {
     amount: parseAmount(values.amount) ?? 0,
     paymentMethod: values.paymentMethod,
     comment: commentValue(values.comment),
+    outsideLimits: values.outsideLimits,
   };
 }

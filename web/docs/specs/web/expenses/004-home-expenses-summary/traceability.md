@@ -1,0 +1,10 @@
+# Home expenses summary — traceability (retroactive)
+
+| Scenario  | Rules          | Code                                     | Test level | Tests                                                                                                                                                           | Status   |
+| --------- | -------------- | ---------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| SC-W4-001 | R-W4-001       | `page/`                                  | component  | `HomePage.test.tsx` «opens the expenses summary in the switcher, other sections are coming»                                                                     | verified |
+| SC-W4-002 | R-W4-003 … 005 | `expenses-summary/overview/`, `figures/` | component  | «shows the month figures, the limits and who spent what»                                                                                                        | verified |
+| SC-W4-003 | R-W4-002       | `use-month-param.ts`                     | component  | «loads the next month from the arrows»                                                                                                                          | verified |
+| SC-W4-004 | R-W4-002       | `ExpensesSummary.tsx`                    | component  | «says why the summary did not load and offers to retry»                                                                                                         | verified |
+| SC-W4-005 | R-W4-004       | `limit-rows.ts`                          | unit       | `limit-rows.test.ts` «adds the ИТОГО row from all expenses against the monthly limit», «leaves the comparison out without a monthly limit or outside the month» | verified |
+| SC-W4-006 | R-W4-004       | `limit-rows.ts`, `LimitFill.tsx`         | unit       | «labels quarterly limits and colours the fill by how much is spent»                                                                                             | verified |

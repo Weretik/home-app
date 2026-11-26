@@ -1,6 +1,6 @@
 # 0007. Editing in dialogs, with an Idempotency-Key, If-Match versions and signed colours
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; the invalidation bullet is amended by [0009](0009-writes-refresh-their-backend-module.md)
 
 ## Context
 
@@ -16,7 +16,7 @@ taken out.
 - Add and edit open a dialog over the list (full screen on a phone); delete asks in a small confirmation dialog. Rows
   get a «⋮» menu with «Изменить» and «Удалить». No separate edit pages or routes: the list and its month stay in view.
 - Writes are React Query mutations in the feature's `data/writes-api.ts`. A success invalidates the queries of that
-  kind of entry; a 404 or `expenses.changed_meanwhile` also reloads them and the form says so in Russian.
+  kind of entry (since [0009](0009-writes-refresh-their-backend-module.md): every query of the module); a 404 or `expenses.changed_meanwhile` also reloads them and the form says so in Russian.
 - A create sends an `Idempotency-Key`. One key belongs to one opened form and to one set of data: a retry of the same
   data reuses it, changed data takes a new one, and a form opened again starts with a new one (`useIdempotencyKey`).
 - An edit sends the `version` of the row the list showed in `If-Match`. The client never resolves a conflict itself:

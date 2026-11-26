@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useId } from 'react';
-import { describeWriteError } from '../data/writes-api';
+import { describeWriteError } from '../write-data/write-errors-api';
 
 interface DeleteEntryDialogProps {
   title: string;

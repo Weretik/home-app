@@ -26,3 +26,11 @@ export function formatExact(value: number): string {
 /** A share in whole percent, 0 when there is nothing to compare with. */
 export const percentOf = (part: number, total: number) =>
   total > 0 ? Math.round((part / total) * 100) : 0;
+
+/**
+ * How much of the savings goal the jar holds, in whole percent rounded down (100 only once the goal is reached), never
+ * below 0, 0 without a goal. The same rule as `goalPercent` of «План копилки» on «Копилка»
+ * (`expenses/savings-goal/goal-progress.ts`); features never import each other, so both sides test the same cases.
+ */
+export const goalPercentOf = (balance: number, goal: number) =>
+  goal > 0 ? Math.max(0, Math.floor((balance / goal) * 100)) : 0;

@@ -12,7 +12,7 @@ const today = new Intl.DateTimeFormat('ru-RU', {
 });
 
 /**
- * Главная: one section's summary at a time, picked with the switcher (`?s=`). Today only «Расходы» has one; the
+ * Главная: one section's summary at a time, picked with the switcher (`?s=`). Today only «Бюджет» has one; the
  * others join through `summary-sections.ts`. The service page «Состояние» is linked below for phones, which have no
  * side menu.
  */
