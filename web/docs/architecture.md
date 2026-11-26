@@ -35,13 +35,14 @@ When a feature grows past six files it splits by meaning (`list/`, `editor/`, `d
 
 ## Routes
 
-| Path                            | Page                                                             | Feature                 |
-| ------------------------------- | ---------------------------------------------------------------- | ----------------------- |
-| `/`                             | Главная, the dashboard                                           | `home`                  |
-| `/expenses`                     | Расходы: the month's expenses, total, category and «Кто» filters | `expenses/expense-list` |
-| `/expenses/incomes`             | Доходы: the month's incomes, total, «Кто» filter                 | `expenses/income-list`  |
-| `/shopping`, `/todos`, `/gifts` | «Раздел скоро появится» placeholder                              | `home/ComingSoonPage`   |
-| `/status`                       | Состояние: API and database status                               | `status`                |
+| Path                            | Page                                                                                 | Feature                 |
+| ------------------------------- | ------------------------------------------------------------------------------------ | ----------------------- |
+| `/`                             | Главная, the dashboard                                                               | `home`                  |
+| `/expenses`                     | Расходы: the month's expenses, category and «Кто» filters, add / edit / delete       | `expenses/expense-list` |
+| `/expenses/incomes`             | Доходы: the month's incomes, «Кто» filter, add / edit / delete                       | `expenses/income-list`  |
+| `/expenses/savings`             | Копилка: the balance now, the month's movements with add / edit / delete, the months | `expenses/savings-page` |
+| `/shopping`, `/todos`, `/gifts` | «Раздел скоро появится» placeholder                                                  | `home/ComingSoonPage`   |
+| `/status`                       | Состояние: API and database status                                                   | `status`                |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
 
@@ -51,19 +52,34 @@ Pages of the old expenses Google Sheet, as tabs of one section ([ADR 0006](decis
 
 ```
 expenses/
-  data/           expenses-api.ts (React Query hooks), month and amount formatting, Russian enum labels
-  section/        ExpensesSection (title, month picker, tabs, <Outlet />), the list of pages
-  url-state/      the month (?year=&month=) and filters (?category=&payer=, ?person=) in the URL
-  month-view/     parts every month page uses: total card, filter select, loading/empty/error, «Показать ещё»
-  expense-list/   «Расходы» page: filters, phone list, computer table
-  income-list/    «Доходы» page: filter, phone list, computer table
+  data/             expenses-api.ts and savings-api.ts (React Query reads), writes-api.ts (save / delete mutations,
+                    the Idempotency-Key hook, Russian text of a failed write), formatting (signed amounts too),
+                    Russian enum labels, months
+  section/          ExpensesSection (title, month picker, tabs, <Outlet />), the list of pages
+  url-state/        the month (?year=&month=) and filters (?category=&payer=, ?person=) in the URL
+  month-view/       parts every month page uses: filter select, loading/empty/error, «Показать ещё»
+  entry-editing/    form logic shared by every entry: field checks, default date, the open-dialog state, useEntryForm
+  entry-dialogs/    the add / edit dialog frame, the delete confirmation, the row «⋮» menu, amount and person fields
+  expense-list/     «Расходы» page: filters, «Добавить расход», phone list, computer table
+  expense-editing/  the expense form (values ↔ request) and its dialogs
+  income-list/      «Доходы» page: filter, «Добавить доход», phone list, computer table
+  income-editing/   the income form and its dialogs
+  savings-page/     «Копилка» page: balance card, movements (phone list, computer table), «По месяцам», signed amounts
+  savings-editing/  the savings form (direction + positive amount → signed request) and its dialogs
 ```
 
 - The month defaults to the current one; the arrows change `?year=&month=`, so a link opens the same month.
-- Lists load 50 rows a page with `useInfiniteQuery` and «Показать ещё»; the total comes from the API for the whole
-  filtered month, not the loaded rows.
+- Lists load 50 rows a page with `useInfiniteQuery` and «Показать ещё». The Расходы and Доходы pages show no month
+  total; an overall summary will be a page of its own.
+- Expenses, incomes and savings movements are added, changed and deleted in dialogs
+  ([ADR 0007](decisions/0007-editing-in-dialogs-with-idempotency-and-versions.md)): a create sends an
+  `Idempotency-Key` (one per opened form, kept while the same data is retried), an edit sends the row's `version` in
+  `If-Match`, and a delete asks first. A success invalidates the kind's queries (`['expenses', 'list']`,
+  `['expenses', 'incomes']`, `['expenses', 'savings']`); a 404 or `expenses.changed_meanwhile` reloads them too.
+- «Копилка» shows the jar's balance today (`/api/expenses/savings/months`), the open month's movements with its
+  start / in / out / end figures (`/api/expenses/savings`), and every month; a month in that list opens it.
 - Below `md` a list is a compact MUI `List`; from `md` it is a `Table` (`useMediaQuery`).
-- A new page (Обзор, Лимиты, План, Платежи, По месяцам, Копилка, Категории) is an entry in
+- A new page (Обзор, Лимиты, План, Платежи, По месяцам, Категории) is an entry in
   `section/expenses-pages.ts`, a nested route in `App.tsx` and its own folder.
 
 ## API client (`src/api-client`)

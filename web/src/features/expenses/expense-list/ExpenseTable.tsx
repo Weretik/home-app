@@ -7,6 +7,8 @@ import TableRow from '@mui/material/TableRow';
 import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
+import { RowActions } from '../entry-dialogs/RowActions';
+import type { RowHandlers } from '../entry-editing/use-entry-editor';
 
 const amountCell = {
   whiteSpace: 'nowrap',
@@ -14,7 +16,11 @@ const amountCell = {
 } as const;
 
 /** Expenses as a table, for a computer. */
-export function ExpenseTable({ items }: { items: ExpenseItem[] }) {
+export function ExpenseTable({
+  items,
+  onEdit,
+  onDelete,
+}: { items: ExpenseItem[] } & RowHandlers<ExpenseItem>) {
   return (
     <TableContainer>
       <Table size="small" aria-label="Расходы за месяц">
@@ -26,6 +32,7 @@ export function ExpenseTable({ items }: { items: ExpenseItem[] }) {
             <TableCell align="right">Сумма</TableCell>
             <TableCell>Оплата</TableCell>
             <TableCell>Комментарий</TableCell>
+            <TableCell padding="checkbox" aria-label="Действия" />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -42,6 +49,13 @@ export function ExpenseTable({ items }: { items: ExpenseItem[] }) {
               <TableCell>{paymentMethodLabels[item.paymentMethod]}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>
                 {item.comment}
+              </TableCell>
+              <TableCell padding="checkbox">
+                <RowActions
+                  label={`${item.categoryName}, ${formatAmount(item.amount)}`}
+                  onEdit={() => onEdit(item)}
+                  onDelete={() => onDelete(item)}
+                />
               </TableCell>
             </TableRow>
           ))}

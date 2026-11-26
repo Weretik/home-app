@@ -2,7 +2,9 @@ using System.Globalization;
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
 using Expenses.Application.Features.Imports.SheetFormat;
+using Expenses.Application.Features.Imports.SheetFormat.Rows;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Savings;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,10 +21,14 @@ public sealed class ImportSheetHandler(IExpensesDbContext db, TimeProvider clock
     {
         var expenses = SheetReader.ReadExpenses(command.ExpenseRows);
         var incomes = SheetReader.ReadIncomes(command.IncomeRows);
+        var savings = command.SavingsRows is null
+            ? new SheetRead<SheetSavings>([], "savingsRows", [])
+            : SheetReader.ReadSavings(command.SavingsRows);
         var problems = new Dictionary<string, List<string>>(StringComparer.Ordinal)
         {
             [expenses.Field] = [.. expenses.Problems],
             [incomes.Field] = [.. incomes.Problems],
+            [savings.Field] = [.. savings.Problems],
         };
 
         var categories = await db.Categories.AsNoTracking()
@@ -32,6 +38,11 @@ public sealed class ImportSheetHandler(IExpensesDbContext db, TimeProvider clock
 
         var expenseKeys = ImportKeys.For("expense", expenses.Items, ImportKeys.Expense);
         var incomeKeys = ImportKeys.For("income", incomes.Items, ImportKeys.Income);
+        var savingsKeys = ImportKeys.For("savings", savings.Items, ImportKeys.Savings);
+        var storedSavingsKeys = await db.SavingsMovements
+            .Where(m => m.ImportKey != null && savingsKeys.Contains(m.ImportKey))
+            .Select(m => m.ImportKey!)
+            .ToListAsync(cancellationToken);
         var storedExpenseKeys = await db.Expenses
             .Where(e => e.ImportKey != null && expenseKeys.Contains(e.ImportKey))
             .Select(e => e.ImportKey!)
@@ -71,11 +82,26 @@ public sealed class ImportSheetHandler(IExpensesDbContext db, TimeProvider clock
                 problems[incomes.Field].Add($"Row {row.Row}: {created.Error!.Message}");
         }
 
+        var newSavings = new List<SavingsMovement>();
+        for (var i = 0; i < savings.Items.Count; i++)
+        {
+            var row = savings.Items[i];
+            if (storedSavingsKeys.Contains(savingsKeys[i]))
+                continue;
+
+            var created = SavingsMovement.Create(row.Date, row.Person, row.Amount, row.Comment, now, savingsKeys[i]);
+            if (created.IsSuccess)
+                newSavings.Add(created.Value);
+            else
+                problems[savings.Field].Add($"Row {row.Row}: {created.Error!.Message}");
+        }
+
         if (problems.Values.Any(list => list.Count > 0))
             return Invalid(problems);
 
         db.Expenses.AddRange(newExpenses);
         db.Incomes.AddRange(newIncomes);
+        db.SavingsMovements.AddRange(newSavings);
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -90,7 +116,9 @@ public sealed class ImportSheetHandler(IExpensesDbContext db, TimeProvider clock
             expenses.Items.Count - newExpenses.Count,
             newIncomes.Count,
             incomes.Items.Count - newIncomes.Count,
-            Months(expenses.Items, incomes.Items));
+            newSavings.Count,
+            savings.Items.Count - newSavings.Count,
+            Months(expenses.Items, incomes.Items, savings.Items));
     }
 
     private static Error Invalid(Dictionary<string, List<string>> problems)
@@ -104,13 +132,16 @@ public sealed class ImportSheetHandler(IExpensesDbContext db, TimeProvider clock
             fields);
     }
 
-    private static List<ImportMonth> Months(IReadOnlyList<SheetExpense> expenses, IReadOnlyList<SheetIncome> incomes)
+    private static List<ImportMonth> Months(
+        IReadOnlyList<SheetExpense> expenses, IReadOnlyList<SheetIncome> incomes, IReadOnlyList<SheetSavings> savings)
     {
         var spent = expenses.GroupBy(e => MonthOf(e.Date)).ToDictionary(g => g.Key, g => g.Sum(e => e.Amount));
         var earned = incomes.GroupBy(i => MonthOf(i.Date)).ToDictionary(g => g.Key, g => g.Sum(i => i.Amount));
-        return spent.Keys.Union(earned.Keys)
+        var saved = savings.GroupBy(s => MonthOf(s.Date)).ToDictionary(g => g.Key, g => g.Sum(s => s.Amount));
+        return spent.Keys.Union(earned.Keys).Union(saved.Keys)
             .Order(StringComparer.Ordinal)
-            .Select(month => new ImportMonth(month, spent.GetValueOrDefault(month), earned.GetValueOrDefault(month)))
+            .Select(month => new ImportMonth(
+                month, spent.GetValueOrDefault(month), earned.GetValueOrDefault(month), saved.GetValueOrDefault(month)))
             .ToList();
     }
 

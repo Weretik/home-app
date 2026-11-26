@@ -13,6 +13,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 const income = (overrides: Record<string, unknown> = {}) => ({
   id: crypto.randomUUID(),
+  version: 1,
   date: '2026-10-05',
   person: 'Vitaliy',
   amount: 50000,
@@ -70,7 +71,7 @@ const normalized = (text: string) => (_: string, element: Element | null) =>
     (child) => child.textContent?.replace(/\s/g, ' ') === text,
   );
 
-test('shows the month total and each income', async () => {
+test('shows each income and no month total card', async () => {
   const { lastUrl } = renderPage(() =>
     json(
       page(
@@ -80,12 +81,10 @@ test('shows the month total and each income', async () => {
     ),
   );
 
-  expect(
-    await screen.findByText(normalized('80 000,00 ₴')),
-  ).toBeInTheDocument();
   const rows = within(
-    screen.getByRole('list', { name: 'Доходы за месяц' }),
+    await screen.findByRole('list', { name: 'Доходы за месяц' }),
   ).getAllByRole('listitem');
+  expect(screen.queryByText(normalized('80 000,00 ₴'))).not.toBeInTheDocument();
   expect(rows[0]).toHaveTextContent('Виталий');
   expect(rows[0]).toHaveTextContent('Зарплата');
   expect(rows[1]).toHaveTextContent('Маша');

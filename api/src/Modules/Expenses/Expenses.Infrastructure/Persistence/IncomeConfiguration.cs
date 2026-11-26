@@ -17,6 +17,7 @@ internal sealed class IncomeConfiguration : IEntityTypeConfiguration<Income>
         builder.Property(i => i.Comment).HasColumnName("comment").HasMaxLength(EntryRules.MaxCommentLength);
         builder.Property(i => i.ImportKey).HasColumnName("import_key").HasMaxLength(EntryRules.MaxImportKeyLength);
         builder.Property(i => i.CreatedAtUtc).HasColumnName("created_at_utc");
+        builder.Property(i => i.Version).IsRowVersion();
 
         builder.HasIndex(i => i.Date).HasDatabaseName("ix_incomes_date");
         builder.HasIndex(i => i.ImportKey).IsUnique().HasFilter("import_key IS NOT NULL")

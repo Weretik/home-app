@@ -54,8 +54,8 @@ environments migrations run as a separate step before the deploy (see [Deploy](#
 | `Database:InitializeOnStartup` | Apply migrations and seed data on start. Development only. |
 | `Cors:Origins` | Browser origins allowed to call the API with credentials. |
 | `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. |
-| `Expenses:Import:Key` | Shared secret for the one-time sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing. |
-| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
+| `Expenses:Import:Key` | Shared secret for the sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing, normally on a local run ([module page](docs/modules/expenses.md#the-one-time-import-from-the-sheet)). |
+| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes (60 a minute, for the open Expenses edits) and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
 | `ForwardedHeaders:Enabled`, `:KnownProxies`, `:KnownNetworks` | Read the client address and scheme from a trusted reverse proxy (see [Deploy behind a reverse proxy](#deploy-behind-a-reverse-proxy)). |
 
 Keep real values in user secrets or environment variables (`ConnectionStrings__Database=...`), never in the
@@ -134,8 +134,8 @@ change it once released.
 ## Idempotent requests
 
 A create that must not happen twice (for example adding an expense from a flaky phone connection) takes an
-`Idempotency-Key` header. The key is stored with the row under a unique index in the same transaction, with a
-fingerprint of the request body. A repeat with the same body returns the first result; the same key with a different
+`Idempotency-Key` header. The key is stored under a unique index in the same transaction as the row, with a
+fingerprint of the request body (in Expenses, in the table `expenses.create_requests`). A repeat with the same body returns the first result; the same key with a different
 body answers `409 Conflict`; two racing copies end with one row. See
 [ADR 0007](docs/decisions/0007-idempotency-key-for-creates.md).
 

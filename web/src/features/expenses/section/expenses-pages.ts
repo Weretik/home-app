@@ -1,6 +1,6 @@
 /**
  * The pages of the Expenses section, shown as tabs (the sheets of the old Google table). A page is added here and in
- * the routes (src/app/root/App.tsx) when it is built; planned ones (Обзор, Лимиты, План, Платежи, По месяцам, Копилка,
+ * the routes (src/app/root/App.tsx) when it is built; planned ones (Обзор, Лимиты, План, Платежи, По месяцам,
  * Категории) are not listed until then, so there are no dead tabs.
  */
 export interface ExpensesPage {
@@ -12,6 +12,7 @@ export interface ExpensesPage {
 export const expensesPages: ExpensesPage[] = [
   { path: '', label: 'Расходы' },
   { path: 'incomes', label: 'Доходы' },
+  { path: 'savings', label: 'Копилка' },
 ];
 
 export const sectionPath = '/expenses';

@@ -1,4 +1,5 @@
 using Expenses.Application.Features.Imports.SheetFormat;
+using Expenses.Application.Features.Imports.SheetFormat.Rows;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 

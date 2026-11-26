@@ -1,13 +1,19 @@
-import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import type { Theme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useExpenses, type Payer } from '../data/expenses-api';
+import {
+  useExpenses,
+  type ExpenseItem,
+  type Payer,
+} from '../data/expenses-api';
 import { payerLabels } from '../data/labels';
 import { ListStatus } from '../month-view/ListStatus';
 import { LoadMoreButton } from '../month-view/LoadMoreButton';
-import { MonthTotalCard } from '../month-view/MonthTotalCard';
+import { useEntryEditor } from '../entry-editing/use-entry-editor';
+import { ExpenseEditor } from '../expense-editing/ExpenseEditor';
 import { useClearFilters, useFilterParam } from '../url-state/use-filter-param';
 import { useMonthParam } from '../url-state/use-month-param';
 import { ExpenseFilters } from './ExpenseFilters';
@@ -16,13 +22,14 @@ import { ExpenseTable } from './ExpenseTable';
 
 const payers = Object.keys(payerLabels) as Payer[];
 
-/** «Расходы»: the month's total, filters, and the expenses, newest first. */
+/** «Расходы»: filters, «Добавить», and the month's expenses, newest first, each with edit and delete. */
 export function ExpensesPage() {
   const [month] = useMonthParam();
   const [categoryId, setCategoryId] = useFilterParam<string>('category');
   const [payer, setPayer] = useFilterParam<Payer>('payer', payers);
   const clearFilters = useClearFilters();
   const query = useExpenses(month, { categoryId, payer });
+  const editor = useEntryEditor<ExpenseItem>();
   const isComputer = useMediaQuery((theme: Theme) =>
     theme.breakpoints.up('md'),
   );
@@ -33,18 +40,29 @@ export function ExpensesPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <MonthTotalCard
-        title="Расходы за месяц"
-        icon={ReceiptLongOutlinedIcon}
-        color="primary"
-        total={first && { amount: first.totalAmount, count: first.totalCount }}
-      />
-      <ExpenseFilters
-        categoryId={categoryId}
-        payer={payer}
-        onCategoryChange={setCategoryId}
-        onPayerChange={setPayer}
-      />
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <ExpenseFilters
+          categoryId={categoryId}
+          payer={payer}
+          onCategoryChange={setCategoryId}
+          onPayerChange={setPayer}
+        />
+        <Button
+          variant="contained"
+          startIcon={<AddOutlinedIcon />}
+          onClick={editor.add}
+        >
+          Добавить расход
+        </Button>
+      </Box>
       <Card>
         <ListStatus
           isPending={query.isPending}
@@ -56,9 +74,17 @@ export function ExpensesPage() {
           onResetFilters={clearFilters}
         >
           {isComputer ? (
-            <ExpenseTable items={items} />
+            <ExpenseTable
+              items={items}
+              onEdit={editor.edit}
+              onDelete={editor.remove}
+            />
           ) : (
-            <ExpenseList items={items} />
+            <ExpenseList
+              items={items}
+              onEdit={editor.edit}
+              onDelete={editor.remove}
+            />
           )}
           {query.hasNextPage && first && (
             <LoadMoreButton
@@ -70,6 +96,7 @@ export function ExpensesPage() {
           )}
         </ListStatus>
       </Card>
+      <ExpenseEditor editor={editor} month={month} />
     </Box>
   );
 }

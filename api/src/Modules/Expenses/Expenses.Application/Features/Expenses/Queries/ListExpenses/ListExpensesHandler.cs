@@ -25,6 +25,7 @@ public sealed class ListExpensesHandler(IExpensesDbContext db) : IQueryHandler<L
             .ThenByDescending(x => x.Expense.Id)
             .Select(x => new ExpenseItem(
                 x.Expense.Id,
+                x.Expense.Version,
                 x.Expense.Date,
                 x.Expense.Payer,
                 x.Expense.CategoryId,

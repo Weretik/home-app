@@ -15,6 +15,16 @@ export function formatAmount(value: number): string {
   return amount.format(value);
 }
 
+/**
+ * A signed amount with an explicit sign: «+1 500,00 ₴», «−700,00 ₴» (a real minus sign), «0,00 ₴». The sign is
+ * always written, so the meaning does not rest on the colour alone.
+ */
+export function formatSignedAmount(value: number): string {
+  if (value > 0) return `+${amount.format(value)}`;
+  if (value < 0) return `\u2212${amount.format(-value)}`;
+  return amount.format(0);
+}
+
 /** A contract date (`2026-10-01`) as a short day: «чт, 1 окт.». Read as a local date, so no time zone shifts it. */
 export function formatDay(isoDate: string): string {
   const [year = 0, month = 1, date = 1] = isoDate.split('-').map(Number);

@@ -52,6 +52,17 @@ internal static partial class SheetValues
         return decimal.Parse(text.Replace(",", "", StringComparison.Ordinal), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
     }
 
+    /// <summary>An amount with an optional sign in front: <c>-111.10</c>, <c>−111.10</c> or <c>+500</c>.</summary>
+    public static decimal? ParseSignedAmount(string cell)
+    {
+        var text = cell.Trim();
+        var negative = text.StartsWith('-') || text.StartsWith('\u2212');
+        if (negative || text.StartsWith('+'))
+            text = text[1..].TrimStart();
+
+        return ParseAmount(text) is { } amount ? (negative ? -amount : amount) : null;
+    }
+
     public static Payer? ParsePayer(string cell) => Payers.TryGetValue(cell.Trim(), out var payer) ? payer : null;
 
     public static Person? ParsePerson(string cell) => People.TryGetValue(cell.Trim(), out var person) ? person : null;

@@ -131,10 +131,13 @@ jobs:
 
       - name: Smoke test /health
         run: |
-          # F1 has no Always On, so the first request after a deploy wakes the app up.
-          for attempt in $(seq 1 12); do
-            if curl --fail --silent --show-error --max-time 30 "$APP_URL/health"; then exit 0; fi
-            echo "Attempt $attempt failed, retrying in 10s"
+          # F1 has no Always On, so the first request after a deploy wakes the app up. The old build can still
+          # answer for a while after the deploy, so only a healthy answer whose version carries this commit counts.
+          for attempt in $(seq 1 18); do
+            body=$(curl --fail --silent --show-error --max-time 30 "$APP_URL/health" || true)
+            echo "$body"
+            if echo "$body" | grep -q "$GITHUB_SHA" && echo "$body" | grep -q '"status":"Healthy"'; then exit 0; fi
+            echo "Attempt $attempt: not the new healthy build yet, retrying in 10s"
             sleep 10
           done
           exit 1

@@ -1,7 +1,9 @@
 using BuildingBlocks.Infrastructure.Persistence;
 using Expenses.Application;
+using Expenses.Application.Idempotency;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Savings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Infrastructure;
@@ -17,4 +19,8 @@ public sealed class ExpensesDbContext(DbContextOptions<ExpensesDbContext> option
     public DbSet<Expense> Expenses => Set<Expense>();
 
     public DbSet<Income> Incomes => Set<Income>();
+
+    public DbSet<SavingsMovement> SavingsMovements => Set<SavingsMovement>();
+
+    public DbSet<CreateRequest> CreateRequests => Set<CreateRequest>();
 }

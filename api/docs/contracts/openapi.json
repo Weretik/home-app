@@ -108,6 +108,243 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Adds an expense. Send a new Idempotency-Key per entry; a repeat returns the first id.",
+        "operationId": "createExpense",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/{id}": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Changes an expense. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Deletes an expense for good.",
+        "operationId": "deleteExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/categories": {
+      "get": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Lists the expense categories in display order.",
+        "operationId": "listExpenseCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryItem"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/expenses/incomes": {
@@ -184,25 +421,497 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Adds an income. Send a new Idempotency-Key per entry; a repeat returns the first id.",
+        "operationId": "createIncome",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncomeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/api/expenses/categories": {
+    "/api/expenses/incomes/{id}": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Changes an income. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateIncome",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncomeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Deletes an income for good.",
+        "operationId": "deleteIncome",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/savings": {
       "get": {
         "tags": [
           "Expenses"
         ],
-        "summary": "Lists the expense categories in display order.",
-        "operationId": "listExpenseCategories",
+        "summary": "Lists one month's savings movements, newest first, with the month's sums and balances.",
+        "operationId": "listSavingsMovements",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CategoryItem"
-                  }
+                  "$ref": "#/components/schemas/SavingsMovementList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Adds a savings movement. Send a new Idempotency-Key per entry; a repeat returns the first id.",
+        "operationId": "createSavingsMovement",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavingsMovementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/savings/months": {
+      "get": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "The current savings balance and every month's deposits, withdrawals and closing balance.",
+        "operationId": "listSavingsMonths",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavingsOverview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/savings/{id}": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Changes a savings movement. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateSavingsMovement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavingsMovementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Deletes a savings movement for good.",
+        "operationId": "deleteSavingsMovement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -235,9 +944,23 @@
         },
         "description": "A category as lists and pickers show it."
       },
+      "CreatedEntry": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "description": "The id of a created expense, income or savings movement."
+      },
       "ExpenseItem": {
         "required": [
           "id",
+          "version",
           "date",
           "payer",
           "categoryId",
@@ -251,6 +974,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           },
           "date": {
             "type": "string",
@@ -317,6 +1044,43 @@
         },
         "description": "One page of a month's expenses, plus the sum of every expense that matches the filter (not just this page)."
       },
+      "ExpenseRequest": {
+        "required": [
+          "date",
+          "payer",
+          "categoryId",
+          "amount",
+          "paymentMethod",
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "payer": {
+            "$ref": "#/components/schemas/Payer"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "paymentMethod": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "HealthStatus": {
         "enum": [
           "Unhealthy",
@@ -372,6 +1136,7 @@
       "IncomeItem": {
         "required": [
           "id",
+          "version",
           "date",
           "person",
           "amount",
@@ -382,6 +1147,10 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           },
           "date": {
             "type": "string",
@@ -438,6 +1207,34 @@
         },
         "description": "One page of a month's incomes, plus the sum of every income that matches the filter."
       },
+      "IncomeRequest": {
+        "required": [
+          "date",
+          "person",
+          "amount",
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "Payer": {
         "enum": [
           "Vitaliy",
@@ -459,6 +1256,228 @@
           "Maria"
         ],
         "description": "One of the two people the household accounts belong to. Incomes always belong to one of them."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SavingsDirection": {
+        "enum": [
+          "Deposit",
+          "Withdrawal"
+        ],
+        "description": "Whether a savings movement put money in or took it out; shown in blue and red on the page."
+      },
+      "SavingsMonthSummary": {
+        "required": [
+          "year",
+          "month",
+          "deposits",
+          "withdrawals",
+          "balanceAtEnd"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deposits": {
+            "type": "number",
+            "format": "double"
+          },
+          "withdrawals": {
+            "type": "number",
+            "format": "double"
+          },
+          "balanceAtEnd": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "One month of the jar: put in, taken out (positive) and the balance at the month's end."
+      },
+      "SavingsMovementItem": {
+        "required": [
+          "id",
+          "version",
+          "date",
+          "person",
+          "amount",
+          "direction",
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/SavingsDirection"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "One movement of the savings jar; decimal SavingsMovementItem.Amount is signed (plus in, minus out)."
+      },
+      "SavingsMovementList": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "deposits",
+          "withdrawals",
+          "balanceAtStart",
+          "balanceAtEnd",
+          "currentBalance"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavingsMovementItem"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deposits": {
+            "type": "number",
+            "format": "double"
+          },
+          "withdrawals": {
+            "type": "number",
+            "format": "double"
+          },
+          "balanceAtStart": {
+            "type": "number",
+            "format": "double"
+          },
+          "balanceAtEnd": {
+            "type": "number",
+            "format": "double"
+          },
+          "currentBalance": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "One page of a month's savings movements, with the month's sums (decimal SavingsMovementList.Withdrawals as a positive number),\nthe balance before and after the month, and the jar's balance today."
+      },
+      "SavingsMovementRequest": {
+        "required": [
+          "date",
+          "person",
+          "amount",
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SavingsOverview": {
+        "required": [
+          "currentBalance",
+          "months"
+        ],
+        "type": "object",
+        "properties": {
+          "currentBalance": {
+            "type": "number",
+            "format": "double"
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavingsMonthSummary"
+            }
+          }
+        },
+        "description": "The jar's balance today and its movement month by month, newest month first."
       },
       "SystemStatus": {
         "required": [

@@ -19,6 +19,11 @@ them again. The database password lives only in the App Service and in a GitHub 
   header, and rate limited. The operator sets the key, runs the import, checks the monthly totals and removes the
   key.
 - The sheet is only read; it is not changed.
+- In practice the import runs on a local API and database; the stored rows are dumped as
+  `INSERT ... ON CONFLICT DO NOTHING` (`pg_dump --data-only --inserts --on-conflict-do-nothing`) and the script is run
+  against production in DBeaver, so the production key stays unset. The «Копилка» tab
+  ([0018](0018-savings-jar-as-signed-movements.md)) is an optional third tab of the same endpoint and goes the same
+  way.
 
 ## Consequences
 

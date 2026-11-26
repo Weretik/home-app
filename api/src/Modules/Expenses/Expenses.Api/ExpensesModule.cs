@@ -1,5 +1,7 @@
+using Expenses.Api.Endpoints.Expenses;
 using Expenses.Api.Endpoints.Import;
-using Expenses.Api.Endpoints.Ledger;
+using Expenses.Api.Endpoints.Incomes;
+using Expenses.Api.Endpoints.Savings;
 using Expenses.Application;
 using Expenses.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -30,8 +32,19 @@ public static class ExpensesModule
         endpoints.MapGroup("/api/expenses")
             .WithTags("Expenses")
             .MapListExpenses()
-            .MapListIncomes()
+            .MapCreateExpense()
+            .MapUpdateExpense()
+            .MapDeleteExpense()
             .MapListCategories()
+            .MapListIncomes()
+            .MapCreateIncome()
+            .MapUpdateIncome()
+            .MapDeleteIncome()
+            .MapListSavingsMovements()
+            .MapListSavingsMonths()
+            .MapCreateSavingsMovement()
+            .MapUpdateSavingsMovement()
+            .MapDeleteSavingsMovement()
             .MapImportSheet();
         return endpoints;
     }

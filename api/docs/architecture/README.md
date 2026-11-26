@@ -12,7 +12,7 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 
 | Module | Owns | Schema | Status |
 | --- | --- | --- | --- |
-| Expenses | Expenses, incomes, categories, who paid; later limits, plan, payments, savings | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
+| Expenses | Expenses, incomes, savings jar, categories, who paid; later limits, plan, payments | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
 | Shopping | The shared shopping list | `shopping` | planned |
 | Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
 | Gifts | Gift wishlist | `gifts` | planned |
@@ -88,8 +88,10 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 ## Security
 
 - Authentication is not in place yet; it arrives with the Identity module and its ADR. The authentication and
-  authorization middleware is already in the pipeline. Until then the Expenses reads are anonymous
-  ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
+  authorization middleware is already in the pipeline. Until then the Expenses reads and writes are
+  anonymous; writes are rate limited ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
+- Edits of shared rows are guarded by a row version (`xmin`, `If-Match`)
+  ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).
 - The one-time sheet import needs the `X-Import-Key` header, compared in constant time, and is hidden from the
   OpenAPI document ([ADR 0014](../decisions/0014-one-time-sheet-import.md)).
 - CORS allows only the origins in `Cors:Origins` (the web app), with credentials, ready for a cookie session.

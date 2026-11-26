@@ -22,13 +22,14 @@ export interface IncomeFilter {
   person?: Person;
 }
 
-interface Paged {
+export interface Paged {
   page: number;
   pageSize: number;
   totalCount: number;
 }
 
-const nextPage = (last: Paged) =>
+/** The next page number of a paged list, or undefined after the last page. */
+export const nextPage = (last: Paged) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
 /** One month's expenses, loaded page by page («Показать ещё»). */

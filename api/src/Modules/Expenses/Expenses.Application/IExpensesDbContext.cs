@@ -1,5 +1,7 @@
+using Expenses.Application.Idempotency;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Savings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Application;
@@ -15,6 +17,10 @@ public interface IExpensesDbContext
     DbSet<Expense> Expenses { get; }
 
     DbSet<Income> Incomes { get; }
+
+    DbSet<SavingsMovement> SavingsMovements { get; }
+
+    DbSet<CreateRequest> CreateRequests { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

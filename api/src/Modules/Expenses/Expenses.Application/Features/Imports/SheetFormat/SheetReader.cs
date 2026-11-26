@@ -1,7 +1,9 @@
+using Expenses.Application.Features.Imports.SheetFormat.Rows;
+
 namespace Expenses.Application.Features.Imports.SheetFormat;
 
 /// <summary>
-/// Reads the «Расходы» and «Доходы» tabs, given as rows of cell text with the header first. The header must match,
+/// Reads the «Расходы», «Доходы» and «Копилка» tabs, given as rows of cell text with the header first. The header must match,
 /// so a moved column cannot load amounts as dates. Empty rows are skipped; every unreadable cell is reported with
 /// its sheet row number, and nothing is imported while any is left.
 /// </summary>
@@ -9,6 +11,7 @@ internal static class SheetReader
 {
     public static readonly string[] ExpenseHeader = ["Дата", "Кто", "Категория", "Сумма, грн", "Оплата", "Комментарий"];
     public static readonly string[] IncomeHeader = ["Дата", "Кто", "Сумма, грн", "Комментарий"];
+    public static readonly string[] SavingsHeader = ["Дата", "Кто", "Сумма, грн (+ отложили, − взяли)", "Комментарий"];
 
     public static SheetRead<SheetExpense> ReadExpenses(IReadOnlyList<IReadOnlyList<string>> rows) =>
         Read(rows, ExpenseHeader, "expenseRows", (row, cells, problems) =>
@@ -46,6 +49,22 @@ internal static class SheetReader
                 : new SheetIncome(row, date.Value, person.Value, amount.Value, cells[3]);
         });
 
+    public static SheetRead<SheetSavings> ReadSavings(IReadOnlyList<IReadOnlyList<string>> rows) =>
+        Read(rows, SavingsHeader, "savingsRows", (row, cells, problems) =>
+        {
+            var date = SheetValues.ParseDate(cells[0]);
+            var person = SheetValues.ParsePerson(cells[1]);
+            var amount = SheetValues.ParseSignedAmount(cells[2]);
+
+            if (date is null) problems.Add($"Row {row}: «{cells[0]}» is not a date like 01.10.2026.");
+            if (person is null) problems.Add($"Row {row}: «{cells[1]}» is not Виталий or Мария.");
+            if (amount is null) problems.Add($"Row {row}: «{cells[2]}» is not an amount like 2,424.00 or -111.10.");
+
+            return date is null || person is null || amount is null
+                ? null
+                : new SheetSavings(row, date.Value, person.Value, amount.Value, cells[3]);
+        });
+
     private static SheetRead<T> Read<T>(
         IReadOnlyList<IReadOnlyList<string>> rows,
         string[] header,
@@ -78,7 +97,10 @@ internal static class SheetReader
 
     private static bool HeaderMatches(IReadOnlyList<string> row, string[] header) =>
         row.Count >= header.Length
-        && header.Select((title, i) => string.Equals(row[i].Trim(), title, StringComparison.OrdinalIgnoreCase)).All(x => x);
+        && header.Select((title, i) => string.Equals(Plain(row[i]), Plain(title), StringComparison.OrdinalIgnoreCase)).All(x => x);
+
+    /// <summary>The «Копилка» header uses a typographic minus; a hyphen in its place reads the same.</summary>
+    private static string Plain(string? cell) => (cell ?? string.Empty).Trim().Replace('\u2212', '-');
 
     /// <summary>The Sheets API drops trailing empty cells, so a row without a comment is one cell short.</summary>
     private static string[] Pad(IReadOnlyList<string> row, int length) =>

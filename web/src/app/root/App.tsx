@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ExpensesPage } from '../../features/expenses/expense-list/ExpensesPage';
 import { IncomesPage } from '../../features/expenses/income-list/IncomesPage';
+import { SavingsPage } from '../../features/expenses/savings-page/SavingsPage';
 import { ExpensesSection } from '../../features/expenses/section/ExpensesSection';
 import { ComingSoonPage } from '../../features/home/ComingSoonPage';
 import { HomePage } from '../../features/home/HomePage';
@@ -15,6 +16,7 @@ export function App() {
         <Route path="/expenses" element={<ExpensesSection />}>
           <Route index element={<ExpensesPage />} />
           <Route path="incomes" element={<IncomesPage />} />
+          <Route path="savings" element={<SavingsPage />} />
         </Route>
         <Route path="/shopping" element={<ComingSoonPage title="Покупки" />} />
         <Route path="/todos" element={<ComingSoonPage title="Дела" />} />
