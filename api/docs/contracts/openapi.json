@@ -4610,42 +4610,6 @@
   },
   "components": {
     "schemas": {
-<<<<<<< HEAD
-      "Assignee": {
-        "enum": [
-          "Vitaliy",
-          "Maria",
-          "Shared"
-        ],
-        "description": "Whose task it is (the sheet's «Чьё» column): one of the two people or both of them."
-      },
-      "AssigneeCounts": {
-        "required": [
-          "assignee",
-          "active",
-          "overdue",
-          "dueToday"
-        ],
-        "type": "object",
-        "properties": {
-          "assignee": {
-            "$ref": "#/components/schemas/Assignee"
-          },
-          "active": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "overdue": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "dueToday": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "description": "How many active tasks an assignee has, how many of them are overdue and how many are due today."
-=======
       "AddItemsResult": {
         "required": [
           "added",
@@ -4704,7 +4668,41 @@
             ]
           }
         }
->>>>>>> origin/main
+      },
+      "Assignee": {
+        "enum": [
+          "Vitaliy",
+          "Maria",
+          "Shared"
+        ],
+        "description": "Whose task it is (the sheet's «Чьё» column): one of the two people or both of them."
+      },
+      "AssigneeCounts": {
+        "required": [
+          "assignee",
+          "active",
+          "overdue",
+          "dueToday"
+        ],
+        "type": "object",
+        "properties": {
+          "assignee": {
+            "$ref": "#/components/schemas/Assignee"
+          },
+          "active": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueToday": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "How many active tasks an assignee has, how many of them are overdue and how many are due today."
       },
       "BudgetSettingsRequest": {
         "required": [

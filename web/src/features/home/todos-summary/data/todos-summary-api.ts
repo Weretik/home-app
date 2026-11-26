@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, apiCall, type Schema } from '../../../../api-client';
 import { api } from '../../../../platform/api';
+import { moduleKeys } from '../../../../platform/query-keys';
 
 export type TodoSummary = Schema<'TodoSummary'>;
 export type AssigneeCounts = Schema<'AssigneeCounts'>;
@@ -9,17 +10,17 @@ export type Assignee = Schema<'Assignee'>;
 export type TodoPriority = Schema<'TodoPriority'>;
 
 /**
- * The family's tasks at a glance (`GET /api/todos/summary`). The key sits under `['todos']`, so every write of the
+ * The family's tasks at a glance (`GET /api/todos/summary`). The key sits under the module prefix `moduleKeys.todos`, so every write of the
  * Todos section refreshes the summary too.
  */
 export function useTodoSummary() {
   return useQuery({
-    queryKey: ['todos', 'summary'],
+    queryKey: [...moduleKeys.todos, 'summary'],
     queryFn: ({ signal }) => apiCall(api.GET('/api/todos/summary', { signal })),
   });
 }
 
-/** Ticks a focus task done in place (FR-008), with its version; then everything under `['todos']` reloads. */
+/** Ticks a focus task done in place (FR-008), with its version; then everything under the module prefix reloads. */
 export function useCompleteFocusTask() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -33,7 +34,8 @@ export function useCompleteFocusTask() {
           body: { status: 'Done' },
         }),
       ),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: moduleKeys.todos }),
   });
 }
 

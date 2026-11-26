@@ -835,7 +835,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-<<<<<<< HEAD
+        /** @description What an add did: new rows, items brought back from the cart, and needed items it updated. */
+        AddItemsResult: {
+            added: components["schemas"]["ShoppingItemView"][];
+            restored: components["schemas"]["ShoppingItemView"][];
+            updated: components["schemas"]["ShoppingItemView"][];
+        };
+        AddShoppingItemsRequest: {
+            text: string;
+            addedBy: components["schemas"]["Person"];
+            /** Format: uuid */
+            departmentId: null | string;
+            urgent: null | boolean;
+        };
         /**
          * @description Whose task it is (the sheet's «Чьё» column): one of the two people or both of them.
          * @enum {unknown}
@@ -850,20 +862,6 @@ export interface components {
             overdue: number;
             /** Format: int32 */
             dueToday: number;
-=======
-        /** @description What an add did: new rows, items brought back from the cart, and needed items it updated. */
-        AddItemsResult: {
-            added: components["schemas"]["ShoppingItemView"][];
-            restored: components["schemas"]["ShoppingItemView"][];
-            updated: components["schemas"]["ShoppingItemView"][];
-        };
-        AddShoppingItemsRequest: {
-            text: string;
-            addedBy: components["schemas"]["Person"];
-            /** Format: uuid */
-            departmentId: null | string;
-            urgent: null | boolean;
->>>>>>> origin/main
         };
         BudgetSettingsRequest: {
             /** Format: double */

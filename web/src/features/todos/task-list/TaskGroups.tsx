@@ -1,10 +1,8 @@
-import Box from '@mui/material/Box';
 import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import { useId } from 'react';
-import { dueBucketLabels, groupByDue, type DueBucket } from '../data/due-date';
+import { dueBucketLabels, groupByDue } from '../data/due-date';
 import type { TodoTaskItem } from '../data/todos-api';
 import { TaskRow } from '../task-row/TaskRow';
+import { TaskGroup } from './TaskGroup';
 
 interface TaskGroupsProps {
   items: TodoTaskItem[];
@@ -35,42 +33,4 @@ export function TaskGroups({ items, today, onDone, onOpen }: TaskGroupsProps) {
       </List>
     </TaskGroup>
   ));
-}
-
-function TaskGroup({
-  bucket,
-  count,
-  children,
-}: {
-  bucket: DueBucket;
-  count: number;
-  children: React.ReactNode;
-}) {
-  const headingId = useId();
-  return (
-    <Box
-      component="section"
-      aria-labelledby={headingId}
-      sx={{ borderTop: 1, borderColor: 'divider' }}
-    >
-      <Typography
-        id={headingId}
-        variant="subtitle2"
-        component="h2"
-        sx={{
-          px: 2,
-          pt: 1.5,
-          pb: 0.5,
-          fontWeight: 600,
-          color: bucket === 'overdue' ? 'error.main' : 'text.secondary',
-        }}
-      >
-        {dueBucketLabels[bucket]}{' '}
-        <Box component="span" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-          · {count}
-        </Box>
-      </Typography>
-      {children}
-    </Box>
-  );
 }

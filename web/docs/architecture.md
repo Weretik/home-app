@@ -26,7 +26,7 @@ src/
   platform/       the API client instance (VITE_API_URL), the query client and each backend module's query key
                   prefix (query-keys.ts)
   features/
-    home/         Главная: the section summaries and their switcher, the placeholder for sections not built yet
+    home/         Главная: the section summaries and their switcher
     status/       API and database status page
     expenses/     the «Бюджет» section, the Expenses module (below)
     shopping/     the «Покупки» section, the Shopping module (below)
@@ -70,7 +70,7 @@ The home page shows one section's summary at a time, picked with a switcher
 ```
 home/
   page/              HomePage (title, switcher, the open summary, the «Состояние» link for phones), the summary
-                     registry (summary-sections.ts), ?s= in the URL, the «Раздел скоро появится» placeholder
+                     registry (summary-sections.ts), ?s= in the URL
   shopping-summary/
     data/            shopping-summary-api.ts (GET /api/shopping/summary, key ['shopping', 'summary']), its labels
     overview/        ShoppingSummary («Открыть список», states), SummaryContent (which cards show), «Список пуст 🎉»

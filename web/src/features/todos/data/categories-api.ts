@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 
 export type TodoCategoryItem = Schema<'TodoCategoryItem'>;
 
-export const categoriesKey = ['todos', 'categories'] as const;
+export const categoriesKey = [...moduleKeys.todos, 'categories'] as const;
 
 /** The family's task categories in their order, with the count of active tasks in each. */
 export function useCategories() {

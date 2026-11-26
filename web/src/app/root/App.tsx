@@ -9,7 +9,6 @@ import { GiftsSection } from '../../features/gifts/section/GiftsSection';
 import { GiftSettingsPage } from '../../features/gifts/settings-page/GiftSettingsPage';
 import { ArchivePage } from '../../features/gifts/pages/ArchivePage';
 import { GiftsPage } from '../../features/gifts/pages/GiftsPage';
-import { ComingSoonPage } from '../../features/home/page/ComingSoonPage';
 import { HomePage } from '../../features/home/page/HomePage';
 import { HistoryPage } from '../../features/shopping/history-page/HistoryPage';
 import { ListPage } from '../../features/shopping/list-page/ListPage';

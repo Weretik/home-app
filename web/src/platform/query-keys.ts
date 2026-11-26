@@ -7,4 +7,5 @@ export const moduleKeys = {
   expenses: ['expenses'],
   shopping: ['shopping'],
   gifts: ['gifts'],
+  todos: ['todos'],
 } as const;

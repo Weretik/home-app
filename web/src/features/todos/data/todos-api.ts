@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 
 export type TodoTaskItem = Schema<'TodoTaskItem'>;
 export type TodoTaskList = Schema<'TodoTaskList'>;
@@ -13,9 +14,12 @@ export type TodoPriority = Schema<'TodoPriority'>;
 /** Rows per request; the API allows up to 100. */
 export const PAGE_SIZE = 50;
 
-/** Everything the Todos screens read sits under this key, so one invalidation refreshes them all. */
-export const todosKey = ['todos'] as const;
-export const tasksKey = ['todos', 'tasks'] as const;
+/**
+ * Everything the Todos screens read sits under the module prefix (`moduleKeys.todos`), so one invalidation refreshes
+ * them all, the home summary too (web ADR 0009).
+ */
+export const todosKey = moduleKeys.todos;
+export const tasksKey = [...moduleKeys.todos, 'tasks'] as const;
 
 export type TaskView = 'active' | 'archive';
 
@@ -59,7 +63,7 @@ export const fetchTask = (id: string) =>
  */
 export function useTask(item: TodoTaskItem | undefined) {
   return useQuery({
-    queryKey: ['todos', 'task', item?.id],
+    queryKey: [...moduleKeys.todos, 'task', item?.id],
     enabled: Boolean(item),
     initialData: item,
     staleTime: 30_000,
