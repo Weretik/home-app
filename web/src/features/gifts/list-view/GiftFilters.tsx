@@ -4,8 +4,17 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import type { ReactNode } from 'react';
-import type { GiftCategoryItem, Recipient } from '../data/gifts-api';
-import { recipientLabels, recipients } from '../display/labels';
+import type {
+  GiftCategoryItem,
+  GiftPriority,
+  Recipient,
+} from '../data/gifts-api';
+import {
+  priorities,
+  priorityLabels,
+  recipientLabels,
+  recipients,
+} from '../display/labels';
 import { RecipientAvatar } from '../display/RecipientAvatar';
 import { toneColor, toneTint } from '../display/recipient-tones';
 import type { GiftFilterState } from '../url-state/use-gift-filters';
@@ -17,7 +26,7 @@ interface GiftFiltersProps {
   action?: ReactNode;
 }
 
-/** «Для кого» (Все / Маша / Виталий / Вместе, each in the person's colour) and «Категория»; both live in the link. */
+/** «Для кого» (Все / Маша / Виталий / Вместе, each in the person's colour), «Категория» and «Приоритет»; all live in the link. */
 export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
   const { filters } = state;
 
@@ -76,6 +85,27 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
         {categories.map((category) => (
           <MenuItem key={category.id} value={category.id}>
             {category.name}
+          </MenuItem>
+        ))}
+      </TextField>
+      <TextField
+        select
+        size="small"
+        label="Приоритет"
+        value={filters.priority ?? ''}
+        onChange={(event) =>
+          state.setPriority((event.target.value as GiftPriority) || undefined)
+        }
+        sx={{ minWidth: { xs: 160, sm: 180 } }}
+        slotProps={{
+          select: { displayEmpty: true },
+          inputLabel: { shrink: true },
+        }}
+      >
+        <MenuItem value="">Все</MenuItem>
+        {priorities.map((priority) => (
+          <MenuItem key={priority} value={priority}>
+            {priorityLabels[priority]}
           </MenuItem>
         ))}
       </TextField>

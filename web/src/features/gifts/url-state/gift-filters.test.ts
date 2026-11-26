@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import type { Recipient } from '../data/gifts-api';
+import type { GiftPriority, Recipient } from '../data/gifts-api';
 import { applyFilters, groupByRecipient, parseFilters } from './gift-filters';
 
-const gift = (id: string, recipient: Recipient, categoryId = 'c1') => ({
+const gift = (
+  id: string,
+  recipient: Recipient,
+  categoryId = 'c1',
+  priority: GiftPriority = 'Normal',
+) => ({
   id,
   recipient,
   categoryId,
+  priority,
 });
 
 describe('parseFilters', () => {
@@ -20,6 +26,13 @@ describe('parseFilters', () => {
   it('ignores an unknown recipient and a category that does not exist', () => {
     const params = new URLSearchParams('recipient=Bob&category=nope');
     expect(parseFilters(params, ['c1'])).toEqual({});
+  });
+
+  it('reads a known priority and ignores an unknown one', () => {
+    expect(parseFilters(new URLSearchParams('priority=High'))).toEqual({
+      priority: 'High',
+    });
+    expect(parseFilters(new URLSearchParams('priority=Urgent'))).toEqual({});
   });
 
   it('keeps any category while the categories are not loaded yet', () => {
@@ -45,6 +58,23 @@ describe('applyFilters', () => {
         (g) => g.id,
       ),
     ).toEqual(['3']);
+  });
+
+  it('filters by priority together with the other filters', () => {
+    const withPriorities = [
+      gift('1', 'Maria', 'c1', 'High'),
+      gift('2', 'Maria', 'c1', 'Normal'),
+      gift('3', 'Vitaliy', 'c1', 'High'),
+    ];
+    expect(
+      applyFilters(withPriorities, { priority: 'High' }).map((g) => g.id),
+    ).toEqual(['1', '3']);
+    expect(
+      applyFilters(withPriorities, {
+        priority: 'High',
+        recipient: 'Maria',
+      }).map((g) => g.id),
+    ).toEqual(['1']);
   });
 
   it('returns everything without filters', () => {
