@@ -152,6 +152,8 @@ Computer (md, 900px and wider)              Phone (below md)
   (a real minus sign). The sign is always written, so the colour is never the only hint. Zero is plain text.
 - Only signed amounts use these colours (`savings-page/SignedAmount.tsx`); plain sums and balances stay
   `text.primary`. This is the one place `error` marks a direction instead of a problem.
+- The «Копилка» balance card puts the month's four figures in tinted tiles in a 2×2 grid: under the balance on a phone,
+  beside it from `md` up, so the wide card has no empty half next to «План копилки».
 
 ## Summaries on the home page
 
