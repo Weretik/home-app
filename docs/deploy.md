@@ -88,7 +88,10 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
    it the password travels in clear text over the internet, so prefer SSL if at all possible.
 5. **Connection string**, then put it into the App Service as described below:
 
-   `Host=<host>;Port=5432;Database=weretick;Username=weretick;Password=<password>;SSL Mode=Require;Search Path=home`
+   `Host=brevistore.psql.tools;Port=10403;Database=weretick;Username=weretick;Password=<password>;SSL Mode=Require;Search Path=home`
+
+   The host and port are the account's PostgreSQL instance (the same one the other project uses). If the server turns
+   out not to support SSL, the connection fails with `SSL Mode=Require`; then use `SSL Mode=Prefer`.
 
 The first EF migration creates the `home` schema itself, since the owner has all rights; nothing to run by hand. The
 schema is kept even in a separate database, so the data can move to a shared server later without changes.
