@@ -14,6 +14,7 @@ import { HistoryPage } from '../../features/shopping/history-page/HistoryPage';
 import { ListPage } from '../../features/shopping/list-page/ListPage';
 import { ShoppingSection } from '../../features/shopping/section/ShoppingSection';
 import { SettingsPage as ShoppingSettingsPage } from '../../features/shopping/settings-page/SettingsPage';
+import { NotificationsPage } from '../../features/notifications/page/NotificationsPage';
 import { StatusPage } from '../../features/status/StatusPage';
 import { ArchivePage as TodosArchivePage } from '../../features/todos/archive/ArchivePage';
 import { CategoriesSettingsPage } from '../../features/todos/settings/CategoriesSettingsPage';
@@ -49,6 +50,7 @@ export function App() {
           <Route path="settings" element={<CategoriesSettingsPage />} />
         </Route>
         <Route path="/status" element={<StatusPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -52,6 +52,17 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
 
     public string? Notes { get; private set; }
 
+    /// <summary>Who buys and gives it («Кто дарит»); null when nobody is set.</summary>
+    public Recipient? Giver { get; private set; }
+
+    /// <summary>The day to buy it by («Купить до»); null when there is none.</summary>
+    public DateOnly? BuyBy { get; private set; }
+
+    /// <summary>
+    /// A wanted gift with a giver and a buy-by date: the giver has a to-do for it and gets a reminder (spec gifts/002).
+    /// </summary>
+    public bool IsPurchasePlanned => Status == GiftStatus.Wanted && Giver is not null && BuyBy is not null;
+
     public IReadOnlyList<GiftVariant> Variants => _variants;
 
     public DateTimeOffset CreatedAtUtc { get; private init; }
@@ -119,6 +130,17 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
         OccasionDate = occasionDate;
         Notes = Normalize(notes);
         _variants = [.. variants.Select((draft, position) => GiftVariant.From(draft, position, now))];
+        return Result.Success();
+    }
+
+    /// <summary>Sets who gives the gift and the day to buy it by; either may be empty. The status stays.</summary>
+    public Result PlanPurchase(Recipient? giver, DateOnly? buyBy)
+    {
+        if (buyBy is not null && !IsInRange(buyBy.Value))
+            return GiftErrors.BuyByOutOfRange;
+
+        Giver = giver;
+        BuyBy = buyBy;
         return Result.Success();
     }
 

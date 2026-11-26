@@ -26,6 +26,8 @@ internal sealed class TodoTaskConfiguration : IEntityTypeConfiguration<TodoTask>
         builder.Property(t => t.UpdatedAtUtc).HasColumnName("updated_at_utc");
         builder.Property(t => t.CompletedAtUtc).HasColumnName("completed_at_utc");
         builder.Property(t => t.ImportKey).HasColumnName("import_key").HasMaxLength(TodoTask.MaxImportKeyLength);
+        builder.Property(t => t.SourceKind).HasColumnName("source_kind").HasMaxLength(TodoTask.MaxSourceKindLength);
+        builder.Property(t => t.SourceId).HasColumnName("source_id");
         builder.Property(t => t.Version).IsRowVersion();
         builder.Ignore(t => t.IsArchived);
 
@@ -43,6 +45,9 @@ internal sealed class TodoTaskConfiguration : IEntityTypeConfiguration<TodoTask>
         builder.HasIndex(t => t.CategoryId).HasDatabaseName("ix_tasks_category_id");
         // A plain unique index (NULLs never collide), so the import script can say ON CONFLICT (import_key).
         builder.HasIndex(t => t.ImportKey).IsUnique().HasDatabaseName("ux_tasks_import_key");
+        // One task per record of another module, such as a gift (spec gifts/002); tasks without one never collide.
+        builder.HasIndex(t => new { t.SourceKind, t.SourceId }).IsUnique().HasDatabaseName("ux_tasks_source")
+            .HasFilter("source_kind IS NOT NULL");
         // The trigram index on lower(title) for the search is created by the Initial migration in SQL.
     }
 }

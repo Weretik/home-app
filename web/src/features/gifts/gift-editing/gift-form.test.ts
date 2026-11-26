@@ -32,6 +32,8 @@ const item: GiftItem = {
   giftedOn: null,
   occasion: 'Новый год',
   occasionDate: '2026-12-31',
+  giver: 'Maria',
+  buyBy: '2026-12-20',
   notes: 'Белые',
   variants: [{ id: 'v1', title: null, link: 'https://b.ua', price: 999 }],
   createdAtUtc: '2026-11-01T00:00:00Z',
@@ -73,6 +75,8 @@ describe('toGiftRequest', () => {
       link: null,
       occasion: null,
       occasionDate: null,
+      giver: null,
+      buyBy: null,
       notes: null,
       variants: [
         { title: 'Синий', link: 'https://a.ua/1', price: 1200 },
@@ -92,6 +96,8 @@ describe('toGiftRequest', () => {
       link: 'https://a.ua/x',
       occasion: 'Новый год',
       occasionDate: '2026-12-31',
+      giver: 'Maria',
+      buyBy: '2026-12-20',
       notes: 'Белые',
       variants: [{ title: null, link: 'https://b.ua', price: 999 }],
     });
@@ -116,6 +122,7 @@ describe('validateGift', () => {
         price: '0',
         link: 'shop.ua',
         occasionDate: '1999-01-01',
+        buyBy: '2101-01-01',
         variants: [{ ...newVariant(), price: '12,345' }],
       }),
     ).toEqual({
@@ -125,6 +132,7 @@ describe('validateGift', () => {
       price: 'Цена больше нуля, до двух знаков после запятой',
       link: 'Ссылка должна начинаться с http:// или https://',
       occasionDate: 'Дата между 2000 и 2100 годом',
+      buyBy: 'Дата между 2000 и 2100 годом',
       'variants[0].link': 'Укажите ссылку варианта',
       'variants[0].price': 'Цена больше нуля, до двух знаков после запятой',
     });

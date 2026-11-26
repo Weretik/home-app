@@ -27,6 +27,9 @@ public static class GiftErrors
     public static readonly Error OccasionDateOutOfRange =
         Error.Validation("gifts.occasion_date_out_of_range", "The occasion date must be between 2000-01-01 and 2100-12-31.", "occasionDate");
 
+    public static readonly Error BuyByOutOfRange =
+        Error.Validation("gifts.buy_by_out_of_range", "The buy-by date must be between 2000-01-01 and 2100-12-31.", "buyBy");
+
     public static readonly Error NotesTooLong =
         Error.Validation("gifts.notes_too_long", $"The notes are longer than {Gift.MaxNotesLength} characters.", "notes");
 

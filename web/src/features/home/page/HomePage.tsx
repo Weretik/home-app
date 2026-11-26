@@ -1,4 +1,5 @@
 import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { SectionCard } from './SectionCard';
@@ -13,8 +14,8 @@ const today = new Intl.DateTimeFormat('ru-RU', {
 
 /**
  * Главная: one section's summary at a time, picked with the switcher (`?s=`). Today «Бюджет» and «Подарки» have one; the
- * others join through `summary-sections.ts`. The service page «Состояние» is linked below for phones, which have no
- * side menu.
+ * others join through `summary-sections.ts`. The service pages «Состояние» and «Телеграм» are linked below for phones,
+ * which have no side menu.
  */
 export function HomePage() {
   const [active, setActive] = useSummaryParam();
@@ -40,6 +41,7 @@ export function HomePage() {
       <Box
         sx={{
           display: 'grid',
+          gap: { xs: 2, md: 3 },
           gridTemplateColumns: {
             xs: '1fr',
             sm: '1fr 1fr',
@@ -53,6 +55,13 @@ export function HomePage() {
           icon={MonitorHeartOutlinedIcon}
           title="Состояние"
           caption="Работают ли сервер и база"
+        />
+        <SectionCard
+          to="/notifications"
+          color="secondary"
+          icon={TelegramIcon}
+          title="Телеграм"
+          caption="Бот: чаты, расписание, отправки"
         />
       </Box>
     </Box>

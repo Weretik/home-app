@@ -11,6 +11,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { useTask, type Assignee, type TodoTaskItem } from '../data/todos-api';
 import { ConfirmDeleteDialog } from '../feedback/ConfirmDeleteDialog';
 import { StepsEditor } from '../task-steps/StepsEditor';
+import { GiftSourceLink } from '../task-row/GiftSourceLink';
 import { useSteps } from '../task-steps/use-steps';
 import { describeWriteError } from '../writes/failures-api';
 import { useDeleteTask } from '../writes/task-writes-api';
@@ -85,6 +86,7 @@ export function TaskDialog({
           }}
         >
           {form.message && <Alert severity="error">{form.message}</Alert>}
+          <GiftSourceLink task={current} />
           <TaskFields
             values={form.values}
             errors={form.errors}

@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Outbox;
 using Gifts.Application.Idempotency;
 using Gifts.Domain.Categories;
 using Gifts.Domain.People;
@@ -9,9 +10,10 @@ namespace Gifts.Application;
 /// <summary>
 /// The module's unit of work: handlers query the sets and call <see cref="SaveChangesAsync"/> once. Infrastructure
 /// implements it with the EF Core context that lives in the <c>gifts</c> schema. Variants have no set of their own:
-/// they load and save with their gift.
+/// they load and save with their gift. <see cref="IOutboxPublisher.Publish"/> stores the purchase events for Todos in
+/// the same save (ADR 0035).
 /// </summary>
-public interface IGiftsDbContext
+public interface IGiftsDbContext : IOutboxPublisher
 {
     DbSet<Gift> Gifts { get; }
 

@@ -24,3 +24,7 @@ against these targets in its SDD.
   target. Measure before storing monthly totals.
 - When a number is confirmed or measured, change "proposed" to the agreed value and fill the current value with its
   date and source.
+- The Telegram bot adds scheduler load, not user load: two keyed calls every 15 minutes (192 a day), each a few
+  indexed reads and at most a handful of Telegram calls; the 15-minute tick is also the delivery delay of integration
+  events ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md)). `notifications.deliveries` grows by about
+  5 rows a day (under 2 000 a year).

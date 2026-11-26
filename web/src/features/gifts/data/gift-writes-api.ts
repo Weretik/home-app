@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 import { giftKeys, type GiftItem, type GiftStatus } from './gifts-api';
 import { isStale } from './write-errors-api';
 import {
@@ -14,9 +15,11 @@ import {
 export type GiftRequest = Schema<'GiftRequest'>;
 export type GiftVariantRequest = Schema<'GiftVariantRequest'>;
 
-/** A gift write changes both tabs and the home summary. */
-/** Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. */
-const giftQueries = [giftKeys.all];
+/**
+ * Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. A gift
+ * with a giver and a buy-by day also has a to-do in the Todos module (gifts 002), so «Дела» refresh too.
+ */
+const giftQueries = [giftKeys.all, moduleKeys.todos];
 
 const giftWriter: Writer<GiftRequest> = {
   keys: giftQueries,

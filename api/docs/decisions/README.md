@@ -39,6 +39,10 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0030 | [The Todos module and its model](0030-todos-module-model.md) |
 | 0031 | [The Shopping module, with the list, cart and history computed on read](0031-shopping-module-model.md) |
 | 0032 | [Text parsing and department matching are pure domain services with learned keywords](0032-text-parsing-and-department-matching.md) |
+| 0033 | [The Notifications module: one Telegram bot with a webhook](0033-notifications-module-and-telegram-webhook.md) |
+| 0034 | [The scheduler is a GitHub Actions cron](0034-scheduler-github-actions-cron.md) |
+| 0035 | [Modules talk through integration events in the outbox](0035-integration-events-through-the-outbox.md) |
+| 0036 | [Telegram chats are linked from Telegram, not configured](0036-telegram-chats-linked-from-telegram.md) |
 
 ## Decisions that must have a record
 

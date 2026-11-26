@@ -74,6 +74,9 @@ jobs:
           dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
             --project src/Modules/Todos/Todos.Infrastructure --startup-project src/Host/Host.Api \
             --context TodosDbContext --output ${{ runner.temp }}/migrations/todos
+          dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
+            --project src/Modules/Notifications/Notifications.Infrastructure --startup-project src/Host/Host.Api \
+            --context NotificationsDbContext --output ${{ runner.temp }}/migrations/notifications
 
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'

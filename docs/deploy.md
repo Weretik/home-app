@@ -22,6 +22,7 @@ Settings → Secrets and variables → Actions:
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | portal: Static Web App `home-web` → Overview → Manage deployment token |
 | `VITE_API_URL` | variable, optional | the API address; when not set, the address above is used |
 | `DATABASE_CONNECTION_STRING` | secret of the `production` environment | the same string as the App Service's `ConnectionStrings__Database`; the deploy job applies migrations with it |
+| `SCHEDULER_KEY` | secret | a long random value, the same as the App Service's `OutboxTick__Key`; the `scheduler.yml` cron sends it every 15 minutes. Until it is set the cron only prints a notice ([ADR 0034](../api/docs/decisions/0034-scheduler-github-actions-cron.md)) |
 
 The API deploys through OIDC: GitHub gets a short-lived Azure token, with no passwords or publish profile (basic auth on
 the App Service is off, and that is fine). Sign-in is allowed only from this repository's `production` environment. GitHub puts the owner and repository ids into
@@ -58,6 +59,8 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` | now, otherwise the front cannot reach the API |
 | `ConnectionStrings__Database` | PostgreSQL connection string | once the database is chosen |
 | `Expenses__Import__Key` | long random value | normally never: the sheet is imported on a local API and the rows reach production as a SQL script; set it only for a direct import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
+| `OutboxTick__Key` | long random value, equal to the GitHub secret `SCHEDULER_KEY` | for the outbox and the Telegram bot; without it both ticks answer `404` |
+| `Telegram__BotToken` | the token from @BotFather | for the Telegram bot; empty means the bot is off and the webhook answers `404` |
 
 Or with one command:
 
@@ -129,10 +132,27 @@ Save (the app restarts) and open `/health`: `checks.database` should be `Healthy
 Locally keep using the Docker database from `api/compose.yaml`, or point at a real one with
 `dotnet user-secrets set "ConnectionStrings:Database" "<string>"` in `api/src/Host/Host.Api`. Never commit the string.
 
+## Telegram bot
+
+Once ([ADR 0033](../api/docs/decisions/0033-notifications-module-and-telegram-webhook.md),
+[module page](../api/docs/modules/notifications.md)):
+
+1. In Telegram, @BotFather → `/newbot` → copy the token. Never commit it.
+2. Generate a key: `openssl rand -hex 32`. Put it into the App Service as `OutboxTick__Key` and into GitHub as the
+   `SCHEDULER_KEY` secret.
+3. Put the token into the App Service as `Telegram__BotToken` and restart it.
+4. The next scheduler tick registers the webhook itself (`setWebhook` with the secret derived from the token). To do it
+   at once, run the `Scheduler` workflow by hand (Actions → Scheduler → Run workflow).
+5. On the site, «Уведомления»: open the bot link, press Start in each private chat and choose «Я Виталий» / «Я Маша»;
+   add the bot to the family group (it becomes the group chat). «Проверить» sends a test message.
+
+A new token changes the webhook secret; the next tick sets the webhook again.
+
 ## F1 limits
 
 - No Always On: after idle time the first request wakes the app up in 10–30 seconds. The workflow's smoke test allows
   for that.
-- 60 CPU minutes per day. Plenty for two people.
+- 60 CPU minutes per day. Plenty for two people, including the scheduler's 96 short calls a day (it also keeps the
+  app warm).
 - No deployment slots: a deployment goes straight to production; roll back by re-running the workflow on an older
   commit.

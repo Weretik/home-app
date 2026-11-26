@@ -848,6 +848,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Telegram bot: whether its token is set, its @username and link, the three chats (Vitaliy, Maria, Family) linked or not, the schedule in Kyiv time and the last ten planned messages. */
+        get: operations["getNotificationsStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/chats/{audience}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unlinks the Telegram chat of Vitaliy, Maria or Family, so another chat can be linked with /start. 404 when none is linked. */
+        delete: operations["unlinkNotificationsChat"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends «✅ Бот на связи» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused. */
+        post: operations["sendNotificationsTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -880,6 +931,11 @@ export interface components {
             /** Format: int32 */
             dueToday: number;
         };
+        /**
+         * @description Who a message is for: Виталий or Маша in their private chats, or the family group.
+         * @enum {unknown}
+         */
+        Audience: "Vitaliy" | "Maria" | "Family";
         BudgetSettingsRequest: {
             /** Format: double */
             monthlyLimit: number;
@@ -966,6 +1022,11 @@ export interface components {
             departmentName: string;
             departmentIcon: string;
         };
+        /**
+         * @description The kinds of scheduled messages (spec notifications/001, R-008…R-013).
+         * @enum {unknown}
+         */
+        DigestKind: "TodosMorning" | "TodosCommon" | "GiftReminder" | "ShoppingEvening" | "ExpensesWeek" | "ExpensesMonth";
         /** @description One expense row of the month list, with its category name. */
         ExpenseItem: {
             /** Format: uuid */
@@ -1068,7 +1129,10 @@ export interface components {
             label: string;
             value: string;
         };
-        /** @description A gift as the list shows it, with its category name and its variants in order. */
+        /**
+         * @description A gift as the list shows it, with its category name and its variants in order; Recipient? GiftItem.Giver and
+         *     DateOnly? GiftItem.BuyBy plan its purchase (spec gifts/002).
+         */
         GiftItem: {
             /** Format: uuid */
             id: string;
@@ -1093,6 +1157,9 @@ export interface components {
             variants: components["schemas"]["GiftVariantItem"][];
             /** Format: date-time */
             createdAtUtc: string;
+            giver: null | components["schemas"]["Recipient"];
+            /** Format: date */
+            buyBy: null | string;
         };
         GiftRequest: {
             recipient: components["schemas"]["Recipient"];
@@ -1108,6 +1175,9 @@ export interface components {
             occasionDate: null | string;
             notes: null | string;
             variants: null | components["schemas"]["GiftVariantRequest"][];
+            giver?: null | components["schemas"]["Recipient"];
+            /** Format: date */
+            buyBy?: null | string;
         };
         /**
          * @description The home page's view of the wishlist: every recipient (Маша, Виталий, Вместе, always all three, in that order), the
@@ -1377,6 +1447,45 @@ export interface components {
             /** Format: date-time */
             lastAddedAtUtc: string;
             inList: boolean;
+        };
+        /** @description One of the three chats; string? NotificationChatItem.Title and DateTimeOffset? NotificationChatItem.LinkedAtUtc are null while it is not linked. */
+        NotificationChatItem: {
+            audience: components["schemas"]["Audience"];
+            linked: boolean;
+            title: null | string;
+            /** Format: date-time */
+            linkedAtUtc: null | string;
+        };
+        /** @description A planned message; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox. */
+        NotificationDeliveryItem: {
+            kind: components["schemas"]["DigestKind"];
+            audience: components["schemas"]["Audience"];
+            key: string;
+            /** Format: date-time */
+            createdAtUtc: string;
+            /** Format: date-time */
+            sentAtUtc: null | string;
+        };
+        /** @description One line of the schedule: the kind, what it is and when it comes (Russian, Kyiv time). */
+        NotificationScheduleItem: {
+            kind: components["schemas"]["DigestKind"];
+            title: string;
+            when: string;
+        };
+        /**
+         * @description Whether the bot token is set, the bot's @username and link, the three chats (linked or not), the schedule and the
+         *     last ten planned messages.
+         */
+        NotificationsStatus: {
+            configured: boolean;
+            botUsername: null | string;
+            botLink: null | string;
+            chats: components["schemas"]["NotificationChatItem"][];
+            schedule: components["schemas"]["NotificationScheduleItem"][];
+            deliveries: components["schemas"]["NotificationDeliveryItem"][];
+        };
+        NotificationsTestRequest: {
+            audience: components["schemas"]["Audience"];
         };
         /**
          * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
@@ -1734,7 +1843,8 @@ export interface components {
         };
         /**
          * @description A task as lists show it, with its category, its steps in order and its version for `If-Match`. Lists carry
-         *     notes and steps too, so opening a task needs no second request.
+         *     notes and steps too, so opening a task needs no second request. string? TodoTaskItem.SourceKind and Guid? TodoTaskItem.SourceId
+         *     name the record of another module the task was made for, such as `gift` and its id (spec gifts/002).
          */
         TodoTaskItem: {
             /** Format: uuid */
@@ -1764,6 +1874,9 @@ export interface components {
             stepsTotal: number;
             /** Format: uint32 */
             version: number;
+            sourceKind: null | string;
+            /** Format: uuid */
+            sourceId: null | string;
         };
         /** @description One page of active or archived tasks and how many match the filter in all. */
         TodoTaskList: {
@@ -5409,6 +5522,131 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodoSummary"];
+                };
+            };
+        };
+    };
+    getNotificationsStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsStatus"];
+                };
+            };
+        };
+    };
+    unlinkNotificationsChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                audience: components["schemas"]["Audience"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    sendNotificationsTest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationsTestRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
         };

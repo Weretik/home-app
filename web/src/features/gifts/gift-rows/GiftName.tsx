@@ -4,9 +4,15 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { GiftItem } from '../data/gifts-api';
+import { formatPurchase, kyivToday } from '../display/purchase';
 
-/** A gift's name with its shop link as an icon, and its notes in at most two lines under it. */
+/**
+ * A gift's name with its shop link as an icon, the purchase line of a wanted gift («🛒 купить до 12.12 · дарит
+ * Виталий», red when late) and its notes in at most two lines under it.
+ */
 export function GiftName({ gift }: { gift: GiftItem }) {
+  const purchase =
+    gift.status === 'Wanted' ? formatPurchase(gift, kyivToday()) : null;
   return (
     <Box sx={{ minWidth: 0 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -28,6 +34,17 @@ export function GiftName({ gift }: { gift: GiftItem }) {
           </Tooltip>
         )}
       </Box>
+      {purchase && (
+        <Typography
+          variant="body2"
+          sx={{
+            color: purchase.overdue ? 'error.main' : 'text.secondary',
+            fontWeight: purchase.overdue ? 600 : undefined,
+          }}
+        >
+          {purchase.text}
+        </Typography>
+      )}
       {gift.notes && (
         <Typography
           variant="body2"

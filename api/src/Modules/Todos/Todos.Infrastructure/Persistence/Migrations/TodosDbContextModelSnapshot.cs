@@ -23,6 +23,52 @@ namespace Todos.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BuildingBlocks.Infrastructure.Outbox.Storage.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ClaimToken")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("FailedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("NextAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("ProcessedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClaimToken");
+
+                    b.HasIndex("ProcessedAtUtc", "FailedAtUtc", "NextAttemptAtUtc");
+
+                    b.ToTable("outbox_messages", "todos");
+                });
+
             modelBuilder.Entity("Todos.Application.Idempotency.CreateRequest", b =>
                 {
                     b.Property<string>("Key")
@@ -226,6 +272,15 @@ namespace Todos.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("priority");
 
+                    b.Property<Guid?>("SourceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_id");
+
+                    b.Property<string>("SourceKind")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("source_kind");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(16)
@@ -260,6 +315,11 @@ namespace Todos.Infrastructure.Persistence.Migrations
                     b.HasIndex("ImportKey")
                         .IsUnique()
                         .HasDatabaseName("ux_tasks_import_key");
+
+                    b.HasIndex("SourceKind", "SourceId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_tasks_source")
+                        .HasFilter("source_kind IS NOT NULL");
 
                     b.HasIndex("Status", "DueDate")
                         .HasDatabaseName("ix_tasks_status_due_date");

@@ -6,7 +6,7 @@ using Mediator;
 
 namespace Gifts.Application.Features.Items.Commands.CreateGift;
 
-/// <summary>Adds a gift idea to the active list. A repeat with the same Idempotency-Key and data returns the first id.</summary>
+/// <summary>Adds a gift idea to the active list, with an optional giver and buy-by date (spec gifts/002). A repeat with the same Idempotency-Key and data returns the first id.</summary>
 public sealed record CreateGiftCommand(
     string IdempotencyKey,
     Recipient Recipient,
@@ -18,4 +18,6 @@ public sealed record CreateGiftCommand(
     string? Occasion,
     DateOnly? OccasionDate,
     string? Notes,
-    IReadOnlyList<VariantDraft> Variants) : ICommand<Result<CreatedGiftsEntry>>;
+    IReadOnlyList<VariantDraft> Variants,
+    Recipient? Giver = null,
+    DateOnly? BuyBy = null) : ICommand<Result<CreatedGiftsEntry>>;

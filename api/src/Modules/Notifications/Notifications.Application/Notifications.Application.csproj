@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\Notifications.Contracts\Notifications.Contracts.csproj" />
+    <ProjectReference Include="..\Notifications.Domain\Notifications.Domain.csproj" />
+    <ProjectReference Include="..\..\Expenses\Expenses.Contracts\Expenses.Contracts.csproj" />
+    <ProjectReference Include="..\..\Gifts\Gifts.Contracts\Gifts.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shopping\Shopping.Contracts\Shopping.Contracts.csproj" />
+    <ProjectReference Include="..\..\Todos\Todos.Contracts\Todos.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UnitTests" />
+  </ItemGroup>
+
+</Project>

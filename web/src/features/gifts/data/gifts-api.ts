@@ -6,6 +6,8 @@ import { moduleKeys } from '../../../platform/query-keys';
 export type Recipient = Schema<'Recipient'>;
 export type GiftPriority = Schema<'Priority'>;
 export type GiftStatus = Schema<'GiftStatus'>;
+/** Who gives a gift: the same three values as the recipient. */
+export type Giver = Recipient;
 export type GiftItem = Schema<'GiftItem'>;
 export type GiftVariantItem = Schema<'GiftVariantItem'>;
 export type GiftCategoryItem = Schema<'GiftCategoryItem'>;
