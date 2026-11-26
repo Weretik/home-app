@@ -19,7 +19,7 @@ not simplify it because the project is small.
   [C4](api/docs/architecture/c4.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
-  [decisions](web/docs/decisions/README.md).
+  [design rules](web/docs/design.md) (every screen follows them), [decisions](web/docs/decisions/README.md).
 - Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database), [deployment](docs/deploy.md).
 
 A new lasting decision (a module, an external system, a way of running work, hosting, authentication, a state or

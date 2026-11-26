@@ -32,6 +32,8 @@
 - The app is never indexed.
 - Mark only problems in lists, with the reason; no "OK" badges.
 - UI text in Russian; layouts work on a phone first.
+- Every screen follows the [design rules](design.md): theme tokens only, no literal colours, both colour schemes,
+  the shell's menus, the card patterns.
 
 ## Tests and checks
 

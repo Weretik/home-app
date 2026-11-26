@@ -6,6 +6,7 @@ client generated from the backend contract. It follows the frontend of
 
 - [Architecture](docs/architecture.md): folders, the API client, how data flows.
 - [Rules](docs/rules.md): the conventions every change follows; most are checked in CI.
+- [Design](docs/design.md): theme, light/dark/system, the shell and card patterns every screen follows.
 - [Decisions](docs/decisions/README.md): why it is built this way.
 
 ## Commands
