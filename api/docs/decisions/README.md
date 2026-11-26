@@ -36,6 +36,9 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0027 | [Overspend carries over like the sheet, computed on read from a start day](0027-limit-carry-over-like-the-sheet.md) |
 | 0028 | [Planned expenses are their own table and are recorded into real expenses](0028-planned-expenses-for-the-forecast.md) |
 | 0029 | [Every backend rule is checked by a test, or marked review-only with a reason](0029-every-rule-checked-by-a-test.md) |
+| 0030 | Reserved for the Todos module, not written yet |
+| 0031 | [The Shopping module, with the list, cart and history computed on read](0031-shopping-module-model.md) |
+| 0032 | [Text parsing and department matching are pure domain services with learned keywords](0032-text-parsing-and-department-matching.md) |
 
 ## Decisions that must have a record
 

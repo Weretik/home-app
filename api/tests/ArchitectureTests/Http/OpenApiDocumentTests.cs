@@ -47,6 +47,8 @@ public sealed partial class OpenApiDocumentTests
     private static readonly Dictionary<string, string> EditsWithoutVersion = new()
     {
         ["renameGiftCategory"] = "a rename is a target value and a category has no other field to lose (ADR 0024)",
+        ["setShoppingItemStatus"] = "a tick is a target value, so two people ticking the same item cannot undo each other (ADR 0031)",
+        ["reorderShoppingDepartments"] = "the whole order is a target value; a concurrent save still meets the row version (ADR 0031)",
     };
 
     private static IEnumerable<string> ResponseCodes(JsonElement operation) =>

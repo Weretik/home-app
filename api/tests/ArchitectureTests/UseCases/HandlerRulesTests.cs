@@ -45,12 +45,20 @@ public sealed partial class HandlerRulesTests
         Assert.Empty(violations);
     }
 
+    /// <summary>Commands that write more than once, inside one explicit transaction, with the reason.</summary>
+    private static readonly Dictionary<string, string> CommandsWithATransaction = new()
+    {
+        ["DeleteDepartmentHandler.cs"] =
+            "moves thousands of history rows with set-based UPDATEs, then deletes, all in one transaction (ADR 0031)",
+    };
+
     [Fact]
     public void A_Command_SavesOnce()
     {
         var violations =
             from file in UseCaseFiles("Commands")
             where file.EndsWith("Handler.cs", StringComparison.Ordinal)
+            where !CommandsWithATransaction.ContainsKey(Path.GetFileName(file))
             let saves = Save().Matches(File.ReadAllText(file)).Count
             where saves > 1
             select $"{SourceFiles.Relative(file)}: {saves} saves";

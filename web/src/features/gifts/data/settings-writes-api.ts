@@ -8,7 +8,7 @@ export type GiftDetailRequest = Schema<'GiftDetailRequest'>;
 
 /** Gifts carry their category's name, so a category write refreshes them too. */
 const categoryWriter: Writer<GiftCategoryRequest> = {
-  keys: [giftKeys.categories, giftKeys.items],
+  keys: [giftKeys.all],
   create: (body, key) =>
     apiCall(
       api.POST('/api/gifts/categories', {
@@ -32,7 +32,7 @@ const categoryWriter: Writer<GiftCategoryRequest> = {
 
 /** The home summary shows the «нюансы», so a detail write refreshes it too. */
 const detailWriter: Writer<GiftDetailRequest> = {
-  keys: [giftKeys.details, giftKeys.summary],
+  keys: [giftKeys.all],
   create: (body, key) =>
     apiCall(
       api.POST('/api/gifts/details', {

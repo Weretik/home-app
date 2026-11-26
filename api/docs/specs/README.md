@@ -16,3 +16,4 @@ SDD existed; it gives the behavior stable ids and lists gaps, and changes nothin
 | Expenses | [004 — Month summary](expenses/004-month-summary/README.md) | retroactive | implemented | [web 004](../../../web/docs/specs/expenses/004-home-expenses-summary/README.md) |
 | Expenses | [005 — Budget: forecast, limit carry-over, expenses outside limits](expenses/005-budget-forecast-carryover/README.md) | new | in implementation | [web 005](../../../web/docs/specs/expenses/005-budget-forecast-carryover/README.md) |
 | Gifts | [001 — Gifts module (wishlist, archive, categories, details, summary)](gifts/001-gifts-module/README.md) | new | implemented, audited | [web 001](../../../web/docs/specs/gifts/001-gifts-section/README.md) |
+| Shopping | [001 — Shopping list (list, cart, history, departments, keywords, frequent items, summary)](shopping/001-shopping-list/README.md) | new | implemented | [web 001](../../../web/docs/specs/shopping/001-shopping-list/README.md) |

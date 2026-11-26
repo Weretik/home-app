@@ -5,4 +5,6 @@
  */
 export const moduleKeys = {
   expenses: ['expenses'],
+  shopping: ['shopping'],
+  gifts: ['gifts'],
 } as const;

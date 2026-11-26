@@ -39,7 +39,7 @@ names the test for each rule and the reason for each rule that is review only
   module's `DbContext` port is the unit of work. **(tested)**
 - Arithmetic that a handler does over what it read (sums, carry-over, forecasts) sits in a pure type beside the
   handler, so it can be unit-tested with fixed input and a fixed day (`GetMonthSummary/SummaryFigures`,
-  `GetGiftsSummary/SummaryFigures`).
+  `GetGiftsSummary/SummaryFigures`, Shopping's `GetSummary/SummaryFigures`).
 
 ## Errors
 
@@ -136,21 +136,21 @@ push. "Review only" rules are checked by the audit of each feature.
 | Use case folder, names, handler and validator beside it | `UseCases/UseCaseRulesTests.Every_UseCase_SitsInItsOwnFolder…`, `.Every_UseCase_IsNamedAfterItsFolder…` |
 | Every use case returns a `Result`; every use case with input has a validator | `UseCaseRulesTests.Every_UseCase_ReturnsAResult`, `.Every_UseCase_WithInput_HasAValidator` |
 | Queries never write; reads without tracking or through a projection | `UseCases/HandlerRulesTests.A_Query_NeverChangesState`, `.A_Query_ReadsWithoutTracking_OrThroughAProjection` |
-| A command saves once | `HandlerRulesTests.A_Command_SavesOnce` |
+| A command saves once | `HandlerRulesTests.A_Command_SavesOnce` (allow-list: `DeleteDepartmentHandler`, set-based moves of the history rows and the delete in one explicit transaction, ADR 0031) |
 | Page size at most 100 | `HandlerRulesTests.A_PagedList_ServesAtMost100RowsAPage` |
 | No `throw` for business rules in `Domain`/`Application` | `HandlerRulesTests.Business_Rules_ReturnResults_InsteadOfThrowing` |
 | Validators check shape, the domain checks rules | `UnitTests/<Module>/Input/*`, `UnitTests/<Module>/Domain/*` (per rule); the split itself is review only (meaning) |
 | Unique `WithName` (camelCase) and `WithSummary` | `Http/OpenApiDocumentTests.Every_Operation_HasAUniqueCamelCaseId_AndASummary` |
 | `Produces…` for every body; errors are problem responses; input lists `400` | `OpenApiDocumentTests.Every_SuccessWithABody_HasASchema`, `.Every_Error_IsAProblemResponse`, `.Every_Operation_WithInput_ListsTheValidationProblem` |
 | Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
-| `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024) |
+| `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024; `setShoppingItemStatus` and `reorderShoppingDepartments` without a version, target values, ADR 0031) |
 | Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |
 | HTTP records have names no other module uses | `Http/ContractSchemaNameTests.Http_Records_HaveNames_NoOtherModuleUses` |
 | Numbers are JSON numbers | `OpenApiDocumentTests.Numbers_AreNotAlsoStrings` |
 | OpenAPI committed and current | CI `api.yml`: `git diff --exit-code -- docs/contracts/openapi.json` after the build |
 | No secrets in committed settings; production does not migrate on startup | `Hosting/ConfigurationRulesTests` |
-| Repeats: same key returns the first result, other data `409` | `IntegrationTests/Api/Expenses/*`, `IntegrationTests/Api/Gifts/GiftsApiTests` (`A_Repeated_*Create*`, per kind) |
-| Race guards (row version, unique index, foreign key) answer `409`, never `500` | `IntegrationTests/Api/Expenses/Entries/ExpensesRaceApiTests`, `IntegrationTests/Api/Gifts/GiftsRaceApiTests` |
+| Repeats: same key returns the first result, other data `409` | `IntegrationTests/Api/Expenses/*`, `IntegrationTests/Api/Gifts/GiftsApiTests`, `IntegrationTests/Api/Shopping/ShoppingItemsApiTests` (`A_Repeated_*`, per kind) |
+| Race guards (row version, unique index, foreign key) answer `409`, never `500` | `IntegrationTests/Api/Expenses/Entries/ExpensesRaceApiTests`, `IntegrationTests/Api/Gifts/GiftsRaceApiTests`, `IntegrationTests/Api/Shopping/ShoppingRaceApiTests` |
 | ADRs have a status and are indexed; SDDs indexed; every module has a page | `Structure/DocumentationIndexTests` |
 | No query and no `SaveChanges` in a loop | review only: a loop over an in-memory list is fine, over a query is not; the text cannot tell them apart reliably |
 | Search: words, escaped `LIKE`, trigram index | `UnitTests/BuildingBlocks/SearchPatternTests` for the pattern; the index is review only (migration content) |

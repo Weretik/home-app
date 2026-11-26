@@ -16,6 +16,7 @@ Next.js storefront.
 | 0008 | [The home page as a registry of per-section summaries](0008-home-page-as-a-registry-of-section-summaries.md)                                  |
 | 0009 | [A write refreshes every query of its backend module](0009-writes-refresh-their-backend-module.md)                                            |
 | 0010 | [Every web rule has a check, or a written reason why it is review only](0010-every-rule-has-a-check.md)                                       |
+| 0012 | [A live shared list: optimistic ticks, polling and «кто я» per device](0012-live-shared-list-with-optimistic-ticks-and-polling.md)            |
 
 ## Decisions that must have a record
 

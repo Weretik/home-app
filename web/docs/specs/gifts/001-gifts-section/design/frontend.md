@@ -100,13 +100,10 @@ Changes against the first plan:
   a filter change sends no request.
 - Dialog state: `use-editor-state` in the page controller (component state, not server data). Form values in
   `use-edit-form`. No global store.
-- Invalidation (every success, and a stale 404/conflict error):
-
-  | Write                                  | Invalidates                                                                  |
-  | -------------------------------------- | ---------------------------------------------------------------------------- |
-  | gift create / update / delete / status | `['gifts', 'items']` (both tabs), `['gifts', 'summary']`                     |
-  | category create / rename / delete      | `['gifts', 'categories']`, `['gifts', 'items']` (cards carry `categoryName`) |
-  | detail create / update / delete        | `['gifts', 'details']`, `['gifts', 'summary']`                               |
+- Invalidation (every success, and a stale 404/conflict error): every Gifts write (gift create / update / delete /
+  status, category create / rename / delete, detail create / update / delete) invalidates the whole Gifts prefix
+  `moduleKeys.gifts` (`['gifts']`), per web ADR 0009. Delivered first with narrower keys per write; aligned with the
+  ADR when the branches merged (same data shown, a few more refetches after a write).
 
 - Loading, empty, error: `list-view/ListStatus.tsx` per tab; cards in settings show their own spinner/error; home
   summary like `ExpensesSummary`. Stale data: refetch on invalidation only (the query client defaults); no polling.

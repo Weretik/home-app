@@ -29,8 +29,9 @@ src/
     home/         Главная: the section summaries and their switcher, the placeholder for sections not built yet
     status/       API and database status page
     expenses/     the «Бюджет» section, the Expenses module (below)
+    shopping/     the «Покупки» section, the Shopping module (below)
     gifts/        the «Подарки» section, the Gifts module (below)
-    <area>/       one folder per backend module: shopping, todos
+    <area>/       one folder per backend module: todos
 ```
 
 A feature folder holds its page components, its `<area>-api.ts` with React Query hooks, and tests next to the code.
@@ -40,19 +41,22 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 
 ## Routes
 
-| Path                  | Page                                                                                                    | Feature                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `/`                   | Главная, the dashboard                                                                                  | `home`                   |
-| `/expenses`           | Бюджет › Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete | `expenses/expense-list`  |
-| `/expenses/incomes`   | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                          | `expenses/income-list`   |
-| `/expenses/savings`   | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months  | `expenses/savings-page`  |
-| `/expenses/forecast`  | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»   | `expenses/forecast-page` |
-| `/expenses/settings`  | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                     | `expenses/settings-page` |
-| `/gifts`              | Список: wanted gifts grouped by person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
-| `/gifts/archive`      | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                | `gifts/pages`            |
-| `/gifts/settings`     | Настройки (the gear next to the tabs): «Нюансы» and categories                                          | `gifts/settings-page`    |
-| `/shopping`, `/todos` | «Раздел скоро появится» placeholder                                                                     | `home/ComingSoonPage`    |
-| `/status`             | Состояние: API and database status                                                                      | `status`                 |
+| Path                 | Page                                                                                                    | Feature                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `/`                  | Главная, the dashboard                                                                                  | `home`                   |
+| `/expenses`          | Бюджет › Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete | `expenses/expense-list`  |
+| `/expenses/incomes`  | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                          | `expenses/income-list`   |
+| `/expenses/savings`  | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months  | `expenses/savings-page`  |
+| `/expenses/forecast` | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»   | `expenses/forecast-page` |
+| `/expenses/settings` | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                     | `expenses/settings-page` |
+| `/shopping`          | Покупки, Список: quick add, ⭐ Частые, groups by department, ticks, «В корзине»                         | `shopping/list-page`     |
+| `/shopping/history`  | История: bought items by day, «Вернуть в список», delete                                                | `shopping/history-page`  |
+| `/shopping/settings` | Настройки (the gear): departments and their order, keywords, cart hours and the frequent window         | `shopping/settings-page` |
+| `/gifts`             | Список: wanted gifts grouped by person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
+| `/gifts/archive`     | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                | `gifts/pages`            |
+| `/gifts/settings`    | Настройки (the gear next to the tabs): «Нюансы» and categories                                          | `gifts/settings-page`    |
+| `/todos`             | «Раздел скоро появится» placeholder                                                                     | `home/ComingSoonPage`    |
+| `/status`            | Состояние: API and database status                                                                      | `status`                 |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
 
@@ -65,6 +69,11 @@ The home page shows one section's summary at a time, picked with a switcher
 home/
   page/              HomePage (title, switcher, the open summary, the «Состояние» link for phones), the summary
                      registry (summary-sections.ts), ?s= in the URL, the «Раздел скоро появится» placeholder
+  shopping-summary/
+    data/            shopping-summary-api.ts (GET /api/shopping/summary, key ['shopping', 'summary']), its labels
+    overview/        ShoppingSummary («Открыть список», states), SummaryContent (which cards show), «Список пуст 🎉»
+    cards/           Нужно купить / Срочно / Куплено за 7 дней (SummaryKpis, FigureCard), «По отделам», «Купить в
+                     первую очередь», «Покупаем чаще всего»
   expenses-summary/
     data/            summary-api.ts (GET /api/expenses/summary), the month and ?year=&month=, amounts and the goal
                      percent (money.ts), labels, figure-lines.ts (the empty month, the «Вне лимитов» line, the
@@ -99,6 +108,8 @@ home/
   one definition per side with the same test cases: the savings goal percent is rounded down on both «Копилка» cards
   (`goalPercentOf` here, `goalPercent` in `expenses/savings-goal/goal-progress.ts`), so 100 % means the goal is reached;
   the month helpers and the month picker are copies of the `expenses` ones.
+- «Покупки» shows the list at a glance: three figure cards, the departments with needed items, up to eight next items
+  (urgent first), the five most bought, and «Открыть список». An empty list says «Список пуст 🎉».
 
 ## Expenses (`src/features/expenses`)
 
@@ -175,6 +186,35 @@ expenses/
 - A new page (Обзор, Лимиты, Платежи, По месяцам, Категории) is an entry in
   `section/expenses-pages.ts`, a nested route in `App.tsx` and its own folder.
 
+## Shopping (`src/features/shopping`)
+
+The shared shopping list of the old «🛒 Список покупок» sheet and its bot, as tabs Список and История plus the
+«Настройки» gear ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)); live for two people
+([ADR 0012](decisions/0012-live-shared-list-with-optimistic-ticks-and-polling.md)). Specification:
+[docs/specs/shopping/001-shopping-list](specs/shopping/001-shopping-list/README.md).
+
+```
+shopping/
+  data/                 shopping-api.ts (the list with 20 s polling, ⭐ Частые, department match), item-writes-api.ts
+                        (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo, the shared write hook),
+                        status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Russian text), labels
+  section/              ShoppingSection (title with counts, «Я», tabs, gear, <Outlet />), the page list, use-me.ts
+  quick-add/            the sticky field with «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
+  list-page/            «Список»: department cards in store order, item rows, «В корзине», the grouping
+  item-editing/         the item dialog (name, quantity, note, department, Срочно, Удалить) and its form
+  page-parts/           form and confirm dialogs, the «⋮» menu, loading / error / offline / empty states
+  history-page/         «История»: days, «Вернуть в список», delete, «Показать ещё»
+  settings-page/        «Настройки»: the page and the «Список» card (cart hours, frequent days)
+  department-settings/  «Отделы»: order with up / down, add / rename / delete
+  keyword-settings/     «Слова для отделов»: search, department filter, add / edit / delete, «выучено»
+```
+
+- Query keys start with the Shopping prefix (`moduleKeys.shopping`, `['shopping']`); every write invalidates that
+  prefix (list, frequent, history, departments, the home summary), as [ADR 0009](decisions/0009-writes-refresh-their-backend-module.md) asks.
+- Needed items are grouped by department in its sort order, urgent first, then oldest added; the cart is newest
+  bought first. Moving an item to another department in the dialog teaches the dictionary on the server.
+- «Я» (Виталий / Маша) is per device and is the author of adds and ticks.
+
 ## Gifts (`src/features/gifts`)
 
 The old «🎁 Список подарков» sheet as a section with tabs ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)):
@@ -215,9 +255,9 @@ gifts/
   hundred gifts at most), so a filter change sends no request. Without a person filter «Список» groups by person.
 - Writes follow [ADR 0007](decisions/0007-editing-in-dialogs-with-idempotency-and-versions.md): creates send an
   `Idempotency-Key`, gift, status and «нюанс» edits send the `version` in `If-Match` (categories have none), a 409
-  `gifts.changed_meanwhile`, a 412 or a 404 reload the list. A gift write invalidates `['gifts', 'items']` and
-  `['gifts', 'summary']`; a category write `['gifts', 'categories']` and the items; a «нюанс» write
-  `['gifts', 'details']` and the summary.
+  `gifts.changed_meanwhile`, a 412 or a 404 reload the list. Every Gifts write (gift, status, category, «нюанс»)
+  invalidates the whole Gifts prefix (`moduleKeys.gifts`, `['gifts']`): both tabs, the settings and the home summary
+  ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
 - «Подарено» sends `{ status: 'Gifted', giftedOn: null }` (the server takes today in Kyiv); «Не актуально» and
   «Вернуть в список» send `Dropped` and `Wanted`. The edit dialog never changes the status.
 - The editing frame is a copy of the Expenses one adapted to the `gifts.*` codes, because features never import each
