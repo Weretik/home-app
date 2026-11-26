@@ -21,12 +21,148 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/expenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists one month's expenses, newest first, with the month's total. */
+        get: operations["listExpenses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/incomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists one month's incomes, newest first, with the month's total. */
+        get: operations["listIncomes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the expense categories in display order. */
+        get: operations["listExpenseCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description A category as lists and pickers show it. */
+        CategoryItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: int32 */
+            sortOrder: number;
+        };
+        /** @description One expense row of the month list, with its category name. */
+        ExpenseItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            date: string;
+            payer: components["schemas"]["Payer"];
+            /** Format: uuid */
+            categoryId: string;
+            categoryName: string;
+            /** Format: double */
+            amount: number;
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            comment: null | string;
+        };
+        /** @description One page of a month's expenses, plus the sum of every expense that matches the filter (not just this page). */
+        ExpenseList: {
+            items: components["schemas"]["ExpenseItem"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: double */
+            totalAmount: number;
+        };
         /** @enum {unknown} */
         HealthStatus: "Unhealthy" | "Degraded" | "Healthy";
+        HttpValidationProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number;
+            detail?: null | string;
+            instance?: null | string;
+            errors?: {
+                [key: string]: string[];
+            };
+        };
+        /** @description One income row of the month list. */
+        IncomeItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            date: string;
+            person: components["schemas"]["Person"];
+            /** Format: double */
+            amount: number;
+            comment: null | string;
+        };
+        /** @description One page of a month's incomes, plus the sum of every income that matches the filter. */
+        IncomeList: {
+            items: components["schemas"]["IncomeItem"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: double */
+            totalAmount: number;
+        };
+        /**
+         * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
+         *     shared spending such as groceries.
+         * @enum {unknown}
+         */
+        Payer: "Vitaliy" | "Maria" | "Shared";
+        /**
+         * @description How an expense was paid (the sheet's «Оплата» column).
+         * @enum {unknown}
+         */
+        PaymentMethod: "Card" | "Cash";
+        /**
+         * @description One of the two people the household accounts belong to. Incomes always belong to one of them.
+         * @enum {unknown}
+         */
+        Person: "Vitaliy" | "Maria";
         /** @description The overall status, the build version with its commit, the environment, and the status of each check. */
         SystemStatus: {
             status: components["schemas"]["HealthStatus"];
@@ -61,6 +197,97 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SystemStatus"];
+                };
+            };
+        };
+    };
+    listExpenses: {
+        parameters: {
+            query: {
+                year: number;
+                month: number;
+                categoryId?: string;
+                payer?: components["schemas"]["Payer"];
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpenseList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    listIncomes: {
+        parameters: {
+            query: {
+                year: number;
+                month: number;
+                person?: components["schemas"]["Person"];
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IncomeList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    listExpenseCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryItem"][];
                 };
             };
         };

@@ -11,6 +11,7 @@ Next.js storefront.
 | 0003 | [A typed API client generated from the backend contract](0003-typed-client-from-openapi.md)                                   |
 | 0004 | [Feature folders with boundaries checked in CI](0004-feature-folders-checked-in-ci.md)                                        |
 | 0005 | [The «Синий плащ» theme, light/dark/system, and a Berry-style dashboard shell](0005-blue-coat-theme-and-berry-style-shell.md) |
+| 0006 | [Section pages as tabs, with the month and filters in the URL](0006-section-pages-as-tabs-with-state-in-the-url.md)           |
 
 ## Decisions that must have a record
 

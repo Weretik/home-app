@@ -77,6 +77,19 @@ Computer (md, 900px and wider)              Phone (below md)
 - Grids: one column on a phone, two from `sm`, three from `lg` where cards are small.
 - A page starts with its title (`h4` as `h1`); the shell shows no extra page header.
 
+## Sections with several pages and month lists
+
+- A section with several pages shows them as tabs under the title (scrollable on a phone), one tab per built page,
+  never a tab for a page that is not built ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)).
+- A page that shows one month has a month picker next to the title: arrows with `aria-label` and tooltips around
+  «Октябрь 2026», and «К текущему» when another month is open. The month and the filters are in the URL.
+- Amounts are formatted as hryvnias with two decimals («95 024,00 ₴»), right-aligned and in tabular figures.
+- A month list starts with a total card (tinted icon tile, caption, the sum, the record count), then the filters,
+  then the list in a card. Below `md` the list is compact (title, a caption line, the amount on the right); from `md`
+  it is a small table. More rows load with «Показать ещё».
+- An empty month says «За этот месяц записей нет»; an empty filtered list offers «Сбросить фильтр». An error shows
+  the reason and «Повторить».
+
 ## Cards
 
 - **Card**: `background.paper`, radius 16px, 1px `divider` border, a soft shadow in the light scheme and none in the
