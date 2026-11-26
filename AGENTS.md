@@ -7,7 +7,9 @@ projects. The code and `docs/` define how things actually work; read only what t
 
 A website for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping list,
 to-dos (Masha / Vitaliy / Shared), gift wishlist. So far there is only `/health` and a status page; there is no
-authentication or database yet, and the PostgreSQL provider is not chosen. The site is private: not indexed, no SEO.
+authentication yet. The database is PostgreSQL on a server shared with another project: everything of ours lives in
+the `home` schema (`HomeDbContext`, migrations history included), never touch other schemas.
+The site is private: not indexed, no SEO.
 
 ## Where things are
 

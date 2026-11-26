@@ -6,6 +6,7 @@ builder.Services
     .AddProblemDetails()
     .AddOpenApi()
     .AddCorsForWeb(builder.Configuration)
+    .AddDatabase(builder.Configuration)
     .AddHealth(builder.Configuration);
 
 var app = builder.Build();

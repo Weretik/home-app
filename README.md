@@ -4,7 +4,7 @@ A family website that replaces Google Sheets and Apps Script Telegram bots: expe
 Vitaliy, shared) and a gift wishlist. For now the repository holds only the scaffold: an API with `/health` and a page
 that calls it.
 
-**Stack:** .NET 10 · ASP.NET Core · PostgreSQL (provider not chosen yet) · React 19 · Vite · TypeScript
+**Stack:** .NET 10 · ASP.NET Core · PostgreSQL (schema `home` on a shared server) · EF Core · React 19 · Vite · TypeScript
 
 ```
 api/    ASP.NET Core API, one project, features in folders (api/src/HomeApp.Api/Features/<Area>/)

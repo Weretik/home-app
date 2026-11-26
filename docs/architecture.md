@@ -4,7 +4,7 @@
 flowchart LR
   browser[Browser] -->|static files| swa[Azure Static Web App<br/>web/dist]
   browser -->|fetch VITE_API_URL| api[Azure App Service<br/>HomeApp.Api]
-  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>provider not chosen)]
+  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>schema home, shared server)]
 ```
 
 The front and the API live on different hosts. The front is built into static files and calls the API by the full
@@ -19,14 +19,18 @@ api/
   compose.yaml                                     local PostgreSQL
   src/HomeApp.Api/
     Program.cs                                     application setup
-    Platform/                                      CORS, health, database check
+    Platform/                                      CORS, health, HomeDbContext, database check
     Features/<Area>/                               appears with the first feature
   tests/HomeApp.Api.Tests/                         tests through WebApplicationFactory
 ```
 
 `GET /health` returns JSON: `status`, `version` (build version with the commit), `environment` and `checks`. The
 database check is on only when `ConnectionStrings:Default` is set; without a connection string the API works and
-reports healthy. The OpenAPI document is served at `/openapi/v1.json` in Development only.
+reports healthy.
+
+Data access goes through one EF Core context, `HomeDbContext`, which puts every table and the migrations history
+(`home.__ef_migrations_history`) in the `home` schema. The context is registered only when a connection string is set.
+Features add their `DbSet` and entity configuration next to the feature code. The OpenAPI document is served at `/openapi/v1.json` in Development only.
 
 ## Web (`web/`)
 

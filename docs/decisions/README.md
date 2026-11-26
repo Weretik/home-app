@@ -7,5 +7,5 @@ New file: `NNNN-short-name.md`, next number in order.
 | --- | --- | --- |
 | [0001](0001-monorepo-simple-api.md) | One repository, the API as a single project | Accepted |
 | [0002](0002-azure-free-hosting.md) | Hosting on Azure free tiers, deployment from GitHub Actions | Accepted |
-| — | Database: PostgreSQL, provider (Neon, Supabase, Azure) | Open |
+| [0003](0003-postgres-schema-on-shared-server.md) | PostgreSQL: own schema `home` on an existing shared server | Accepted |
 | — | Authentication for two users | Open |

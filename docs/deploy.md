@@ -66,23 +66,56 @@ az webapp config appsettings set -g home-rg -n vitaliy-home-api \
 
 The startup command (`dotnet HomeApp.Api.dll`) is set by the workflow itself. Turn on HTTPS Only in General settings.
 
-## Database (Neon)
+## Database
 
 The API reads one connection string, `ConnectionStrings:Default`, in the Npgsql key/value format. When it is set,
-`/health` also checks the database.
+`/health` also checks the database. All tables live in the `home` schema (see
+[ADR 0003](decisions/0003-postgres-schema-on-shared-server.md)), so the database can be shared with another project.
 
-1. Create a free project at [neon.tech](https://neon.tech) in the region closest to Poland Central (AWS Frankfurt,
-   `eu-central-1`). The default database `neondb` is fine.
-2. Dashboard → Connect: pick the pooled connection and the **.NET** format. It looks like:
-   `Host=ep-xxx-pooler.eu-central-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=...;SSL Mode=Require`
-3. Put it into the App Service, either way works:
-   - Settings → Environment variables → **App settings**: name `ConnectionStrings__Default` (two underscores).
-   - Settings → Environment variables → **Connection strings**: name `Default`, type **Custom**. Do not pick the
-     PostgreSQL type: it becomes a `POSTGRESQLCONNSTR_` variable that ASP.NET Core does not map to
-     `ConnectionStrings:Default`.
-4. Save (the app restarts) and open `/health`: `checks.database` should be `Healthy`.
+### Main option: existing PostgreSQL at the hosting provider (adm.tools)
 
-Locally keep using the Docker database from `api/compose.yaml`, or point at a Neon branch with
+1. **Schema and user.** Ideally a separate user that owns only the `home` schema. Connected as the database owner
+   (panel's phpPgAdmin or `psql`):
+
+   ```sql
+   -- If the panel does not let you create roles, create an extra database user in the panel instead,
+   -- or as a last resort keep the owner user and run only: CREATE SCHEMA home;
+   CREATE ROLE home_app LOGIN PASSWORD '<strong password>';
+   GRANT CONNECT ON DATABASE <database> TO home_app;
+   CREATE SCHEMA home AUTHORIZATION home_app;
+   ALTER ROLE home_app SET search_path = home;
+   ```
+
+   `home_app` owns `home`, so migrations can create tables there, and it gets no rights on the other project's tables.
+   Shared hosting often gives the database user no `CREATEROLE` right; then the first comment applies.
+
+2. **Remote access.** Already open: the other project reaches this server from Google Cloud Run with changing IPs, so
+   no IP allow-list is needed. If the hosting ever restricts it, allow every address from
+   `az webapp show -g home-rg -n vitaliy-home-api --query possibleOutboundIpAddresses -o tsv`.
+
+3. **SSL.** Use the same host, port and SSL settings as the other project. With SSL use `SSL Mode=Require`; without
+   it the password travels in clear text over the internet, so prefer SSL if at all possible.
+
+4. **Connection string**, then put it into the App Service the same way as below:
+
+   `Host=<host>;Port=5432;Database=<database>;Username=home_app;Password=<password>;SSL Mode=Require;Search Path=home`
+
+### Alternative: Neon
+
+1. Create a free project at [neon.tech](https://neon.tech) in AWS Frankfurt (`eu-central-1`), the closest region to
+   Poland Central.
+2. Dashboard → Connect: pick the pooled connection and the **.NET** format, and append `;Search Path=home`.
+
+### Putting the connection string into the App Service
+
+- Settings → Environment variables → **App settings**: name `ConnectionStrings__Default` (two underscores), or
+- Settings → Environment variables → **Connection strings**: name `Default`, type **Custom**. Do not pick the
+  PostgreSQL type: it becomes a `POSTGRESQLCONNSTR_` variable that ASP.NET Core does not map to
+  `ConnectionStrings:Default`.
+
+Save (the app restarts) and open `/health`: `checks.database` should be `Healthy`.
+
+Locally keep using the Docker database from `api/compose.yaml`, or point at a real one with
 `dotnet user-secrets set "ConnectionStrings:Default" "<string>"` in `api/src/HomeApp.Api`. Never commit the string.
 
 ## F1 limits
