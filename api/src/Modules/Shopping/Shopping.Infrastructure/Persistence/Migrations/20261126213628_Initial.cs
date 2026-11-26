@@ -1,0 +1,637 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace Shopping.Infrastructure.Persistence.Migrations
+{
+    /// <inheritdoc />
+    public partial class Initial : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.EnsureSchema(
+                name: "shopping");
+
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,");
+
+            migrationBuilder.CreateTable(
+                name: "create_requests",
+                schema: "shopping",
+                columns: table => new
+                {
+                    key = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    kind = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    fingerprint = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    outcome = table.Column<string>(type: "text", nullable: false),
+                    created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_create_requests", x => x.key);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "departments",
+                schema: "shopping",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    icon = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    sort_order = table.Column<int>(type: "integer", nullable: false),
+                    is_fallback = table.Column<bool>(type: "boolean", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_departments", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "shopping_settings",
+                schema: "shopping",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    cart_keep_hours = table.Column<int>(type: "integer", nullable: false),
+                    frequent_days = table.Column<int>(type: "integer", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_shopping_settings", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "department_keywords",
+                schema: "shopping",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    keyword = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    learned = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_department_keywords", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_department_keywords_departments",
+                        column: x => x.department_id,
+                        principalSchema: "shopping",
+                        principalTable: "departments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "shopping_items",
+                schema: "shopping",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    normalized_name = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    quantity = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    note = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    urgent = table.Column<bool>(type: "boolean", nullable: false),
+                    status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    added_by = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    added_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    bought_by = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    bought_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    cleared_at_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    import_key = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_shopping_items", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_shopping_items_departments",
+                        column: x => x.department_id,
+                        principalSchema: "shopping",
+                        principalTable: "departments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                schema: "shopping",
+                table: "departments",
+                columns: new[] { "id", "icon", "is_fallback", "name", "sort_order" },
+                values: new object[,]
+                {
+                    { new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "🥛", false, "Молочное и яйца", 30 },
+                    { new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "🥫", false, "Бакалея", 60 },
+                    { new Guid("18462692-7e3e-5415-9880-d55073636438"), "☕", false, "Чай, кофе, напитки", 80 },
+                    { new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "🥦", false, "Овощи и фрукты", 10 },
+                    { new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "🪥", false, "Гигиена и аптека", 110 },
+                    { new Guid("29aeaa2c-a96b-5320-a72b-e96a8e09d7d6"), "🧺", true, "Другое", 130 },
+                    { new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "🍪", false, "Сладкое и снеки", 70 },
+                    { new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "🥩", false, "Мясо и рыба", 40 },
+                    { new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "🐾", false, "Животным", 120 },
+                    { new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "🧴", false, "Бытовая химия", 100 },
+                    { new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "❄️", false, "Заморозка", 90 },
+                    { new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "🧀", false, "Сыр и колбаса", 50 },
+                    { new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "🍞", false, "Хлеб", 20 }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "shopping",
+                table: "shopping_settings",
+                columns: new[] { "id", "cart_keep_hours", "frequent_days" },
+                values: new object[] { new Guid("7d1c4f0a-3b2e-4c55-9a1d-6e8f0b2c4a17"), 3, 183 });
+
+            migrationBuilder.InsertData(
+                schema: "shopping",
+                table: "department_keywords",
+                columns: new[] { "id", "created_at_utc", "department_id", "keyword", "learned" },
+                values: new object[,]
+                {
+                    { new Guid("01177479-c1df-58b7-b2c7-6a968a69b815"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "снек", false },
+                    { new Guid("0149da00-41e7-539d-bf9d-1ab12b32e8f3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "картоф", false },
+                    { new Guid("01912646-f388-538d-8d0d-36d62c163aed"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "прокладк", false },
+                    { new Guid("01a0b324-c7bc-50cc-80f8-90b37d07ac51"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "мюслі", false },
+                    { new Guid("032c2ab5-dc98-5c41-8161-d0cc6d800aa2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "масло", false },
+                    { new Guid("04209c69-e1b9-58e8-b7ea-2dd865134231"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "миюч", false },
+                    { new Guid("0607d5b5-2d28-50ef-90f4-4c2160503794"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "капуст", false },
+                    { new Guid("06af2023-5a19-58e2-8aac-738438b3d6a7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "дын", false },
+                    { new Guid("06e6d3d3-b209-507f-baf4-8eae4fc44bbf"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "вафл", false },
+                    { new Guid("099f36f4-3064-54fe-894a-c5b35422cd49"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "плівк", false },
+                    { new Guid("0a18f296-9ff1-504d-a943-22eec8d52588"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "нут", false },
+                    { new Guid("0b5eb825-a8fb-5f9b-9279-62dcd450a88c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "мяс", false },
+                    { new Guid("0bbd896c-8303-558c-b716-4f8b4ded6697"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "собач", false },
+                    { new Guid("0c18f2de-e003-5aa0-a256-11e104c18a9d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "семг", false },
+                    { new Guid("0c3784e2-d709-5fea-b8f0-275443d62e64"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "шей", false },
+                    { new Guid("0c447708-7754-5531-a61f-8e7dcb4d92c7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "моющ", false },
+                    { new Guid("0c44e4e8-0c7c-50c6-b93d-3e07cae981ee"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "бекон", false },
+                    { new Guid("0dbd66e2-c960-5d5e-88da-1d488a9d0b14"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "гриб", false },
+                    { new Guid("0eb0006c-6e1d-58c4-8790-e6dd49c83e95"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "простокваш", false },
+                    { new Guid("0ebb71bf-a293-5d88-9ea4-edcb50df7ce8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "пармез", false },
+                    { new Guid("0f12d598-4fc4-5d6a-920e-d9b620bb5993"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "салфет", false },
+                    { new Guid("0fa4c0aa-73c8-5ced-a5a3-b8c453b07b04"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "щітк", false },
+                    { new Guid("0ffcf75d-782c-5280-8b6a-db0c9b0aefc7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "соль", false },
+                    { new Guid("1069c455-c6d5-5f37-a5f6-b1a8253e3255"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "пакет мусор", false },
+                    { new Guid("10dd5798-6d1a-5c08-a10a-d06f527281c7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "белизн", false },
+                    { new Guid("12639689-80fe-5852-8dbb-09f189afaea9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "мук", false },
+                    { new Guid("13fa03e1-42b4-540d-93c1-a7e97bcdcd34"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "яєц", false },
+                    { new Guid("14e876d8-70d2-54e5-809b-a34556c2aa6c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "замороз", false },
+                    { new Guid("14f060a9-24bb-5a2e-81fd-9fd0100325fa"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "бумажн полотен", false },
+                    { new Guid("161a5b65-a4fd-5422-99fd-ee015855d87e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "наполнит", false },
+                    { new Guid("174b34fb-a88e-5a62-8cac-b03e7d76e9a2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "ласощ", false },
+                    { new Guid("174f9b41-e896-595f-8ebc-1f45c1c30f26"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "квасол", false },
+                    { new Guid("178ecb35-c55b-5e4e-8779-d9103faebcb1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "ванілін", false },
+                    { new Guid("17ba3c55-0c69-55ec-9c3f-2a77c6bea378"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "уксус", false },
+                    { new Guid("17c40f9c-14ef-5a69-a276-c6a397597b16"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "вина", false },
+                    { new Guid("17e2ce7f-248a-5535-94fa-da52595ba97b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "печень", false },
+                    { new Guid("189cb992-9bd3-5a42-853f-205d50f3705a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "кускус", false },
+                    { new Guid("1a2aa3ac-d98f-5d41-9aca-64f973fb779b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "овсян", false },
+                    { new Guid("1a39797b-813c-599c-b57b-7b3b66572769"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "шпрот", false },
+                    { new Guid("1b12958e-5125-5c70-bfb1-f3a4f6fd8a48"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "наповнюв", false },
+                    { new Guid("1b67441d-1f37-5561-a681-ed90e9ca5cae"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "піц", false },
+                    { new Guid("1c0ce6a8-4613-5c22-9276-16ad98155051"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "квас", false },
+                    { new Guid("1cb3ef3d-96c6-5cb6-b7b9-4994835231cf"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "персик", false },
+                    { new Guid("1cc1424f-2580-55e9-a3e8-1f851ee16388"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "салат", false },
+                    { new Guid("1cf71667-2599-54fe-8eb4-5be3e5c3ba96"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "печінк", false },
+                    { new Guid("1d088f44-f4ad-5dec-b9d0-679b677f03d2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "презерв", false },
+                    { new Guid("1db54365-bf3a-5761-9705-24c00b28231a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "губк", false },
+                    { new Guid("1dce961b-eda5-5409-ba60-1dc44acaa5b4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "лосос", false },
+                    { new Guid("1e227df4-db08-5c8d-aa01-9f88aa1b6978"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "влажн салфет", false },
+                    { new Guid("1e6551a0-3a15-554f-8386-89057c3a7773"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "кава", false },
+                    { new Guid("1f13d2b4-ad1f-50ac-8f27-394de2de5049"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "морозив", false },
+                    { new Guid("2114d1e5-19b0-509e-9cba-bbc82f1a7aff"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "ребр", false },
+                    { new Guid("21942a53-a678-5764-9ad6-33577a6eb0bd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "яйка", false },
+                    { new Guid("22259354-09f7-5bf5-a725-8157a865d121"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "халв", false },
+                    { new Guid("222d0cc5-22e6-52bf-9288-1dc7e99fb0d6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "воду", false },
+                    { new Guid("22799bf0-4f7a-53ca-b875-af9dfd162a29"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "изюм", false },
+                    { new Guid("23ff650a-b292-5aa9-8be9-282a5bf8bb51"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "яблук", false },
+                    { new Guid("2470084f-aa4e-599f-b26f-4f110dafb7ca"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "сервелат", false },
+                    { new Guid("274cea31-050e-5941-b45c-70a3c92fe94a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "сельдер", false },
+                    { new Guid("27cb5dba-b56a-5b65-a46b-89327dc0a8c4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "разрыхл", false },
+                    { new Guid("28686347-6a69-5751-974d-46d21aa48149"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "витамин", false },
+                    { new Guid("2953f955-0f9d-5d52-9db3-109105bf1a75"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "печенья", false },
+                    { new Guid("296aa118-b2c0-519b-8ddf-cbff77c432f3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "лаваш", false },
+                    { new Guid("29b8f847-5d81-5693-9492-0f51861658ed"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "пастил", false },
+                    { new Guid("2a72039d-c1df-5b1d-8d93-825c76c8531b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "сірник", false },
+                    { new Guid("2b3fc30d-7a11-5e3d-b0b5-f4e11ae2b2aa"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "корм соб", false },
+                    { new Guid("2b8cf262-045a-5024-9e50-6724f07ed439"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "вино", false },
+                    { new Guid("2c38234d-9c42-5a74-a09f-b11858c6c171"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "полуниц", false },
+                    { new Guid("2caa9e22-dfc9-56ca-8ee8-3c2c9551566c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "рукавич", false },
+                    { new Guid("2d3adef5-4577-5746-800e-5f581c44d29f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "ацидоф", false },
+                    { new Guid("2d713a35-2c63-5d7f-9f1c-f8289d5d8e5c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "тістечк", false },
+                    { new Guid("2e06f684-878b-55c7-8f7f-e0374d8380ec"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "лед", false },
+                    { new Guid("2f35e8dd-dcf7-531f-b78e-d89bae7f3374"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "сало", false },
+                    { new Guid("2f91c3ed-8272-58b0-9c86-d3aeb81a503c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "бульб", false },
+                    { new Guid("3005b046-10b9-58c5-aa1c-335d15ff47c4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "рыб", false },
+                    { new Guid("304d8563-08f0-56c0-b696-81bc1b44a5e9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "гомілк", false },
+                    { new Guid("30a949a1-6b41-5737-bc68-6dc34c28ebd9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "диня", false },
+                    { new Guid("3259c129-46ca-5d83-987f-dcc97c2b15cc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "ватн", false },
+                    { new Guid("32c46e37-55bf-5fa3-a449-9aa5c5719817"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "чипс", false },
+                    { new Guid("36a3ce0a-d15d-50f7-a067-524f4a70b021"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "бальзам", false },
+                    { new Guid("3708da65-f2d4-5ae4-9e69-385c83ad4a71"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "фета", false },
+                    { new Guid("37685afe-2080-5d45-9bb4-b711ace1dafb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "сок", false },
+                    { new Guid("37a14728-9fa6-573e-be2e-236f9a391f3f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "груш", false },
+                    { new Guid("37be5f0d-7dcb-5cff-9622-3f6cd19e9fac"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "філе", false },
+                    { new Guid("3935409b-1a7d-5f5d-9652-373e66dd3ff2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "сливк", false },
+                    { new Guid("39731acd-c2ae-5e46-afff-9913e6a66e29"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "яловичин", false },
+                    { new Guid("3a1040db-4c8c-5c3b-8414-5bebb6cb8076"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "виноград", false },
+                    { new Guid("3a40344d-58f4-5213-9e74-0b75f0f3bf3f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "дріжд", false },
+                    { new Guid("3a802dbb-aacf-550f-b4bb-e4638903bb28"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "чеснок", false },
+                    { new Guid("3b16f9bd-60dd-5094-a709-66b2376e1a42"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "лук", false },
+                    { new Guid("3b754ee5-0c33-5685-ae7e-73fb7b3c58ee"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "черник", false },
+                    { new Guid("3c4f789b-49b8-5d10-a99d-1e855e17879c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "ванил", false },
+                    { new Guid("3c54a4d2-473e-5ae9-b86d-5a27d7f3c37b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "шампун", false },
+                    { new Guid("3cc6ba29-048b-5771-a382-ddd5e73e68df"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "індичк", false },
+                    { new Guid("3f8f9e5d-ffb2-55e5-92f1-b4bd41c406b4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "геркулес", false },
+                    { new Guid("4150c637-9fa3-5998-81f8-a5a8ae164147"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "лекарств", false },
+                    { new Guid("4168ead0-5370-5702-88ed-6ad2e1ee78c6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "гірчиц", false },
+                    { new Guid("41bf5b63-ff58-5684-a798-1eb78e9299c9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "кефир", false },
+                    { new Guid("424996f9-52bd-5036-802a-6227a59e9874"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "майонез", false },
+                    { new Guid("43d916b4-6dbd-5a85-85b4-41cc5175c889"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "лід", false },
+                    { new Guid("453a168e-a5a8-5123-9976-e3ff043a87cc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "голен", false },
+                    { new Guid("4552cc31-4178-547c-9980-f57a215d592b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "тунц", false },
+                    { new Guid("4553494b-6125-5d24-bee0-3450f5eb81fb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "свічк", false },
+                    { new Guid("45895872-43e8-5066-87fd-9e93eeb9ad2c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "картош", false },
+                    { new Guid("45bf82ab-4508-5586-a74b-7376ef140760"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "свеч", false },
+                    { new Guid("45d8e195-537d-53ab-8eb5-d2e802ab1681"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "йогурт", false },
+                    { new Guid("4661574e-0e8e-5ea2-81f4-3667781d8985"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "пен брит", false },
+                    { new Guid("4778d286-07f4-523a-aed5-fc0961b374d5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "куриц", false },
+                    { new Guid("47935f9a-d70f-5ccb-8188-c009f20d1c77"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "риб", false },
+                    { new Guid("482f81d4-7e20-522d-abcf-89513cf62f6c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "мед", false },
+                    { new Guid("4947faca-7843-5988-b7ab-764686bac08f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "оливк", false },
+                    { new Guid("498ddf29-746e-5e08-97c8-8cab6dd15643"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "кекс", false },
+                    { new Guid("49e75ad7-045a-55a3-bd82-30325e112e38"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "ветчин", false },
+                    { new Guid("4a568069-1397-501f-804e-a60f481dc9b2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "моцарел", false },
+                    { new Guid("4a9d2879-32ff-5bb4-8b77-e4133d194de3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "сир", false },
+                    { new Guid("4b5cca89-e98c-5f1b-83ae-8ef07d0b750a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "ушн палоч", false },
+                    { new Guid("4be1ce46-6d2e-562b-83e4-db7ebabc4404"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "соус", false },
+                    { new Guid("4c3bc422-6a76-5d3e-abc5-244345e6655d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "сельд", false },
+                    { new Guid("4ce3d87b-b8f1-534d-8bd3-1bc063cffd4d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "вітамін", false },
+                    { new Guid("4e42b083-1da9-5e62-a61e-67c9fae991e4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "укроп", false },
+                    { new Guid("4f0aa89e-a8f9-5cf5-a18d-e1ffed4cb3e3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "лимонад", false },
+                    { new Guid("4f3b21a5-517a-50e7-a481-0a74f649ba61"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "мюсли", false },
+                    { new Guid("50915fc5-42ab-53df-af5c-ff78c7877ed9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "пшен", false },
+                    { new Guid("51f60406-3c62-52c7-bf1a-9cc1571640c1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "борошн", false },
+                    { new Guid("527471e6-1347-5cb9-b703-bb458dd181d6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "петруш", false },
+                    { new Guid("5325b252-d7a8-5873-8f9c-642223c22f07"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "смітт", false },
+                    { new Guid("5353ec51-7738-5a0b-8bc3-892d543f44d1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "ківі", false },
+                    { new Guid("54011461-51ba-520f-a23b-407842e52d9d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "м'яс", false },
+                    { new Guid("549d2628-e6db-5cdb-9e21-ebaf1fc34eea"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "шоколад", false },
+                    { new Guid("564137ba-2b48-5534-bb92-b1d9e57803f2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "кошач", false },
+                    { new Guid("570bed32-43d1-584e-b987-f1ab5541eeff"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "кола", false },
+                    { new Guid("572bbdf0-66a8-5630-b1fc-4cfbda513916"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "слив", false },
+                    { new Guid("574ebe29-5391-59dc-b36b-30b8af563caa"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "индич", false },
+                    { new Guid("57ca3c87-2af3-5eb2-861f-23e2a294635d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "пергамент", false },
+                    { new Guid("57f97436-de11-5b44-8133-29d0519bf423"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "хамон", false },
+                    { new Guid("586d2903-c504-52c1-b410-abe8d14652d2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "хурм", false },
+                    { new Guid("5880b92c-1907-5891-a7b6-be99fe47f29a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "зефир", false },
+                    { new Guid("58f26e46-0d14-5069-8d62-ed189275e447"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "ополаск", false },
+                    { new Guid("5a253fb7-6dab-583a-817e-98ba57321671"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "вода", false },
+                    { new Guid("5a3407b1-0db2-5415-aae9-b78484291a34"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "пицц", false },
+                    { new Guid("5b138919-7666-510a-a59b-2e983cfd832e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "пепси", false },
+                    { new Guid("5bd33696-ea9c-59e7-bcd6-f368f5c4a559"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "какао", false },
+                    { new Guid("5cb2206c-8765-5a4a-ac27-88cc0e6c0e5b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "багет", false },
+                    { new Guid("5cc1b683-982e-5daf-bb22-4bcabf08dc5a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "лайм", false },
+                    { new Guid("5e14fb4a-af3f-5375-afbd-9cde133fcc47"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "мандарин", false },
+                    { new Guid("5e73d075-0d37-5f85-9942-c502f03c79ed"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "сахар", false },
+                    { new Guid("5e9103ec-cff6-5ffd-a839-809ac1b15b34"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "стегн", false },
+                    { new Guid("5eb4e18d-0964-5577-ab14-982d0eeec00d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "руккол", false },
+                    { new Guid("5ed55d66-ec32-51db-9b3d-4efa13bedbfb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "пирожн", false },
+                    { new Guid("5ffc8029-0f1a-5b09-b9fd-713052566be2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "хлеб", false },
+                    { new Guid("61029031-b528-5537-bd00-0094c38edcaf"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "тунец", false },
+                    { new Guid("62c55339-f1ee-598d-b799-3f114b2eeba4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "хлібц", false },
+                    { new Guid("63b70e3f-61cd-53ee-bb7d-04cef4a4acb6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "аптек", false },
+                    { new Guid("63cad5d3-a459-5279-91d8-96f0d8fa41f4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "яйко", false },
+                    { new Guid("641532e0-ef37-504c-a867-aeb125c1b5e4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "гель", false },
+                    { new Guid("6484ed77-66cc-5c25-bcb0-407bb19c8df6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "ребер", false },
+                    { new Guid("64e12d4e-0adf-5ceb-9227-f10018adb8db"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "сухофр", false },
+                    { new Guid("65c7410f-c683-5fc4-9eb5-84ba5ea12dec"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "чечевиц", false },
+                    { new Guid("65f9607d-9a71-50ec-9040-1f9760d7b46f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "лапш", false },
+                    { new Guid("66235946-0a66-5e22-a2f5-9edf3f97de90"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "крахмал", false },
+                    { new Guid("66df41b7-044c-54db-bbea-9d6d9feaea86"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "ополіскувач", false },
+                    { new Guid("67478442-22dd-58b7-b36c-5cb55b4c3c78"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "греч", false },
+                    { new Guid("6831b6db-1e5d-5332-a24d-5f189d5e19a8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "курк", false },
+                    { new Guid("6966451b-ead8-55ba-8a61-6e7d3933e72d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "салямі", false },
+                    { new Guid("6a6d4001-d3ec-5c24-bacb-4319d5728a8f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "бурак", false },
+                    { new Guid("6a77ce85-ac3c-5aff-8a04-273c39d347ba"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "кондиционер", false },
+                    { new Guid("6acb4d96-d50c-55a6-b0a3-97a8ee005b41"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "маслин", false },
+                    { new Guid("6b92eb49-dccb-578c-94be-74ca487733ac"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "брокол", false },
+                    { new Guid("6bb77f7c-cf7f-5880-8c89-a524f2057761"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "творож", false },
+                    { new Guid("6d1dea28-7863-5321-ae6a-7a6f7d75ccd5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "свекл", false },
+                    { new Guid("6e2a9dc0-057b-5053-a476-855588ccafae"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "щавел", false },
+                    { new Guid("6ebc34bc-641b-54d8-a453-3839968cad80"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "семечк", false },
+                    { new Guid("6fc7b9bb-a79a-55a8-b908-73cd3120153a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "шинк", false },
+                    { new Guid("6febba4a-e87e-5d5e-8eab-b52b314aeac0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "пластыр", false },
+                    { new Guid("705856ef-fe27-5483-a62d-27d1904d5e4d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "печенье", false },
+                    { new Guid("708dcd3b-0a03-5b3c-ae77-472ff405bb31"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "спагет", false },
+                    { new Guid("70e3f337-554c-5ebf-9629-284730fa8f8d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "пластівц", false },
+                    { new Guid("710992a9-4859-57db-8d5c-5025d921df82"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "перец", false },
+                    { new Guid("71e6bf4c-855f-525a-9bad-57af1065abfd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "грудк", false },
+                    { new Guid("7380f56c-bea7-5e23-ad07-db8f7480e69e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "варени", false },
+                    { new Guid("7402cb1e-d5b5-58fb-90d6-0e07921e2e05"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "имбир", false },
+                    { new Guid("746a9ee0-f82f-57d4-90dd-99b711457e8a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "кетчуп", false },
+                    { new Guid("758c31ee-ebdc-56aa-8b1c-100b59b6ef6c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "розпушув", false },
+                    { new Guid("768a9e44-2ada-5274-ab3c-4268e1a30a7c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "ганчір", false },
+                    { new Guid("774a3921-c314-5e3a-8ad8-63429b721666"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "цукор", false },
+                    { new Guid("77662a69-c082-53ea-9815-d255bc9481fa"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "апельсин", false },
+                    { new Guid("77b9c412-3dae-588b-91da-14d7c804dd7e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "сырок", false },
+                    { new Guid("7946ddb3-f821-50f6-8065-6279d5c48043"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "свинин", false },
+                    { new Guid("79a855ba-52f2-5451-aeca-0c389c770110"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "молок", false },
+                    { new Guid("7a8cc9d3-ad2e-5d45-9e93-940cbe3a4c62"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "крыл", false },
+                    { new Guid("7aa9487c-05f7-59a7-a359-ae65f887431b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "пита", false },
+                    { new Guid("7ab45938-8f01-5e2a-8d1b-26016083fbf8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "сіль", false },
+                    { new Guid("7aee4ad9-63b1-5461-b1fa-4ac44e6bc399"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "бритв", false },
+                    { new Guid("7e1c8b6a-1ee0-514b-a88b-2f207960d16b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "сардел", false },
+                    { new Guid("7e4857cc-0618-5e7a-bf37-79d6f0d97cf0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "мармелад", false },
+                    { new Guid("7e839770-c007-5bc8-ba92-977bc6d947fd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "средство", false },
+                    { new Guid("7e882aec-fa54-5fe9-9aae-cc4d2a5b8758"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "горіх", false },
+                    { new Guid("807161e4-3fbd-5562-93bf-d79b8da54c9d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "тампон", false },
+                    { new Guid("813f714b-e566-589b-8882-7d7275d00c50"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "болг", false },
+                    { new Guid("82283ae6-948d-58d7-8890-4e3fb2ffe2a5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "чернослив", false },
+                    { new Guid("82358a9d-d3ec-5caf-ada6-afe3c6218575"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "крем", false },
+                    { new Guid("8261111c-e4aa-52aa-be49-890421f8bdf0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "джем", false },
+                    { new Guid("8299350e-b53e-558e-8166-d94a2dbb45bc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "кревет", false },
+                    { new Guid("833e3836-065c-5db5-b220-d437607d4bed"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "абрикос", false },
+                    { new Guid("83ab8292-96a2-568c-ac4d-a4f86e91ad6f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "зажигал", false },
+                    { new Guid("847928f9-7925-5ca0-9897-059e92623f0c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "цветн", false },
+                    { new Guid("84a3fc94-589d-5fc5-be16-034e8586b8ab"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "мидии", false },
+                    { new Guid("85440c0f-a009-5691-b438-86534553879f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "мило", false },
+                    { new Guid("87108adf-cb0b-5e3b-80f8-5ac62dc4d999"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "ліки", false },
+                    { new Guid("87a84a6e-f90c-5ddb-8654-4133a180b038"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "сода", false },
+                    { new Guid("87e1e64b-871b-52fe-8dd5-cb831be4938d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "корм кош", false },
+                    { new Guid("8802476c-1cfd-5983-b829-a6f4d65deeda"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "спрайт", false },
+                    { new Guid("884778e1-0a57-5add-b6bc-9dec09f8c197"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "масло растит", false },
+                    { new Guid("889f13ee-0fe3-5ded-9f7e-89d36559d75a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "гель душ", false },
+                    { new Guid("894d22b7-eb1a-5c5f-b83d-dd3cb7b4a068"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "томат", false },
+                    { new Guid("8954d301-71be-5259-b4ba-25354ef7de76"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "капсул", false },
+                    { new Guid("8a375349-74be-545b-86be-c9106e787ff3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "перец черн", false },
+                    { new Guid("8ae95e49-12c8-5f3f-babb-924697232071"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "круп", false },
+                    { new Guid("8bae8da8-850e-5c56-b81a-f4b4778cc7fa"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "гранат", false },
+                    { new Guid("8c821233-a918-5ab0-86aa-757e9f3b7483"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "кофе", false },
+                    { new Guid("8c9c811a-d5f7-5789-9b6e-9fd0405853b3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "баклаж", false },
+                    { new Guid("8d83028a-e3cc-58ac-8236-372e77dcc24d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "попкорн", false },
+                    { new Guid("8d8b2737-47d5-508f-a579-3f4fff705905"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "кавун", false },
+                    { new Guid("8d9aa08a-bbf3-5262-8316-d24b10fe2888"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "станк", false },
+                    { new Guid("8e213043-9533-5307-9917-01ac52ec774a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "пакет", false },
+                    { new Guid("8eb84e3a-ce6c-507f-b058-4d439c6aad11"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "овощ", false },
+                    { new Guid("8f3636c1-5c14-55b0-abbf-1e0616d20aff"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "торт", false },
+                    { new Guid("904ae181-6d09-5796-8d6d-c253a60227f5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "мусор", false },
+                    { new Guid("9108e3e3-8c9d-56e8-9541-460ff3f344de"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "жвачк", false },
+                    { new Guid("91f8d774-aa53-5013-ba6e-a89cb3e23e82"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "сирок", false },
+                    { new Guid("9284368f-3bed-554c-b538-6806fc02531d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "маск", false },
+                    { new Guid("9292ab20-b43a-5fab-9e88-34e0fa7b7bb2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "цибул", false },
+                    { new Guid("92b68a7c-86e7-5b0d-bc5f-20f82c3aa646"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "хлебц", false },
+                    { new Guid("93ee9af4-757f-5652-a787-51ba28440ab6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "молоч", false },
+                    { new Guid("942f23bc-c536-5ccb-97fc-1a49300aa15d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "колбас", false },
+                    { new Guid("951b5f3b-e53f-5d49-8d5d-d015a599264b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "курин", false },
+                    { new Guid("95450579-e8e3-535d-abc5-7c7e91f821ba"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "батон", false },
+                    { new Guid("956a97d8-4bb2-5b6a-8a8d-e99d388bd68a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "шампин", false },
+                    { new Guid("95dd3f2c-fd34-5099-aa2a-97bb36abf3a9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "индейк", false },
+                    { new Guid("95fe8325-643b-520a-8e53-78907c129c5a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "лампоч", false },
+                    { new Guid("96ffc48c-478e-570d-a811-50727b915795"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "рис", false },
+                    { new Guid("992ebaf0-2f70-59e2-8d1a-9c784eea31fe"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "авокадо", false },
+                    { new Guid("99460a5d-443d-5602-b432-af02c21b1af5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "клубник", false },
+                    { new Guid("9b6b5ba5-eb1b-5801-bad8-d1dab3004c3f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "отбел", false },
+                    { new Guid("9bbbf5e4-7763-5976-93f8-1ca934aca910"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "заморож", false },
+                    { new Guid("9d214ae1-b981-5a04-b512-aa2f4b05adea"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "минерал", false },
+                    { new Guid("9ddd92a7-a57f-54e5-b875-cc785f40c1f6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "банан", false },
+                    { new Guid("9e5ccc46-51f0-5148-ba39-30d1a05b6f15"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "дезодор", false },
+                    { new Guid("9ef36df8-1a0f-564d-b5a7-d63eb02eeb66"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "пленк", false },
+                    { new Guid("9fca502b-4fed-5cb2-96ae-5178b640634d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "порош", false },
+                    { new Guid("a06e432a-a308-5d51-afac-bdc4fa15fad7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "ряженк", false },
+                    { new Guid("a0a7ac0a-29c8-5859-b5df-24f485aca7c8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "бинт", false },
+                    { new Guid("a110738e-9917-5190-9d8e-1ad755ba80a2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "насінн", false },
+                    { new Guid("a190d91b-7eab-5db3-9de5-6d022b25b516"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "зелень", false },
+                    { new Guid("a1c5ba5e-7984-5d3a-8061-e610ad576b6a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "говяд", false },
+                    { new Guid("a25ea732-672b-56d7-a972-dda2a39aea42"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "крил", false },
+                    { new Guid("a5d30276-b54b-55c4-961b-d1e2e5f3494f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "паштет", false },
+                    { new Guid("a68175f2-b9f8-582a-8d6c-c3e7b08093d3"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "селер", false },
+                    { new Guid("a723120a-7e93-56ae-b779-a02a72ee4ab0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "масло соняшн", false },
+                    { new Guid("a75fb896-ec8f-551d-abd8-8130e171db4b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "овоч", false },
+                    { new Guid("aab80624-4c95-5de9-b5f3-e0b2a2e0ed05"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "сосиск", false },
+                    { new Guid("ab60321f-4fa5-5a8d-b5ec-e451bcda769d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "сочевиц", false },
+                    { new Guid("ab6fcc93-7695-56ce-bbc5-877e1946296a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "сыр", false },
+                    { new Guid("ab8435e7-4005-58cd-9222-f6396f8dcdd8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "імбир", false },
+                    { new Guid("abe66aec-5c00-549a-bf9f-2672b496fc91"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "форел", false },
+                    { new Guid("ac826cb4-05ec-57e2-9615-b1262da99d75"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "нектарин", false },
+                    { new Guid("ad3938fc-3110-519d-8d6a-f1159402cd34"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "сік", false },
+                    { new Guid("af056922-f118-5d4d-ac67-81adb0137a3a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "лавров", false },
+                    { new Guid("af365c36-da24-58b3-8e11-d83ea6b26db1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "крохмал", false },
+                    { new Guid("af3caf5f-5dc6-58d9-ac61-02452506a7f8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "сметан", false },
+                    { new Guid("af9dbbc3-049a-5ecd-8b08-dc31398b38ec"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "кріп", false },
+                    { new Guid("b07fa58d-840d-5c2c-bcc1-f880aaef42c0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "кальмар", false },
+                    { new Guid("b0983b38-4ace-57b5-a2e1-b637e0d40636"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "сухарик", false },
+                    { new Guid("b245b910-5103-5cb5-ae24-6788af80893d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "батарейк", false },
+                    { new Guid("b440e274-3879-551e-b52a-451f4487f96e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "дрожж", false },
+                    { new Guid("b4eea7fb-af4b-5236-81f0-3b8b46f03bbb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "фарш", false },
+                    { new Guid("b50051c1-c4b0-5ef8-a2ca-398844cbdbef"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "бринз", false },
+                    { new Guid("b52b68c5-bfc6-58b3-97f1-c9d9452aab54"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "помідор", false },
+                    { new Guid("b5b5c589-040d-5783-9afb-4ea1b31ce610"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "пральн", false },
+                    { new Guid("b65914e7-8e5c-5c1f-9477-6b0a9d0ecdec"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "морква", false },
+                    { new Guid("b66b3ebe-13ad-5dab-a267-b8728e2cfe5a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "тряпк", false },
+                    { new Guid("b68ceb61-7274-5f29-8f6e-1253806803b8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "горчиц", false },
+                    { new Guid("b763d2da-360b-5f02-a3c5-7be0a2d9c8fe"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "фрукт", false },
+                    { new Guid("b7ed6df2-ada5-5438-a3d3-978e44008f61"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "черри", false },
+                    { new Guid("b8e5e2a8-eabf-5046-8821-60c6f380c427"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "булгур", false },
+                    { new Guid("b9e5a48c-57c1-5430-a3fe-4c83ddf65361"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "зубн паст", false },
+                    { new Guid("ba429c2e-0f47-5f18-8ae2-73d1b7368ebc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "родзинк", false },
+                    { new Guid("ba6800c2-1e17-54d3-95e0-42cb525fc09c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "пряник", false },
+                    { new Guid("bab8cfe6-1268-55a6-85f8-8ab2e65a976f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "филе", false },
+                    { new Guid("bb4d1d72-cb4e-55d1-ad27-65a858caba0e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "морков", false },
+                    { new Guid("bdbd85b2-3de5-5808-ab9c-bca54cc45404"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "масло олив", false },
+                    { new Guid("be0272c0-a5d6-58b9-8a5c-5d7c5f552d7a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "арбуз", false },
+                    { new Guid("be3fe67b-9f18-52ea-814d-b956816c2ecf"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "морожен", false },
+                    { new Guid("bf04eaee-b7cb-516e-896f-5abfd1c85072"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "кабач", false },
+                    { new Guid("c0a2e69f-1b1c-5ed6-9bbc-6297792e874b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "оцет", false },
+                    { new Guid("c0ad57b2-0c8d-59e2-b2bb-90841f03d9fc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "fairy", false },
+                    { new Guid("c0ef7498-7084-5777-b354-4cf2fe2f9999"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "сухар", false },
+                    { new Guid("c180bea6-2e8a-5fe2-a4de-9388aa97bc87"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "швабр", false },
+                    { new Guid("c1ac2c6a-2d95-5fa4-b93d-30d4c8451d74"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "перчат", false },
+                    { new Guid("c1baf949-e391-573e-b964-2fae755966e1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "чай", false },
+                    { new Guid("c1ea2b36-63e9-5551-bf1c-9659652a18cb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "щетк", false },
+                    { new Guid("c33e2d9e-28dd-537b-949d-4cdfada52d94"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "сердечк", false },
+                    { new Guid("c38c2152-f119-5d22-a547-1424a2779be7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "кукуруз", false },
+                    { new Guid("c40f630d-1daf-59cf-b0c7-71e44b64e90c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "зелен", false },
+                    { new Guid("c5d96c58-1ed6-584a-8595-a89d26b31c86"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "пластир", false },
+                    { new Guid("c61c42cb-cfba-5d7b-afb5-e439acefeb79"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "кефір", false },
+                    { new Guid("c663bcc3-8e2e-5962-a833-28e20910836d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "тушк", false },
+                    { new Guid("c73fb9a5-95bc-5cff-b958-8e1dd3d82418"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "консерв", false },
+                    { new Guid("cad4aeb6-8369-59b9-9e70-d553db2fefcc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "специ", false },
+                    { new Guid("caea0f28-576f-5dfc-ad97-c2d74b175d98"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "приправ", false },
+                    { new Guid("cf0e7832-55ec-578f-91fe-5b5c7becc63c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "засіб", false },
+                    { new Guid("cf0ed600-6481-5c41-9c28-9a16e05d2021"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "айран", false },
+                    { new Guid("cf715af8-76f5-5bb6-b269-720203fb4c5b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "серветк", false },
+                    { new Guid("d0b88796-0aeb-5f21-95df-fc1ff2547312"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "подгузн", false },
+                    { new Guid("d0d71c0e-232d-52cf-9f77-8fd0e73185ab"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "киви", false },
+                    { new Guid("d0eed592-f644-51b2-b5e4-ea21915ab4f0"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "булк", false },
+                    { new Guid("d163346e-bed8-55ef-8d9c-c8c318ea7246"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "круасан", false },
+                    { new Guid("d287c321-9e3f-52c5-881e-752141b3118c"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "курятин", false },
+                    { new Guid("d29fb7a0-b7ff-523f-81ac-3124bdf4115a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "ряжанк", false },
+                    { new Guid("d416d5a4-82dc-5176-a6da-db8b1a0b4bd4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "наггетс", false },
+                    { new Guid("d43f9552-8817-5325-96f8-d7faf6ffa8d8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "фасол", false },
+                    { new Guid("d5075b41-bacf-5135-925d-5e8bb109e495"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "буженин", false },
+                    { new Guid("d5b61204-4b3d-52cf-a492-43c289fbf3ed"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "макарон", false },
+                    { new Guid("d5e1cce3-f19a-50e5-894a-a68160c236a9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "скумбр", false },
+                    { new Guid("d69ecf02-a97a-534f-9a9e-a00143174fb8"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "доместос", false },
+                    { new Guid("d6dec658-47f2-5ab7-b19e-d480fc90b9d4"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "масло подсолн", false },
+                    { new Guid("d7646ed0-935e-5a15-b829-602f1455df68"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "паст", false },
+                    { new Guid("d779206b-d9f2-5d3b-bec7-af63bc01b53d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "спеці", false },
+                    { new Guid("d79e041d-a435-5a91-8d81-149977129aad"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "пиво", false },
+                    { new Guid("d7e5cb09-0cb2-57cc-a36c-4cd3c95aa6af"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "паст томат", false },
+                    { new Guid("d9143515-aab1-58a3-930d-154786b8e989"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "перец молот", false },
+                    { new Guid("d941103a-643e-5366-91cc-03b5aa627ddb"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "ковбас", false },
+                    { new Guid("d9a776d0-392a-5800-8582-0f355f6ac4ab"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "стирал", false },
+                    { new Guid("da3e5a62-e513-5267-8de3-ebb8ebf6e22d"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "салями", false },
+                    { new Guid("db297cc1-5613-54f4-ad20-ac1011376de5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "фейри", false },
+                    { new Guid("db91a2aa-cb0f-5404-85dd-d496c1f63a62"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "корм", false },
+                    { new Guid("dbf92445-fce0-55b6-9b69-60da92a895c6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "зубн", false },
+                    { new Guid("dc5781fc-ba02-55b2-a2db-4c328ea42a2e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "олія", false },
+                    { new Guid("dd275b50-7638-562c-9b09-d94cfe47b4a1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "печиво", false },
+                    { new Guid("dd359efa-6ad9-586b-a6cc-4d427310a6ef"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "фольг", false },
+                    { new Guid("df1206f8-e4a9-5ec9-b8e6-4e20dc0099f9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "нить", false },
+                    { new Guid("df31f1ce-534c-5264-b0aa-e947a2135852"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a426aaf7-0392-54fd-aaa2-2c7073eed013"), "лакомств", false },
+                    { new Guid("df3e2aa3-d47d-5843-a31d-acf37598b549"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "булоч", false },
+                    { new Guid("df5d5164-06f2-51f2-b957-92cd99dca84f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "газиров", false },
+                    { new Guid("dfa758c0-0610-54b0-8cda-7c36aa52db23"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "помидор", false },
+                    { new Guid("e002db50-5dd5-5f15-90e7-58dda872f900"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "варень", false },
+                    { new Guid("e02d8f60-9724-568e-b549-47904ec5fb54"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "часник", false },
+                    { new Guid("e06f6e0b-1382-50aa-99cf-e6929b0d7055"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "вафел", false },
+                    { new Guid("e09d4355-b261-58d1-91d1-98731dc65cd5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "хлопь", false },
+                    { new Guid("e0e36995-7bcb-5705-8270-e0643eeb038b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "малин", false },
+                    { new Guid("e181f497-f0a9-5049-b839-f4a0e1664fbd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "горош", false },
+                    { new Guid("e1f7a12d-3e00-5ec3-88d2-c136bc6c5331"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "гарбуз", false },
+                    { new Guid("e2f66176-e204-5792-867d-ef109bca88f5"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "цукерк", false },
+                    { new Guid("e3c192da-48f3-513a-b076-916277890589"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "огур", false },
+                    { new Guid("e5d79448-88c6-58c6-9b65-78a5b348efdc"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "туалетн бумаг", false },
+                    { new Guid("e6bccb36-da74-5de2-9ef6-52d2ff5bf289"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "хліб", false },
+                    { new Guid("e6fd2aeb-36ee-5537-8311-7fa511453166"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "киноа", false },
+                    { new Guid("e867d38d-3f2d-5799-9800-5321dd5aa90a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "огірк", false },
+                    { new Guid("ec42b38d-d196-586b-a6a4-c976ae19bdd9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "вата", false },
+                    { new Guid("ede40796-0d64-53c9-8044-05bdf1a4f005"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "сушк", false },
+                    { new Guid("ee0e4e79-9464-57aa-8d9a-e229d9f6c335"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "творог", false },
+                    { new Guid("ee4caef1-a6d4-58a7-939e-4bd81fec519a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "энергет", false },
+                    { new Guid("eed7bcb7-5b0b-5e38-abc2-ddefdb12c318"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "таблет", false },
+                    { new Guid("ef029020-8c01-5dd0-90ab-2e1db1cb6f1e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "соль посуд", false },
+                    { new Guid("ef664b67-6c3e-5b6e-acca-f36abca52c75"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "шпинат", false },
+                    { new Guid("ef6accf8-9cbc-59c9-a020-d33995f0b3fd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "мешк мусор", false },
+                    { new Guid("ef7b4d72-e837-55d4-a245-0e686fe961d9"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "памперс", false },
+                    { new Guid("efc3b605-8fe7-50c0-be8f-2c2ef07e418b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "ягод", false },
+                    { new Guid("f0011cce-45ce-566f-9b4c-e9657a2aee7a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "яблок", false },
+                    { new Guid("f0ade0bd-29ab-5287-890f-8737bdec10d1"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "орех", false },
+                    { new Guid("f2722314-ba34-5868-ad1f-643c3c27893a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "бедр", false },
+                    { new Guid("f2cbaccf-da57-5ab7-b4f5-9beabfb26b72"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "тыкв", false },
+                    { new Guid("f2db9a58-af05-5e18-bfbf-970be2d1a6e6"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "спич", false },
+                    { new Guid("f3a60b02-73b3-52a4-a20a-72f07686ae3a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "вершк", false },
+                    { new Guid("f3d603c2-c839-5603-9c65-75537a3a4006"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "хлорк", false },
+                    { new Guid("f5632891-87ea-5598-b299-9f8af45a567a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "гречк", false },
+                    { new Guid("f57c7d65-f3a9-53f4-9569-c998f470fb64"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "тушенк", false },
+                    { new Guid("f65bd9c3-0e09-55af-b326-27c371465576"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "редис", false },
+                    { new Guid("f6bcb997-8d37-5bab-9f10-4668de7570e7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "оселед", false },
+                    { new Guid("f7090bf1-46e0-5bd7-8f48-2e87a5705b8b"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("cdd2aed7-bf46-5f02-996e-4b7e7f5532bc"), "пельмен", false },
+                    { new Guid("f73689eb-df56-5148-ba0a-8358c730ec79"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "освежит", false },
+                    { new Guid("f749e496-12a1-5842-8a21-ea89cb750901"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "лимон", false },
+                    { new Guid("f8237e76-c12b-532f-b033-22bb19c46d2e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("a49d88ad-1a8c-5253-92ad-c32cff44618d"), "гель стирк", false },
+                    { new Guid("f9600e5a-4487-5760-af6d-399201101cdd"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "телят", false },
+                    { new Guid("fa1f8c9a-7f47-55ef-ab7f-dd7b716c5bc7"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("029e7454-7cdf-53a1-bcd7-0243a8945f4b"), "яйц", false },
+                    { new Guid("fabd9ea4-cc00-5e7a-8076-1e6c2412156e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("19dd6058-ac4a-51d2-afd7-1acf014a394e"), "мыл", false },
+                    { new Guid("fba9ce5c-8efd-5994-879f-26a2526de310"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "компот", false },
+                    { new Guid("fc38f04a-828a-5722-a905-82d19b4acf0e"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("18462692-7e3e-5415-9880-d55073636438"), "сироп", false },
+                    { new Guid("fc97e46c-76cd-595f-915d-a6b92ecd9442"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "круасс", false },
+                    { new Guid("fcd6e1af-865e-5b56-9936-b4589be2eb03"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("8a1fa59d-f3f8-55e4-ab23-9b10b4723b3e"), "стейк", false },
+                    { new Guid("fcf2edfb-22ed-5b91-a197-b94c003d787f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("0657255d-de21-5dfa-8699-ea1ed8da65a4"), "курага", false },
+                    { new Guid("fcf423bf-13c8-5016-8dfb-5706f1fa9817"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("1977a8d6-f535-5da1-9165-3e7942f63949"), "ананас", false },
+                    { new Guid("fd0813e0-2d02-5b42-ad4d-97928b0f7c03"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e6e0ec92-e35c-572d-99ea-fb94cc3c5f5d"), "тост", false },
+                    { new Guid("fd327de5-b1b3-543e-9e4f-e29d252a86d2"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "батончик", false },
+                    { new Guid("fdd7864c-e203-532f-95b0-fba0af90904a"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("e50048ae-6578-58ed-a8c3-5f4972a171c1"), "брынз", false },
+                    { new Guid("ffd7871b-f241-5a55-b9cf-ae4307f0530f"), new DateTimeOffset(new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new Guid("2f4b7711-8847-504f-bd0a-e198879507fb"), "конфет", false }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_department_keywords_department_id",
+                schema: "shopping",
+                table: "department_keywords",
+                column: "department_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_department_keywords_keyword_trgm",
+                schema: "shopping",
+                table: "department_keywords",
+                column: "keyword")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "ux_department_keywords_keyword",
+                schema: "shopping",
+                table: "department_keywords",
+                column: "keyword",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ux_departments_name",
+                schema: "shopping",
+                table: "departments",
+                column: "name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_shopping_items_department_id",
+                schema: "shopping",
+                table: "shopping_items",
+                column: "department_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_shopping_items_normalized_name",
+                schema: "shopping",
+                table: "shopping_items",
+                column: "normalized_name");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_shopping_items_status_bought_at_utc",
+                schema: "shopping",
+                table: "shopping_items",
+                columns: new[] { "status", "bought_at_utc" });
+
+            migrationBuilder.CreateIndex(
+                name: "ux_shopping_items_import_key",
+                schema: "shopping",
+                table: "shopping_items",
+                column: "import_key",
+                unique: true,
+                filter: "import_key IS NOT NULL");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "create_requests",
+                schema: "shopping");
+
+            migrationBuilder.DropTable(
+                name: "department_keywords",
+                schema: "shopping");
+
+            migrationBuilder.DropTable(
+                name: "shopping_items",
+                schema: "shopping");
+
+            migrationBuilder.DropTable(
+                name: "shopping_settings",
+                schema: "shopping");
+
+            migrationBuilder.DropTable(
+                name: "departments",
+                schema: "shopping");
+        }
+    }
+}

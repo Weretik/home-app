@@ -249,6 +249,251 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shopping/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists what is needed (by department in store order, urgent first) and what is in the cart (latest bought first). */
+        get: operations["listShoppingItems"];
+        put?: never;
+        /** Adds items typed as text («молоко, хлеб, яйца 10»). Send a new Idempotency-Key per add; a repeat returns the first result. */
+        post: operations["addShoppingItems"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes an item in the list. Send its version in If-Match; moving it to another department teaches the dictionary its name. */
+        put: operations["updateShoppingItem"];
+        post?: never;
+        /** Deletes a list or history row for good. Send its version in If-Match. */
+        delete: operations["deleteShoppingItem"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/items/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Ticks an item bought or needed. Sets a target value, so a repeat changes nothing; 404 for an item that is history. */
+        put: operations["setShoppingItemStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/items/clear-cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Убрать купленные»: moves everything in the cart to history now and says how many items left. */
+        post: operations["clearShoppingCart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists bought items that left the list, newest bought first, one page at a time. */
+        get: operations["listShoppingHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/frequent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the 20 names bought most often in the frequent window, without names that are in the list now. */
+        get: operations["listFrequentItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The list at a glance for the home page: counts, departments with needed items, next items and top frequent names. */
+        get: operations["getShoppingSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/departments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the departments in store order, with their keyword and needed item counts. */
+        get: operations["listShoppingDepartments"];
+        put?: never;
+        /** Adds a department just before the fallback. Send a new Idempotency-Key; a repeat returns the first id. */
+        post: operations["createShoppingDepartment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/departments/match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Says which department an item with this name would go to (the preview while typing). */
+        get: operations["matchShoppingDepartment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/departments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Renames a department or changes its icon. Send its version in If-Match. */
+        put: operations["updateShoppingDepartment"];
+        post?: never;
+        /** Deletes a department; its items and keywords move to the fallback. Send its version in If-Match; the fallback answers 409. */
+        delete: operations["deleteShoppingDepartment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/departments/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the store walk: send every department id exactly once, in the new order. */
+        put: operations["reorderShoppingDepartments"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/keywords": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the keywords alphabetically, optionally of one department and containing every word of the search. */
+        get: operations["listShoppingKeywords"];
+        put?: never;
+        /** Adds a keyword (stored normalised). Send a new Idempotency-Key; a repeat returns the first id, a taken keyword 409. */
+        post: operations["createShoppingKeyword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/keywords/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a keyword's text or department. Send its version in If-Match. */
+        put: operations["updateShoppingKeyword"];
+        post?: never;
+        /** Deletes a keyword. Send its version in If-Match. */
+        delete: operations["deleteShoppingKeyword"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shopping/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The cart hours and the frequent window, with the version to edit them with. */
+        get: operations["getShoppingSettings"];
+        /** Sets how long bought items stay in the cart (1–72 hours) and the frequent window (30–730 days). Send the version in If-Match. */
+        put: operations["updateShoppingSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gifts/items": {
         parameters: {
             query?: never;
@@ -395,6 +640,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description What an add did: new rows, items brought back from the cart, and needed items it updated. */
+        AddItemsResult: {
+            added: components["schemas"]["ShoppingItemView"][];
+            restored: components["schemas"]["ShoppingItemView"][];
+            updated: components["schemas"]["ShoppingItemView"][];
+        };
+        AddShoppingItemsRequest: {
+            text: string;
+            addedBy: components["schemas"]["Person"];
+            /** Format: uuid */
+            departmentId: null | string;
+            urgent: null | boolean;
+        };
         BudgetSettingsRequest: {
             /** Format: double */
             monthlyLimit: number;
@@ -427,6 +685,11 @@ export interface components {
             /** Format: int32 */
             sortOrder: number;
         };
+        /** @description How many items left the cart. */
+        ClearCartResult: {
+            /** Format: int32 */
+            cleared: number;
+        };
         /** @description The id of a created expense, income or savings movement. */
         CreatedEntry: {
             /** Format: uuid */
@@ -436,6 +699,38 @@ export interface components {
         CreatedGiftsEntry: {
             /** Format: uuid */
             id: string;
+        };
+        CreateShoppingDepartmentRequest: {
+            name: string;
+            icon: null | string;
+        };
+        CreateShoppingKeywordRequest: {
+            keyword: string;
+            /** Format: uuid */
+            departmentId: string;
+        };
+        /** @description A department as the settings and pickers show it. */
+        DepartmentItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            icon: string;
+            /** Format: int32 */
+            sortOrder: number;
+            isFallback: boolean;
+            /** Format: int32 */
+            keywordCount: number;
+            /** Format: int32 */
+            neededCount: number;
+            /** Format: uint32 */
+            version: number;
+        };
+        /** @description The department the dictionary picks for a name. */
+        DepartmentMatch: {
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: string;
+            departmentIcon: string;
         };
         /** @description One expense row of the month list, with its category name. */
         ExpenseItem: {
@@ -476,6 +771,18 @@ export interface components {
             amount: number;
             paymentMethod: components["schemas"]["PaymentMethod"];
             comment: null | string;
+        };
+        /** @description A name bought often, in its latest spelling and department; one tap adds it. */
+        FrequentItem: {
+            name: string;
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: string;
+            departmentIcon: string;
+            /** Format: int32 */
+            timesBought: number;
+            /** Format: date-time */
+            lastBoughtAtUtc: string;
         };
         /** @description A gift category as lists and pickers show it. */
         GiftCategoryItem: {
@@ -646,6 +953,19 @@ export interface components {
             amount: number;
             comment: null | string;
         };
+        /** @description A keyword as the settings show it, with its department. */
+        KeywordItem: {
+            /** Format: uuid */
+            id: string;
+            keyword: string;
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: string;
+            departmentIcon: string;
+            learned: boolean;
+            /** Format: uint32 */
+            version: number;
+        };
         /**
          * @description The stretch of time a spending limit covers: a calendar month or a calendar quarter.
          * @enum {unknown}
@@ -787,6 +1107,9 @@ export interface components {
             counts: components["schemas"]["GiftCounts"];
             topWanted: components["schemas"]["SummaryGift"][];
         };
+        ReorderShoppingDepartmentsRequest: {
+            departmentIds: null | string[];
+        };
         /**
          * @description Whether a savings movement put money in or took it out; shown in blue and red on the page.
          * @enum {unknown}
@@ -856,6 +1179,83 @@ export interface components {
             currentBalance: number;
             months: components["schemas"]["SavingsMonthSummary"][];
         };
+        SetShoppingItemStatusRequest: {
+            status: components["schemas"]["ShoppingItemStatus"];
+            by: components["schemas"]["Person"];
+        };
+        /** @description The id of a created department or keyword. */
+        ShoppingCreatedId: {
+            /** Format: uuid */
+            id: string;
+        };
+        /** @description One page of history, with the count of all history rows. */
+        ShoppingHistoryPage: {
+            items: components["schemas"]["ShoppingItemView"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+        };
+        /**
+         * @description «Нужно» or «Куплено». Whether a bought item is still in the cart or already history is computed (CartWindow).
+         * @enum {unknown}
+         */
+        ShoppingItemStatus: "Needed" | "Bought";
+        /** @description An item as the list, the cart, history and the summary show it, with its department. */
+        ShoppingItemView: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            quantity: null | string;
+            note: null | string;
+            /** Format: uuid */
+            departmentId: string;
+            departmentName: string;
+            departmentIcon: string;
+            /** Format: int32 */
+            departmentSortOrder: number;
+            urgent: boolean;
+            status: components["schemas"]["ShoppingItemStatus"];
+            addedBy: components["schemas"]["Person"];
+            /** Format: date-time */
+            addedAtUtc: string;
+            boughtBy: null | components["schemas"]["Person"];
+            /** Format: date-time */
+            boughtAtUtc: null | string;
+            /** Format: uint32 */
+            version: number;
+        };
+        /** @description Needed items (by department in store order, urgent first, then by when added), then the cart (latest bought first). */
+        ShoppingList: {
+            items: components["schemas"]["ShoppingItemView"][];
+        };
+        /** @description How long bought items stay in the cart, how far back frequent items count, and the version to edit with. */
+        ShoppingSettingsView: {
+            /** Format: int32 */
+            cartKeepHours: number;
+            /** Format: int32 */
+            frequentDays: number;
+            /** Format: uint32 */
+            version: number;
+        };
+        /** @description Counts, departments with needed items in store order, the next items to buy and the top frequent names. */
+        ShoppingSummary: {
+            /** Format: int32 */
+            neededCount: number;
+            /** Format: int32 */
+            urgentCount: number;
+            /** Format: int32 */
+            inCartCount: number;
+            /** Format: int32 */
+            boughtLast7Days: number;
+            /** Format: int32 */
+            boughtLast30Days: number;
+            departments: components["schemas"]["SummaryDepartment"][];
+            nextItems: components["schemas"]["ShoppingItemView"][];
+            topFrequent: components["schemas"]["SummaryFrequentItem"][];
+        };
         /** @description One spending limit with the categories it counts. */
         SpendingLimitItem: {
             /** Format: uuid */
@@ -874,6 +1274,21 @@ export interface components {
             /** Format: double */
             amount: number;
             categoryIds: string[];
+        };
+        /** @description A department with something to buy. */
+        SummaryDepartment: {
+            /** Format: uuid */
+            departmentId: string;
+            name: string;
+            icon: string;
+            /** Format: int32 */
+            neededCount: number;
+        };
+        /** @description A frequent name and how many times it was bought in the window. */
+        SummaryFrequentItem: {
+            name: string;
+            /** Format: int32 */
+            timesBought: number;
         };
         /** @description A wanted «🔥» gift in a recipient's top list. */
         SummaryGift: {
@@ -902,6 +1317,29 @@ export interface components {
             occasion: null | string;
             /** Format: date */
             occasionDate: string;
+        };
+        UpdateShoppingDepartmentRequest: {
+            name: string;
+            icon: null | string;
+        };
+        UpdateShoppingItemRequest: {
+            name: string;
+            quantity: null | string;
+            note: null | string;
+            /** Format: uuid */
+            departmentId: string;
+            urgent: boolean;
+        };
+        UpdateShoppingKeywordRequest: {
+            keyword: string;
+            /** Format: uuid */
+            departmentId: string;
+        };
+        UpdateShoppingSettingsRequest: {
+            /** Format: int32 */
+            cartKeepHours: number;
+            /** Format: int32 */
+            frequentDays: number;
         };
     };
     responses: never;
@@ -1839,6 +2277,949 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listShoppingItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingList"];
+                };
+            };
+        };
+    };
+    addShoppingItems: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddShoppingItemsRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddItemsResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateShoppingItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShoppingItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingItemView"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteShoppingItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    setShoppingItemStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetShoppingItemStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingItemView"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    clearShoppingCart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClearCartResult"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listShoppingHistory: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingHistoryPage"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    listFrequentItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FrequentItem"][];
+                };
+            };
+        };
+    };
+    getShoppingSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingSummary"];
+                };
+            };
+        };
+    };
+    listShoppingDepartments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepartmentItem"][];
+                };
+            };
+        };
+    };
+    createShoppingDepartment: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateShoppingDepartmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingCreatedId"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    matchShoppingDepartment: {
+        parameters: {
+            query?: {
+                name?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepartmentMatch"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    updateShoppingDepartment: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShoppingDepartmentRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteShoppingDepartment: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    reorderShoppingDepartments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderShoppingDepartmentsRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listShoppingKeywords: {
+        parameters: {
+            query?: {
+                departmentId?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordItem"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    createShoppingKeyword: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateShoppingKeywordRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingCreatedId"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateShoppingKeyword: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShoppingKeywordRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteShoppingKeyword: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getShoppingSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShoppingSettingsView"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateShoppingSettings: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShoppingSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

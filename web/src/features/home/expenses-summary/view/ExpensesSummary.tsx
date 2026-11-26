@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { useMonthSummary, type MonthSummary } from '../data/summary-api';
 import { useMonthParam } from '../data/use-month-param';
 import { KpiCards } from './KpiCards';
-import { LimitsCard } from './LimitsCard';
+import { LimitsCard } from '../limits/LimitsCard';
 import { MonthPicker } from './MonthPicker';
 import { SpendingCards } from './SpendingCards';
 

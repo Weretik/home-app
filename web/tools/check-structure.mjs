@@ -3,11 +3,15 @@
 // - a folder holds either files or subfolders, never both, and never a single file alone;
 // - folders are named by feature or meaning, never as a dump (utils, helpers, common, ...);
 // - a feature never imports another feature;
-// - only src/platform and a feature's *-api.ts files import the API client.
+// - only src/platform and a feature's *-api.ts files import the API client;
+// - a component file (.tsx) has at most 150 lines, any other module (.ts) at most 200 (tests and generated code are
+//   exempt).
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 const MAX_FILES = 6;
+const MAX_COMPONENT_LINES = 150;
+const MAX_MODULE_LINES = 200;
 const FORBIDDEN = new Set([
   'utils',
   'utilities',
@@ -73,9 +77,18 @@ for (const folder of allFolders) {
   for (const name of readdirSync(folder).filter(isCode)) {
     const file = join(folder, name);
     const from = area(file);
-    const imports = [
-      ...readFileSync(file, 'utf8').matchAll(/from\s+'(\.[^']+)'/g),
-    ].map((match) => resolve(dirname(file), match[1]));
+    const text = readFileSync(file, 'utf8');
+    const limit = name.endsWith('.tsx')
+      ? MAX_COMPONENT_LINES
+      : MAX_MODULE_LINES;
+    const lines = text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
+    if (!isTest(name) && lines > limit)
+      problems.push(
+        `${relative(root, file)}: ${lines} lines, at most ${limit}; split it by responsibility`,
+      );
+    const imports = [...text.matchAll(/from\s+'(\.[^']+)'/g)].map((match) =>
+      resolve(dirname(file), match[1]),
+    );
 
     for (const target of imports) {
       const to = area(target);
