@@ -55,7 +55,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | Name | Value | When |
 | --- | --- | --- |
 | `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` | now, otherwise the front cannot reach the API |
-| `ConnectionStrings__Default` | PostgreSQL connection string | once the database is chosen |
+| `ConnectionStrings__Database` | PostgreSQL connection string | once the database is chosen |
 
 Or with one command:
 
@@ -64,13 +64,14 @@ az webapp config appsettings set -g home-rg -n vitaliy-home-api \
   --settings Cors__Origins__0=https://ambitious-beach-0b1d13b10.6.azurestaticapps.net
 ```
 
-The startup command (`dotnet HomeApp.Api.dll`) is set by the workflow itself. Turn on HTTPS Only in General settings.
+The startup command (`dotnet Host.Api.dll`) is set by the workflow itself. Turn on HTTPS Only in General settings.
 
 ## Database
 
-The API reads one connection string, `ConnectionStrings:Default`, in the Npgsql key/value format. When it is set,
-`/health` also checks the database. All tables live in the `home` schema (see
-[ADR 0003](decisions/0003-postgres-at-hosting-provider.md)).
+The API reads one connection string, `ConnectionStrings:Database`, in the Npgsql key/value format. When it is set,
+`/health` also checks the database. Each backend module keeps its tables in its own schema (`shopping`, `todos`, ...;
+see [ADR 0003](decisions/0003-postgres-at-hosting-provider.md) and the backend's
+[schema-per-module ADR](../api/docs/decisions/0005-schema-per-module.md)).
 
 ### Main option: a separate database at the hosting provider (adm.tools)
 
@@ -88,31 +89,34 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
    it the password travels in clear text over the internet, so prefer SSL if at all possible.
 5. **Connection string**, then put it into the App Service as described below:
 
-   `Host=brevistore.psql.tools;Port=10403;Database=weretick;Username=weretick;Password=<password>;SSL Mode=Require;Search Path=home`
+   `Host=brevistore.psql.tools;Port=10403;Database=weretick;Username=weretick;Password=<password>;SSL Mode=Require`
 
    The host and port are the account's PostgreSQL instance (the same one the other project uses). If the server turns
    out not to support SSL, the connection fails with `SSL Mode=Require`; then use `SSL Mode=Prefer`.
 
-The first EF migration creates the `home` schema itself, since the owner has all rights; nothing to run by hand. The
-schema is kept even in a separate database, so the data can move to a shared server later without changes.
+Each module's first migration creates its schema itself, since the owner has all rights; nothing to run by hand.
+
+**Migrations.** Production never migrates on start (`Database:InitializeOnStartup` is off). With the first module the
+API workflow gets a step that builds an EF migrations bundle and runs it against `ConnectionStrings__Database` before
+the deploy; until then there is nothing to migrate.
 
 ### Alternative: Neon
 
 1. Create a free project at [neon.tech](https://neon.tech) in AWS Frankfurt (`eu-central-1`), the closest region to
    Poland Central.
-2. Dashboard → Connect: pick the pooled connection and the **.NET** format, and append `;Search Path=home`.
+2. Dashboard → Connect: pick the pooled connection and the **.NET** format.
 
 ### Putting the connection string into the App Service
 
-- Settings → Environment variables → **App settings**: name `ConnectionStrings__Default` (two underscores), or
-- Settings → Environment variables → **Connection strings**: name `Default`, type **Custom**. Do not pick the
+- Settings → Environment variables → **App settings**: name `ConnectionStrings__Database` (two underscores), or
+- Settings → Environment variables → **Connection strings**: name `Database`, type **Custom**. Do not pick the
   PostgreSQL type: it becomes a `POSTGRESQLCONNSTR_` variable that ASP.NET Core does not map to
-  `ConnectionStrings:Default`.
+  `ConnectionStrings:Database`.
 
 Save (the app restarts) and open `/health`: `checks.database` should be `Healthy`.
 
 Locally keep using the Docker database from `api/compose.yaml`, or point at a real one with
-`dotnet user-secrets set "ConnectionStrings:Default" "<string>"` in `api/src/HomeApp.Api`. Never commit the string.
+`dotnet user-secrets set "ConnectionStrings:Database" "<string>"` in `api/src/Host/Host.Api`. Never commit the string.
 
 ## F1 limits
 

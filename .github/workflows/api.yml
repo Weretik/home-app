@@ -39,15 +39,24 @@ jobs:
       - name: Restore
         run: dotnet restore HomeApp.slnx
 
-      - name: Build
+      - name: Build (also regenerates the OpenAPI document)
         run: dotnet build HomeApp.slnx --no-restore --configuration Release
 
-      - name: Test
-        run: dotnet test HomeApp.slnx --no-build --configuration Release
+      - name: OpenAPI document matches the code
+        run: git diff --exit-code -- docs/contracts/openapi.json
+
+      - name: Unit tests
+        run: dotnet test tests/UnitTests --no-build --configuration Release
+
+      - name: Architecture tests
+        run: dotnet test tests/ArchitectureTests --no-build --configuration Release
+
+      - name: Integration tests (PostgreSQL in Testcontainers)
+        run: dotnet test tests/IntegrationTests --no-build --configuration Release
 
       - name: Publish
         if: github.event_name != 'pull_request'
-        run: dotnet publish src/HomeApp.Api --no-build --configuration Release --output ${{ runner.temp }}/api
+        run: dotnet publish src/Host/Host.Api --no-build --configuration Release --output ${{ runner.temp }}/api
 
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
@@ -82,7 +91,7 @@ jobs:
         with:
           app-name: ${{ env.APP_NAME }}
           package: api
-          startup-command: dotnet HomeApp.Api.dll
+          startup-command: dotnet Host.Api.dll
 
       - name: Smoke test /health
         run: |

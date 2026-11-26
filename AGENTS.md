@@ -1,55 +1,84 @@
-# AGENTS.md: home website
+# AI navigation: home
 
-A short entry point for AI agents. This is a small family project: keep things simple, without the ceremony of work
-projects. The code and `docs/` define how things actually work; read only what the task needs.
+A short entry point for working in this repository. The code and its documentation define the actual architecture,
+rules and commands; read only the sources the current task needs. This file applies to the whole repository.
 
 ## Product
 
-A website for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping list,
-to-dos (Masha / Vitaliy / Shared), gift wishlist. So far there is only `/health` and a status page; there is no
-authentication yet. The database is PostgreSQL at the hosting provider, a separate database; everything of ours lives
-in the `home` schema (`HomeDbContext`, migrations history included).
-The site is private: not indexed, no SEO.
+A private site for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping
+list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today only the platform exists (health and status); no feature
+module and no authentication yet. Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
+is English.
 
-## Where things are
+## Project context
 
-- [Architecture](docs/architecture.md): folders, how the front calls the API, configuration.
-- [Deployment](docs/deploy.md): Azure, workflows, which secrets live where.
-- [Decisions (ADRs)](docs/decisions/README.md): why things are the way they are. A new lasting decision (database,
-  authentication, hosting, a new state library) gets a short ADR in the same change.
+The repository follows [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template) in full; do
+not simplify it because the project is small.
+
+- API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
+  [C4](api/docs/architecture/c4.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
+  [contract](api/docs/contracts/openapi.json).
+- Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
+  [decisions](web/docs/decisions/README.md).
+- Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database), [deployment](docs/deploy.md).
+
+A new lasting decision (a module, an external system, a way of running work, hosting, authentication, a state or
+transport approach) gets an ADR in the same change, in the half it belongs to, plus a C4 update for the backend.
+
+## Context search order
+
+1. The half's architecture and rules, then the module or feature folder.
+2. Search code in `api/src`, `api/tests`, `web/src` first; documentation only in the matching section.
+3. Package versions come from `api/Directory.Packages.props` and `web/package.json`, not from documentation.
+4. Keep `rg` scoped to a path.
 
 ## Commands
 
-- API: `cd api && dotnet build HomeApp.slnx && dotnet test HomeApp.slnx` (fast, no Docker).
-- Focused test: `dotnet test HomeApp.slnx --filter "FullyQualifiedName~<Name>"`.
-- Web: `cd web && npm run typecheck && npm test && npm run format:check`; `npm run format` fixes style.
+- API build (regenerates `api/docs/contracts/openapi.json`): `cd api && dotnet build HomeApp.slnx`.
+- API focused test: `dotnet test api/tests/UnitTests --filter "FullyQualifiedName~<Name>"`; architecture tests:
+  `dotnet test api/tests/ArchitectureTests` (fast).
+- Integration tests need Docker (`dotnet test api/tests/IntegrationTests`); do not run them unless asked, CI does.
+- Web: `cd web && npm run typecheck && npm run lint && npm test && npm run architecture:structure`.
+- After a backend contract change: `cd web && npm run contracts:generate`, commit the generated file with the change.
 
-## Rules
+A small fix that restores documented behavior needs no SDD, file map or audit: fix it, run the focused test, describe
+it briefly.
 
-**Language.** All documentation, comments and commit messages are in English. User-facing UI text is in Russian.
+## Task routing
 
-**API (`api/`).** One project, `HomeApp.Api`. Code is split by feature: `Features/<Area>/` (`Expenses`, `Shopping`,
-`Todos`, `Gifts`), with endpoints, model and data access side by side. Shared wiring (CORS, health, database) lives in
-`Platform/`. Minimal APIs, endpoints grouped with `MapGroup("/api/<area>")`. Errors are returned as ProblemDetails.
-There are no five-project modules, mediator, outbox or Result types here; add them only when truly needed, with an ADR.
+| Task | Skill or process | Project rules |
+| --- | --- | --- |
+| New or changed backend feature: specification | `backend-feature-spec` | [API rules](api/docs/rules.md) |
+| Implementing an accepted backend specification | `backend-feature-delivery` | [API README](api/README.md#add-a-use-case) |
+| New or changed web feature: specification / implementation | `frontend-feature-spec` / `frontend-feature-delivery` | [Web rules](web/docs/rules.md) |
+| One feature across API and web | `full-stack-feature-orchestrator` (only on explicit request for several agents) | both halves' rules |
+| HTTP contract change | `backend-api-contract-sync`, then `frontend-api-contract-sync` | [ADR 0008](api/docs/decisions/0008-openapi-generated-from-code.md), [web ADR 0003](web/docs/decisions/0003-typed-client-from-openapi.md) |
+| Schema, migrations, seed data | `backend-database-change` | [API rules, Data](api/docs/rules.md#data), [deployment](docs/deploy.md#database) |
+| Code audit / remediation plan | `backend-code-audit`, `frontend-code-audit` / `*-remediation-plan` | architecture and rules |
+| Verification before review / PR text | `backend-change-verification`, `frontend-change-verification` / `*-pr-handoff` | rules, Tests sections |
+| Docs out of sync with code | `backend-docs-sync`, `frontend-docs-sync` | this file and the halves' docs |
 
-**Web (`web/`).** Code by feature: `src/features/<area>/`, app wiring in `src/app/`, the API client and environment in
-`src/platform/`. Call the API only through `src/platform/api-client.ts`, never with a raw `fetch` in components. No
-secrets in the front: everything in `VITE_*` ends up in the build. The build stays a plain Vite static build with no
-ties to Azure.
+## Boundaries
 
-**Folders.** At most 6 code files per folder (tests next to them do not count); a seventh file means the folder should
-be split by meaning. No dump folders such as `utils`, `helpers`, `common`, `shared`; name files after what they do.
+**API contract:** `api/docs/contracts/openapi.json` is generated from the code on every build and is the only
+machine contract; never write it by hand. Every endpoint has `WithName` (unique camelCase), `WithSummary`,
+`Produces<T>` for each body and `ProducesProblem`; the architecture tests and CI fail when the committed file differs
+from the code. Merge order for a contract change: API, then regenerate the web client, then web.
 
-**Configuration and secrets.** Settings come from `appsettings.json` and environment variables (`Cors__Origins__0`,
-`ConnectionStrings__Default`). Secrets: locally in `dotnet user-secrets`, in Azure as App Service environment variables,
-in CI as GitHub Actions secrets. Secrets are never committed.
+**Folders:** at most 6 code files per folder; the seventh splits it by meaning into named subfolders of at least two
+files. No empty folders, wrapper folders or one-file folders; only generated code (`Migrations/`, `generated/`) is
+exempt. Tested in both halves.
 
-**Tests.** Every endpoint has at least one test through `WebApplicationFactory`; front logic is tested with Vitest and
-Testing Library. No full E2E suite.
+**Modules:** a module uses another one only through its `Contracts`; `Domain` knows no EF Core or ASP.NET Core; one
+schema per module, no foreign keys across schemas. **Web features** never import each other and reach the API only
+through `src/platform/api.ts` from their `*-api.ts`.
 
-**Scope of work.** A small fix that restores behavior needs no spec: fix it, run the test, describe it briefly. A new
-area (for example, "expenses") starts with a short plan in the task or PR; no separate SDD.
+**Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
+transaction go through the outbox, and their handlers are safe to run twice.
 
-**Git.** Commits, pushes, branches and PRs only on direct request. Leave other people's uncommitted changes alone.
-`main` deploys automatically, so only changes that pass the checks go to `main`.
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key` come from App
+Service environment variables; locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
+`web/` (everything `VITE_*` ends up in the build). Never commit secrets.
+
+Commits, pushes, branches, PRs and other remote actions only on the user's direct request. Keep unrelated working tree
+changes. `main` deploys automatically, so only changes that pass the checks go to `main`.

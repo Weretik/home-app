@@ -1,0 +1,32 @@
+# Decisions
+
+Architecture decision records: why the backend is built the way it is. Records 0001–0012 come from
+[fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template) and keep its examples
+(`Catalog`, `Orders`); the rules apply to this project's modules the same way. Repository-wide decisions (hosting,
+database server) live in [../../docs/decisions](../../../docs/decisions/README.md).
+
+| # | Decision |
+| --- | --- |
+| 0001 | [A modular monolith, not microservices](0001-modular-monolith.md) |
+| 0002 | [Five projects per module; other modules only through Contracts](0002-module-projects-and-contracts.md) |
+| 0003 | [Business rules return Result with a typed Error](0003-result-and-typed-errors.md) |
+| 0004 | [A DbContext port per module instead of repositories](0004-dbcontext-port-instead-of-repositories.md) |
+| 0005 | [One PostgreSQL database with a schema per module](0005-schema-per-module.md) |
+| 0006 | [Outbox delivered by a scheduled HTTP tick](0006-outbox-with-scheduled-tick.md) |
+| 0007 | [Idempotency-Key for creates that must not happen twice](0007-idempotency-key-for-creates.md) |
+| 0008 | [The OpenAPI document is generated from the code](0008-openapi-generated-from-code.md) |
+| 0009 | Authentication for the two users: open, decided with the identity module |
+| 0010 | [Source-generated Mediator with a validation pipeline](0010-mediator-pipeline.md) |
+| 0011 | [Folder rules enforced by tests](0011-folder-rules-enforced-by-tests.md) |
+| 0012 | [Rate limits on anonymous writes and sign-in](0012-rate-limits-on-anonymous-writes.md) |
+
+## Decisions that must have a record
+
+- Adding, merging or extracting a module.
+- A new external system (payment provider, e-mail, storage, another API).
+- A new way of running work (scheduled job, queue, broker, background process).
+- A change of database, hosting or authentication.
+- A rule that every change must follow.
+
+New record: copy the newest file, take the next number, and keep the sections Context, Decision, Consequences. A record
+that is replaced stays, with its status changed to `superseded by NNNN`.
