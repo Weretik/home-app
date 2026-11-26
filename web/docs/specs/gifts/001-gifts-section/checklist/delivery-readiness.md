@@ -7,7 +7,7 @@ themes, phone layout and Russian text; the feature audit against the architectur
 - [x] Every in-scope `SC-*` is `verified`.
 - [x] Every `TS-*`/`EN-*` met its done condition.
 - [x] New testable behaviour has Red → Green → Refactor → Regression evidence.
-- [x] Contract, docs and code agree (EN-001 names, architecture.md, design.md «Wish cards»).
+- [x] Contract, docs and code agree (EN-001 names, architecture.md, design.md «Gift lists» and «Person colours»).
 - [x] Boundaries reviewed after the last change: no `features/expenses` import, API only from `*-api.ts`.
 - [x] Every changed file has one responsibility and fits the size rule (component ≤150, hook/module ≤200 lines);
       folders 2–6 production files.

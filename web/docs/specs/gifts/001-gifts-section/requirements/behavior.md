@@ -35,7 +35,10 @@ newest wish first. The page keeps the server's order.
 
 The lists can be narrowed to one recipient and to one category. The open tab and the filters are part of the link,
 so a link, a reload or «Назад» opens the same view. A filter value that does not exist is ignored. Without a recipient
-filter «Список» shows the wishes in groups per person (Маша, Виталий, Вместе) with each group's count.
+filter both tabs show the gifts in a block per person (Маша, Виталий, Вместе), each with the person's colour and
+circle, the count and the sum of the known prices, so it is clear at a glance whose wish is whose. With a recipient
+filter the rows are flat. On a computer the gifts are a table, on a phone a compact list (the Expenses pattern); each
+row ends with «⋮».
 
 ### R-007 — No lost or doubled changes
 
@@ -71,16 +74,19 @@ the form keeps what was typed.
 
 ## Acceptance scenarios
 
-### SC-001 — The wishlist opens grouped by person
+### SC-001 — The wishlist opens in a block per person
 
 **Covers:** R-001, R-003, R-005, R-006
 
 Given wanted wishes for Маша, Виталий and Вместе
 When the person opens «Подарки»
-Then the «Список» tab is selected and the wishes show in three groups «Маша», «Виталий», «Вместе», each with its count
-And within a group the order is the server's (🔥 first, nearest occasion first)
-And each wish shows its name, category, priority, the price or «цена не указана», the occasion with its date when
-set, a link button when it has a link, and the number of variants when it has any
+Then the «Список» tab is selected and the wishes show in three blocks «Маша», «Виталий», «Вместе», each headed by the
+person's coloured circle, name, count and sum («2 подарка · ≈ 3 200 ₴»), with Виталий in `primary`, Маша in
+`secondary` and Вместе in `info`
+And within a block the order is the server's (🔥 first, nearest occasion first)
+And each wish is one row (a table row on a computer, a compact row on a phone) with its name, category, priority, the
+price («1 625 ₴», or «цена не указана»), the occasion with its date when set, a link button when it has a link, and
+the number of variants when it has any
 
 ### SC-002 — Filter by recipient
 
@@ -88,9 +94,9 @@ set, a link button when it has a link, and the number of variants when it has an
 
 Given the «Список» tab with wishes for every person
 When the person picks «Маша» in the recipient filter
-Then only Masha's wishes show, without group headings
+Then only Masha's wishes show as flat rows, without block headers, and the «Маша» button is tinted in her colour
 And the link now opens the same filter after a reload
-And picking «Все» shows the groups again
+And picking «Все» shows the blocks again
 
 ### SC-003 — Filter by category, and an empty filtered list
 
@@ -98,7 +104,7 @@ And picking «Все» shows the groups again
 
 Given the «Список» tab
 When the person picks the category «Украшения»
-Then only wishes in «Украшения» show, in the groups of their recipients
+Then only wishes in «Украшения» show, in the blocks of their recipients
 And when no wish matches the filters, the list says «С этими фильтрами подарков нет» and offers «Сбросить фильтры»,
 which shows every wish again
 
@@ -169,7 +175,7 @@ And «Добавить вариант» is unavailable once the gift has 20 vari
 Given a wish with three variants
 When the person opens «⋮» → «Изменить», removes the second variant, adds a new one, changes the price and saves
 Then the request carries the wish's version and exactly the two kept variants plus the new one in the form's order
-And the card shows the new price and «3 варианта»
+And the row shows the new price and «3 варианта»
 
 ### SC-011 — An edit that came too late
 
@@ -196,7 +202,7 @@ And «Удалить» removes it from the list; «Отмена» changes nothin
 **Covers:** R-004
 
 Given a wanted wish in «Список»
-When the person taps its «Подарено» button
+When the person taps «Подарено» (the row's quick button on a computer, «⋮» → «Подарено» on a phone)
 Then the button is disabled while the change is sent
 And the wish leaves «Список» and shows in «Подаренные» with today's date («Подарено 26 ноября 2026»)
 And the home summary counts it as gifted
@@ -214,7 +220,7 @@ Then the wish leaves «Список» and shows in «Подаренные» mark
 **Covers:** R-004
 
 Given a gifted or dropped wish in «Подаренные»
-When the person taps «Вернуть в список»
+When the person taps «Вернуть в список» (the row's quick button on a computer, in «⋮» on a phone)
 Then it leaves «Подаренные» and shows in «Список» again, without a gifted date
 
 ### SC-016 — The archive tab
@@ -223,7 +229,8 @@ Then it leaves «Подаренные» and shows in «Список» again, wit
 
 Given gifted and dropped wishes
 When the person opens «Подаренные»
-Then the newest gifted wish is first, each gifted one shows its date, dropped ones are marked «Не актуально»
+Then the gifts show in a block per person like «Список», the newest gifted first in a block, each gifted one shows
+its date in «Итог», dropped ones are marked «Не актуально»
 And the recipient and category filters work like in «Список»; an empty archive says «Здесь появятся подаренные
 подарки»
 
@@ -232,8 +239,8 @@ And the recipient and category filters work like in «Список»; an empty a
 **Covers:** R-002
 
 Given a wish with variants
-When the person taps «3 варианта» on its card
-Then the list of variants opens under the wish: each a link (its title, or the shop's address when there is none) with
+When the person taps the variants count of its row («3» on a computer, «3 варианта» on a phone)
+Then the list of variants opens under the row: each a link (its title, or the shop's address when there is none) with
 its price when known, opening in a new tab
 And tapping again folds it
 
@@ -312,8 +319,8 @@ Then the person reads «Слишком много изменений подря�
 | occasion date set, occasion empty                         | chip «12 марта 2027»                                          |
 | status Gifted, giftedOn 2026-11-26                        | «Подарено 26 ноября 2026»                                     |
 | status Dropped                                            | chip «Не актуально»                                           |
-| `/gifts?recipient=Maria&category=<id>`                    | Masha's wishes of that category, no group headings            |
-| `/gifts?recipient=Bob`                                    | every wish, grouped                                           |
+| `/gifts?recipient=Maria&category=<id>`                    | Masha's wishes of that category, flat rows, no block headers  |
+| `/gifts?recipient=Bob`                                    | every wish, in a block per person                             |
 
 ## Deferred scenarios
 

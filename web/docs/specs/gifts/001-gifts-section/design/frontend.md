@@ -36,7 +36,7 @@ change to Expenses) and is out of scope; recorded as a follow-up for the coordin
 | `web/src/features/home/page/HomePage.test.tsx`   | asserts the switcher                               | keep; update the «скоро» expectation for gifts                                                    | same file | TS-014 |
 | `web/src/features/home/page/ComingSoonPage.tsx`  | placeholder                                        | keep (still used by `/shopping`, `/todos`)                                                        | —         | —      |
 | `web/docs/architecture.md`                       | routes table, folder trees                         | extend: Gifts section, `/gifts*` routes, home `gifts-summary/`                                    | same file | TS-015 |
-| `web/docs/design.md`                             | design rules                                       | add a short «Wish cards» pattern (the gift card list, see below)                                  | same file | TS-015 |
+| `web/docs/design.md`                             | design rules                                       | add the «Gift lists» and «Person colours» patterns (see below)                                    | same file | TS-015 |
 
 ## Planned feature file map
 
@@ -45,29 +45,34 @@ the file they cover. Line budgets: component ≤150, hook/module ≤200. **State
 every row below exists**; the largest file is well under its budget. Changes against the first plan are listed after
 the table.
 
-| Path                                                                                                                                                                                                                        | Responsibility                                                                                                 | Task           |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------- |
-| `gifts/data/gifts-api.ts`                                                                                                                                                                                                   | contract types via `Schema<>`, the query keys, `useGifts(archived)`, `useGiftCategories()`, `useGiftDetails()` | TS-002         |
-| `gifts/data/writes-api.ts`                                                                                                                                                                                                  | `Writer`, `ifMatch`, `useRefresh`, `useSave`, `useRemove`, `useIdempotencyKey`                                 | TS-003         |
-| `gifts/data/gift-writes-api.ts`                                                                                                                                                                                             | gift writer, `useSaveGift`, `useDeleteGift`, `useChangeGiftStatus`                                             | TS-003, TS-010 |
-| `gifts/data/settings-writes-api.ts`                                                                                                                                                                                         | category and «нюанс» writers and hooks                                                                         | TS-003         |
-| `gifts/data/write-errors-api.ts` (+ test)                                                                                                                                                                                   | `describeWriteError`, `isStale` (named `*-api.ts` because only such files may import `ApiError`)               | TS-003         |
-| `gifts/display/labels.ts`, `formatting.ts` (+ test)                                                                                                                                                                         | Russian labels; price, date, occasion, variant label, plurals                                                  | TS-001         |
-| `gifts/url-state/gift-filters.ts` (+ test), `use-gift-filters.ts`                                                                                                                                                           | URL filters, filtering and grouping in memory                                                                  | TS-004         |
-| `gifts/section/GiftsSection.tsx`, `SectionTabs.tsx`, `gifts-pages.ts` (+ `GiftsSection.test.tsx`)                                                                                                                           | the section frame, tabs, gear                                                                                  | TS-006         |
-| `gifts/editing/EditDialog.tsx`, `DeleteDialog.tsx` (+ `EditDialog.test.tsx`), `RowActions.tsx`, `use-edit-form.ts`, `use-editor-state.ts`, `field-checks.ts` (+ test)                                                       | the editing frame and field checks                                                                             | TS-005         |
-| `gifts/gift-card/GiftCard.tsx` (+ test), `GiftChips.tsx`, `VariantLinks.tsx`, `CardActions.tsx`                                                                                                                             | one wish card                                                                                                  | TS-007         |
-| `gifts/list-view/use-gift-list.ts`, `GiftFilters.tsx`, `GiftGroups.tsx`, `ListStatus.tsx`, `StatusSnackbar.tsx`                                                                                                             | the controller of a tab and its parts                                                                          | TS-008, TS-010 |
-| `gifts/pages/GiftsPage.tsx` (+ test), `ArchivePage.tsx` (+ test)                                                                                                                                                            | «Список», «Подаренные»                                                                                         | TS-008, TS-011 |
-| `gifts/gift-editing/GiftEditor.tsx`, `GiftDialog.tsx`, `GiftFields.tsx`, `OccasionFields.tsx`, `gift-form.ts` (+ test)                                                                                                      | gift add / edit / delete                                                                                       | TS-009         |
-| `gifts/variant-editing/VariantsEditor.tsx`, `VariantRow.tsx`, `PriceField.tsx`                                                                                                                                              | the variants block                                                                                             | TS-009         |
-| `gifts/settings-page/GiftSettingsPage.tsx` (+ test), `SettingsCard.tsx`, `DetailsCard.tsx`, `CategoriesCard.tsx`                                                                                                            | «Настройки»                                                                                                    | TS-012, TS-013 |
-| `gifts/detail-editing/DetailEditor.tsx`, `DetailDialog.tsx`, `detail-form.ts` (+ test)                                                                                                                                      | «нюанс» dialogs                                                                                                | TS-012         |
-| `gifts/category-editing/CategoryEditor.tsx`, `CategoryDialog.tsx`, `category-form.ts` (+ test)                                                                                                                              | category dialogs                                                                                               | TS-013         |
-| `home/gifts-summary/data/summary-api.ts`, `labels.ts`, `formatting.ts` (+ test)                                                                                                                                             | the summary read and its own labels and formatting                                                             | TS-014         |
-| `home/gifts-summary/overview/GiftsSummary.tsx` (+ test), `SummaryContent.tsx`, `NoWishes.tsx`; `cards/SummaryCard.tsx`, `FigureCard.tsx`, `RecipientCards.tsx`, `TopWishesCard.tsx`, `OccasionsCard.tsx`, `DetailsCard.tsx` | the summary                                                                                                    | TS-014         |
-| `app/root/App.tsx` (existing)                                                                                                                                                                                               | `/gifts` → `GiftsSection` with `GiftsPage`, `archive` → `ArchivePage`, `settings` → `GiftSettingsPage`         | TS-006         |
-| `home/page/summary-sections.ts`, `HomePage.test.tsx`, `HomePage.tsx` (existing)                                                                                                                                             | registry line, «Подарки» enabled, comment                                                                      | TS-014         |
+| Path                                                                                                                                                                  | Responsibility                                                                                                           | Task           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| `gifts/data/gifts-api.ts`                                                                                                                                             | contract types via `Schema<>`, the query keys, `useGifts(archived)`, `useGiftCategories()`, `useGiftDetails()`           | TS-002         |
+| `gifts/data/writes-api.ts`                                                                                                                                            | `Writer`, `ifMatch`, `useRefresh`, `useSave`, `useRemove`, `useIdempotencyKey`                                           | TS-003         |
+| `gifts/data/gift-writes-api.ts`                                                                                                                                       | gift writer, `useSaveGift`, `useDeleteGift`, `useChangeGiftStatus`                                                       | TS-003, TS-010 |
+| `gifts/data/settings-writes-api.ts`                                                                                                                                   | category and «нюанс» writers and hooks                                                                                   | TS-003         |
+| `gifts/data/write-errors-api.ts` (+ test)                                                                                                                             | `describeWriteError`, `isStale` (named `*-api.ts` because only such files may import `ApiError`)                         | TS-003         |
+| `gifts/display/labels.ts`, `formatting.ts` (+ test), `recipient-tones.ts` (+ test), `RecipientAvatar.tsx`                                                             | Russian labels; price, date, occasion, variant label, plurals; the person → theme colour mapping and the person's circle | TS-001         |
+| `gifts/url-state/gift-filters.ts` (+ test), `use-gift-filters.ts`                                                                                                     | URL filters, filtering and grouping in memory                                                                            | TS-004         |
+| `gifts/section/GiftsSection.tsx`, `SectionTabs.tsx`, `gifts-pages.ts` (+ `GiftsSection.test.tsx`)                                                                     | the section frame, tabs, gear                                                                                            | TS-006         |
+| `gifts/editing/EditDialog.tsx`, `DeleteDialog.tsx` (+ `EditDialog.test.tsx`), `RowActions.tsx`, `use-edit-form.ts`, `use-editor-state.ts`, `field-checks.ts` (+ test) | the editing frame and field checks                                                                                       | TS-005         |
+| `gifts/gift-rows/GiftName.tsx`, `GiftActions.tsx`, `VariantLinks.tsx`, `GroupTitle.tsx`                                                                               | what a table row and a list row share: name, link and notes; status and «⋮»; variant links; a person's group header      | TS-007         |
+| `gifts/gift-table/GiftTable.tsx` (+ test), `GiftTableRow.tsx`                                                                                                         | the computer table, a coloured header row per person, variants in a sub-row                                              | TS-007         |
+| `gifts/gift-list/GiftList.tsx` (+ test), `PersonBlock.tsx`, `ListRows.tsx`, `GiftListRow.tsx`                                                                         | the phone list, a coloured block per person, compact rows                                                                | TS-007         |
+| `gifts/list-view/use-gift-list.ts`, `GiftFilters.tsx`, `GiftRows.tsx`, `ListStatus.tsx`, `StatusSnackbar.tsx`                                                         | the controller of a tab and its parts; `GiftRows` picks the table from `md`, the list below                              | TS-008, TS-010 |
+| `gifts/pages/GiftsPage.tsx` (+ test), `ArchivePage.tsx` (+ test)                                                                                                      | «Список», «Подаренные»                                                                                                   | TS-008, TS-011 |
+| `gifts/gift-editing/GiftEditor.tsx`, `GiftDialog.tsx`, `GiftFields.tsx`, `OccasionFields.tsx`, `gift-form.ts` (+ test)                                                | gift add / edit / delete                                                                                                 | TS-009         |
+| `gifts/variant-editing/VariantsEditor.tsx`, `VariantRow.tsx`, `PriceField.tsx`                                                                                        | the variants block                                                                                                       | TS-009         |
+| `gifts/settings-page/GiftSettingsPage.tsx` (+ test), `SettingsCard.tsx`, `DetailsCard.tsx`, `CategoriesCard.tsx`                                                      | «Настройки»                                                                                                              | TS-012, TS-013 |
+| `gifts/detail-editing/DetailEditor.tsx`, `DetailDialog.tsx`, `detail-form.ts` (+ test)                                                                                | «нюанс» dialogs                                                                                                          | TS-012         |
+| `gifts/category-editing/CategoryEditor.tsx`, `CategoryDialog.tsx`, `category-form.ts` (+ test)                                                                        | category dialogs                                                                                                         | TS-013         |
+| `home/gifts-summary/data/summary-api.ts`, `labels.ts`, `formatting.ts` (+ test)                                                                                       | the summary read and its own labels and formatting                                                                       | TS-014         |
+| `home/gifts-summary/overview/GiftsSummary.tsx` (+ test), `SummaryContent.tsx`, `NoWishes.tsx`                                                                         | the summary's states and layout (figures, «🔥 Очень хочу» full width, then occasions and «нюансы»)                       | TS-014         |
+| `home/gifts-summary/cards/SummaryCard.tsx`, `FigureCard.tsx`, `RecipientCards.tsx`, `OccasionsCard.tsx`, `DetailsCard.tsx`                                            | the summary cards; person cards with a top border in the person's colour                                                 | TS-014         |
+| `home/gifts-summary/persons/person-colors.ts` (+ test), `PersonAvatar.tsx`                                                                                            | the home copy of the person → theme colour mapping and the person's circle                                               | TS-014         |
+| `home/gifts-summary/top-wishes/TopWishesCard.tsx`, `PersonWishes.tsx`                                                                                                 | «🔥 Очень хочу»: a tinted block per person                                                                               | TS-014         |
+| `app/root/App.tsx` (existing)                                                                                                                                         | `/gifts` → `GiftsSection` with `GiftsPage`, `archive` → `ArchivePage`, `settings` → `GiftSettingsPage`                   | TS-006         |
+| `home/page/summary-sections.ts`, `HomePage.test.tsx`, `HomePage.tsx` (existing)                                                                                       | registry line, «Подарки» enabled, comment                                                                                | TS-014         |
 
 Changes against the first plan:
 
@@ -78,6 +83,9 @@ Changes against the first plan:
 - `GiftMenu` became `CardActions` with `RowActions` taking extra items; `SettingsCard` frames both settings cards;
   `SummaryCard` frames the home summary cards; the home `money.ts` is `formatting.ts`.
 - The temporary `section/PageInProgress.tsx` was removed when the pages were wired.
+- After the first review (2026-11-26) the wish cards (`gift-card/`, `list-view/GiftGroups.tsx`) were replaced by
+  `gift-table/` and `gift-list/` sharing `gift-rows/`, with `list-view/GiftRows.tsx` choosing by width; person colours
+  came with `display/recipient-tones.ts` and `RecipientAvatar.tsx`; `groupByRecipient` now adds the group's price sum.
 
 ## Architecture questions for a new feature
 
@@ -128,16 +136,24 @@ Changes against the first plan:
 ## Visual system and responsiveness
 
 - Theme «Синий плащ», tokens only, light and dark both designed ([design rules](../../../../design.md)).
-- Wish cards (new pattern, added to design.md in TS-015): a gift is a rich item (chips, variants, notes), so the tabs
-  show cards in a grid instead of the month lists' `List`/`Table` — one column on a phone, two from `md`, three from
-  `xl`; gap 2/3. A group heading is `subtitle1` 600 with the count in `text.secondary`.
-- Priority chip: 🔥 uses `secondary` (the second accent, not a status), ⭐ and 💭 the default chip; the emoji carries the
-  meaning so colour is never the only hint. «Не актуально» is a default outlined chip; status colours are not used.
-- Price: kopecks in lists («1 234,50 ₴», tabular, right side of the card header); figure cards round.
+- Gift lists (design.md «Gift lists», changed 2026-11-26 after the first review: cards were inconvenient): the tabs
+  follow the Expenses pattern, a table from `md` and a compact list below it, each row ending with «⋮». Table columns:
+  Подарок (name, link icon, notes), Категория, Приоритет («Список»), Цена, Повод or Итог, Варианты (count → a sub-row
+  with the links), the quick status button and «⋮». Phone: name and price, the category, small chips (priority or
+  outcome, occasion), «N вариантов» → a `Collapse`; every action in «⋮».
+- Person colours (design.md «Person colours», an explicit exception to «info is status only», like signed amounts):
+  Виталий `primary`, Маша `secondary`, Вместе `info`, in `gifts/display/recipient-tones.ts`; the home summary keeps its
+  own copy (`home/gifts-summary/persons/person-colors.ts`) because features never import each other. Without a person
+  filter both tabs group by person: a header with the person's circle (`<tone>.main`, «В»/«М»/two people), the name,
+  «N подарков · ≈ сумма», on a 0.08 tint, and a 4px line in the colour along the group. The «Для кого» filter buttons
+  carry the same circle and a 0.12 tint when picked. No «Для кого» column: blocks or the filter already say who.
+- Priority chip: neutral outlined, «🔥 Очень хочу» bolder (crimson now means Маша); the emoji carries the meaning.
+  «Не актуально» is a default outlined chip.
+- Price: «1 625 ₴» when whole, real kopecks kept («1 234,50 ₴»), tabular, right-aligned; group sums round.
 - Phone (360–400px): filters wrap (recipient toggle scrolls sideways like the home switcher), the dialog is full
   screen, variant rows stack link over title/price, long names and links wrap (`overflowWrap: 'anywhere'`), no
-  horizontal page scroll. Computer: same cards, more columns.
-- Risks: long variant URLs (shown as host, full URL only in `href`), many chips on one card (wrap), 20 variant rows in
+  horizontal page scroll. Computer: the table.
+- Risks: long variant URLs (shown as host, full URL only in `href`), many chips on one phone row (wrap), 20 variant rows in
   a dialog (the dialog content scrolls; «Добавить вариант» stays at the block's end).
 
 ## Platform adapters and permissions
@@ -166,7 +182,7 @@ Expenses); the forms map their string values to the request type in `gift-form.t
 
 ## Responsibilities in scope
 
-Data and writes: `gifts/data`. URL state: `gifts/url-state`. Generic editing: `gifts/editing`. UI: card, list,
+Data and writes: `gifts/data`. URL state: `gifts/url-state`. Generic editing: `gifts/editing`. UI: table, list,
 pages, editors as in the map. Navigation: `gifts/section` + `App.tsx`. Home: `home/gifts-summary` + registry.
 Verification: tests beside each file, TS-016.
 
@@ -205,10 +221,10 @@ Decided without asking; each is cheap to change.
 6. **Category rename and delete** send no `If-Match` (categories carry no version, confirmed by the backend SDD);
    detail edits send `If-Match`.
 7. **Variant request** items carry no id: `{ title?, link, price? }`, the order of the array is the order shown.
-8. **Edit dialog** does not change status; status changes only through the card actions.
+8. **Edit dialog** does not change status; status changes only through the row actions.
 9. **Default recipient** of a new gift or «нюанс» is the recipient filter (or the group's «+» in settings), else
    empty and required. Default category: the category filter, else empty and required. Default priority: `Normal`.
-10. **Archive actions**: «Вернуть в список» is a button on the card; a gifted wish can be marked «Не актуально» only
+10. **Archive actions**: «Вернуть в список» is the row's quick button (in «⋮» on a phone); a gifted wish can be marked «Не актуально» only
     by returning it first (keeps the menu small).
 11. **No undo snackbar** after «Подарено»: the archive's «Вернуть в список» reverses it; failures of a quick action
     show in a `Snackbar` with an error `Alert`.

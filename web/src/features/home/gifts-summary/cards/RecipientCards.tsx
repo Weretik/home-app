@@ -1,9 +1,10 @@
 import Box from '@mui/material/Box';
-import { recipientEmoji, recipientLabels } from '../data/labels';
+import { recipientLabels } from '../data/labels';
 import type { GiftsSummaryView } from '../data/summary-api';
+import { PersonAvatar } from '../persons/PersonAvatar';
 import { FigureCard } from './FigureCard';
 
-/** The top row: one figure card per person and «Всего» (docs/design.md, «Figure card»). */
+/** The top row: one figure card per person in their colour and «Всего» (docs/design.md, «Figure card»). */
 export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
   return (
     <Box
@@ -16,12 +17,21 @@ export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
       {summary.recipients.map((item) => (
         <FigureCard
           key={item.recipient}
-          emoji={recipientEmoji[item.recipient]}
+          mark={<PersonAvatar recipient={item.recipient} size={28} />}
           title={recipientLabels[item.recipient]}
           counts={item.counts}
+          recipient={item.recipient}
         />
       ))}
-      <FigureCard emoji="🎁" title="Всего" counts={summary.total} />
+      <FigureCard
+        mark={
+          <Box component="span" aria-hidden>
+            🎁
+          </Box>
+        }
+        title="Всего"
+        counts={summary.total}
+      />
     </Box>
   );
 }

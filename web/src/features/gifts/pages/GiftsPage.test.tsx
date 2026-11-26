@@ -120,17 +120,20 @@ const three = [
   gift({ name: 'Кольцо', priority: 'Someday' }),
 ];
 
-test('shows the wanted gifts grouped by person, in the server order', async () => {
+const rows = () => screen.getAllByRole('listitem');
+const rowNames = (scope: HTMLElement) =>
+  within(scope)
+    .getAllByRole('listitem')
+    .map((row) => within(row).getAllByText(/^[А-Яа-я ]+$/)[0]!.textContent);
+
+test('shows the wanted gifts in a block per person, in the server order', async () => {
   const { lists } = renderPage(three);
   const masha = await screen.findByRole('region', { name: 'Маша' });
   expect(
-    within(masha).getByRole('heading', { name: 'Маша 2' }),
+    within(masha).getByRole('heading', { name: 'Маша' }),
   ).toBeInTheDocument();
-  expect(within(masha).getAllByRole('article')).toHaveLength(2);
-  const names = within(masha)
-    .getAllByRole('heading', { level: 3 })
-    .map((h) => h.textContent);
-  expect(names).toEqual(['Серьги', 'Кольцо']);
+  expect(within(masha).getByText(/^2 подарка/)).toBeInTheDocument();
+  expect(rowNames(masha)).toEqual(['Серьги', 'Кольцо']);
   expect(screen.getByRole('region', { name: 'Виталий' })).toBeInTheDocument();
   expect(screen.getByRole('region', { name: 'Вместе' })).toBeInTheDocument();
   expect(lists()[0]!.url.searchParams.get('archived')).toBe('false');
@@ -143,7 +146,11 @@ test('filters by person and category in the URL without a new request', async ()
   await userEvent.click(screen.getByRole('button', { name: 'Маша' }));
   expect(new URLSearchParams(search()).get('recipient')).toBe('Maria');
   expect(screen.queryByRole('region', { name: 'Маша' })).toBeNull();
-  expect(screen.getAllByRole('article')).toHaveLength(2);
+  expect(
+    within(screen.getByRole('list', { name: 'Список подарков' })).getAllByRole(
+      'listitem',
+    ),
+  ).toHaveLength(2);
 
   await userEvent.click(screen.getByRole('combobox', { name: 'Категория' }));
   await userEvent.click(screen.getByRole('option', { name: 'Техника' }));
@@ -155,7 +162,7 @@ test('filters by person and category in the URL without a new request', async ()
   await userEvent.click(
     screen.getByRole('button', { name: 'Сбросить фильтры' }),
   );
-  expect(screen.getAllByRole('article')).toHaveLength(4);
+  expect(rows()).toHaveLength(4);
   expect(search()).toBe('');
 });
 
@@ -164,7 +171,7 @@ test('ignores a person or category in the link that does not exist', async () =>
   expect(
     await screen.findByRole('region', { name: 'Маша' }),
   ).toBeInTheDocument();
-  await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(4));
+  await waitFor(() => expect(rows()).toHaveLength(4));
 });
 
 test('says when the wishlist is empty', async () => {
@@ -383,8 +390,9 @@ test('marks a gift gifted and it leaves the list', async () => {
     },
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Подарено' }),
+    await screen.findByRole('button', { name: 'Действия: Плед' }),
   );
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Подарено' }));
   expect(await screen.findByText('Список желаний пуст')).toBeInTheDocument();
   const put = writes()[0]!;
   expect(put.url.pathname).toBe(`/api/gifts/items/${item.id}/status`);

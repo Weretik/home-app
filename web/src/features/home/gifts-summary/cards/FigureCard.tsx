@@ -1,29 +1,50 @@
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import type { ReactNode } from 'react';
 import { formatWhole, formatWishes } from '../data/formatting';
-import type { GiftCounts } from '../data/summary-api';
+import type { GiftCounts, Recipient } from '../data/summary-api';
+import { personColors } from '../persons/person-colors';
+
+interface FigureCardProps {
+  /** The person's circle, or an emoji for «Всего». */
+  mark: ReactNode;
+  title: string;
+  counts: GiftCounts;
+  /** A person's card gets a 4px top border in their colour. */
+  recipient?: Recipient;
+}
 
 /** One person's (or «Всего») wishes: how many, their sum, how many 🔥, and what was given. */
 export function FigureCard({
-  emoji,
+  mark,
   title,
   counts,
-}: {
-  emoji: string;
-  title: string;
-  counts: GiftCounts;
-}) {
+  recipient,
+}: FigureCardProps) {
   return (
-    <Card component="section" aria-label={title} sx={{ p: 2.5 }}>
+    <Card
+      component="section"
+      aria-label={title}
+      sx={{
+        p: 2.5,
+        ...(recipient && {
+          borderTop: '4px solid',
+          borderTopColor: `${personColors[recipient]}.main`,
+        }),
+      }}
+    >
       <Typography
         variant="subtitle1"
         component="h2"
-        sx={{ fontWeight: 600, color: 'text.secondary' }}
+        sx={{
+          fontWeight: 600,
+          color: 'text.secondary',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+        }}
       >
-        <Box component="span" aria-hidden sx={{ mr: 1 }}>
-          {emoji}
-        </Box>
+        {mark}
         {title}
       </Typography>
       <Typography

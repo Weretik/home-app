@@ -135,6 +135,15 @@ test('shows the figures per person and in total', async () => {
 test('lists the 🔥 wishes, the nearest occasions and the нюансы read-only', async () => {
   renderSummary(() => json(summary));
   const top = await screen.findByRole('region', { name: '🔥 Очень хочу' });
+  const masha = within(top).getByRole('group', { name: 'Маша' });
+  expect(plain(masha)).toContain('🔥 4 желания · ≈ 3 200 ₴');
+  expect(plain(masha)).toContain('И ещё 2 в разделе «Подарки»');
+  expect(within(top).getByRole('group', { name: 'Виталий' })).toHaveTextContent(
+    'Пока нет желаний с 🔥',
+  );
+  expect(
+    within(top).getByRole('group', { name: 'Вместе' }),
+  ).toBeInTheDocument();
   expect(within(top).getByText('Серьги')).toBeInTheDocument();
   expect(within(top).getByText('цена не указана')).toBeInTheDocument();
   expect(
