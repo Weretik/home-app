@@ -16,7 +16,7 @@ internal static class ListTodoTasksEndpoint
     {
         group.MapGet("/tasks", HandleAsync)
             .WithName("listTodoTasks")
-            .WithSummary("Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat.")
+            .WithSummary("Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat; dueFrom/dueTo (both included) or withoutDueDate narrow by due date; in the archive completedFrom/completedTo (Kyiv days, both included) narrow by completion day.")
             .Produces<TodoTaskList>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
         return group;
@@ -28,6 +28,11 @@ internal static class ListTodoTasksEndpoint
         [FromQuery] Guid? categoryId,
         [FromQuery] bool? withoutCategory,
         [FromQuery] string? search,
+        [FromQuery] DateOnly? dueFrom,
+        [FromQuery] DateOnly? dueTo,
+        [FromQuery] bool? withoutDueDate,
+        [FromQuery] DateOnly? completedFrom,
+        [FromQuery] DateOnly? completedTo,
         ISender sender,
         HttpContext http,
         CancellationToken cancellationToken,
@@ -41,6 +46,11 @@ internal static class ListTodoTasksEndpoint
                 categoryId,
                 withoutCategory ?? false,
                 search,
+                dueFrom,
+                dueTo,
+                withoutDueDate ?? false,
+                completedFrom,
+                completedTo,
                 page,
                 pageSize),
             cancellationToken);

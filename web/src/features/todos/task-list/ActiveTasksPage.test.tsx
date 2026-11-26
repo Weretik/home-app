@@ -6,6 +6,7 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
 import { createQueryClient } from '../../../platform/query-client';
+import { dayHeading } from '../data/day-groups';
 import { addDays, kyivToday } from '../data/due-date';
 import { TodosSection } from '../section/TodosSection';
 import { ActiveTasksPage } from './ActiveTasksPage';
@@ -161,12 +162,13 @@ test('groups the active tasks by due date and hides empty groups', async () => {
   expect(
     within(todayList).getByRole('img', { name: 'Кому: Маша' }),
   ).toBeInTheDocument();
-  const soon = screen.getByRole('list', { name: 'Скоро' });
+  const soon = screen.getByRole('list', {
+    name: dayHeading(addDays(today, 3), today),
+  });
   expect(soon).toHaveTextContent('🏠 Дом');
   expect(within(soon).getByLabelText('Шаги: 2 из 3')).toHaveTextContent('2/3');
   expect(within(soon).getByTitle('Есть заметка')).toBeInTheDocument();
   expect(screen.getByRole('list', { name: 'Без срока' })).toBeInTheDocument();
-  expect(screen.queryByRole('list', { name: 'Позже' })).not.toBeInTheDocument();
 
   const query = lists()[0]!.url.searchParams;
   expect(query.get('view')).toBe('active');
@@ -201,6 +203,27 @@ test('keeps the filters in the URL and sends them to the API', async () => {
     },
   );
   expect(screen.getByTestId('location').textContent).toContain('q=');
+});
+
+test('filters by due date from the URL and from «Срок»', async () => {
+  const { lists } = renderPage(
+    () => json(page([task()])),
+    '/todos?when=period&from=2026-12-01&to=2026-12-07',
+  );
+  await screen.findByRole('list', { name: 'Без срока' });
+  expect(lists()[0]!.url.searchParams.get('dueFrom')).toBe('2026-12-01');
+  expect(lists()[0]!.url.searchParams.get('dueTo')).toBe('2026-12-07');
+  expect(screen.getByLabelText('С')).toHaveValue('2026-12-01');
+
+  await userEvent.click(screen.getByRole('combobox', { name: 'Срок' }));
+  await userEvent.click(screen.getByRole('option', { name: 'Без срока' }));
+
+  await waitFor(() =>
+    expect(lists().at(-1)!.url.searchParams.get('withoutDueDate')).toBe('true'),
+  );
+  expect(lists().at(-1)!.url.searchParams.get('dueFrom')).toBeNull();
+  expect(screen.getByTestId('location').textContent).not.toContain('from=');
+  expect(screen.queryByLabelText('С')).not.toBeInTheDocument();
 });
 
 test('quick-adds a task for the chosen person and keeps the field ready', async () => {

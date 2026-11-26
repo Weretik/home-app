@@ -1,5 +1,5 @@
 /**
- * Due dates of tasks: today in Kyiv (R-013), the list's groups and the short Russian labels («сегодня», «завтра»,
+ * Due dates of tasks: today in Kyiv (R-013), day arithmetic and the short Russian labels («сегодня», «завтра»,
  * «пн 30.11»). Dates are contract days («2026-11-30») and are compared as strings; arithmetic goes through UTC so no
  * time zone or daylight saving shift moves a day.
  */
@@ -39,49 +39,9 @@ export function weekendOf(today: string): string {
   return addDays(today, 6 - weekday);
 }
 
-/** The groups of the active list (FR-001), in the order they are shown. */
-export type DueBucket = 'overdue' | 'today' | 'soon' | 'later' | 'none';
-
-export const dueBuckets: readonly DueBucket[] = [
-  'overdue',
-  'today',
-  'soon',
-  'later',
-  'none',
-];
-
-export const dueBucketLabels: Record<DueBucket, string> = {
-  overdue: 'Просрочено',
-  today: 'Сегодня',
-  soon: 'Скоро',
-  later: 'Позже',
-  none: 'Без срока',
-};
-
-/** The group of a due date: before today, today, within the next 7 days, later, or none. */
-export function dueBucket(
-  dueDate: string | null | undefined,
-  today: string,
-): DueBucket {
-  if (!dueDate) return 'none';
-  if (dueDate < today) return 'overdue';
-  if (dueDate === today) return 'today';
-  if (dueDate <= addDays(today, 7)) return 'soon';
-  return 'later';
-}
-
-/** Splits items into the groups in their order, keeping the order inside a group; empty groups are left out. */
-export function groupByDue<T extends { dueDate?: string | null }>(
-  items: readonly T[],
-  today: string,
-): { bucket: DueBucket; items: T[] }[] {
-  return dueBuckets
-    .map((bucket) => ({
-      bucket,
-      items: items.filter((item) => dueBucket(item.dueDate, today) === bucket),
-    }))
-    .filter((group) => group.items.length > 0);
-}
+/** Whether an open task's due date has passed (before today in Kyiv). */
+export const isOverdue = (dueDate: string | null | undefined, today: string) =>
+  Boolean(dueDate && dueDate < today);
 
 /** «сегодня», «завтра», «вчера», else «пн 30.11» (with the year when it is not this year: «пн 30.11.2027»). */
 export function formatDue(day: string, today: string): string {

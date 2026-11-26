@@ -1,25 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { TaskView } from '../data/todos-api';
+import { whenFits, type When } from './date-filter';
 import { whoValues, type TodoFilters, type Who } from './filters';
 
-const names = ['who', 'category', 'q'] as const;
+const names = ['who', 'category', 'q', 'when', 'from', 'to'] as const;
+type Name = (typeof names)[number];
 
-/** The filters of a task list kept in `?who=&category=&q=`, so a link opens the same list. */
-export function useTodoFilters() {
+/**
+ * The filters of a task list kept in `?who=&category=&q=&when=&from=&to=`, so a link opens the same list. A `when`
+ * the list does not offer (another list's choice) is ignored.
+ */
+export function useTodoFilters(view: TaskView = 'active') {
   const [params, setParams] = useSearchParams();
   const rawWho = params.get('who');
+  const rawWhen = (params.get('when') || undefined) as When | undefined;
+  const when = whenFits(view, rawWhen) ? rawWhen : undefined;
   const filters: TodoFilters = {
     who: whoValues.includes(rawWho as Who) ? (rawWho as Who) : undefined,
     category: params.get('category') || undefined,
     q: params.get('q') || undefined,
+    when,
+    from: when === 'period' ? params.get('from') || undefined : undefined,
+    to: when === 'period' ? params.get('to') || undefined : undefined,
   };
 
-  const set = (name: (typeof names)[number], value: string | undefined) =>
+  const set = (values: Partial<Record<Name, string | undefined>>) =>
     setParams(
       (current) => {
         const updated = new URLSearchParams(current);
-        if (value) updated.set(name, value);
-        else updated.delete(name);
+        for (const [name, value] of Object.entries(values)) {
+          if (value) updated.set(name, value);
+          else updated.delete(name);
+        }
         return updated;
       },
       { replace: true },
@@ -37,9 +50,14 @@ export function useTodoFilters() {
 
   return {
     filters,
-    setWho: (who: Who | undefined) => set('who', who),
-    setCategory: (category: string | undefined) => set('category', category),
-    setSearch: (q: string | undefined) => set('q', q),
+    setWho: (who: Who | undefined) => set({ who }),
+    setCategory: (category: string | undefined) => set({ category }),
+    setSearch: (q: string | undefined) => set({ q }),
+    // A new choice drops the old period's days.
+    setWhen: (value: When | undefined) =>
+      set({ when: value, from: undefined, to: undefined }),
+    setPeriod: (from: string | undefined, to: string | undefined) =>
+      set({ when: 'period', from, to }),
     clear,
   };
 }

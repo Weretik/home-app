@@ -3666,7 +3666,7 @@
         "tags": [
           "Todos"
         ],
-        "summary": "Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat.",
+        "summary": "Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat; dueFrom/dueTo (both included) or withoutDueDate narrow by due date; in the archive completedFrom/completedTo (Kyiv days, both included) narrow by completion day.",
         "operationId": "listTodoTasks",
         "parameters": [
           {
@@ -3706,6 +3706,45 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "dueFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dueTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "withoutDueDate",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "completedFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "completedTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           },
           {

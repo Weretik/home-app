@@ -119,12 +119,16 @@ test('shows the counts per assignee, the week and the focus list', async () => {
   );
 
   const rows = within(
-    screen.getByRole('list', { name: 'В фокусе' }),
+    screen.getByRole('list', { name: 'На сегодня' }),
   ).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
   expect(rows[0]).toHaveTextContent('вт 24.11');
   expect(rows[1]).toHaveTextContent('сегодня');
   expect(rows[1]).toHaveTextContent('Общее');
+  expect(screen.getByRole('link', { name: 'Все на сегодня' })).toHaveAttribute(
+    'href',
+    '/todos?when=today',
+  );
 });
 
 test('ticks a focus task done with its version and reloads the summary', async () => {
@@ -150,10 +154,13 @@ test('ticks a focus task done with its version and reloads the summary', async (
   expect(put.body).toEqual({ status: 'Done' });
 });
 
-test('says when nothing needs attention', async () => {
+test('hides «На сегодня» when nothing needs attention', async () => {
   renderHome(() => json(summary([])));
 
-  expect(await screen.findByText(/Ничего срочного/)).toBeInTheDocument();
+  expect(await screen.findByText('Сделано за неделю: 5')).toBeInTheDocument();
+  expect(
+    screen.queryByRole('heading', { name: 'На сегодня' }),
+  ).not.toBeInTheDocument();
 });
 
 test('says in Russian when a focus task changed elsewhere', async () => {
