@@ -39,6 +39,7 @@ public static class ShoppingModule
             .MapClearShoppingCart()
             .MapListShoppingHistory()
             .MapListFrequentItems()
+            .MapListShoppingNameSuggestions()
             .MapGetShoppingSummary()
             .MapListShoppingDepartments()
             .MapMatchShoppingDepartment()

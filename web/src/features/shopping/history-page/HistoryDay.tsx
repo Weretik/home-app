@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useId } from 'react';
 import { itemTitle, personLabel } from '../data/labels';
 import type { ShoppingItem } from '../data/shopping-api';
-import type { HistoryDay as Day } from './history-days';
+import type { HistoryDay as Day } from './history-groups';
 
 interface HistoryDayProps {
   day: Day;
@@ -38,7 +38,7 @@ export function HistoryDay({
       <Typography
         id={titleId}
         variant="subtitle1"
-        component="h2"
+        component="h3"
         sx={{
           fontWeight: 600,
           px: 2,

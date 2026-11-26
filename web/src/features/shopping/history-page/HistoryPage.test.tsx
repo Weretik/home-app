@@ -160,3 +160,46 @@ test('an empty history says so', async () => {
 
   expect(await screen.findByText('Истории пока нет')).toBeInTheDocument();
 });
+
+test('groups days under months with counts; a month continues on the next page', async () => {
+  const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+  const title = (date: Date) => {
+    const name = new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(
+      date,
+    );
+    return `${name.charAt(0).toUpperCase()}${name.slice(1)} ${date.getFullYear()}`;
+  };
+  renderHistory(
+    [
+      row('a', 'Молоко', at(today, 11)),
+      row('b', 'Хлеб', at(thisMonth, 9)),
+      row('c', 'Сыр', at(lastMonth, 18)),
+    ],
+    51,
+  );
+
+  const current = await screen.findByRole('heading', {
+    level: 2,
+    name: new RegExp(`^${title(today)} · `),
+  });
+  expect(current).toHaveTextContent(/· [12] покупк[аи]$/);
+  const previous = screen.getByRole('region', {
+    name: `${title(lastMonth)} · 1+ покупок`,
+  });
+  expect(within(previous).getByText('Сыр')).toBeInTheDocument();
+  expect(
+    within(previous).getAllByRole('heading', { level: 3 }).length,
+  ).toBeGreaterThan(0);
+
+  // The next page holds an older month: the last loaded one is complete now.
+  await userEvent.click(screen.getByRole('button', { name: 'Показать ещё' }));
+  expect(
+    await screen.findByRole('region', {
+      name: `${title(lastMonth)} · 1 покупка`,
+    }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('region', { name: 'Январь 2025 · 1 покупка' }),
+  ).toBeInTheDocument();
+});

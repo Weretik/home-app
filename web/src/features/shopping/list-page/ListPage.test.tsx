@@ -248,7 +248,7 @@ test('adds from the field as «Я» with an Idempotency-Key, then «Отмени
   await userEvent.click(screen.getByRole('button', { name: 'Маша' }));
 
   await userEvent.type(
-    screen.getByRole('textbox', { name: 'Что купить' }),
+    screen.getByRole('combobox', { name: 'Что купить' }),
     'творог{Enter}',
   );
 
@@ -261,7 +261,7 @@ test('adds from the field as «Я» with an Idempotency-Key, then «Отмени
     departmentId: null,
     urgent: false,
   });
-  expect(screen.getByRole('textbox', { name: 'Что купить' })).toHaveValue('');
+  expect(screen.getByRole('combobox', { name: 'Что купить' })).toHaveValue('');
 
   await userEvent.click(screen.getByRole('button', { name: 'Отменить' }));
   await waitFor(() => expect(writes()).toHaveLength(2));
@@ -275,7 +275,7 @@ test('shows the department of a single typed item and adds a frequent one with i
   await screen.findByRole('region', { name: /Молочка/ });
 
   await userEvent.type(
-    screen.getByRole('textbox', { name: 'Что купить' }),
+    screen.getByRole('combobox', { name: 'Что купить' }),
     'йогурт',
   );
   expect(

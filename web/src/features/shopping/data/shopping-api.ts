@@ -1,4 +1,8 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
 import { moduleKeys } from '../../../platform/query-keys';
@@ -7,6 +11,7 @@ export type ShoppingItem = Schema<'ShoppingItemView'>;
 export type ShoppingList = Schema<'ShoppingList'>;
 export type FrequentItem = Schema<'FrequentItem'>;
 export type DepartmentMatch = Schema<'DepartmentMatch'>;
+export type NameSuggestion = Schema<'NameSuggestion'>;
 export type ShoppingPerson = ShoppingItem['addedBy'];
 
 /** Every shopping query starts with this key, so an item write refreshes the list, history, frequent and counts. */
@@ -58,6 +63,29 @@ export function useDepartmentMatch(name: string) {
       apiCall(
         api.GET('/api/shopping/departments/match', {
           params: { query: { name } },
+          signal,
+        }),
+      ),
+  });
+}
+
+/** How many names the quick add suggests at once. */
+export const SUGGESTION_LIMIT = 8;
+
+/**
+ * Names ever added that start with the typed segment (or have a word that does), for the quick add. Nothing is asked
+ * for an empty query; the previous answer stays while the next one loads, so the list does not flicker.
+ */
+export function useNameSuggestions(query: string) {
+  return useQuery({
+    queryKey: [...shoppingKey, 'suggestions', query],
+    enabled: query.length > 0,
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    queryFn: ({ signal }) =>
+      apiCall(
+        api.GET('/api/shopping/items/suggestions', {
+          params: { query: { query, limit: SUGGESTION_LIMIT } },
           signal,
         }),
       ),

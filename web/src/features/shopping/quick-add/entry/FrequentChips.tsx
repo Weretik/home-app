@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import { useFrequentItems } from '../data/shopping-api';
+import { useFrequentItems } from '../../data/shopping-api';
 import type { QuickAddController } from './use-quick-add';
 
 /** ⭐ Частые: one tap adds the item with its usual department (R-8). Scrolls sideways on a phone. */
