@@ -19,6 +19,10 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0010 | [Source-generated Mediator with a validation pipeline](0010-mediator-pipeline.md) |
 | 0011 | [Folder rules enforced by tests](0011-folder-rules-enforced-by-tests.md) |
 | 0012 | [Rate limits on anonymous writes and sign-in](0012-rate-limits-on-anonymous-writes.md) |
+| 0013 | [The Expenses module and its model](0013-expenses-module-model.md) |
+| 0014 | [One-time import from the Google Sheet through a keyed endpoint](0014-one-time-sheet-import.md) |
+| 0015 | [Expenses are readable without sign-in until the Identity module](0015-expenses-open-until-identity.md) (temporary) |
+| 0016 | [Production migrations run as EF bundles in the deploy job](0016-migrations-as-bundles-in-deploy.md) |
 
 ## Decisions that must have a record
 

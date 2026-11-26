@@ -11,6 +11,7 @@ namespace IntegrationTests.TestHost;
 public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public const string TickKey = "integration-tick-key";
+    public const string ImportKey = "integration-import-key";
     public const string WebOrigin = "https://web.example";
 
     private PostgreSqlContainer? _database;
@@ -41,6 +42,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Database", _database!.GetConnectionString());
         builder.UseSetting("Database:InitializeOnStartup", "true");
         builder.UseSetting("OutboxTick:Key", TickKey);
+        builder.UseSetting("Expenses:Import:Key", ImportKey);
         builder.UseSetting("Cors:Origins:0", WebOrigin);
         // The shared host runs many requests from one address.
         builder.UseSetting("RateLimiting:PublicWrite:PermitLimit", "1000");

@@ -7,12 +7,12 @@ to, one process is cheaper and simpler.
 
 ## Modules
 
-No module exists yet; the API serves only health and status. The planned modules follow the areas of the old Google
-Sheets and Telegram bots:
+The modules follow the areas of the old Google Sheets and Telegram bots. Each module has a page in
+[../modules](../modules/expenses.md) once it exists:
 
 | Module | Owns | Schema | Status |
 | --- | --- | --- | --- |
-| Expenses | Expenses, categories, who paid, monthly totals | `expenses` | planned |
+| Expenses | Expenses, incomes, categories, who paid; later limits, plan, payments, savings | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
 | Shopping | The shared shopping list | `shopping` | planned |
 | Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
 | Gifts | Gift wishlist | `gifts` | planned |
@@ -88,6 +88,9 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 ## Security
 
 - Authentication is not in place yet; it arrives with the Identity module and its ADR. The authentication and
-  authorization middleware is already in the pipeline.
+  authorization middleware is already in the pipeline. Until then the Expenses reads are anonymous
+  ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
+- The one-time sheet import needs the `X-Import-Key` header, compared in constant time, and is hidden from the
+  OpenAPI document ([ADR 0014](../decisions/0014-one-time-sheet-import.md)).
 - CORS allows only the origins in `Cors:Origins` (the web app), with credentials, ready for a cookie session.
 - The outbox tick endpoint needs a shared key, compared in constant time, and is hidden from the OpenAPI document.
