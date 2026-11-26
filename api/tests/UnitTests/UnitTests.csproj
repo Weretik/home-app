@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Expenses\Expenses.Application\Expenses.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Gifts\Gifts.Application\Gifts.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Todos\Todos.Application\Todos.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

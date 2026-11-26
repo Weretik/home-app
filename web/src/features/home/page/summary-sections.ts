@@ -5,6 +5,7 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import type { ComponentType } from 'react';
 import { ExpensesSummary } from '../expenses-summary/view/ExpensesSummary';
 import { GiftsSummary } from '../gifts-summary/view/GiftsSummary';
+import { TodosSummary } from '../todos-summary/view/TodosSummary';
 
 export interface SummarySection {
   /** The value of `?s=` that opens this summary. */
@@ -26,7 +27,12 @@ export const summarySections: SummarySection[] = [
     icon: ReceiptLongOutlinedIcon,
     Summary: ExpensesSummary,
   },
-  { key: 'todos', label: 'Дела', icon: ChecklistOutlinedIcon, Summary: null },
+  {
+    key: 'todos',
+    label: 'Дела',
+    icon: ChecklistOutlinedIcon,
+    Summary: TodosSummary,
+  },
   {
     key: 'shopping',
     label: 'Покупки',

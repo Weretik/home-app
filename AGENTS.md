@@ -9,9 +9,11 @@ A private site for two people (Masha and Vitaliy) that replaces Google Sheets an
 list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses, incomes and the «Копилка» savings jar,
 imported from the old Google Sheet and now added, edited and deleted on the site, plus spending limits, the savings
 goal and a computed month summary that replace the sheet's «Бюджет» and «Сводка» tabs, see
-[api/docs/modules/expenses.md](api/docs/modules/expenses.md)), and the Gifts module (the gift wishlist for Masha,
+[api/docs/modules/expenses.md](api/docs/modules/expenses.md)), the Gifts module (the gift wishlist for Masha,
 Vitaliy or both, with variants, an archive of what was given, gift categories, the personal details «нюансы» and a
-summary for the home page, see [api/docs/modules/gifts.md](api/docs/modules/gifts.md)); no authentication yet, writes are open and rate
+summary for the home page, see [api/docs/modules/gifts.md](api/docs/modules/gifts.md)) and the Todos module (tasks for Masha, Vitaliy or both
+with steps, statuses, priorities, editable categories, an archive and a home page summary, replacing the «✅ Список
+дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); no authentication yet, writes are open and rate
 limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
 
@@ -21,8 +23,8 @@ The repository follows [fullstack-modular-template](https://github.com/Weretik/f
 not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
-  [C4](api/docs/architecture/c4.md), modules ([Expenses](api/docs/modules/expenses.md), [Gifts](api/docs/modules/gifts.md)),
-  [specs](api/docs/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
+  [C4](api/docs/architecture/c4.md), modules ([Expenses](api/docs/modules/expenses.md), [Gifts](api/docs/modules/gifts.md),
+  [Todos](api/docs/modules/todos.md)), [specs](api/docs/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
   [design rules](web/docs/design.md) (every screen follows them), [decisions](web/docs/decisions/README.md).

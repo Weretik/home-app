@@ -106,10 +106,15 @@ test('opens the expenses summary in the switcher, other sections are coming', as
   expect(
     within(switcher).getByRole('button', { name: /Расходы/ }),
   ).toHaveAttribute('aria-pressed', 'true');
-  expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeDisabled();
   expect(
     within(switcher).getByRole('button', { name: /Подарки/ }),
   ).toBeEnabled();
+  expect(
+    within(switcher).getByRole('button', { name: /Дела/ }),
+  ).not.toBeDisabled();
+  expect(
+    within(switcher).getByRole('button', { name: /Покупки/ }),
+  ).toBeDisabled();
   expect(screen.getByRole('link', { name: /Состояние/ })).toHaveAttribute(
     'href',
     '/status',

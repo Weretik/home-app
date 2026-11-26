@@ -14,8 +14,8 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 | --- | --- | --- | --- |
 | Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits and the month summary; later plan, payments | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
 | Shopping | The shared shopping list | `shopping` | planned |
-| Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
 | Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md) |
+| Todos | To-dos for Masha, Vitaliy and both: tasks with steps, statuses, priorities, categories and the home page summary | `todos` | in place, see [todos.md](../modules/todos.md) |
 | Identity | The two user accounts and the session | `identity` | planned, see [ADR 0009](../decisions/README.md) |
 
 Add a module as [the README](../../README.md#add-a-module) describes, then add it to this table, to
@@ -88,7 +88,7 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 ## Security
 
 - Authentication is not in place yet; it arrives with the Identity module and its ADR. The authentication and
-  authorization middleware is already in the pipeline. Until then the Expenses and Gifts reads and writes are
+  authorization middleware is already in the pipeline. Until then the Expenses, Gifts and Todos reads and writes are
   anonymous; writes are rate limited ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
 - Edits of shared rows are guarded by a row version (`xmin`, `If-Match`)
   ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).

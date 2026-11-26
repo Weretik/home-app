@@ -14,6 +14,7 @@ Next.js storefront.
 | 0006 | [Section pages as tabs, with the month and filters in the URL](0006-section-pages-as-tabs-with-state-in-the-url.md)                           |
 | 0007 | [Editing in dialogs, with an Idempotency-Key, If-Match versions and signed colours](0007-editing-in-dialogs-with-idempotency-and-versions.md) |
 | 0008 | [The home page as a registry of per-section summaries](0008-home-page-as-a-registry-of-section-summaries.md)                                  |
+| 0011 | [Todos: a grouped list with quick add, an optimistic done tick, steps saved at once](0011-todos-grouped-list-quick-add-optimistic-done.md)    |
 
 ## Decisions that must have a record
 

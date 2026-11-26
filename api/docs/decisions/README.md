@@ -33,6 +33,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0024 | [Gift categories are editable data with a seeded start](0024-gift-categories-as-editable-data.md) |
 | 0025 | [Personal details are reference data of the Gifts module, shown read-only on the home page](0025-gift-details-as-reference-data.md) |
 | 0026 | [The gifts sheet is imported once by a hand-run SQL script](0026-gifts-import-as-sql-script.md) |
+| 0030 | [The Todos module and its model](0030-todos-module-model.md) |
 
 ## Decisions that must have a record
 
