@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatLongDay,
+  formatOutcome,
   formatOccasion,
+  formatGiftsCount,
   formatPrice,
   formatVariantsCount,
+  formatWhole,
   variantLabel,
 } from './formatting';
 
@@ -15,8 +18,18 @@ describe('formatPrice', () => {
     expect(formatPrice(undefined)).toBe('цена не указана');
   });
 
-  it('shows hryvnias with kopecks', () => {
+  it('drops «,00» from a whole price and keeps real kopecks', () => {
+    expect(nbsp(formatPrice(1625))).toBe(nbsp('1 625 ₴'));
     expect(nbsp(formatPrice(1234.5))).toBe(nbsp('1 234,50 ₴'));
+  });
+});
+
+describe('group figures', () => {
+  it('rounds a group sum and declines «подарок»', () => {
+    expect(nbsp(formatWhole(4500.4))).toBe(nbsp('4 500 ₴'));
+    expect(formatGiftsCount(1)).toBe('1 подарок');
+    expect(formatGiftsCount(3)).toBe('3 подарка');
+    expect(formatGiftsCount(12)).toBe('12 подарков');
   });
 });
 
@@ -69,5 +82,20 @@ describe('formatVariantsCount', () => {
     expect(formatVariantsCount(2)).toBe('2 варианта');
     expect(formatVariantsCount(5)).toBe('5 вариантов');
     expect(formatVariantsCount(21)).toBe('21 вариант');
+  });
+});
+
+describe('formatOutcome', () => {
+  it('says how an archived gift ended', () => {
+    expect(formatOutcome({ status: 'Gifted', giftedOn: '2026-11-26' })).toBe(
+      'Подарено 26 ноября 2026',
+    );
+    expect(formatOutcome({ status: 'Gifted', giftedOn: null })).toBe(
+      'Подарено',
+    );
+    expect(formatOutcome({ status: 'Dropped', giftedOn: null })).toBe(
+      'Не актуально',
+    );
+    expect(formatOutcome({ status: 'Wanted', giftedOn: null })).toBeUndefined();
   });
 });

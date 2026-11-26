@@ -7,7 +7,7 @@
 - Domain/model: none client-side beyond pure form and filter modules (`gift-form.ts`, `gift-filters.ts`,
   `field-checks.ts`); the API computes order and summary.
 - State/data: `gifts/data/*-api.ts` (React Query), `gifts/url-state` (search params).
-- UI: `gift-card`, `list-view`, `*-page`, `*-editing`, `editing` folders (see [frontend.md](frontend.md#planned-feature-file-map)).
+- UI: `gift-rows`, `gift-table`, `gift-list`, `list-view`, `*-page`, `*-editing`, `editing` folders (see [frontend.md](frontend.md#planned-feature-file-map)).
 - Feature coordination: one controller hook per page that loads or changes data (`use-gift-list`,
   `use-archive-list`); the settings page composes two cards that each use the data hooks and their editor.
 - Public exports: the four page components (imported by `App.tsx`) and `GiftsSummary` (home feature, own folder).
@@ -19,12 +19,13 @@
 - Forms, focus, keyboard: dialogs are MUI `Dialog` (focus trap, Escape closes unless saving); the form submits on
   Enter; the first field gets focus on open; «Добавить вариант» moves focus to the new row's link field; removing a
   variant moves focus to «Добавить вариант». Variant remove buttons have `aria-label` «Удалить вариант N».
-- Responsive: phone first; dialog full screen below `sm`; card grid 1/2/3 columns (`xs`/`md`/`xl`).
+- Responsive: phone first; dialog full screen below `sm`; a table from `md`, a compact list below it.
 - Existing UI components and tokens: MUI `Card`, `Chip`, `ToggleButtonGroup`, `TextField select`, `Menu`, `Collapse`,
   `Snackbar` + `Alert`; patterns copied from Expenses (`EntryDialog`, `RowActions`, `ListStatus`, `SectionTabs`,
   `KpiCards`).
 - One style for lists and returning to the list: the section frame and tabs match Expenses (title, tabs, gear);
-  lists differ only in being card grids (documented as «Wish cards» in design.md, TS-015). Edits never leave the list
+  lists follow the Expenses table/list too, with a coloured block per person («Gift lists», «Person colours» in
+  design.md). Edits never leave the list
   (dialogs), so there is no detail page to return from.
 - Theme: `src/app/theme/*`, light/dark/system; no mode checks in code, `theme.applyStyles('dark', …)` if needed.
 - Phone and tablet: see [frontend.md, Visual system](frontend.md#visual-system-and-responsiveness).
@@ -36,7 +37,7 @@
 
 ## State and API
 
-- Local: dialog/editor state, form values, the open variants toggle per card, the quick-action error snackbar.
+- Local: dialog/editor state, form values, the open variants toggle per row, the quick-action error snackbar.
 - Client: URL params (`recipient`, `category`).
 - Server: React Query keys in [frontend.md](frontend.md#state-and-data); no copies in component state.
 - Fetching: `apiCall(api.GET(..., { signal }))`; no client retry of 4xx; invalidation after writes.

@@ -74,7 +74,7 @@ function renderArchive(items: () => GiftItem[], onWrite?: () => void) {
   return sent;
 }
 
-test('shows gifted and dropped gifts in the server order, with the person', async () => {
+test('shows gifted and dropped gifts in a block per person, with how each ended', async () => {
   const sent = renderArchive(() => [
     gift({ name: 'Серьги' }),
     gift({
@@ -84,15 +84,14 @@ test('shows gifted and dropped gifts in the server order, with the person', asyn
       giftedOn: null,
     }),
   ]);
-  const cards = await screen.findAllByRole('article');
+  const masha = await screen.findByRole('region', { name: 'Маша' });
+  expect(within(masha).getByText('Серьги')).toBeInTheDocument();
   expect(
-    cards.map((card) => within(card).getByRole('heading').textContent),
-  ).toEqual(['Серьги', 'Плед']);
-  expect(
-    within(cards[0]!).getByText('Подарено 26 ноября 2026'),
+    within(masha).getByText('Подарено 26 ноября 2026'),
   ).toBeInTheDocument();
-  expect(within(cards[0]!).getByText('Маша')).toBeInTheDocument();
-  expect(within(cards[1]!).getByText('Не актуально')).toBeInTheDocument();
+  const together = screen.getByRole('region', { name: 'Вместе' });
+  expect(within(together).getByText('Плед')).toBeInTheDocument();
+  expect(within(together).getByText('Не актуально')).toBeInTheDocument();
   const list = sent.find((s) => s.url.pathname === '/api/gifts/items')!;
   expect(list.url.searchParams.get('archived')).toBe('true');
 });
@@ -114,7 +113,10 @@ test('returns a gift to the list', async () => {
     },
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Вернуть в список' }),
+    await screen.findByRole('button', { name: 'Действия: Серьги' }),
+  );
+  await userEvent.click(
+    screen.getByRole('menuitem', { name: 'Вернуть в список' }),
   );
   expect(
     await screen.findByText('Здесь появятся подаренные подарки'),
@@ -122,5 +124,7 @@ test('returns a gift to the list', async () => {
   const put = sent.find((s) => s.method === 'PUT')!;
   expect(put.url.pathname).toBe(`/api/gifts/items/${item.id}/status`);
   expect(put.body).toEqual({ status: 'Wanted', giftedOn: null });
-  await waitFor(() => expect(screen.queryAllByRole('article')).toHaveLength(0));
+  await waitFor(() =>
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0),
+  );
 });

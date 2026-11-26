@@ -23,11 +23,11 @@ interface RowActionsProps {
   label: string;
   onEdit: () => void;
   onDelete: () => void;
-  /** Actions between «Изменить» and «Удалить». */
+  /** Actions shown before «Изменить» and «Удалить» (e.g. «Подарено»). */
   extra?: RowAction[];
 }
 
-/** The «⋮» button of a row or card: «Изменить», any extra actions, then «Удалить». */
+/** The «⋮» button of a row: any extra actions, then «Изменить» and «Удалить». */
 export function RowActions({
   label,
   onEdit,
@@ -36,12 +36,12 @@ export function RowActions({
 }: RowActionsProps) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const actions: RowAction[] = [
+    ...extra,
     {
       label: 'Изменить',
       icon: <EditOutlinedIcon fontSize="small" />,
       onClick: onEdit,
     },
-    ...extra,
     {
       label: 'Удалить',
       icon: <DeleteOutlineOutlinedIcon fontSize="small" />,

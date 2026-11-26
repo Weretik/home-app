@@ -1,29 +1,52 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import type { ReactNode } from 'react';
 import { formatWhole, formatWishes } from '../data/formatting';
-import { recipientEmoji, recipientLabels } from '../data/labels';
-import type { GiftCounts, GiftsSummaryView } from '../data/summary-api';
+import { recipientLabels } from '../data/labels';
+import type {
+  GiftCounts,
+  GiftsSummaryView,
+  Recipient,
+} from '../data/summary-api';
+import { PersonAvatar } from './PersonAvatar';
+import { personColors } from './person-colors';
 
 function FigureCard({
-  emoji,
+  mark,
   title,
   counts,
+  recipient,
 }: {
-  emoji: string;
+  mark: ReactNode;
   title: string;
   counts: GiftCounts;
+  recipient?: Recipient;
 }) {
   return (
-    <Card component="section" aria-label={title} sx={{ p: 2.5 }}>
+    <Card
+      component="section"
+      aria-label={title}
+      sx={{
+        p: 2.5,
+        ...(recipient && {
+          borderTop: '4px solid',
+          borderTopColor: `${personColors[recipient]}.main`,
+        }),
+      }}
+    >
       <Typography
         variant="subtitle1"
         component="h2"
-        sx={{ fontWeight: 600, color: 'text.secondary' }}
+        sx={{
+          fontWeight: 600,
+          color: 'text.secondary',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+        }}
       >
-        <Box component="span" aria-hidden sx={{ mr: 1 }}>
-          {emoji}
-        </Box>
+        {mark}
         {title}
       </Typography>
       <Typography
@@ -53,7 +76,7 @@ function FigureCard({
   );
 }
 
-/** The top row: one figure card per person and «Всего» (docs/design.md, «Figure card»). */
+/** The top row: one figure card per person in their colour and «Всего» (docs/design.md, «Figure card»). */
 export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
   return (
     <Box
@@ -66,12 +89,21 @@ export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
       {summary.recipients.map((item) => (
         <FigureCard
           key={item.recipient}
-          emoji={recipientEmoji[item.recipient]}
+          mark={<PersonAvatar recipient={item.recipient} size={28} />}
           title={recipientLabels[item.recipient]}
           counts={item.counts}
+          recipient={item.recipient}
         />
       ))}
-      <FigureCard emoji="🎁" title="Всего" counts={summary.total} />
+      <FigureCard
+        mark={
+          <Box component="span" aria-hidden>
+            🎁
+          </Box>
+        }
+        title="Всего"
+        counts={summary.total}
+      />
     </Box>
   );
 }

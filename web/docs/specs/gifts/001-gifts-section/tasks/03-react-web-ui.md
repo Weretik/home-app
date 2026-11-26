@@ -33,49 +33,53 @@ module ≤200 lines; split along the seams in [frontend.md](../design/frontend.m
 
 `field-checks.test.ts` passes; no import from `features/expenses`.
 
-## TS-007 — Gift card
+## TS-007 — Gift rows: table and phone list
 
 - **Task id:** TS-007
 - **Covers:** SC-001, SC-014, SC-016, SC-017
 - **Depends on:** TS-001
-- **Exact paths:** `web/src/features/gifts/gift-card/{GiftCard.tsx,GiftChips.tsx,VariantLinks.tsx,CardActions.tsx}`;
-  tested through `GiftsPage.test.tsx` and `ArchivePage.test.tsx`
-- **Test level:** page
-- **Baseline:** design.md cards, chips, accessibility; «Wish cards» pattern (TS-015)
+- **Exact paths:** `web/src/features/gifts/gift-rows/{GiftName.tsx,GiftActions.tsx,VariantLinks.tsx,GroupTitle.tsx}`,
+  `gift-table/{GiftTable.tsx,GiftTableRow.tsx}`, `gift-list/{GiftList.tsx,GiftListRow.tsx}`,
+  `display/{recipient-tones.ts,RecipientAvatar.tsx}`; tests `gift-table/GiftTable.test.tsx`, `gift-list/GiftList.test.tsx`
+- **Test level:** component
+- **Baseline:** design.md «Gift lists» and «Person colours»; the Expenses list (table from `md`, compact list below)
 
 ### Work
 
-- [ ] Page test first: a card shows name, «Украшения», «🔥 Очень хочу», «цена не указана», «День рождения · 12 марта
-      2027», a «Открыть ссылку» link with `target=_blank`; «2 варианта» toggles a list of two links (title or host,
-      price).
-- [ ] Components; the card gets `variant: 'active' | 'archive'` to choose «Подарено» or «Вернуть в список» and the
-      menu items; `aria-label` «Действия: {name}» on «⋮».
-- [ ] Responsibility check (each component ≤150 lines; `CardActions.tsx` seam if needed).
+- [x] Tests first where practical: table columns per tab, a coloured header row per person with «N подарков · ≈
+      сумма», variants sub-row, quick status button and «⋮» (Не актуально, Изменить, Удалить), pending lock, archive
+      «Итог» and «Вернуть в список»; phone row texts, a block per person, menu order, archive outcome.
+- [x] Components; `variant: 'active' | 'archive'` chooses the quick action and the columns; `aria-label`
+      «Действия: {name}» on «⋮», «Подарено: {name}» on the quick button, «Варианты: N» on the count.
+- [x] Responsibility check (every component ≤150 lines).
 
 ### Evidence
 
-- Test: `web/src/features/gifts/gift-card/GiftCard.test.tsx` (facts and chips, shop link in a new tab, variants toggle, «Подарено», «Не актуально» from the menu, pending lock, archive «Вернуть в список» and gifted day, dropped mark, recipient chip).
-- Red: `cd web && npx vitest run src/features/gifts` → `./GiftCard` not resolved. Green: 6 tests passed.
-- Refactor: the planned `GiftMenu` became `CardActions` (link, status button, `RowActions` with an extra item).
-- Status: implemented at card level; the page assertions follow in TS-008/TS-011.
+- Tests: `gift-table/GiftTable.test.tsx` (6), `gift-list/GiftList.test.tsx` (5), plus `display/formatting.test.ts`
+  (`formatOutcome`, whole prices, group sums) and `url-state/gift-filters.test.ts` (group price sum).
+- Red: `formatOutcome`, the whole-price, plural and group-sum cases failed before the code (4 failed, 18 passed).
+  Deviation: the table and list component tests were written alongside the components, not after a failing run.
+- Green: `npx vitest run src/features/gifts` → 88 passed.
+- Refactor: the first version (wish cards, `gift-card/`) was replaced after the first review; the shared row parts
+  went to `gift-rows/`. Status: done.
 
 ### Done when
 
-The card assertions in both page tests pass in light and dark themes' token use (no literal colours).
+Both component tests and the page tests pass; no literal colours (person colours come from theme tokens).
 
 ## TS-008 — «Список» page
 
 - **Task id:** TS-008
 - **Covers:** SC-001, SC-002, SC-003, SC-004, SC-005, SC-006
 - **Depends on:** TS-002, TS-004, TS-006, TS-007
-- **Exact paths:** `web/src/features/gifts/list-view/{GiftFilters.tsx,GiftGroups.tsx,ListStatus.tsx}`;
+- **Exact paths:** `web/src/features/gifts/list-view/{GiftFilters.tsx,GiftRows.tsx,ListStatus.tsx}`;
   `web/src/features/gifts/active-page/{GiftsPage.tsx,use-gift-list.ts}`; test `web/src/features/gifts/active-page/GiftsPage.test.tsx`
 - **Test level:** page
 - **Baseline:** ADR 0006; design.md lists and empty states; controller hook per page
 
 ### Work
 
-- [ ] Tests first: grouped headings with counts; «Маша» filter writes `?recipient=Maria`, hides headings, sends no
+- [ ] Tests first: a block per person with its header and count; «Маша» filter writes `?recipient=Maria`, hides the blocks, sends no
       request; category filter; unknown params ignored; empty and empty-filtered states with «Сбросить фильтры»;
       loading label and error with «Повторить» refetching.
 - [ ] Components and the controller hook.
@@ -129,7 +133,7 @@ The card assertions in both page tests pass in light and dark themes' token use 
 - **Covers:** SC-013, SC-014, SC-023
 - **Depends on:** TS-003, TS-008
 - **Exact paths:** `web/src/features/gifts/active-page/use-gift-list.ts` (or `use-status-change.ts` seam);
-  `web/src/features/gifts/gift-card/GiftCard.tsx`, `CardActions.tsx`; cases in `GiftsPage.test.tsx`
+  `web/src/features/gifts/gift-rows/GiftActions.tsx`; cases in `GiftsPage.test.tsx`
 - **Test level:** page
 - **Baseline:** rules, Writes (submit disabled while pending)
 
@@ -137,7 +141,7 @@ The card assertions in both page tests pass in light and dark themes' token use 
 
 - [ ] Tests first: «Подарено» sends `PUT …/status` `{ status: 'Gifted' }` with `If-Match`, is disabled while pending,
       the wish disappears after refetch; «Не актуально» sends `Dropped`; 429 shows the snackbar text.
-- [ ] Status mutation with per-card pending state and a `Snackbar` error.
+- [ ] Status mutation with per-row pending state and a `Snackbar` error.
 - [ ] Responsibility check.
 
 ### Evidence

@@ -36,18 +36,18 @@ When a feature grows past six files it splits by meaning (`list/`, `editor/`, `d
 
 ## Routes
 
-| Path                  | Page                                                                                                    | Feature                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `/`                   | Главная, the dashboard                                                                                  | `home`                   |
-| `/expenses`           | Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete          | `expenses/expense-list`  |
-| `/expenses/incomes`   | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                          | `expenses/income-list`   |
-| `/expenses/savings`   | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months  | `expenses/savings-page`  |
-| `/expenses/settings`  | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                     | `expenses/settings-page` |
-| `/gifts`              | Список: wanted gifts grouped by person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
-| `/gifts/archive`      | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                | `gifts/pages`            |
-| `/gifts/settings`     | Настройки (the gear next to the tabs): «Нюансы» and categories                                          | `gifts/settings-page`    |
-| `/shopping`, `/todos` | «Раздел скоро появится» placeholder                                                                     | `home/ComingSoonPage`    |
-| `/status`             | Состояние: API and database status                                                                      | `status`                 |
+| Path                  | Page                                                                                                        | Feature                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `/`                   | Главная, the dashboard                                                                                      | `home`                   |
+| `/expenses`           | Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete              | `expenses/expense-list`  |
+| `/expenses/incomes`   | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                              | `expenses/income-list`   |
+| `/expenses/savings`   | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months      | `expenses/savings-page`  |
+| `/expenses/settings`  | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                         | `expenses/settings-page` |
+| `/gifts`              | Список: wanted gifts in a block per person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
+| `/gifts/archive`      | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                    | `gifts/pages`            |
+| `/gifts/settings`     | Настройки (the gear next to the tabs): «Нюансы» and categories                                              | `gifts/settings-page`    |
+| `/shopping`, `/todos` | «Раздел скоро появится» placeholder                                                                         | `home/ComingSoonPage`    |
+| `/status`             | Состояние: API and database status                                                                          | `status`                 |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
 
@@ -138,10 +138,11 @@ The old «🎁 Список подарков» sheet as a section with tabs ([AD
 
 ```mermaid
 flowchart LR
-    pages["pages/ GiftsPage, ArchivePage"] --> list["list-view/ useGiftList, filters, groups, states"]
+    pages["pages/ GiftsPage, ArchivePage"] --> list["list-view/ useGiftList, filters, GiftRows, states"]
     list --> url["url-state/ ?recipient=&category="]
     list --> data["data/ gifts-api (reads), *-writes-api, write-errors-api"]
-    pages --> card["gift-card/"] & giftEdit["gift-editing/ + variant-editing/"]
+    list --> rows["gift-table/ (md+) or gift-list/ (phone)"] --> parts["gift-rows/ name, actions, variants, group title"]
+    pages --> giftEdit["gift-editing/ + variant-editing/"]
     settings["settings-page/"] --> detail["detail-editing/"] & category["category-editing/"]
     giftEdit & detail & category --> editing["editing/ dialogs, useEditForm"] --> data
     data --> platform["src/platform/api.ts"]
@@ -152,12 +153,17 @@ gifts/
   data/              gifts-api.ts (types from the contract, reads, query keys), writes-api.ts (Writer, useSave/useRemove,
                      useIdempotencyKey), gift-writes-api.ts (gift and status), settings-writes-api.ts (categories,
                      «нюансы»), write-errors-api.ts (Russian text of a failed write, isStale)
-  display/           Russian labels of recipients, priorities and statuses; price, date, variant and plural formatting
-  url-state/         ?recipient=&category= (unknown values ignored), filtering and grouping in memory
+  display/           Russian labels of recipients, priorities and statuses; price, date, variant and plural formatting;
+                     recipient-tones.ts (the person → theme colour mapping) and RecipientAvatar
+  url-state/         ?recipient=&category= (unknown values ignored), filtering and grouping (with the price sum) in memory
   section/           GiftsSection (title, tabs, gear, <Outlet />), the list of pages
   editing/           EditDialog, DeleteDialog, RowActions («⋮» with extra items), useEditForm, useEditorState, field checks
-  gift-card/         GiftCard: name and price, chips, notes, variants (VariantLinks), CardActions (link, status, «⋮»)
-  list-view/         useGiftList (the controller of a tab), GiftFilters, GiftGroups, ListStatus, StatusSnackbar
+  gift-rows/         what a table row and a list row share: GiftName (link, notes), GiftActions (status, «⋮»),
+                     VariantLinks, GroupTitle (a person's circle, name, count and sum)
+  gift-table/        GiftTable (columns, a coloured header row per person), GiftTableRow (variants in a sub-row)
+  gift-list/         GiftList (a coloured block per person), GiftListRow (compact row, chips, variants in a Collapse)
+  list-view/         useGiftList (the controller of a tab), GiftFilters, GiftRows (table from md, list below), ListStatus,
+                     StatusSnackbar
   pages/             GiftsPage («Список»), ArchivePage («Подаренные»)
   gift-editing/      GiftEditor, GiftDialog (GiftFields, OccasionFields), gift-form.ts (values ↔ GiftRequest, checks)
   variant-editing/   VariantsEditor (up to 20 rows), VariantRow, PriceField
@@ -167,7 +173,10 @@ gifts/
 ```
 
 - The API filters only by `archived`; the person and category filters run in memory over the tab's one list (a few
-  hundred gifts at most), so a filter change sends no request. Without a person filter «Список» groups by person.
+  hundred gifts at most), so a filter change sends no request. Without a person filter both tabs group by person
+  (a coloured header with the count and the sum); with one, the rows are flat and the filter says who.
+- Each person has one theme colour (`display/recipient-tones.ts`, docs/design.md «Person colours»); the home summary
+  keeps its own copy of the mapping, because features never import each other.
 - Writes follow [ADR 0007](decisions/0007-editing-in-dialogs-with-idempotency-and-versions.md): creates send an
   `Idempotency-Key`, gift, status and «нюанс» edits send the `version` in `If-Match` (categories have none), a 409
   `gifts.changed_meanwhile`, a 412 or a 404 reload the list. A gift write invalidates `['gifts', 'items']` and
@@ -182,7 +191,8 @@ gifts/
 
 `cd web && npx vitest run src/features/gifts src/features/home/gifts-summary`: unit tests of `display/formatting`,
 `url-state/gift-filters`, `editing/field-checks`, `data/write-errors-api`, `gift-editing/gift-form`,
-`detail-editing/detail-form`, `category-editing/category-form`; component tests of `gift-card/GiftCard`,
+`detail-editing/detail-form`, `category-editing/category-form`; component tests of `gift-table/GiftTable`,
+`gift-list/GiftList`,
 `editing/EditDialog` (and `DeleteDialog`), `section/GiftsSection`; page tests of `pages/GiftsPage`,
 `pages/ArchivePage`, `settings-page/GiftSettingsPage` and `home/gifts-summary/view/GiftsSummary` with a stubbed
 `fetch`.

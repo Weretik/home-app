@@ -9,8 +9,8 @@ import { Link } from 'react-router-dom';
 import { useGiftsSummary, type GiftsSummaryView } from '../data/summary-api';
 import { DetailsCard } from './DetailsCard';
 import { OccasionsCard } from './OccasionsCard';
-import { RecipientCards } from './RecipientCards';
-import { TopWishesCard } from './TopWishesCard';
+import { RecipientCards } from '../persons/RecipientCards';
+import { TopWishesCard } from '../top-wishes/TopWishesCard';
 
 /** «Подарки» on the home page: figures per person, the 🔥 wishes, the nearest occasions and the «нюансы», read-only. */
 export function GiftsSummary() {
@@ -46,29 +46,20 @@ export function GiftsSummary() {
 }
 
 function SummaryContent({ summary }: { summary: GiftsSummaryView }) {
+  const hasWishes = summary.total.wantedCount > 0;
   return (
     <>
       <RecipientCards summary={summary} />
+      {hasWishes && <TopWishesCard summary={summary} />}
       <Box
         sx={{
           display: 'grid',
           gap: { xs: 2, md: 3 },
-          gridTemplateColumns: {
-            xs: '1fr',
-            md: '1fr 1fr',
-            lg: 'repeat(3, 1fr)',
-          },
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
           alignItems: 'start',
         }}
       >
-        {summary.total.wantedCount === 0 ? (
-          <NoWishes />
-        ) : (
-          <>
-            <TopWishesCard summary={summary} />
-            <OccasionsCard summary={summary} />
-          </>
-        )}
+        {hasWishes ? <OccasionsCard summary={summary} /> : <NoWishes />}
         <DetailsCard summary={summary} />
       </Box>
     </>

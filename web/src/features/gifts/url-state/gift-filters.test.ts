@@ -64,4 +64,13 @@ describe('groupByRecipient', () => {
       ['Together', ['1', '3']],
     ]);
   });
+
+  it('sums the known prices of a group', () => {
+    const [group] = groupByRecipient([
+      { ...gift('1', 'Maria'), price: 1000 },
+      { ...gift('2', 'Maria'), price: null },
+      { ...gift('3', 'Maria'), price: 625.5 },
+    ]);
+    expect(group?.priceSum).toBe(1625.5);
+  });
 });

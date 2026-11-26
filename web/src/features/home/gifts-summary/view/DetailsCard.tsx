@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 import { recipientLabels, recipientOrder } from '../data/labels';
 import type { GiftsSummaryView } from '../data/summary-api';
+import { PersonAvatar } from '../persons/PersonAvatar';
 import { SummaryCard } from './SummaryCard';
 
 /** «Нюансы» read-only: sizes and details per person; they are edited only in the Gifts settings. */
@@ -32,7 +33,18 @@ export function DetailsCard({ summary }: { summary: GiftsSummaryView }) {
       )}
       {groups.map((group) => (
         <Box key={group.recipient}>
-          <Typography variant="subtitle2" component="h3" color="text.secondary">
+          <Typography
+            variant="subtitle1"
+            component="h3"
+            sx={{
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 0.5,
+            }}
+          >
+            <PersonAvatar recipient={group.recipient} size={24} />
             {recipientLabels[group.recipient]}
           </Typography>
           <Box

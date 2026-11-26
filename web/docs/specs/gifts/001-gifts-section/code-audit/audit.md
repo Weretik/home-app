@@ -110,3 +110,34 @@ and `VariantsEditor` to stay small.
 | AF-004 | low      | jsx-a11y `no-autofocus` (eslint)                            | `VariantRow.tsx` used `autoFocus`                                                                                      | focus the new row's link in an effect on mount                          | TS-009                            | verified                  | `npm run lint` exit 0; `GiftsPage.test.tsx` checks focus on the new link                    |
 | AF-005 | low      | design.md «Summaries on the home page» / SC-021             | no test opened the summary from `?s=gifts`                                                                             | added `HomePage.test.tsx::opens the gifts summary from ?s=gifts`        | TS-014                            | verified                  | test passes                                                                                 |
 | AF-006 | low      | correctness                                                 | `priceText(100)` would have shown «10» (trailing-zero strip)                                                           | split whole and cents                                                   | TS-009                            | verified                  | `field-checks.test.ts::priceText` (red, then green)                                         |
+
+## Pass 2 — gift lists and person colours (2026-11-26)
+
+Scope: the change after the first review. Wish cards were replaced by a table (from `md`) and a compact phone list.
+Each person now has a coloured block. Changed area: `gifts/gift-rows`, `gift-table`, `gift-list`,
+`list-view/GiftRows.tsx` and `GiftFilters.tsx`, `display/recipient-tones.ts` and `RecipientAvatar.tsx`,
+`display/formatting.ts`, `url-state/gift-filters.ts`, `pages/*`, `editing/RowActions.tsx`. The home summary's copy
+of the colours belongs to a separate change and was not audited here.
+
+- [x] Boundaries: no feature imports another feature. The person → colour mapping lives in one gifts file; home keeps
+      its own copy (`home/gifts-summary/persons/person-colors.ts`), as AF-001 already accepts. No new API calls; the
+      writes are unchanged.
+- [x] Structure: production files per folder: `gift-rows` 4, `gift-table` 2, `gift-list` 2, `display` 4,
+      `list-view` 5, `pages` 2. `gift-card/` and `list-view/GiftGroups.tsx` were removed; no folder is left empty
+      or holding one file. The largest changed component is `GiftListRow.tsx` at 110 lines (limit 150).
+- [x] Theme: there are no literal colours. Person colours come from `theme.vars.palette.<tone>` (`main`,
+      `mainChannel`, `contrastText`). The `info` exception is recorded in design.md. The name is always written next
+      to a colour, so colour is never the only hint.
+- [x] Accessibility: - Each group is a `section` labelled by its `h2` on a phone, or a `th scope="rowgroup"` row in its own `tbody`
+      in the table. - The quick status button has an `aria-label` and a tooltip. - The variants toggle has `aria-expanded` and `aria-controls`. - The avatars are `aria-hidden`.
+- [x] Responsive: `useMediaQuery(breakpoints.up('md'))` chooses the table or the list, the same pattern as
+      Expenses. The table sits in a `TableContainer`, so it scrolls inside itself, not the page.
+- [x] Tests: gifts 14 files / 88 tests. The whole web suite has 34 files / 172 tests. typecheck, lint,
+      format:check and architecture:structure all pass.
+
+| ID     | Severity | Rule / source                               | Evidence                                                                                                           | Fix                                                                                 | Task   | Status   |
+| ------ | -------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | ------ | -------- |
+| AF-007 | low      | design.md Accessibility «contrast ≥ 4.5:1»  | `list-view/GiftFilters.tsx`: a picked «Вместе» button wrote its text in `info.main` on a 0.12 tint (light ≈ 3.7:1) | text stays `text.primary` 600; the tint, the border and the circle carry the colour | TS-008 | verified |
+| AF-008 | low      | design.md «Status colours mean only status» | «🔥 Очень хочу» used a `secondary` chip, which now means Маша                                                      | priority chips are neutral outlined; 🔥 is bolder                                   | TS-007 | verified |
+
+Verdict: no open findings in the changed area. AF-001 and AF-002 stay as recorded above.

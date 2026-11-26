@@ -24,7 +24,8 @@ second colour. Colours and mood only: no game art, logos or fonts.
   `` `rgba(${theme.vars.palette.primary.mainChannel} / 0.12)` ``). The only exception is the white overlay on the
   highlight cards.
 - Status colours (`success`, `warning`, `error`, `info`) are MUI's defaults and mean only status, never decoration.
-  The one exception is a signed amount, where `error` marks money going out (see «Signed amounts»).
+  Two exceptions: a signed amount, where `error` marks money going out (see «Signed amounts»), and «Вместе», whose
+  person colour is `info` (see «Person colours»).
 - Tints: `0.08` for hover, `0.12` for a selected item or an icon tile, `0.16` for a pressed state.
 
 ## Light, dark, system
@@ -113,6 +114,34 @@ Computer (md, 900px and wider)              Phone (below md)
 - Each row ends with a «⋮» button (`aria-label` «Действия: …» names the row) that opens «Изменить» and «Удалить».
   Delete always asks in a small dialog with the entry in one line and a red «Удалить».
 
+## Gift lists
+
+- The Gifts tabs follow the Expenses pattern: a table from `md` (`gifts/gift-table`), a compact list below it
+  (`gifts/gift-list`), each row ending with «⋮». No cards.
+- Table columns: Подарок (name 600, the shop link icon, notes clamped to two lines), Категория, Приоритет («Список»
+  only), Цена (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»),
+  Варианты (the count; a click opens the variant links in a row under the gift), then the quick status button
+  («Подарено» or «Вернуть в список», an icon with a tooltip) and «⋮» (Не актуально, Изменить, Удалить).
+- Phone row: the name and the price on the first line, the category under it, then small outlined chips (priority or
+  how it ended, the occasion) and «N вариантов» unfolding the links; every action is in «⋮».
+- A priority chip is neutral (outlined); «🔥 Очень хочу» is only bolder. Crimson belongs to Маша (see below).
+- A gift price drops «,00» («1 625 ₴») and keeps real kopecks («1 234,50 ₴»); «цена не указана» in
+  `text.secondary`, never 0. A person's group sum is rounded («≈ 4 500 ₴»).
+
+## Person colours
+
+- Each person has one theme colour everywhere in Gifts and in the gifts summary: **Виталий `primary`**, **Маша
+  `secondary`**, **Вместе `info`**. The mapping lives in one file per feature (`gifts/display/recipient-tones.ts`;
+  the home summary keeps its own copy, because features never import each other). Never a literal colour.
+- The mark is a circle in `<tone>.main` with `<tone>.contrastText`: «В», «М», or the two-people icon for «Вместе»
+  (`aria-hidden`; the name is always written next to it, so colour is never the only hint).
+- A person's group: a header with the circle, the name (`subtitle1` 700) and «3 подарка · ≈ 4 500 ₴» on a 0.08 tint
+  of the colour, and a 4px line in the colour on the left of the header and of every row in the group (table: a
+  `th` row per group in its own `tbody`; phone: a bordered block per person, 16px apart).
+- Groups appear while no person is picked; with a person picked the rows are flat and keep only the left line.
+- The «Для кого» filter buttons carry the same circle; a picked person's button is tinted 0.12 in their colour with a
+  border in it, and its text stays `text.primary` (600): `info.main` text on a light tint is under 4.5:1.
+
 ## Signed amounts
 
 - Money that goes in is shown in `primary.main` (blue) with «+», money that goes out in `error.main` (red) with «−»
@@ -147,12 +176,6 @@ Computer (md, 900px and wider)              Phone (below md)
   `aria-hidden`), the rounded amount as `h4` («95 024 ₴», no kopecks), one caption line, an optional thin progress bar.
   The value is `text.primary`, except a result that is good or bad: `success` from zero up, `error` below.
 - **Section card**: a light card with a tinted icon tile, a title, one line of caption and a chevron; a link.
-- **Wish card** (`gifts/gift-card/GiftCard.tsx`): a gift is too rich for a list row, so the Gifts tabs show cards in a
-  grid (one column on a phone, two from `md`, three from `xl`), grouped under a person's name with the count. The
-  name (`subtitle1` 600) and the price on the right («цена не указана» in `text.secondary`, never 0), chips (where it
-  ended up, priority, category, occasion with its date), notes, «N вариантов» unfolding the variant links, then the
-  shop link, the status button («Подарено» contained, «Вернуть в список» outlined) and «⋮». «🔥 Очень хочу» is a
-  `secondary` outlined chip: the second accent, not a status; the emoji carries the meaning too.
 - Empty and loading states are designed, not blank: say what will appear and how to add the first item.
 
 ## Icons and shape
