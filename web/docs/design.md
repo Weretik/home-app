@@ -90,6 +90,9 @@ Computer (md, 900px and wider)              Phone (below md)
 
 ## Icons and shape
 
+- The site icon is a white house with a crimson door on the blue gradient tile: `web/public/favicon.svg` is the
+  source, used by the header logo too. The PNG sizes, `favicon.ico` and `site.webmanifest` are made from it; redraw
+  them all together when it changes.
 - Icons from `@mui/icons-material`, the **Outlined** set; `fontSize="small"` inside compact controls.
 - Radius: 12px by default (theme `shape`), 16px cards, 12px icon tiles and menu items.
 - Interactive elements look interactive: a hover tint, a visible keyboard focus, a pointer.
