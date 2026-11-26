@@ -33,11 +33,11 @@ export function GiftTable({
   const isActive = variant === 'active';
   const headers = [
     'Подарок',
+    'Варианты',
     'Категория',
     ...(isActive ? ['Приоритет'] : []),
     'Цена',
     isActive ? 'Повод' : 'Итог',
-    'Варианты',
   ];
   const columns = headers.length + 1;
   const rows = (gifts: GiftItem[]) =>

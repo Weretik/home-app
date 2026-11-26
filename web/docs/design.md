@@ -122,9 +122,9 @@ Computer (md, 900px and wider)              Phone (below md)
 
 - The Gifts tabs follow the Expenses pattern: a table from `md` (`gifts/gift-table`), a compact list below it
   (`gifts/gift-list`), each row ending with «⋮». No cards.
-- Table columns: Подарок (name 600, the shop link icon, notes clamped to two lines), Категория, Приоритет («Список»
-  only), Цена (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»),
-  Варианты (the count; a click opens the variant links in a row under the gift), then the quick status button
+- Table columns: Подарок (name 600, the shop link icon, notes clamped to two lines), Варианты (right after the name:
+  the count; a click opens the variant links in a row under the gift), Категория, Приоритет («Список» only), Цена
+  (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»), then the quick status button
   («Подарено» or «Вернуть в список», an icon with a tooltip) and «⋮» (Не актуально, Изменить, Удалить).
 - Phone row: the name and the price on the first line, the category under it, then small outlined chips (priority or
   how it ended, the occasion) and «N вариантов» unfolding the links; every action is in «⋮».
