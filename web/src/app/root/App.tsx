@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { ExpensesPage } from '../../features/expenses/expense-list/ExpensesPage';
+import { IncomesPage } from '../../features/expenses/income-list/IncomesPage';
+import { ExpensesSection } from '../../features/expenses/section/ExpensesSection';
 import { ComingSoonPage } from '../../features/home/ComingSoonPage';
 import { HomePage } from '../../features/home/HomePage';
 import { StatusPage } from '../../features/status/StatusPage';
@@ -9,7 +12,10 @@ export function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="/expenses" element={<ComingSoonPage title="Расходы" />} />
+        <Route path="/expenses" element={<ExpensesSection />}>
+          <Route index element={<ExpensesPage />} />
+          <Route path="incomes" element={<IncomesPage />} />
+        </Route>
         <Route path="/shopping" element={<ComingSoonPage title="Покупки" />} />
         <Route path="/todos" element={<ComingSoonPage title="Дела" />} />
         <Route path="/gifts" element={<ComingSoonPage title="Подарки" />} />

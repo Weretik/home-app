@@ -58,11 +58,26 @@ jobs:
         if: github.event_name != 'pull_request'
         run: dotnet publish src/Host/Host.Api --no-build --configuration Release --output ${{ runner.temp }}/api
 
+      - name: Build the migration bundles (one per module)
+        if: github.event_name != 'pull_request'
+        run: |
+          dotnet tool restore
+          dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
+            --project src/Modules/Expenses/Expenses.Infrastructure --startup-project src/Host/Host.Api \
+            --context ExpensesDbContext --output ${{ runner.temp }}/migrations/expenses
+
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
         with:
           name: api
           path: ${{ runner.temp }}/api
+          retention-days: 3
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: migrations
+          path: ${{ runner.temp }}/migrations
           retention-days: 3
 
   deploy:
@@ -80,6 +95,27 @@ jobs:
         with:
           name: api
           path: api
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: migrations
+          path: migrations
+
+      # Migrations run before the new version starts and keep the previous release working (add first, remove later).
+      - name: Apply database migrations
+        env:
+          DATABASE_CONNECTION_STRING: ${{ secrets.DATABASE_CONNECTION_STRING }}
+        run: |
+          if [ -z "$DATABASE_CONNECTION_STRING" ]; then
+            echo "::error::Secret DATABASE_CONNECTION_STRING is not set in the production environment (see docs/deploy.md)."
+            exit 1
+          fi
+          for bundle in migrations/*; do
+            chmod +x "$bundle"
+            echo "Migrating $(basename "$bundle")"
+            # The bundle starts the host to build the DbContext, and the host requires ConnectionStrings:Database.
+            ConnectionStrings__Database="$DATABASE_CONNECTION_STRING" "$bundle" --connection "$DATABASE_CONNECTION_STRING"
+          done
 
       - uses: azure/login@v2
         with:

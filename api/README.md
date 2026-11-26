@@ -2,13 +2,14 @@
 
 A .NET 10 modular monolith on PostgreSQL, built on
 [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). One deployable API (`Host.Api`)
-hosts the modules; each module owns its own schema, its own use cases and its own public surface. No module exists
-yet: the API serves health and status only.
+hosts the modules; each module owns its own schema, its own use cases and its own public surface. Modules so far:
+[Expenses](docs/modules/expenses.md).
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
 - [Rules](docs/rules.md): the conventions every change follows; most are checked by tests.
 - [Decisions](docs/decisions/README.md): why it is built this way.
+- [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints).
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
 ## Layout
@@ -16,7 +17,7 @@ yet: the API serves health and status only.
 ```
 src/
   BuildingBlocks/   Result and Error, validation pipeline, outbox, persistence helpers, problem responses
-  Modules/          one folder per module, five projects each (created with the first module)
+  Modules/          one folder per module, five projects each (Expenses)
     <Name>/         <Name>.Api, .Application, .Contracts, .Domain, .Infrastructure
   Host/Host.Api/    Composition only: registers modules, middleware, OpenAPI
 tests/
@@ -53,6 +54,7 @@ environments migrations run as a separate step before the deploy (see [Deploy](#
 | `Database:InitializeOnStartup` | Apply migrations and seed data on start. Development only. |
 | `Cors:Origins` | Browser origins allowed to call the API with credentials. |
 | `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. |
+| `Expenses:Import:Key` | Shared secret for the one-time sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing. |
 | `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
 | `ForwardedHeaders:Enabled`, `:KnownProxies`, `:KnownNetworks` | Read the client address and scheme from a trusted reverse proxy (see [Deploy behind a reverse proxy](#deploy-behind-a-reverse-proxy)). |
 
@@ -154,9 +156,11 @@ The API runs on Azure App Service (Linux, F1). The workflow, secrets and App Ser
    real client address.
 2. **HTTPS.** Turn on HTTPS Only; outside Development the API adds HSTS.
 3. **CORS.** The web app's origin in `Cors__Origins__0`.
-4. **Database.** Migrations run as a separate step before the new version starts (`dotnet ef migrations bundle` in
-   the workflow, added with the first module); keep `Database:InitializeOnStartup` off and each migration compatible
-   with the previous release.
+4. **Database.** Migrations run as a separate step before the new version starts: the workflow builds one
+   `dotnet ef migrations bundle` per module and runs it with the `DATABASE_CONNECTION_STRING` secret
+   ([ADR 0016](docs/decisions/0016-migrations-as-bundles-in-deploy.md)). A new module adds its bundle to
+   `.github/workflows/api.yml`. Keep `Database:InitializeOnStartup` off and each migration compatible with the
+   previous release.
 5. **Secrets.** `ConnectionStrings__Database` and `OutboxTick__Key` come from App Service environment variables,
    never from `appsettings.json`.
 6. **Health.** `GET /health`; the workflow's smoke test calls it after every deploy.

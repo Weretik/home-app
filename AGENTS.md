@@ -6,8 +6,8 @@ rules and commands; read only the sources the current task needs. This file appl
 ## Product
 
 A private site for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping
-list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today only the platform exists (health and status); no feature
-module and no authentication yet. Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
+list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses and incomes imported from
+the old Google Sheet, see [api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet. Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
 
 ## Project context
@@ -16,7 +16,7 @@ The repository follows [fullstack-modular-template](https://github.com/Weretik/f
 not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
-  [C4](api/docs/architecture/c4.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
+  [C4](api/docs/architecture/c4.md), [modules](api/docs/modules/expenses.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
   [design rules](web/docs/design.md) (every screen follows them), [decisions](web/docs/decisions/README.md).
@@ -76,8 +76,9 @@ through `src/platform/api.ts` from their `*-api.ts`.
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
 transaction go through the outbox, and their handlers are safe to run twice.
 
-**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key` come from App
-Service environment variables; locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key` (and
+`Expenses__Import__Key` only during an import) come from App Service environment variables; production migrations use
+the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
 `web/` (everything `VITE_*` ends up in the build). Never commit secrets.
 
 Commits, pushes, branches, PRs and other remote actions only on the user's direct request. Keep unrelated working tree

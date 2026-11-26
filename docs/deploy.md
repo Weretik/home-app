@@ -21,6 +21,7 @@ Settings → Secrets and variables → Actions:
 | `AZURE_SUBSCRIPTION_ID` | secret | `az account show --query id -o tsv` |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | portal: Static Web App `home-web` → Overview → Manage deployment token |
 | `VITE_API_URL` | variable, optional | the API address; when not set, the address above is used |
+| `DATABASE_CONNECTION_STRING` | secret of the `production` environment | the same string as the App Service's `ConnectionStrings__Database`; the deploy job applies migrations with it |
 
 The API deploys through OIDC: GitHub gets a short-lived Azure token, with no passwords or publish profile (basic auth on
 the App Service is off, and that is fine). Sign-in is allowed only from this repository's `production` environment. GitHub puts the owner and repository ids into
@@ -56,6 +57,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | --- | --- | --- |
 | `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` | now, otherwise the front cannot reach the API |
 | `ConnectionStrings__Database` | PostgreSQL connection string | once the database is chosen |
+| `Expenses__Import__Key` | long random value | only while running the one-time sheet import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
 
 Or with one command:
 
@@ -96,9 +98,12 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
 
 Each module's first migration creates its schema itself, since the owner has all rights; nothing to run by hand.
 
-**Migrations.** Production never migrates on start (`Database:InitializeOnStartup` is off). With the first module the
-API workflow gets a step that builds an EF migrations bundle and runs it against `ConnectionStrings__Database` before
-the deploy; until then there is nothing to migrate.
+**Migrations.** Production never migrates on start (`Database:InitializeOnStartup` is off). The API workflow builds
+one EF migrations bundle per module and, in the deploy job, runs them against the `DATABASE_CONNECTION_STRING` secret
+before the new version is deployed. Without that secret the deploy stops with an error, and the running version stays.
+Add it once: Settings → Environments → `production` → Environment secrets → `DATABASE_CONNECTION_STRING` (the GitHub
+runner reaches the database because the server accepts remote connections). See
+[ADR 0016](../api/docs/decisions/0016-migrations-as-bundles-in-deploy.md).
 
 ### Alternative: Neon
 
