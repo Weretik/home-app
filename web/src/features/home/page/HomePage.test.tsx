@@ -42,6 +42,9 @@ const summary = {
       left: -1500,
       percent: 110,
       perDay: 0,
+      carriedIn: 0,
+      carriesOut: 1500,
+      planned: 0,
     },
     {
       id: 'l2',
@@ -54,12 +57,25 @@ const summary = {
       left: 6000,
       percent: 33,
       perDay: null,
+      carriedIn: 0,
+      carriesOut: 0,
+      planned: 0,
     },
   ],
   topCategories: [
     { categoryId: 'c1', name: 'Продукты', amount: 16500 },
     { categoryId: 'c2', name: 'Кафе', amount: 7000 },
   ],
+  outsideLimitsCount: 0,
+  outsideLimitsAmount: 0,
+  carriedIn: 0,
+  carriesOut: 0,
+  forecast: {
+    planned: 2000,
+    expectedExpenses: 38000,
+    expectedResult: -3500,
+    expectedTotalLeft: 2000,
+  },
 };
 
 const json = (body: unknown, status = 200) =>
@@ -70,7 +86,11 @@ const json = (body: unknown, status = 200) =>
     }),
   );
 
-function renderHome(path = '/?year=2026&month=10', status = 200) {
+function renderHome(
+  path = '/?year=2026&month=10',
+  status = 200,
+  overrides: Record<string, unknown> = {},
+) {
   const urls: URL[] = [];
   vi.stubGlobal('fetch', (request: Request) => {
     const url = new URL(request.url);
@@ -78,6 +98,7 @@ function renderHome(path = '/?year=2026&month=10', status = 200) {
     return status === 200
       ? json({
           ...summary,
+          ...overrides,
           month: Number(url.searchParams.get('month')),
         })
       : json({ title: 'Сервер недоступен', status }, status);
@@ -104,7 +125,7 @@ test('opens the expenses summary in the switcher, other sections are coming', as
 
   const switcher = screen.getByRole('group', { name: 'Сводка' });
   expect(
-    within(switcher).getByRole('button', { name: /Расходы/ }),
+    within(switcher).getByRole('button', { name: /Бюджет/ }),
   ).toHaveAttribute('aria-pressed', 'true');
   expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeDisabled();
   expect(
@@ -143,15 +164,51 @@ test('shows the month figures, the limits and who spent what', async () => {
   expect(within(rows[0]!).getByText(/остаток −1\s500,00/)).toHaveStyle({
     color: theme.colorSchemes.light!.palette.error.main,
   });
+  expect(plain(rows[0]!)).toContain('→ след. мес. 1 500,00 ₴');
+  expect(rows[0]).not.toHaveTextContent('перенос');
   expect(rows[1]).toHaveTextContent('Одежда (квартал)');
+  expect(rows[1]).not.toHaveTextContent('след. мес.');
   expect(rows[1]).not.toHaveTextContent('в день');
   expect(plain(rows[2]!)).toContain('ИТОГО90%');
   expect(plain(rows[2]!)).toContain('остаток 4 000,00 ₴ · в день 1 000,00 ₴');
+
+  expect(screen.getByRole('region', { name: 'Расходы' })).not.toHaveTextContent(
+    'Вне лимитов',
+  );
+  const forecast = screen.getByRole('region', { name: 'Прогноз' });
+  expect(plain(forecast)).toContain('Ожидаемые расходы38 000,00 ₴');
+  expect(plain(forecast)).toContain('Запланировано2 000,00 ₴');
+  expect(plain(forecast)).toContain('Ожидаемый итог месяца−3 500,00 ₴');
+  expect(plain(forecast)).toContain('Останется от лимита2 000,00 ₴');
+  expect(
+    within(forecast).getByRole('link', { name: 'Открыть план' }),
+  ).toHaveAttribute('href', '/expenses/forecast?year=2026&month=10');
 
   const who = screen.getByRole('list', { name: 'Кто сколько потратил' });
   expect(plain(who)).toContain('Общее50% расходов18 000,00 ₴');
   const top = screen.getByRole('list', { name: 'Топ-5 категорий' });
   expect(within(top).getAllByRole('listitem')).toHaveLength(2);
+});
+
+test('counts the carry-over and the expenses outside the limits in ИТОГО', async () => {
+  renderHome('/?year=2026&month=10', 200, {
+    outsideLimitsCount: 2,
+    outsideLimitsAmount: 4000,
+    carriedIn: 3000,
+    carriesOut: 0,
+  });
+
+  const expenses = await screen.findByRole('region', { name: 'Расходы' });
+  expect(plain(expenses)).toContain('Вне лимитов: 2 траты на 4 000 ₴');
+  // (36 000 − 4 000 outside the limits + 3 000 carried in) of 40 000.
+  expect(plain(expenses)).toContain('лимит 40 000 ₴ · 88%');
+  const total = within(
+    screen.getByRole('list', { name: 'Лимиты месяца' }),
+  ).getAllByRole('listitem')[2]!;
+  expect(plain(total)).toContain('ИТОГО88%');
+  expect(plain(total)).toContain('32 000,00 ₴ из 40 000,00 ₴');
+  expect(plain(total)).toContain('остаток 5 000,00 ₴');
+  expect(plain(total)).toContain('перенос 3 000,00 ₴ · план 2 000,00 ₴');
 });
 
 test('loads the next month from the arrows', async () => {

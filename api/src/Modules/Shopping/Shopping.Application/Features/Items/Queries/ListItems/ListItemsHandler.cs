@@ -12,7 +12,7 @@ public sealed class ListItemsHandler(IShoppingDbContext db, TimeProvider clock) 
     public async ValueTask<Result<ShoppingList>> Handle(ListItemsQuery query, CancellationToken cancellationToken)
     {
         var window = await ItemWindow.ReadAsync(db, clock, cancellationToken);
-        var rows = await ItemViews.Rows(db, db.Items.Where(CartWindow.InList(window.Cutoff))).ToListAsync(cancellationToken);
+        var rows = await ItemViews.Rows(db, db.Items.AsNoTracking().Where(CartWindow.InList(window.Cutoff))).ToListAsync(cancellationToken);
         return new ShoppingList(ItemViews.InListOrder(rows.Select(ItemViews.ToView)));
     }
 }

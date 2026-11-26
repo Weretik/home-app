@@ -26,8 +26,9 @@ public sealed class DepartmentDictionary
         var keywords = await db.Keywords.AsNoTracking()
             .Select(k => new KeywordRule(k.Keyword, k.DepartmentId))
             .ToListAsync(cancellationToken);
-        var fallback = departments.Values.SingleOrDefault(d => d.IsFallback)
-            ?? throw new InvalidOperationException("The shopping schema has no fallback department; apply the migrations.");
+        // Exactly one fallback is a schema invariant seeded by the first migration (ADR 0031), not a business rule,
+        // so a missing one fails like the other seeded reads (DeleteDepartment's SingleAsync).
+        var fallback = departments.Values.Single(d => d.IsFallback);
 
         var rules = keywords
             .OrderBy(k => departments[k.DepartmentId].SortOrder)

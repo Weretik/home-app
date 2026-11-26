@@ -34,7 +34,7 @@ internal static class UpdateExpenseEndpoint
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(
-            new UpdateExpenseCommand(id, EntryVersionHeader.Parse(ifMatch), request.Date, request.Payer, request.CategoryId, request.Amount, request.PaymentMethod, request.Comment), cancellationToken);
+            new UpdateExpenseCommand(id, EntryVersionHeader.Parse(ifMatch), request.Date, request.Payer, request.CategoryId, request.Amount, request.PaymentMethod, request.Comment, request.OutsideLimits), cancellationToken);
         return result.ToHttpResult(http);
     }
 }

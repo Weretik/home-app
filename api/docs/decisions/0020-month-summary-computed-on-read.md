@@ -1,6 +1,7 @@
 # 0020. The month summary is computed on read, with no stored totals
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; extended by [0027](0027-limit-carry-over-like-the-sheet.md) (carry-over, which reads
+back to the limits start day) and [0028](0028-planned-expenses-for-the-forecast.md) (the forecast)
 
 ## Context
 

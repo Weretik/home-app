@@ -3,9 +3,9 @@ import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import type { ComponentType } from 'react';
-import { ExpensesSummary } from '../expenses-summary/view/ExpensesSummary';
-import { ShoppingSummary } from '../shopping-summary/view/ShoppingSummary';
-import { GiftsSummary } from '../gifts-summary/view/GiftsSummary';
+import { ExpensesSummary } from '../expenses-summary/overview/ExpensesSummary';
+import { GiftsSummary } from '../gifts-summary/overview/GiftsSummary';
+import { ShoppingSummary } from '../shopping-summary/overview/ShoppingSummary';
 
 export interface SummarySection {
   /** The value of `?s=` that opens this summary. */
@@ -23,7 +23,7 @@ export interface SummarySection {
 export const summarySections: SummarySection[] = [
   {
     key: 'expenses',
-    label: 'Расходы',
+    label: 'Бюджет',
     icon: ReceiptLongOutlinedIcon,
     Summary: ExpensesSummary,
   },

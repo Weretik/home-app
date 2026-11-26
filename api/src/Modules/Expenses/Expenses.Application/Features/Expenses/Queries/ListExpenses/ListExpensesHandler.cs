@@ -31,7 +31,8 @@ public sealed class ListExpensesHandler(IExpensesDbContext db) : IQueryHandler<L
                 x.CategoryName,
                 x.Expense.Amount,
                 x.Expense.PaymentMethod,
-                x.Expense.Comment))
+                x.Expense.Comment,
+                x.Expense.OutsideLimits))
             .ToPagedListAsync(query.Page, query.PageSize, cancellationToken);
 
         return new ExpenseList(page.Items, page.Page, page.PageSize, page.TotalCount, total);

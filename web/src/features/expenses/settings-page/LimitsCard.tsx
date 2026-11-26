@@ -2,16 +2,12 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import type { SpendingLimitItem } from '../budget-data/budget-api';
 import { useExpenseCategories } from '../data/expenses-api';
-import { formatAmount } from '../data/formatting';
-import { limitPeriodLabels } from '../data/labels';
-import { RowActions } from '../entry-dialogs/RowActions';
 import type { RowHandlers } from '../entry-editing/use-entry-editor';
+import { LimitRow } from './LimitRow';
 
 interface LimitsCardProps extends RowHandlers<SpendingLimitItem> {
   limits: SpendingLimitItem[];
@@ -72,43 +68,14 @@ export function LimitsCard({
       ) : (
         <List aria-label="Лимиты" sx={{ px: { md: 1 } }}>
           {limits.map((limit, index) => (
-            <ListItem
+            <LimitRow
               key={limit.id}
+              limit={limit}
+              categoryNames={names}
               divider={index < limits.length - 1}
-              sx={{ alignItems: 'flex-start', gap: 2, py: 1.5 }}
-            >
-              <Box sx={{ flex: 1, minWidth: 0, display: 'grid', gap: 1 }}>
-                <Typography sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
-                  {limit.name}
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-                  {limit.categoryIds.map((id) => (
-                    <Chip key={id} size="small" label={names.get(id) ?? '…'} />
-                  ))}
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {formatAmount(limit.amount)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {limitPeriodLabels[limit.period]}
-                  </Typography>
-                </Box>
-                <RowActions
-                  label={`${limit.name}, ${formatAmount(limit.amount)}`}
-                  onEdit={() => onEdit(limit)}
-                  onDelete={() => onDelete(limit)}
-                />
-              </Box>
-            </ListItem>
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           ))}
         </List>
       )}

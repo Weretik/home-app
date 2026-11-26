@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 import type { Month } from './month';
 
 export type ExpenseItem = Schema<'ExpenseItem'>;
@@ -45,7 +46,7 @@ export function useExpenses(
   enabled = true,
 ) {
   return useInfiniteQuery({
-    queryKey: ['expenses', 'list', days, filter],
+    queryKey: [...moduleKeys.expenses, 'list', days, filter],
     enabled,
     initialPageParam: 1,
     getNextPageParam: nextPage,
@@ -69,7 +70,7 @@ export function useExpenses(
 /** One month's incomes, loaded page by page. */
 export function useIncomes(month: Month, filter: IncomeFilter) {
   return useInfiniteQuery({
-    queryKey: ['expenses', 'incomes', month, filter],
+    queryKey: [...moduleKeys.expenses, 'incomes', month, filter],
     initialPageParam: 1,
     getNextPageParam: nextPage,
     queryFn: ({ pageParam, signal }) =>
@@ -92,7 +93,7 @@ export function useIncomes(month: Month, filter: IncomeFilter) {
 /** Expense categories for the filter; they change rarely. */
 export function useExpenseCategories() {
   return useQuery({
-    queryKey: ['expenses', 'categories'],
+    queryKey: [...moduleKeys.expenses, 'categories'],
     staleTime: 5 * 60_000,
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/expenses/categories', { signal })),

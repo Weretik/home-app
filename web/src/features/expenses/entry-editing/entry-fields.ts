@@ -7,16 +7,16 @@ export type FieldErrors = Record<string, string | undefined>;
 export const MAX_AMOUNT = 10_000_000;
 export const MAX_COMMENT = 500;
 
+/** Today as the API writes a day: «2026-11-26». */
+export const todayIso = (today: Date = new Date()) =>
+  isoDay(today.getFullYear(), today.getMonth() + 1, today.getDate());
+
 /** The date a new entry starts with: today when it is within the days shown, else their first day. */
 export function defaultDateIn(
   days: { from: string; to: string },
   today: Date = new Date(),
 ) {
-  const day = isoDay(
-    today.getFullYear(),
-    today.getMonth() + 1,
-    today.getDate(),
-  );
+  const day = todayIso(today);
   return day >= days.from && day <= days.to ? day : days.from;
 }
 

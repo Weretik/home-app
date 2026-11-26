@@ -1,6 +1,6 @@
 # 0004. Feature folders with boundaries checked in CI
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; extended by [0010](0010-every-rule-has-a-check.md)
 
 ## Context
 

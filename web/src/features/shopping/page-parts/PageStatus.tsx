@@ -1,9 +1,9 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { RetryButton } from './RetryButton';
 
 interface PageStatusProps {
   isPending: boolean;
@@ -16,12 +16,6 @@ interface PageStatusProps {
   onRetry: () => void;
   children: ReactNode;
 }
-
-const RetryButton = ({ onRetry }: { onRetry: () => void }) => (
-  <Button color="inherit" size="small" onClick={onRetry}>
-    Повторить
-  </Button>
-);
 
 /** Loading, error, offline and empty states of a page (docs/design.md: designed, not blank); the content otherwise. */
 export function PageStatus({

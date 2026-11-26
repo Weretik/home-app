@@ -22,9 +22,7 @@ export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
     initial: budgetSettingsValues(budget),
     validate: validateBudgetSettings,
     toBody: toBudgetSettingsRequest,
-    // The settings are one record without an id; only the version is sent (If-Match).
-    edit: { id: 'budget', version: budget.version },
-    save: useSaveBudgetSettings(),
+    save: useSaveBudgetSettings(budget.version),
     onSaved: () => setSaved(true),
   });
   const set = (name: keyof BudgetSettingsValues, value: string) => {

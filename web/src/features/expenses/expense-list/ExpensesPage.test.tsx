@@ -33,6 +33,7 @@ const expense = (overrides: Record<string, unknown> = {}) => ({
   amount: 1234.5,
   paymentMethod: 'Card',
   comment: 'Сильпо',
+  outsideLimits: false,
   ...overrides,
 });
 
@@ -348,6 +349,7 @@ test('adds an expense with an Idempotency-Key and keeps the key on a retry', asy
     amount: 250.5,
     paymentMethod: 'Card',
     comment: null,
+    outsideLimits: false,
   });
   const key = first!.headers.get('Idempotency-Key');
   expect(key).toBeTruthy();
@@ -417,6 +419,40 @@ test('says when the expense was changed elsewhere and reloads the list', async (
     'Запись изменили в другом месте',
   );
   await waitFor(() => expect(expenseUrls().length).toBeGreaterThan(loads));
+});
+
+test('marks expenses outside the limits and changes the mark in the dialog', async () => {
+  const item = expense({ outsideLimits: true, version: 2 });
+  const { writes } = renderSection((_, sent) =>
+    sent.method === 'PUT'
+      ? noContent()
+      : json(page([item, expense({ categoryName: 'Дом' })])),
+  );
+  const list = await screen.findByRole('list', { name: 'Расходы за месяц' });
+
+  const [marked, plain] = within(list).getAllByRole('listitem');
+  expect(marked).toHaveTextContent('вне лимитов');
+  expect(plain).not.toHaveTextContent('вне лимитов');
+
+  await userEvent.click(
+    screen.getByRole('button', { name: /Действия: Продукты/ }),
+  );
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Изменить расход',
+  });
+  const box = within(dialog).getByRole('checkbox', { name: 'Не в лимиты' });
+  expect(box).toBeChecked();
+  expect(box).toHaveAccessibleDescription(
+    'Считается в итогах, но не в лимитах и не переносится',
+  );
+  await userEvent.click(box);
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Сохранить' }),
+  );
+  await dialogClosed();
+
+  expect(writes()[0]!.body).toMatchObject({ outsideLimits: false });
 });
 
 test('deletes an expense only after the confirmation', async () => {

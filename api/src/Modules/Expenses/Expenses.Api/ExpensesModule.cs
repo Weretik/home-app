@@ -3,6 +3,8 @@ using Expenses.Api.Endpoints.Budget.Overview;
 using Expenses.Api.Endpoints.Expenses;
 using Expenses.Api.Endpoints.Import;
 using Expenses.Api.Endpoints.Incomes;
+using Expenses.Api.Endpoints.Planned.Plans;
+using Expenses.Api.Endpoints.Planned.Recording;
 using Expenses.Api.Endpoints.Savings;
 using Expenses.Application;
 using Expenses.Infrastructure;
@@ -53,6 +55,11 @@ public static class ExpensesModule
             .MapCreateSpendingLimit()
             .MapUpdateSpendingLimit()
             .MapDeleteSpendingLimit()
+            .MapListPlannedExpenses()
+            .MapCreatePlannedExpense()
+            .MapUpdatePlannedExpense()
+            .MapDeletePlannedExpense()
+            .MapRecordPlannedExpense()
             .MapImportSheet();
         return endpoints;
     }

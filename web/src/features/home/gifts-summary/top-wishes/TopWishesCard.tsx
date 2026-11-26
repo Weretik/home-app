@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import type { GiftsSummaryView } from '../data/summary-api';
-import { SummaryCard } from '../view/SummaryCard';
+import { SummaryCard } from '../cards/SummaryCard';
 import { PersonWishes } from './PersonWishes';
 
 /**

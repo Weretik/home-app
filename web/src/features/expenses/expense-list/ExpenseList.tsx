@@ -7,6 +7,7 @@ import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
 import { RowActions } from '../entry-dialogs/RowActions';
+import { OutsideLimitsChip } from './OutsideLimitsChip';
 import type { RowHandlers } from '../entry-editing/use-entry-editor';
 
 /** Expenses as a compact list, for a phone. */
@@ -30,7 +31,12 @@ export function ExpenseList({
         >
           <ListItemText
             sx={{ my: 0, minWidth: 0 }}
-            primary={item.categoryName}
+            primary={
+              <>
+                {item.categoryName}
+                {item.outsideLimits && <OutsideLimitsChip />}
+              </>
+            }
             secondary={
               <>
                 {formatDay(item.date)} · {payerLabels[item.payer]} ·{' '}

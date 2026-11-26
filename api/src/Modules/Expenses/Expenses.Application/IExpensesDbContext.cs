@@ -2,6 +2,7 @@ using Expenses.Application.Idempotency;
 using Expenses.Domain.Budget;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Planning;
 using Expenses.Domain.Savings;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,8 @@ public interface IExpensesDbContext
     DbSet<SpendingLimit> SpendingLimits { get; }
 
     DbSet<BudgetSettings> BudgetSettings { get; }
+
+    DbSet<PlannedExpense> PlannedExpenses { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

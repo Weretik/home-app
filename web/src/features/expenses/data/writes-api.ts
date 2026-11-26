@@ -1,50 +1,17 @@
-import {
-  useMutation,
-  useQueryClient,
-  type QueryKey,
-} from '@tanstack/react-query';
-import { useRef } from 'react';
-import {
-  ApiError,
-  apiCall,
-  newIdempotencyKey,
-  type Schema,
-} from '../../../api-client';
+import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import {
+  ifMatch,
+  useRemove,
+  useSave,
+  type Writer,
+} from '../write-data/write-hooks-api';
 
 export type ExpenseRequest = Schema<'ExpenseRequest'>;
 export type IncomeRequest = Schema<'IncomeRequest'>;
-
-/** The entry an edit starts from: its id and the version the list showed (sent in If-Match). */
-export interface EditedEntry {
-  id: string;
-  version: number;
-}
-
-export interface SaveInput<Body> {
-  body: Body;
-  /** Set for an edit; a create leaves it out. */
-  edit?: EditedEntry;
-  /** Sent with a create (see {@link useIdempotencyKey}). */
-  idempotencyKey: string;
-}
-
-/** How one kind of entry is written; budget-data/ describes the spending limits with it too. */
-export interface Writer<Body> {
-  /** The queries the entry shows in; a write refreshes them. */
-  key: QueryKey;
-  create: (body: Body, idempotencyKey: string) => Promise<unknown>;
-  update: (entry: EditedEntry, body: Body) => Promise<unknown>;
-  remove: (id: string) => Promise<unknown>;
-}
-
-export const ifMatch = (entry: EditedEntry) => ({
-  path: { id: entry.id },
-  header: { 'If-Match': String(entry.version) },
-});
+export type SavingsMovementRequest = Schema<'SavingsMovementRequest'>;
 
 const expenseWriter: Writer<ExpenseRequest> = {
-  key: ['expenses', 'list'],
   create: (body, key) =>
     apiCall(
       api.POST('/api/expenses', {
@@ -59,7 +26,6 @@ const expenseWriter: Writer<ExpenseRequest> = {
 };
 
 const incomeWriter: Writer<IncomeRequest> = {
-  key: ['expenses', 'incomes'],
   create: (body, key) =>
     apiCall(
       api.POST('/api/expenses/incomes', {
@@ -77,107 +43,30 @@ const incomeWriter: Writer<IncomeRequest> = {
     ),
 };
 
-/** The entry is no longer what the list shows (changed or deleted elsewhere), so the list must reload. */
-export const isStale = (error: Error) =>
-  error instanceof ApiError &&
-  (error.status === 404 || error.code === 'expenses.changed_meanwhile');
+const savingsWriter: Writer<SavingsMovementRequest> = {
+  create: (body, key) =>
+    apiCall(
+      api.POST('/api/expenses/savings', {
+        params: { header: { 'Idempotency-Key': key } },
+        body,
+      }),
+    ),
+  update: (entry, body) =>
+    apiCall(
+      api.PUT('/api/expenses/savings/{id}', { params: ifMatch(entry), body }),
+    ),
+  remove: (id) =>
+    apiCall(
+      api.DELETE('/api/expenses/savings/{id}', { params: { path: { id } } }),
+    ),
+};
 
-/** A write of `key`'s kind that refreshes its queries on success, and on failure when the entry turned out stale. */
-function useWrite<Input>(
-  key: QueryKey,
-  mutationFn: (input: Input) => Promise<unknown>,
-) {
-  const queryClient = useQueryClient();
-  const refresh = () => void queryClient.invalidateQueries({ queryKey: key });
-  return useMutation({
-    mutationFn,
-    onSuccess: refresh,
-    onError: (error) => {
-      if (isStale(error)) refresh();
-    },
-  });
-}
-
-/** Adds or changes an entry of `writer`'s kind. */
-export const useSave = <Body>(writer: Writer<Body>) =>
-  useWrite(writer.key, ({ body, edit, idempotencyKey }: SaveInput<Body>) =>
-    edit ? writer.update(edit, body) : writer.create(body, idempotencyKey),
-  );
-
-/** Deletes an entry of `writer`'s kind. */
-export const useRemove = (writer: Writer<unknown>) =>
-  useWrite(writer.key, (id: string) => writer.remove(id));
-
-/** Adds or changes an expense; refreshes the expense lists. */
+/** Adds or changes an expense; refreshes the Expenses module's queries. */
 export const useSaveExpense = () => useSave(expenseWriter);
-export const useDeleteExpense = () =>
-  useRemove(expenseWriter as Writer<unknown>);
-/** Adds or changes an income; refreshes the income lists. */
+export const useDeleteExpense = () => useRemove(expenseWriter.remove);
+/** Adds or changes an income; refreshes the Expenses module's queries. */
 export const useSaveIncome = () => useSave(incomeWriter);
-export const useDeleteIncome = () => useRemove(incomeWriter as Writer<unknown>);
-/**
- * The Idempotency-Key of one opened add form (docs/rules.md, "Writes"): the same key while the same data is retried,
- * a new one when the data changes. A form that is opened again mounts again and starts with a new key.
- */
-export function useIdempotencyKey() {
-  const last = useRef<{ body: string; key: string } | null>(null);
-  return {
-    keyFor: (body: unknown): string => {
-      const text = JSON.stringify(body);
-      if (last.current?.body !== text)
-        last.current = { body: text, key: newIdempotencyKey() };
-      return last.current.key;
-    },
-    /** Forgets the key, after the API said it was used for other data. */
-    renew: () => {
-      last.current = null;
-    },
-  };
-}
-
-/** What a form shows after a failed write: one message, and the messages of the fields the API rejected. */
-export interface WriteFailure {
-  message: string;
-  fieldErrors: Record<string, string[]>;
-  /** The Idempotency-Key was already used for other data; the next attempt needs a new one. */
-  renewKey?: boolean;
-}
-
-/** Turns a failed write into Russian text for the form (docs/rules.md, "API"); `action` names the failed step. */
-export function describeWriteError(
-  error: Error,
-  action = 'сохранить',
-): WriteFailure {
-  if (!(error instanceof ApiError))
-    return {
-      message: 'Нет связи с сервером. Проверьте интернет и попробуйте снова.',
-      fieldErrors: {},
-    };
-  const fieldErrors = error.fieldErrors;
-  if (error.code === 'expenses.changed_meanwhile')
-    return {
-      message:
-        'Запись изменили в другом месте — обновите и попробуйте снова. Список уже обновлён.',
-      fieldErrors,
-    };
-  if (error.status === 404)
-    return {
-      message: 'Этой записи уже нет: её удалили в другом месте.',
-      fieldErrors,
-    };
-  if (error.status === 409)
-    return {
-      message:
-        'Эту запись уже отправляли с другими данными. Попробуйте ещё раз.',
-      fieldErrors,
-      renewKey: true,
-    };
-  if (error.status === 429)
-    return {
-      message: 'Слишком много изменений подряд. Подождите минуту и повторите.',
-      fieldErrors,
-    };
-  if (error.status === 400)
-    return { message: `Проверьте поля: ${error.message}`, fieldErrors };
-  return { message: `Не удалось ${action}: ${error.message}`, fieldErrors };
-}
+export const useDeleteIncome = () => useRemove(incomeWriter.remove);
+/** Adds or changes a savings movement; refreshes the Expenses module's queries. */
+export const useSaveSavingsMovement = () => useSave(savingsWriter);
+export const useDeleteSavingsMovement = () => useRemove(savingsWriter.remove);

@@ -8,6 +8,7 @@ import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
 import { RowActions } from '../entry-dialogs/RowActions';
+import { OutsideLimitsChip } from './OutsideLimitsChip';
 import type { RowHandlers } from '../entry-editing/use-entry-editor';
 
 const amountCell = {
@@ -46,7 +47,10 @@ export function ExpenseTable({
               <TableCell sx={{ whiteSpace: 'nowrap' }}>
                 {formatDay(item.date)}
               </TableCell>
-              <TableCell>{item.categoryName}</TableCell>
+              <TableCell>
+                {item.categoryName}
+                {item.outsideLimits && <OutsideLimitsChip />}
+              </TableCell>
               <TableCell>{payerLabels[item.payer]}</TableCell>
               <TableCell align="right" sx={{ ...amountCell, fontWeight: 600 }}>
                 {formatAmount(item.amount)}

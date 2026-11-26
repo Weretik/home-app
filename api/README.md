@@ -7,11 +7,14 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
-- [Rules](docs/rules.md): the conventions every change follows; most are checked by tests.
+- [Rules](docs/rules.md): the conventions every change follows, each with the test that checks it ([rule → test table](docs/rules.md#enforcement)).
 - [Decisions](docs/decisions/README.md): why it is built this way.
+- [Specifications (SDD)](docs/specs/README.md): one folder per feature (requirements, design, contract, tasks,
+  traceability, audit), written before the code ([ADR 0004](../docs/decisions/0004-sdd-first-feature-delivery.md)).
+- [Quality targets](docs/architecture/quality-targets.md): latency, load, data and recovery numbers every audit starts from.
+- [Audits](docs/audits/): architecture audits of finished features and what was fixed.
 - [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints):
   [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md).
-- [Feature specifications](docs/specs/README.md): the SDD of each feature, with its traceability and audit.
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
 ## Layout

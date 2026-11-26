@@ -30,5 +30,7 @@ Status `verified` means the acceptance test below passed on 2026-11-26 (integrat
 - No handler unit tests with a fake database: handlers only order load → check → domain → save, and the integration
   tests exercise each of them on PostgreSQL (the project's practice, as in Expenses).
 - Races (two copies of one create, a category deleted while a gift is added) are guarded by the unique key and the
-  foreign key and mapped to the same answers as the sequential cases; they are not reproduced by a concurrent test
-  (audit AF-006).
+  foreign key and mapped to the same answers as the sequential cases (audit AF-006). After the merge with the
+  Expenses rule work, `IntegrationTests/Api/Gifts/GiftsRaceApiTests` reproduces the row-version races (gift edit,
+  status change, detail edit) and the category delete raced by a new gift deterministically with
+  `TestHost/RacingGiftsDb`; two copies of one create are still not reproduced (the unique key guards them).

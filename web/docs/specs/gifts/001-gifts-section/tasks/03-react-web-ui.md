@@ -39,8 +39,8 @@ module ≤200 lines; split along the seams in [frontend.md](../design/frontend.m
 - **Covers:** SC-001, SC-014, SC-016, SC-017
 - **Depends on:** TS-001
 - **Exact paths:** `web/src/features/gifts/gift-rows/{GiftName.tsx,GiftActions.tsx,VariantLinks.tsx,GroupTitle.tsx}`,
-  `gift-table/{GiftTable.tsx,GiftTableRow.tsx}`, `gift-list/{GiftList.tsx,GiftListRow.tsx}`,
-  `display/{recipient-tones.ts,RecipientAvatar.tsx}`; tests `gift-table/GiftTable.test.tsx`, `gift-list/GiftList.test.tsx`
+  `gift-table/{GiftTable.tsx,GiftTableRow.tsx}`, `gift-list/{GiftList.tsx,PersonBlock.tsx,ListRows.tsx,GiftListRow.tsx}`,
+  `display/{recipient-tones.ts,RecipientAvatar.tsx}`; tests `display/recipient-tones.test.ts`, `gift-table/GiftTable.test.tsx`, `gift-list/GiftList.test.tsx`
 - **Test level:** component
 - **Baseline:** design.md «Gift lists» and «Person colours»; the Expenses list (table from `md`, compact list below)
 

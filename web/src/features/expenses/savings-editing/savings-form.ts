@@ -4,7 +4,7 @@ import type {
   SavingsDirection,
   SavingsMovementItem,
 } from '../data/savings-api';
-import type { SavingsMovementRequest } from '../data/savings-api';
+import type { SavingsMovementRequest } from '../data/writes-api';
 import {
   amountError,
   amountText,

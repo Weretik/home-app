@@ -938,7 +938,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "The budget settings (monthly limit, savings goal) and every spending limit, in order.",
+        "summary": "The budget settings (monthly limit, savings goal, limits start day) and every spending limit, in order.",
         "operationId": "getBudget",
         "responses": {
           "200": {
@@ -947,6 +947,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BudgetView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -959,7 +969,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "One month at a glance: incomes, expenses, the month's result, the savings jar, limits and top categories.",
+        "summary": "One month at a glance: incomes, expenses, the month's result, the savings jar, limits with carry-over, top categories and the forecast.",
         "operationId": "getMonthSummary",
         "parameters": [
           {
@@ -1010,7 +1020,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "Sets the monthly limit on all expenses and the savings goal. Send the budget version in If-Match.",
+        "summary": "Sets the monthly limit on all expenses, the savings goal and the day limits start carrying overspend. Send the budget version in If-Match.",
         "operationId": "updateBudgetSettings",
         "parameters": [
           {
@@ -1272,6 +1282,359 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/planned": {
+      "get": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Lists the planned expenses of one month by name, with their total.",
+        "operationId": "listPlannedExpenses",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlannedExpenseList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Plans an expense for a month. Send a new Idempotency-Key per plan; a repeat returns the first id.",
+        "operationId": "createPlannedExpense",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannedExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/planned/{id}": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Changes a planned expense. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updatePlannedExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannedExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Drops a planned expense for good; nothing is recorded.",
+        "operationId": "deletePlannedExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/planned/{id}/record": {
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Records a planned expense as a real one (counted in the limits) and drops the plan, in one transaction. Send the plan's version in If-Match; returns the new expense id.",
+        "operationId": "recordPlannedExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordPlannedExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3374,6 +3737,13 @@
           "savingsGoal": {
             "type": "number",
             "format": "double"
+          },
+          "limitsFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -3382,6 +3752,7 @@
           "version",
           "monthlyLimit",
           "savingsGoal",
+          "limitsFrom",
           "limits"
         ],
         "type": "object",
@@ -3398,6 +3769,10 @@
             "type": "number",
             "format": "double"
           },
+          "limitsFrom": {
+            "type": "string",
+            "format": "date"
+          },
           "limits": {
             "type": "array",
             "items": {
@@ -3405,7 +3780,7 @@
             }
           }
         },
-        "description": "The monthly limit on all expenses (0 = none), the savings goal (0 = none) and the category limits."
+        "description": "The monthly limit on all expenses (0 = none), the savings goal (0 = none), the day limits start counting and\ncarrying overspend, and the category limits."
       },
       "CategoryAmount": {
         "required": [
@@ -3600,7 +3975,8 @@
           "categoryName",
           "amount",
           "paymentMethod",
-          "comment"
+          "comment",
+          "outsideLimits"
         ],
         "type": "object",
         "properties": {
@@ -3638,6 +4014,10 @@
               "null",
               "string"
             ]
+          },
+          "outsideLimits": {
+            "type": "boolean",
+            "description": "Counted in the totals but in no limit («Не в лимиты»)."
           }
         },
         "description": "One expense row of the month list, with its category name."
@@ -3711,6 +4091,10 @@
               "null",
               "string"
             ]
+          },
+          "outsideLimits": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -4372,9 +4756,12 @@
           "to",
           "amount",
           "spent",
+          "carriedIn",
           "left",
           "percent",
-          "perDay"
+          "perDay",
+          "carriesOut",
+          "planned"
         ],
         "type": "object",
         "properties": {
@@ -4404,16 +4791,22 @@
           },
           "spent": {
             "type": "number",
+            "description": "What was spent on the limit's categories in the period.",
+            "format": "double"
+          },
+          "carriedIn": {
+            "type": "number",
+            "description": "Overspend of earlier periods this period has to cover; 0 when there is none.",
             "format": "double"
           },
           "left": {
             "type": "number",
-            "description": "The limit minus what was spent; negative when it is overspent.",
+            "description": "The limit minus what was spent minus decimal LimitUsage.CarriedIn; negative when it is overspent.",
             "format": "double"
           },
           "percent": {
             "type": "integer",
-            "description": "Spent as a share of the limit, in percent, rounded.",
+            "description": "Spent plus decimal LimitUsage.CarriedIn as a share of the limit, in percent, rounded.",
             "format": "int32"
           },
           "perDay": {
@@ -4423,9 +4816,51 @@
             ],
             "description": "What may still be spent per day until the period ends, or null when the period is not running now.",
             "format": "double"
+          },
+          "carriesOut": {
+            "type": "number",
+            "description": "What this period passes on to the next one if nothing more is spent.",
+            "format": "double"
+          },
+          "planned": {
+            "type": "number",
+            "description": "Planned expenses of the limit's categories in the months of the period.",
+            "format": "double"
           }
         },
-        "description": "A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month)."
+        "description": "A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month),\nwith the overspend carried in from earlier periods like the old «Бюджет» sheet. Expenses marked «Не в лимиты»\nnever count here."
+      },
+      "MonthForecast": {
+        "required": [
+          "planned",
+          "expectedExpenses",
+          "expectedResult",
+          "expectedTotalLeft"
+        ],
+        "type": "object",
+        "properties": {
+          "planned": {
+            "type": "number",
+            "description": "The planned expenses of the month.",
+            "format": "double"
+          },
+          "expectedExpenses": {
+            "type": "number",
+            "description": "The month's expenses plus decimal MonthForecast.Planned.",
+            "format": "double"
+          },
+          "expectedResult": {
+            "type": "number",
+            "description": "Incomes minus decimal MonthForecast.ExpectedExpenses minus what went into the savings jar.",
+            "format": "double"
+          },
+          "expectedTotalLeft": {
+            "type": "number",
+            "description": "The monthly limit minus the expenses it counts, minus decimal MonthForecast.Planned, minus what was carried in from earlier\nmonths; 0 when there is no monthly limit.",
+            "format": "double"
+          }
+        },
+        "description": "Where the month is heading once the planned expenses («Прогноз») are spent too."
       },
       "MonthSummary": {
         "required": [
@@ -4435,14 +4870,19 @@
           "incomesByPerson",
           "expenses",
           "expensesByPayer",
+          "outsideLimitsCount",
+          "outsideLimitsAmount",
           "monthlyLimit",
+          "carriedIn",
+          "carriesOut",
           "daysLeft",
           "result",
           "savingsNet",
           "savingsBalance",
           "savingsGoal",
           "limits",
-          "topCategories"
+          "topCategories",
+          "forecast"
         ],
         "type": "object",
         "properties": {
@@ -4466,6 +4906,7 @@
           },
           "expenses": {
             "type": "number",
+            "description": "Every expense of the month, those marked «Не в лимиты» included.",
             "format": "double"
           },
           "expensesByPayer": {
@@ -4474,9 +4915,29 @@
               "$ref": "#/components/schemas/PayerAmount"
             }
           },
+          "outsideLimitsCount": {
+            "type": "integer",
+            "description": "How many expenses of the month are marked «Не в лимиты».",
+            "format": "int32"
+          },
+          "outsideLimitsAmount": {
+            "type": "number",
+            "description": "What those expenses add up to; they are part of decimal MonthSummary.Expenses.",
+            "format": "double"
+          },
           "monthlyLimit": {
             "type": "number",
             "description": "The limit on all expenses of a month; 0 means none.",
+            "format": "double"
+          },
+          "carriedIn": {
+            "type": "number",
+            "description": "Overspend of the monthly limit carried in from earlier months; 0 when there is no monthly limit.",
+            "format": "double"
+          },
+          "carriesOut": {
+            "type": "number",
+            "description": "What the month passes on to the next one: the expenses the limit counts plus decimal MonthSummary.CarriedIn over the\nlimit; 0 when there is no monthly limit.",
             "format": "double"
           },
           "daysLeft": {
@@ -4518,9 +4979,12 @@
             "items": {
               "$ref": "#/components/schemas/CategoryAmount"
             }
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/MonthForecast"
           }
         },
-        "description": "One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they\nbelong to, the month's result after the savings jar, the jar itself, the spending limits and the top categories."
+        "description": "One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they\nbelong to, the month's result after the savings jar, the jar itself, the spending limits with their carry-over,\nthe top categories and the forecast with the planned expenses."
       },
       "Payer": {
         "enum": [
@@ -4577,6 +5041,111 @@
           }
         },
         "description": "How much one person earned in the month."
+      },
+      "PlannedExpenseItem": {
+        "required": [
+          "id",
+          "version",
+          "year",
+          "month",
+          "name",
+          "categoryId",
+          "categoryName",
+          "payer",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "payer": {
+            "$ref": "#/components/schemas/Payer"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "One planned expense of the month, with its category name."
+      },
+      "PlannedExpenseList": {
+        "required": [
+          "items",
+          "totalAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlannedExpenseItem"
+            }
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "A month's planned expenses and what they add up to («Запланировано»)."
+      },
+      "PlannedExpenseRequest": {
+        "required": [
+          "year",
+          "month",
+          "name",
+          "categoryId",
+          "payer",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "payer": {
+            "$ref": "#/components/schemas/Payer"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        }
       },
       "Priority": {
         "enum": [
@@ -4652,6 +5221,29 @@
           }
         },
         "description": "One recipient's figures and up to five of their High-priority wanted gifts, in the active list's order."
+      },
+      "RecordPlannedExpenseRequest": {
+        "required": [
+          "date",
+          "paymentMethod",
+          "comment"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "paymentMethod": {
+            "$ref": "#/components/schemas/PaymentMethod"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       },
       "ReorderShoppingDepartmentsRequest": {
         "required": [

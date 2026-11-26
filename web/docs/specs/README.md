@@ -1,9 +1,18 @@
 # Web feature specifications
 
-Scenario-first specifications (SDD) of web features, written before the code. One folder per feature under its
-area: `specs/<area>/<NNN>-<slug>/`. A specification keeps its `R-*`, `SC-*`, `TS-*` and `EN-*` ids once accepted;
-the lasting description of a built feature lives in [architecture](../architecture.md), not here.
+Scenario-first specifications (SDD) of web features, built from the frontend SDD feature template with the React
+variant and written before the code. One folder per feature under its area: `specs/<area>/<NNN>-<slug>/`, the same
+layout as the backend's [api/docs/specs](../../../api/docs/specs/README.md). A specification keeps its `R-*`, `SC-*`,
+`TS-*` and `EN-*` ids once accepted; the lasting description of a built feature lives in
+[architecture](../architecture.md), not here. A retroactive SDD describes behavior built before the SDD existed; it
+gives it stable ids, lists gaps, and changes nothing.
 
-| Area  | Specification                                            | Status                        |
-| ----- | -------------------------------------------------------- | ----------------------------- |
-| gifts | [001 — Gifts section](gifts/001-gifts-section/README.md) | implemented, ready for review |
+| Area     | SDD                                                                                                             | Kind        | Status                        | Backend counterpart                                                                  |
+| -------- | --------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------- | ------------------------------------------------------------------------------------ |
+| expenses | [001 — Expenses and incomes pages](expenses/001-entries-pages/README.md)                                        | retroactive | implemented                   | [api 001](../../../api/docs/specs/expenses/001-entries-and-sheet-import/README.md)   |
+| expenses | [002 — Savings page «Копилка» and the goal card](expenses/002-savings-page/README.md)                           | retroactive | implemented                   | [api 002](../../../api/docs/specs/expenses/002-savings-jar/README.md)                |
+| expenses | [003 — Budget settings page «Настройки»](expenses/003-budget-settings-page/README.md)                           | retroactive | implemented                   | [api 003](../../../api/docs/specs/expenses/003-budget-settings-and-limits/README.md) |
+| expenses | [004 — Home page expenses summary](expenses/004-home-expenses-summary/README.md)                                | retroactive | implemented                   | [api 004](../../../api/docs/specs/expenses/004-month-summary/README.md)              |
+| expenses | [005 — Budget: forecast, carry-over, expenses outside limits](expenses/005-budget-forecast-carryover/README.md) | new         | in implementation             | [api 005](../../../api/docs/specs/expenses/005-budget-forecast-carryover/README.md)  |
+| gifts    | [001 — Gifts section](gifts/001-gifts-section/README.md)                                                        | new         | implemented, ready for review | [api 001](../../../api/docs/specs/gifts/001-gifts-module/README.md)                  |
+| shopping | [001 — Shopping list «Покупки»](shopping/001-shopping-list/README.md)                                           | new         | implemented                   | [api 001](../../../api/docs/specs/shopping/001-shopping-list/README.md)              |

@@ -5,6 +5,10 @@ The backend is a **modular monolith**, built exactly like
 several modules that keep to themselves. Each module could become its own service later, but until there is a reason
 to, one process is cheaper and simpler.
 
+Every feature starts as a specification in [../specs](../specs/README.md) and ends with an architecture audit in
+[../audits](../audits/); the [rules](../rules.md#enforcement) list the test that checks each rule, and the
+[quality targets](quality-targets.md) give the numbers a design or an audit is measured against.
+
 ## Modules
 
 The modules follow the areas of the old Google Sheets and Telegram bots. Each module has a page in
@@ -12,10 +16,10 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 
 | Module | Owns | Schema | Status |
 | --- | --- | --- | --- |
-| Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits and the month summary; later plan, payments | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
-| Shopping | The shared shopping list: items, cart and history (computed), departments, keywords, frequent items, summary | `shopping` | in place, see [shopping.md](../modules/shopping.md) |
+| Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits with carry-over, planned expenses and the month summary; later payments | `expenses` | in place, see [expenses.md](../modules/expenses.md); specifications [001–005](../specs/README.md) |
+| Shopping | The shared shopping list: items, cart and history (computed), departments, keywords, frequent items, summary | `shopping` | in place, see [shopping.md](../modules/shopping.md); specification [001](../specs/shopping/001-shopping-list/README.md) |
 | Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
-| Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md) |
+| Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md); specification [001](../specs/gifts/001-gifts-module/README.md) |
 | Identity | The two user accounts and the session | `identity` | planned, see [ADR 0009](../decisions/README.md) |
 
 Add a module as [the README](../../README.md#add-a-module) describes, then add it to this table, to

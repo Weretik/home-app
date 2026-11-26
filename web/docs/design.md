@@ -111,8 +111,12 @@ Computer (md, 900px and wider)              Phone (below md)
   the API's field errors go under the same fields, its message in an error `Alert` above them.
 - Amounts are typed as positive numbers with up to two decimals («1 234,5» works); the phone shows the decimal
   keypad. Where the direction matters (the jar), it is a separate choice, not a minus sign.
-- Each row ends with a «⋮» button (`aria-label` «Действия: …» names the row) that opens «Изменить» and «Удалить».
-  Delete always asks in a small dialog with the entry in one line and a red «Удалить».
+- A choice that changes how an entry counts is a checkbox with a helper line under it saying what it does («Не в
+  лимиты» — «Считается в итогах, но не в лимитах и не переносится»); a list marks such rows with a small outlined
+  chip («вне лимитов») after the title.
+- Each row ends with a «⋮» button (`aria-label` «Действия: …» names the row) that opens «Изменить» and «Удалить»;
+  a row with a step of its own lists it first («Записать как расход»), whose dialog names its button by the step
+  («Записать»). Delete always asks in a small dialog with the entry in one line and a red «Удалить».
 
 ## Gift lists
 
@@ -161,6 +165,11 @@ Computer (md, 900px and wider)              Phone (below md)
   100 %, `error` past 100 %. A negative «Остаток» is `error`. «Можно в день» is «—» when the period is not running.
   The last row «ИТОГО» is bold. Below `md` the table becomes a list: the name and the percent, the bar, then «X из
   Y · остаток Z · в день W».
+- A limit row notes, under its figures, the overspend carried in («перенос N»), what moves on to the next period
+  («→ след. мес. N») and what is planned («план N»), each only when it is not zero, in `text.secondary`; the notes
+  wrap between each other, never inside an amount.
+- A figure card may have a second caption line for something worth knowing that is not always there («Вне лимитов:
+  2 траты на 3 500 ₴»); it is left out, not shown as zero, when there is nothing.
 - Amounts in summary tables and lists have kopecks like every list; only the figure cards round them.
 
 ## Cards
@@ -171,7 +180,7 @@ Computer (md, 900px and wider)              Phone (below md)
   an icon tile, a big value, a title and a caption; the whole card is a link. Kept as a pattern for a dashboard's top
   row (at most two to four); no screen uses it now. In the dark scheme it uses the deep shade so white text stays
   readable.
-- **Figure card** (`home/expenses-summary/view/KpiCards.tsx`): the top row of a summary, one to four in a row (one
+- **Figure card** (`home/expenses-summary/figures/KpiCard.tsx`): the top row of a summary, one to four in a row (one
   column on a phone, two from `sm`, four from `lg`). An emoji and a title in `text.secondary` (the emoji is
   `aria-hidden`), the rounded amount as `h4` («95 024 ₴», no kopecks), one caption line, an optional thin progress bar.
   The value is `text.primary`, except a result that is good or bad: `success` from zero up, `error` below.

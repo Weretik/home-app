@@ -1,5 +1,5 @@
 import LinearProgress from '@mui/material/LinearProgress';
-import { fillOf } from '../data/limit-rows';
+import { fillOf } from './limit-rows';
 
 /** How full a limit is: green under 80 %, amber up to 100 %, red past it. */
 export function LimitFill({

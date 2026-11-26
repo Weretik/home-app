@@ -1,0 +1,18 @@
+import { useQuery } from '@tanstack/react-query';
+import { apiCall, type Schema } from '../../../api-client';
+import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
+import type { Month } from '../data/month';
+
+export type PlannedExpenseItem = Schema<'PlannedExpenseItem'>;
+
+/** «Прогноз»: the expenses planned for a month, ordered by name, and their total («Запланировано»). */
+export function usePlannedExpenses(month: Month) {
+  return useQuery({
+    queryKey: [...moduleKeys.expenses, 'planned', month],
+    queryFn: ({ signal }) =>
+      apiCall(
+        api.GET('/api/expenses/planned', { params: { query: month }, signal }),
+      ),
+  });
+}

@@ -10,7 +10,7 @@ import type {
   SavingsDirection,
   SavingsMovementItem,
 } from '../data/savings-api';
-import { useSaveSavingsMovement } from '../data/savings-api';
+import { useSaveSavingsMovement } from '../data/writes-api';
 import { AmountField } from '../entry-dialogs/AmountField';
 import { EntryDialog } from '../entry-dialogs/EntryDialog';
 import { PersonField } from '../entry-dialogs/PersonField';

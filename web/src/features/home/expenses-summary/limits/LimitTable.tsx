@@ -4,12 +4,18 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import type { LimitRow } from '../data/limit-rows';
 import { formatExact } from '../data/money';
 import { LimitFill } from './LimitFill';
-import { leftColor, limitsLabel, number, orDash } from './limit-format';
+import { LimitNotes } from './LimitNotes';
+import {
+  leftColor,
+  limitsLabel,
+  numberSx,
+  orDash,
+  type LimitRow,
+} from './limit-rows';
 
-/** «Лимиты» on a computer: a small table. */
+/** The limits on a computer: one table row per limit, «ИТОГО» last. */
 export function LimitTable({ rows }: { rows: LimitRow[] }) {
   return (
     <TableContainer sx={{ pb: 1 }}>
@@ -32,20 +38,23 @@ export function LimitTable({ rows }: { rows: LimitRow[] }) {
               hover
               sx={row.isTotal ? { '& td': { fontWeight: 700 } } : undefined}
             >
-              <TableCell>{row.name}</TableCell>
-              <TableCell align="right" sx={number}>
+              <TableCell>
+                {row.name}
+                <LimitNotes row={row} />
+              </TableCell>
+              <TableCell align="right" sx={numberSx}>
                 {formatExact(row.spent)}
               </TableCell>
-              <TableCell align="right" sx={number}>
+              <TableCell align="right" sx={numberSx}>
                 {orDash(row.limit, formatExact)}
               </TableCell>
               <TableCell
                 align="right"
-                sx={{ ...number, color: leftColor(row.left) }}
+                sx={{ ...numberSx, color: leftColor(row.left) }}
               >
                 {orDash(row.left, formatExact)}
               </TableCell>
-              <TableCell align="right" sx={number}>
+              <TableCell align="right" sx={numberSx}>
                 {orDash(row.percent, (p) => `${p}%`)}
               </TableCell>
               <TableCell>
@@ -53,7 +62,7 @@ export function LimitTable({ rows }: { rows: LimitRow[] }) {
                   <LimitFill name={row.name} percent={row.percent} />
                 )}
               </TableCell>
-              <TableCell align="right" sx={number}>
+              <TableCell align="right" sx={numberSx}>
                 {orDash(row.perDay, formatExact)}
               </TableCell>
             </TableRow>
