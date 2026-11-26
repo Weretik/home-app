@@ -21,7 +21,6 @@ namespace Shopping.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Shopping.Application.Idempotency.CreateRequest", b =>
@@ -238,11 +237,6 @@ namespace Shopping.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("DepartmentId")
                         .HasDatabaseName("ix_department_keywords_department_id");
-
-                    b.HasIndex(new[] { "Keyword" }, "ix_department_keywords_keyword_trgm");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Keyword" }, "ix_department_keywords_keyword_trgm"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Keyword" }, "ix_department_keywords_keyword_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "Keyword" }, "ux_department_keywords_keyword")
                         .IsUnique();

@@ -72,7 +72,8 @@ names the test for each rule and the reason for each rule that is review only
 - Reads use projections or `AsNoTracking` and page in SQL (page size at most 100). **(tested)**
 - No query and no `SaveChanges` inside a loop.
 - Search splits the input into words; each word is an escaped `LIKE` on a lower-cased,
-  `pg_trgm`-indexed column.
+  `pg_trgm`-indexed column (exception: Shopping keywords, about 400 rows, ADR 0031; the production server does not
+  allow `CREATE EXTENSION`).
 - Shared state gets a named race guard: unique index, row version, or conditional `UPDATE`. The guard is tested by
   letting a second request in between the read and the save (`TestHost/RacingExpensesDb`).
 - Migrations are a separate step before a deploy and must keep the previous release working (add first, remove

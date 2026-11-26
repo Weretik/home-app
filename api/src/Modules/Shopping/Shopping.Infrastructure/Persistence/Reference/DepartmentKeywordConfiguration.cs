@@ -22,9 +22,6 @@ internal sealed class DepartmentKeywordConfiguration : IEntityTypeConfiguration<
             .HasConstraintName("fk_department_keywords_departments");
         builder.HasIndex(k => k.Keyword, "ux_department_keywords_keyword").IsUnique();
         builder.HasIndex(k => k.DepartmentId).HasDatabaseName("ix_department_keywords_department_id");
-        // The settings search: one LIKE per word on the keyword.
-        builder.HasIndex(k => k.Keyword, "ix_department_keywords_keyword_trgm")
-            .HasMethod("gin").HasOperators("gin_trgm_ops");
 
         builder.HasData(DictionarySeed.Keywords.Select(k => new
         {
