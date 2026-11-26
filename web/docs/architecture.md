@@ -41,24 +41,24 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 
 ## Routes
 
-| Path                 | Page                                                                                                        | Feature                  |
-| -------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `/`                  | Главная, the dashboard                                                                                      | `home`                   |
-| `/expenses`          | Бюджет › Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete     | `expenses/expense-list`  |
-| `/expenses/incomes`  | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                              | `expenses/income-list`   |
-| `/expenses/savings`  | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months      | `expenses/savings-page`  |
-| `/expenses/forecast` | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»       | `expenses/forecast-page` |
-| `/expenses/settings` | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                         | `expenses/settings-page` |
-| `/shopping`          | Покупки, Список: quick add, ⭐ Частые, groups by department, ticks, «В корзине»                             | `shopping/list-page`     |
-| `/shopping/history`  | История: bought items by day, «Вернуть в список», delete                                                    | `shopping/history-page`  |
-| `/shopping/settings` | Настройки (the gear): departments and their order, keywords, cart hours and the frequent window             | `shopping/settings-page` |
-| `/gifts`             | Список: wanted gifts in a block per person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
-| `/gifts/archive`     | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                    | `gifts/pages`            |
-| `/gifts/settings`    | Настройки (the gear next to the tabs): «Нюансы» and categories                                              | `gifts/settings-page`    |
-| `/todos`             | Задачи: active tasks in due groups, «Кому» / category / search filters, quick add, done with undo           | `todos/task-list`        |
-| `/todos/archive`     | Архив: done and cancelled tasks, «Вернуть», «Показать ещё»                                                  | `todos/archive`          |
-| `/todos/settings`    | Настройки (the gear next to the tabs): categories with emoji and active count                               | `todos/settings`         |
-| `/status`            | Состояние: API and database status                                                                          | `status`                 |
+| Path                 | Page                                                                                                                  | Feature                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `/`                  | Главная, the dashboard                                                                                                | `home`                   |
+| `/expenses`          | Бюджет › Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete               | `expenses/expense-list`  |
+| `/expenses/incomes`  | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                                        | `expenses/income-list`   |
+| `/expenses/savings`  | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months                | `expenses/savings-page`  |
+| `/expenses/forecast` | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»                 | `expenses/forecast-page` |
+| `/expenses/settings` | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                                   | `expenses/settings-page` |
+| `/shopping`          | Покупки, Список: quick add, ⭐ Частые, groups by department, ticks, «В корзине»                                       | `shopping/list-page`     |
+| `/shopping/history`  | История: bought items by day, «Вернуть в список», delete                                                              | `shopping/history-page`  |
+| `/shopping/settings` | Настройки (the gear): departments and their order, keywords, cart hours and the frequent window                       | `shopping/settings-page` |
+| `/gifts`             | Список: wanted gifts in a block per person, recipient, category and priority filters, add / edit / delete, «Подарено» | `gifts/pages`            |
+| `/gifts/archive`     | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                              | `gifts/pages`            |
+| `/gifts/settings`    | Настройки (the gear next to the tabs): «Нюансы» and categories                                                        | `gifts/settings-page`    |
+| `/todos`             | Задачи: active tasks in due groups, «Кому» / category / search filters, quick add, done with undo                     | `todos/task-list`        |
+| `/todos/archive`     | Архив: done and cancelled tasks, «Вернуть», «Показать ещё»                                                            | `todos/archive`          |
+| `/todos/settings`    | Настройки (the gear next to the tabs): categories with emoji and active count                                         | `todos/settings`         |
+| `/status`            | Состояние: API and database status                                                                                    | `status`                 |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
 
@@ -236,7 +236,7 @@ The old «🎁 Список подарков» sheet as a section with tabs ([AD
 ```mermaid
 flowchart LR
     pages["pages/ GiftsPage, ArchivePage"] --> list["list-view/ useGiftList, filters, GiftRows, states"]
-    list --> url["url-state/ ?recipient=&category="]
+    list --> url["url-state/ ?recipient=&category=&priority="]
     list --> data["data/ gifts-api (reads), *-writes-api, write-errors-api"]
     list --> rows["gift-table/ (md+) or gift-list/ (phone)"] --> parts["gift-rows/ name, actions, variants, group title"]
     pages --> giftEdit["gift-editing/ + variant-editing/"]
@@ -252,7 +252,7 @@ gifts/
                      «нюансы»), write-errors-api.ts (Russian text of a failed write, isStale)
   display/           Russian labels of recipients, priorities and statuses; price, date, variant and plural formatting;
                      recipient-tones.ts (the person → theme colour mapping) and RecipientAvatar
-  url-state/         ?recipient=&category= (unknown values ignored), filtering and grouping (with the price sum) in memory
+  url-state/         ?recipient=&category=&priority= (unknown values ignored), filtering and grouping (with the price sum) in memory
   section/           GiftsSection (title, tabs, gear, <Outlet />), the list of pages
   editing/           EditDialog, DeleteDialog, RowActions («⋮» with extra items), useEditForm, useEditorState, field checks
   gift-rows/         what a table row and a list row share: GiftName (link, notes), GiftActions (status, «⋮»),

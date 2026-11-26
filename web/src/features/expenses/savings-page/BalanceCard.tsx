@@ -23,7 +23,10 @@ interface BalanceCardProps {
 
 const plain = { fontWeight: 600, fontVariantNumeric: 'tabular-nums' } as const;
 
-/** What is in the jar now, big, and the open month's movement under it. */
+/**
+ * What is in the jar now, big, and the open month's movement as four tiles: under it on phones, beside it on wide
+ * screens so the card has no empty half.
+ */
 export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
   const figures: { label: string; value?: ReactNode }[] = [
     {
@@ -52,7 +55,16 @@ export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
     <Card
       component="section"
       aria-label="Копилка"
-      sx={{ p: { xs: 2, md: 3 }, display: 'grid', gap: { xs: 2, md: 3 } }}
+      sx={{
+        p: { xs: 2, md: 3 },
+        display: 'grid',
+        gap: { xs: 2, md: 3 },
+        alignItems: 'center',
+        gridTemplateColumns: {
+          xs: 'minmax(0, 1fr)',
+          md: 'minmax(0, 1fr) minmax(0, 1.4fr)',
+        },
+      }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box
@@ -91,14 +103,15 @@ export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
         sx={{
           m: 0,
           display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, auto)' },
-          justifyContent: { md: 'start' },
-          columnGap: { md: 5 },
+          gap: { xs: 1, md: 1.5 },
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         }}
       >
         {figures.map(({ label, value }) => (
-          <Box key={label}>
+          <Box
+            key={label}
+            sx={{ px: 1.5, py: 1.25, borderRadius: 2, bgcolor: 'action.hover' }}
+          >
             <Typography component="dt" variant="caption" color="text.secondary">
               {label}
             </Typography>

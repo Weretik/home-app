@@ -122,9 +122,9 @@ Computer (md, 900px and wider)              Phone (below md)
 
 - The Gifts tabs follow the Expenses pattern: a table from `md` (`gifts/gift-table`), a compact list below it
   (`gifts/gift-list`), each row ending with «⋮». No cards.
-- Table columns: Подарок (name 600, the shop link icon, notes clamped to two lines), Категория, Приоритет («Список»
-  only), Цена (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»),
-  Варианты (the count; a click opens the variant links in a row under the gift), then the quick status button
+- Table columns: Подарок (name 600, the shop link icon, notes clamped to two lines), Варианты (right after the name:
+  the count; a click opens the variant links in a row under the gift), Категория, Приоритет («Список» only), Цена
+  (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»), then the quick status button
   («Подарено» or «Вернуть в список», an icon with a tooltip) and «⋮» (Не актуально, Изменить, Удалить).
 - Phone row: the name and the price on the first line, the category under it, then small outlined chips (priority or
   how it ended, the occasion) and «N вариантов» unfolding the links; every action is in «⋮».
@@ -152,6 +152,8 @@ Computer (md, 900px and wider)              Phone (below md)
   (a real minus sign). The sign is always written, so the colour is never the only hint. Zero is plain text.
 - Only signed amounts use these colours (`savings-page/SignedAmount.tsx`); plain sums and balances stay
   `text.primary`. This is the one place `error` marks a direction instead of a problem.
+- The «Копилка» balance card puts the month's four figures in tinted tiles in a 2×2 grid: under the balance on a phone,
+  beside it from `md` up, so the wide card has no empty half next to «План копилки».
 
 ## Summaries on the home page
 

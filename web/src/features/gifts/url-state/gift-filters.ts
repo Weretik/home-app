@@ -1,15 +1,17 @@
-import type { Recipient } from '../data/gifts-api';
-import { recipients } from '../display/labels';
+import type { GiftPriority, Recipient } from '../data/gifts-api';
+import { priorities, recipients } from '../display/labels';
 
-/** The list filters a link carries (`?recipient=&category=`); only known values. */
+/** The list filters a link carries (`?recipient=&category=&priority=`); only known values. */
 export interface GiftFilters {
   recipient?: Recipient;
   categoryId?: string;
+  priority?: GiftPriority;
 }
 
 interface Filterable {
   recipient: Recipient;
   categoryId: string;
+  priority: GiftPriority;
 }
 
 interface Priced {
@@ -26,8 +28,11 @@ export interface GiftGroup<T> {
 const isRecipient = (value: string | null): value is Recipient =>
   (recipients as readonly (string | null)[]).includes(value);
 
+const isPriority = (value: string | null): value is GiftPriority =>
+  (priorities as readonly (string | null)[]).includes(value);
+
 /**
- * Reads the filters from the URL. An unknown recipient is ignored; a category is kept only when it exists, or while
+ * Reads the filters from the URL. An unknown recipient or priority is ignored; a category is kept only when it exists, or while
  * the categories are not loaded yet (`categoryIds` undefined).
  */
 export function parseFilters(
@@ -40,6 +45,8 @@ export function parseFilters(
   const category = params.get('category');
   if (category && (!categoryIds || categoryIds.includes(category)))
     filters.categoryId = category;
+  const priority = params.get('priority');
+  if (isPriority(priority)) filters.priority = priority;
   return filters;
 }
 
@@ -51,7 +58,8 @@ export function applyFilters<T extends Filterable>(
   return items.filter(
     (item) =>
       (!filters.recipient || item.recipient === filters.recipient) &&
-      (!filters.categoryId || item.categoryId === filters.categoryId),
+      (!filters.categoryId || item.categoryId === filters.categoryId) &&
+      (!filters.priority || item.priority === filters.priority),
   );
 }
 

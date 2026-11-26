@@ -12,7 +12,7 @@
 - **Updated:** 2026-11-26
 
 Masha and Vitaliy keep a gift wishlist in the Google Sheet «🎁 Список подарков». This feature replaces it with a
-«Подарки» section: the active wishlist («Список») as a table in a coloured block per person with recipient and category filters, an archive
+«Подарки» section: the active wishlist («Список») as a table in a coloured block per person with recipient, category and priority filters, an archive
 («Подаренные») where a gifted or dropped wish moves instead of being greyed out, and settings (the «нюансы» — ring
 size, clothes, shoes — and the categories). A gift has a recipient, name, category, priority, an optional price and
 link, any number of variants each with its own link, an occasion with a date, and notes; it is added, edited and
