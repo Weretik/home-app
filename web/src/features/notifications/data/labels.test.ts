@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { NotificationScheduleItem } from './notifications-api';
 import { audienceLabels, deliveryTitle, formatKyivTime } from './labels';
 
 describe('audienceLabels', () => {
@@ -12,7 +13,7 @@ describe('audienceLabels', () => {
 });
 
 describe('deliveryTitle', () => {
-  const schedule = [
+  const schedule: NotificationScheduleItem[] = [
     {
       kind: 'TodosMorning',
       title: 'Утренние дела',
@@ -22,7 +23,7 @@ describe('deliveryTitle', () => {
 
   it('takes the title from the schedule, else the kind', () => {
     expect(deliveryTitle('TodosMorning', schedule)).toBe('Утренние дела');
-    expect(deliveryTitle('test', schedule)).toBe('test');
+    expect(deliveryTitle('ExpensesWeek', schedule)).toBe('ExpensesWeek');
   });
 });
 

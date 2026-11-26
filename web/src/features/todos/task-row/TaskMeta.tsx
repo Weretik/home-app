@@ -53,7 +53,7 @@ export function TaskMeta({
       }}
     >
       {extra && <Box component="span">{extra}</Box>}
-      {task.source?.kind === 'gift' && (
+      {task.sourceKind === 'gift' && (
         <Box
           component="span"
           role="img"

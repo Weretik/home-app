@@ -17,7 +17,7 @@ Written from the frontend SDD template (Weretik/obsidian `Templates/frontend-sdd
 
 ## State
 
-- Specification: accepted · Implementation: done (typed client pending, AF-001) · Verification: local checks green, audit in [audit.md](audit.md) ·
+- Specification: accepted · Implementation: done, bound to the generated client · Verification: local checks green, audit in [audit.md](audit.md) ·
   Blockers: none
 
 ## Requirements and behaviour

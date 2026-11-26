@@ -7,7 +7,7 @@ import type { TodoTaskItem } from '../data/todos-api';
 import { GiftSourceLink } from './GiftSourceLink';
 import { TaskMeta } from './TaskMeta';
 
-const task = (source: TodoTaskItem['source']): TodoTaskItem => ({
+const task = (sourceId: string | null): TodoTaskItem => ({
   id: 't1',
   title: '🎁 Купить подарок: Духи',
   notes: null,
@@ -26,7 +26,8 @@ const task = (source: TodoTaskItem['source']): TodoTaskItem => ({
   stepsDone: 0,
   stepsTotal: 0,
   version: 1,
-  source,
+  sourceKind: sourceId ? 'gift' : null,
+  sourceId,
 });
 
 const themed = (node: ReactNode) =>
@@ -36,7 +37,7 @@ const themed = (node: ReactNode) =>
     </ThemeProvider>,
   );
 
-const gift = { kind: 'gift', id: 'g 1', url: 'https://site/gifts?gift=g%201' };
+const gift = 'g 1';
 
 test('a gift to-do links to its gift inside the app', () => {
   themed(<GiftSourceLink task={task(gift)} />);

@@ -19,6 +19,8 @@ export function ChatsCard({ chats }: { chats: NotificationChatItem[] }) {
       chats.find((chat) => chat.audience === audience) ?? {
         audience,
         linked: false,
+        title: null,
+        linkedAtUtc: null,
       },
   );
 

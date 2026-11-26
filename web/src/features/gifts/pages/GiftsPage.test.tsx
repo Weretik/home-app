@@ -31,6 +31,8 @@ const gift = (overrides: Partial<GiftItem> = {}): GiftItem => ({
   giftedOn: null,
   occasion: null,
   occasionDate: null,
+  giver: null,
+  buyBy: null,
   notes: null,
   variants: [],
   createdAtUtc: '2026-11-01T00:00:00Z',

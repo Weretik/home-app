@@ -8,11 +8,7 @@ export type GiftPriority = Schema<'Priority'>;
 export type GiftStatus = Schema<'GiftStatus'>;
 /** Who gives a gift: the same three values as the recipient. */
 export type Giver = Recipient;
-// TEMP shim (notifications 001): `giver` and `buyBy` until the client is regenerated from the new contract.
-export type GiftItem = Schema<'GiftItem'> & {
-  giver?: Giver | null;
-  buyBy?: string | null;
-};
+export type GiftItem = Schema<'GiftItem'>;
 export type GiftVariantItem = Schema<'GiftVariantItem'>;
 export type GiftCategoryItem = Schema<'GiftCategoryItem'>;
 export type GiftDetailItem = Schema<'GiftDetailItem'>;

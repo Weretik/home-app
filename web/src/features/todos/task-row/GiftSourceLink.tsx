@@ -7,12 +7,11 @@ import type { TodoTaskItem } from '../data/todos-api';
  * (web ADR 0013), never an import of the Gifts feature. Nothing for other tasks.
  */
 export function GiftSourceLink({ task }: { task?: TodoTaskItem }) {
-  const source = task?.source;
-  if (source?.kind !== 'gift') return null;
+  if (task?.sourceKind !== 'gift' || !task.sourceId) return null;
   return (
     <Link
       component={RouterLink}
-      to={`/gifts?gift=${encodeURIComponent(source.id)}`}
+      to={`/gifts?gift=${encodeURIComponent(task.sourceId)}`}
       sx={{ justifySelf: 'start', fontWeight: 500 }}
     >
       🎁 Открыть подарок

@@ -1,4 +1,8 @@
-import type { Audience, NotificationScheduleItem } from './notifications-api';
+import type {
+  Audience,
+  NotificationDeliveryItem,
+  NotificationScheduleItem,
+} from './notifications-api';
 
 /** The chats in the order the page lists them. */
 export const audiences: readonly Audience[] = ['Vitaliy', 'Maria', 'Family'];
@@ -11,7 +15,7 @@ export const audienceLabels: Record<Audience, string> = {
 
 /** A delivery's kind as the schedule names it («Утренние дела»), else the kind itself. */
 export const deliveryTitle = (
-  kind: string,
+  kind: NotificationDeliveryItem['kind'],
   schedule: readonly NotificationScheduleItem[],
 ) => schedule.find((item) => item.kind === kind)?.title ?? kind;
 

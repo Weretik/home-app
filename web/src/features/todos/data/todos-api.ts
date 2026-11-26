@@ -3,16 +3,7 @@ import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
 import { moduleKeys } from '../../../platform/query-keys';
 
-/** Where a task came from: `gift` for the purchase to-do of a gift (gifts 002); read only. */
-export interface TaskSource {
-  kind: string;
-  id: string;
-  url?: string | null;
-}
-// TEMP shim (notifications 001): `source` until the client is regenerated from the new contract.
-export type TodoTaskItem = Schema<'TodoTaskItem'> & {
-  source?: TaskSource | null;
-};
+export type TodoTaskItem = Schema<'TodoTaskItem'>;
 export type TodoTaskList = Schema<'TodoTaskList'>;
 export type TaskStepItem = Schema<'TaskStepItem'>;
 export type Assignee = Schema<'Assignee'>;

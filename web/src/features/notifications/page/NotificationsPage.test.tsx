@@ -23,7 +23,7 @@ const status = (
       title: 'Виталий',
       linkedAtUtc: '2026-11-27T06:00:00Z',
     },
-    { audience: 'Maria', linked: false },
+    { audience: 'Maria', linked: false, title: null, linkedAtUtc: null },
   ],
   schedule: [
     {

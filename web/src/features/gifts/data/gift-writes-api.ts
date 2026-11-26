@@ -2,12 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
 import { moduleKeys } from '../../../platform/query-keys';
-import {
-  giftKeys,
-  type GiftItem,
-  type GiftStatus,
-  type Giver,
-} from './gifts-api';
+import { giftKeys, type GiftItem, type GiftStatus } from './gifts-api';
 import { isStale } from './write-errors-api';
 import {
   ifMatch,
@@ -17,11 +12,7 @@ import {
   type Writer,
 } from './writes-api';
 
-// TEMP shim (notifications 001): `giver` and `buyBy` until the client is regenerated from the new contract.
-export type GiftRequest = Schema<'GiftRequest'> & {
-  giver: Giver | null;
-  buyBy: string | null;
-};
+export type GiftRequest = Schema<'GiftRequest'>;
 export type GiftVariantRequest = Schema<'GiftVariantRequest'>;
 
 /**

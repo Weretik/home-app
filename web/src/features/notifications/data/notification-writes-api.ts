@@ -1,10 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import {
-  notificationsKeys,
-  untypedApi,
-  type Audience,
-} from './notifications-api';
+import { api } from '../../../platform/api';
+import { notificationsKeys, type Audience } from './notifications-api';
 
 function useRefresh() {
   const queryClient = useQueryClient();
@@ -18,7 +15,7 @@ export function useUnlinkChat() {
   return useMutation({
     mutationFn: (audience: Audience) =>
       apiCall(
-        untypedApi.DELETE('/api/notifications/chats/{audience}', {
+        api.DELETE('/api/notifications/chats/{audience}', {
           params: { path: { audience } },
         }),
       ),
@@ -33,8 +30,6 @@ export function useUnlinkChat() {
 export function useSendTest() {
   return useMutation({
     mutationFn: (audience: Audience) =>
-      apiCall(
-        untypedApi.POST('/api/notifications/test', { body: { audience } }),
-      ),
+      apiCall(api.POST('/api/notifications/test', { body: { audience } })),
   });
 }
