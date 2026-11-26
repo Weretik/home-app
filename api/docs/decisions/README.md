@@ -27,6 +27,12 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0018 | [The savings jar is a log of signed movements](0018-savings-jar-as-signed-movements.md) |
 | 0019 | [Spending limits are named, overlapping category sets stored in the module](0019-spending-limits-as-category-sets.md) |
 | 0020 | [The month summary is computed on read, with no stored totals](0020-month-summary-computed-on-read.md) |
+| 0021 | [The Gifts module and its model](0021-gifts-module-model.md) |
+| 0022 | [Gift variants belong to the gift and are replaced as a whole](0022-gift-variants-owned-by-gift.md) |
+| 0023 | [A gifted or dropped gift moves to an archive by its status](0023-gifted-gifts-move-to-archive.md) |
+| 0024 | [Gift categories are editable data with a seeded start](0024-gift-categories-as-editable-data.md) |
+| 0025 | [Personal details are reference data of the Gifts module, shown read-only on the home page](0025-gift-details-as-reference-data.md) |
+| 0026 | [The gifts sheet is imported once by a hand-run SQL script](0026-gifts-import-as-sql-script.md) |
 
 ## Decisions that must have a record
 

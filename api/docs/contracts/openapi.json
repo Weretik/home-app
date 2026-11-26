@@ -1292,6 +1292,823 @@
           }
         }
       }
+    },
+    "/api/gifts/items": {
+      "get": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Lists the wanted gifts (archived=false, by priority, then the nearest occasion) or the archive of gifted and dropped ones (archived=true, latest gifted first), with their variants.",
+        "operationId": "listGifts",
+        "parameters": [
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GiftItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Adds a wanted gift with its variants. Send a new Idempotency-Key per gift; a repeat returns the first id.",
+        "operationId": "createGift",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedGiftsEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/items/{id}": {
+      "put": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Changes a gift and replaces its whole variant list; the status stays. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateGift",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Deletes a gift and its variants for good.",
+        "operationId": "deleteGift",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/items/{id}/status": {
+      "put": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Marks a gift Gifted (with giftedOn, today in Kyiv by default) or Dropped, which moves it to the archive, or Wanted, which returns it to the list. Send its version in If-Match.",
+        "operationId": "changeGiftStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/summary": {
+      "get": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "The wishlist for the home page: per recipient and in total the wanted and gifted counts and sums, the top High-priority wanted gifts, the upcoming occasions and all details.",
+        "operationId": "getGiftsSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftsSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/categories": {
+      "get": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Lists the gift categories in display order.",
+        "operationId": "listGiftCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GiftCategoryItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Adds a gift category at the end of the list. Send a new Idempotency-Key; 409 when the name is taken.",
+        "operationId": "createGiftCategory",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedGiftsEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/categories/{id}": {
+      "put": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Renames a gift category; its gifts follow. 409 when the name is taken.",
+        "operationId": "renameGiftCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Deletes a gift category; 409 while any gift (also an archived one) uses it.",
+        "operationId": "deleteGiftCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/details": {
+      "get": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Lists the personal details (sizes and other nuances) by recipient (Maria, Vitaliy, Together) and position.",
+        "operationId": "listGiftDetails",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GiftDetailItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Adds a detail at the end of the recipient's list. Send a new Idempotency-Key; a repeat returns the first id.",
+        "operationId": "createGiftDetail",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftDetailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedGiftsEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gifts/details/{id}": {
+      "put": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Changes a detail; its position stays. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateGiftDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiftDetailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Gifts"
+        ],
+        "summary": "Deletes a detail for good.",
+        "operationId": "deleteGiftDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1399,6 +2216,19 @@
           }
         },
         "description": "The id of a created expense, income or savings movement."
+      },
+      "CreatedGiftsEntry": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "description": "The id of a created gift, category or detail."
       },
       "ExpenseItem": {
         "required": [
@@ -1521,6 +2351,420 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "GiftCategoryItem": {
+        "required": [
+          "id",
+          "name",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "A gift category as lists and pickers show it."
+      },
+      "GiftCategoryRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftCounts": {
+        "required": [
+          "wantedCount",
+          "wantedPriceSum",
+          "wantedWithoutPrice",
+          "highCount",
+          "giftedCount",
+          "giftedPriceSum"
+        ],
+        "type": "object",
+        "properties": {
+          "wantedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "wantedPriceSum": {
+            "type": "number",
+            "format": "double"
+          },
+          "wantedWithoutPrice": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "highCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "giftedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "giftedPriceSum": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "The figures of one recipient or of everyone. Sums count only the gifts with a known price; dropped gifts count\nnowhere."
+      },
+      "GiftDetailItem": {
+        "required": [
+          "id",
+          "version",
+          "recipient",
+          "label",
+          "value",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "A detail («нюанс») as settings and the home summary show it."
+      },
+      "GiftDetailRequest": {
+        "required": [
+          "recipient",
+          "label",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "GiftItem": {
+        "required": [
+          "id",
+          "version",
+          "recipient",
+          "name",
+          "categoryId",
+          "categoryName",
+          "priority",
+          "price",
+          "link",
+          "status",
+          "giftedOn",
+          "occasion",
+          "occasionDate",
+          "notes",
+          "variants",
+          "createdAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "price": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "link": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/GiftStatus"
+          },
+          "giftedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "occasion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "occasionDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftVariantItem"
+            }
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "A gift as the list shows it, with its category name and its variants in order."
+      },
+      "GiftRequest": {
+        "required": [
+          "recipient",
+          "name",
+          "categoryId",
+          "priority",
+          "price",
+          "link",
+          "occasion",
+          "occasionDate",
+          "notes",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/Priority"
+          },
+          "price": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "link": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "occasion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "occasionDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "variants": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/GiftVariantRequest"
+            }
+          }
+        }
+      },
+      "GiftsSummary": {
+        "required": [
+          "recipients",
+          "total",
+          "upcoming",
+          "details"
+        ],
+        "type": "object",
+        "properties": {
+          "recipients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipientSummary"
+            }
+          },
+          "total": {
+            "$ref": "#/components/schemas/GiftCounts"
+          },
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpcomingOccasion"
+            }
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GiftDetailItem"
+            }
+          }
+        },
+        "description": "The home page's view of the wishlist: every recipient (Маша, Виталий, Вместе, always all three, in that order), the\ntotal, up to five upcoming occasions, and all details. Computed on every read."
+      },
+      "GiftStatus": {
+        "enum": [
+          "Wanted",
+          "Gifted",
+          "Dropped"
+        ],
+        "description": "Where a gift idea stands. GiftStatus.Wanted is the active list; GiftStatus.Gifted (given or bought, the sheet's\n«Куплено») and GiftStatus.Dropped («Не актуально») are the archive."
+      },
+      "GiftStatusRequest": {
+        "required": [
+          "status",
+          "giftedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/GiftStatus"
+          },
+          "giftedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "GiftVariantItem": {
+        "required": [
+          "id",
+          "title",
+          "link",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "link": {
+            "type": "string"
+          },
+          "price": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        },
+        "description": "One variant of a gift: a link with an optional title and price."
+      },
+      "GiftVariantRequest": {
+        "required": [
+          "title",
+          "link",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "link": {
+            "type": "string"
+          },
+          "price": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
           }
         }
       },
@@ -1900,6 +3144,14 @@
         },
         "description": "How much one person earned in the month."
       },
+      "Priority": {
+        "enum": [
+          "High",
+          "Normal",
+          "Someday"
+        ],
+        "description": "How much the recipient wants it: «🔥 Очень хочу», «⭐ Хочу», «💭 Когда-нибудь»."
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -1935,6 +3187,37 @@
             ]
           }
         }
+      },
+      "Recipient": {
+        "enum": [
+          "Maria",
+          "Vitaliy",
+          "Together"
+        ],
+        "description": "Whom a gift or a detail is for: Маша, Виталий, or both («Вместе», things for the home)."
+      },
+      "RecipientSummary": {
+        "required": [
+          "recipient",
+          "counts",
+          "topWanted"
+        ],
+        "type": "object",
+        "properties": {
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/GiftCounts"
+          },
+          "topWanted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SummaryGift"
+            }
+          }
+        },
+        "description": "One recipient's figures and up to five of their High-priority wanted gifts, in the active list's order."
       },
       "SavingsDirection": {
         "enum": [
@@ -2189,6 +3472,38 @@
           }
         }
       },
+      "SummaryGift": {
+        "required": [
+          "id",
+          "name",
+          "price",
+          "link"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "link": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "A wanted «🔥» gift in a recipient's top list."
+      },
       "SystemStatus": {
         "required": [
           "status",
@@ -2215,6 +3530,39 @@
           }
         },
         "description": "The overall status, the build version with its commit, the environment, and the status of each check."
+      },
+      "UpcomingOccasion": {
+        "required": [
+          "id",
+          "recipient",
+          "name",
+          "occasion",
+          "occasionDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "name": {
+            "type": "string"
+          },
+          "occasion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "occasionDate": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "description": "A wanted gift whose occasion is today or later."
       }
     }
   },
@@ -2224,6 +3572,9 @@
     },
     {
       "name": "Expenses"
+    },
+    {
+      "name": "Gifts"
     }
   ]
 }
