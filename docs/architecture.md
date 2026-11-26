@@ -4,7 +4,7 @@
 flowchart LR
   browser[Browser] -->|static files| swa[Azure Static Web App<br/>web/dist]
   browser -->|fetch VITE_API_URL| api[Azure App Service<br/>HomeApp.Api]
-  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>schema home, shared server)]
+  api -->|ConnectionStrings__Default| db[(PostgreSQL<br/>schema home)]
 ```
 
 The front and the API live on different hosts. The front is built into static files and calls the API by the full

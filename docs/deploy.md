@@ -70,35 +70,28 @@ The startup command (`dotnet HomeApp.Api.dll`) is set by the workflow itself. Tu
 
 The API reads one connection string, `ConnectionStrings:Default`, in the Npgsql key/value format. When it is set,
 `/health` also checks the database. All tables live in the `home` schema (see
-[ADR 0003](decisions/0003-postgres-schema-on-shared-server.md)), so the database can be shared with another project.
+[ADR 0003](decisions/0003-postgres-at-hosting-provider.md)).
 
-### Main option: existing PostgreSQL at the hosting provider (adm.tools)
+### Main option: a separate database at the hosting provider (adm.tools)
 
-1. **Schema and user.** Ideally a separate user that owns only the `home` schema. Connected as the database owner
-   (panel's phpPgAdmin or `psql`):
+The hosting plan allows several PostgreSQL databases, so this project gets its own database next to the other ones.
 
-   ```sql
-   -- If the panel does not let you create roles, create an extra database user in the panel instead,
-   -- or as a last resort keep the owner user and run only: CREATE SCHEMA home;
-   CREATE ROLE home_app LOGIN PASSWORD '<strong password>';
-   GRANT CONNECT ON DATABASE <database> TO home_app;
-   CREATE SCHEMA home AUTHORIZATION home_app;
-   ALTER ROLE home_app SET search_path = home;
-   ```
-
-   `home_app` owns `home`, so migrations can create tables there, and it gets no rights on the other project's tables.
-   Shared hosting often gives the database user no `CREATEROLE` right; then the first comment applies.
-
-2. **Remote access.** Already open: the other project reaches this server from Google Cloud Run with changing IPs, so
-   no IP allow-list is needed. If the hosting ever restricts it, allow every address from
+1. **Database.** adm.tools → Databases → Create database (for example `home`). The panel creates an owner user of the
+   same name with all rights on it. Set its password with "Change password".
+2. **Access from other users (optional).** The panel gives `PUBLIC` the TEMPORARY & CONNECT rights on every database,
+   so other database users on the account can connect to it. Remove the `PUBLIC` row on the new database if you want
+   only its owner to get in.
+3. **Remote access.** Already open: another project reaches this server from Google Cloud Run with changing IPs, so no
+   IP allow-list is needed. If the hosting ever restricts it, allow every address from
    `az webapp show -g home-rg -n vitaliy-home-api --query possibleOutboundIpAddresses -o tsv`.
-
-3. **SSL.** Use the same host, port and SSL settings as the other project. With SSL use `SSL Mode=Require`; without
+4. **SSL.** Use the same host, port and SSL settings as the other project. With SSL use `SSL Mode=Require`; without
    it the password travels in clear text over the internet, so prefer SSL if at all possible.
+5. **Connection string**, then put it into the App Service as described below:
 
-4. **Connection string**, then put it into the App Service the same way as below:
+   `Host=<host>;Port=5432;Database=home;Username=home;Password=<password>;SSL Mode=Require;Search Path=home`
 
-   `Host=<host>;Port=5432;Database=<database>;Username=home_app;Password=<password>;SSL Mode=Require;Search Path=home`
+The first EF migration creates the `home` schema itself, since the owner has all rights; nothing to run by hand. The
+schema is kept even in a separate database, so the data can move to a shared server later without changes.
 
 ### Alternative: Neon
 
