@@ -30,7 +30,7 @@ public sealed class GetTodoSummaryHandler(ITodosDbContext db, TimeProvider clock
             .ToListAsync(cancellationToken);
 
         var weekAgo = now.AddDays(-7);
-        var doneLast7Days = await db.Tasks.CountAsync(
+        var doneLast7Days = await db.Tasks.AsNoTracking().CountAsync(
             t => t.Status == TodoStatus.Done && t.CompletedAtUtc >= weekAgo, cancellationToken);
 
         // Only overdue, today's and urgent tasks can be in focus. The database orders them as SummaryFocus does and

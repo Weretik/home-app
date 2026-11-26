@@ -20,6 +20,7 @@ public static class KyivCalendar
                 return zone;
         }
 
-        throw new InvalidOperationException("The Europe/Kyiv time zone is not available on this machine.");
+        // Neither id is known: let the runtime report the missing zone (a broken host, not a business rule).
+        return TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
     }
 }
