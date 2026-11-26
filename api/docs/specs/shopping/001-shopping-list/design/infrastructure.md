@@ -17,8 +17,8 @@
 - Indexes: `ix_shopping_items_status_bought_at_utc` (status, bought_at_utc) for the cart window, history and frequent
   items; `ix_shopping_items_normalized_name` for re-add lookups; `ix_shopping_items_department_id`;
   `ux_shopping_items_import_key` (filtered); `ux_departments_name`; `ux_department_keywords_keyword`;
-  `ix_department_keywords_department_id`; `ix_department_keywords_keyword_trgm` (gin, `gin_trgm_ops`, extension
-  `pg_trgm` created by the migration) for the keyword search. Foreign keys inside the schema: items → departments and keywords →
+  `ix_department_keywords_department_id`. No trigram index: the keyword search scans about 400 rows, and the
+  production server does not allow creating `pg_trgm` (AF-014). Foreign keys inside the schema: items → departments and keywords →
   departments, both `restrict` (a department is deleted only after its rows moved).
 
 ## Seed

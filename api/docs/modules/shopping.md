@@ -132,13 +132,13 @@ frequent statistics) and `Features/Dictionary/` (the matcher loaded in store ord
 
 ## Database
 
-Schema `shopping`, migration history in `shopping.__ef_migrations_history`. Migration: `Initial` (it also creates the
-`pg_trgm` extension if it is missing; the database owner may, it is a trusted extension).
+Schema `shopping`, migration history in `shopping.__ef_migrations_history`. Migration: `Initial`. No database extension: the production server does not let the migration create
+`pg_trgm`, and the keyword search scans about 400 rows, so it needs no trigram index.
 
 | Table | Columns | Indexes and keys |
 | --- | --- | --- |
 | `departments` | `id`, `name` (40), `icon` (8), `sort_order`, `is_fallback` | `ux_departments_name` unique; 13 rows from the migration |
-| `department_keywords` | `id`, `keyword` (60), `department_id`, `learned`, `created_at_utc` | `ux_department_keywords_keyword` unique, `ix_department_keywords_department_id`, `ix_department_keywords_keyword_trgm` (gin, `gin_trgm_ops`), `fk_department_keywords_departments` (restrict); 396 rows from the migration |
+| `department_keywords` | `id`, `keyword` (60), `department_id`, `learned`, `created_at_utc` | `ux_department_keywords_keyword` unique, `ix_department_keywords_department_id`, `fk_department_keywords_departments` (restrict); 396 rows from the migration |
 | `shopping_items` | `id`, `name` (80), `normalized_name` (80), `quantity` (30), `note` (200), `department_id`, `urgent`, `status` (text enum), `added_by` (text enum), `added_at_utc`, `bought_by` (text enum), `bought_at_utc`, `cleared_at_utc`, `import_key` (100) | `ix_shopping_items_status_bought_at_utc`, `ix_shopping_items_normalized_name`, `ix_shopping_items_department_id`, `ux_shopping_items_import_key` unique where not null, `fk_shopping_items_departments` (restrict) |
 | `shopping_settings` | `id`, `cart_keep_hours`, `frequent_days` | one row (`7d1c4f0a-3b2e-4c55-9a1d-6e8f0b2c4a17`, 3, 183) |
 | `create_requests` | `key` (100), `kind` (20), `fingerprint` (64), `outcome` (JSON text), `created_at_utc` | primary key `key` |

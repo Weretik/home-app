@@ -1,0 +1,48 @@
+import type { Assignee, TaskQuery } from '../data/todos-api';
+
+/** «Кому» in the URL (`?who=`): lower-case words, so a link reads well. */
+export type Who = 'maria' | 'vitaliy' | 'shared';
+
+export const whoValues: readonly Who[] = ['maria', 'vitaliy', 'shared'];
+
+export const whoLabels: Record<Who, string> = {
+  maria: 'Маша',
+  vitaliy: 'Виталий',
+  shared: 'Общее',
+};
+
+/** The filters of a task list as the URL keeps them (FR-002). `category` is an id or `none`. */
+export interface TodoFilters {
+  who?: Who;
+  category?: string;
+  q?: string;
+}
+
+const whoAssignee: Record<Who, Assignee> = {
+  maria: 'Maria',
+  vitaliy: 'Vitaliy',
+  shared: 'Shared',
+};
+
+/**
+ * The API query of the filters. «Маша» and «Виталий» also bring the shared tasks, as the old sheet's per-person tabs
+ * did; «Общее» brings only the shared ones.
+ */
+export function toTaskQuery({ who, category, q }: TodoFilters): TaskQuery {
+  const query: TaskQuery = {};
+  if (who)
+    query.assignee =
+      who === 'shared' ? ['Shared'] : [whoAssignee[who], 'Shared'];
+  if (category === 'none') query.withoutCategory = true;
+  else if (category) query.categoryId = category;
+  const search = q?.trim();
+  if (search) query.search = search;
+  return query;
+}
+
+/** The assignee of a quick-added task: the chosen «Кому», or «Общее» when the list shows everyone (FR-003). */
+export const quickAddAssignee = (who: Who | undefined): Assignee =>
+  who ? whoAssignee[who] : 'Shared';
+
+export const isFiltered = (filters: TodoFilters) =>
+  Boolean(filters.who || filters.category || filters.q?.trim());

@@ -41,6 +41,8 @@ public sealed partial class OpenApiDocumentTests
     private static readonly Dictionary<string, string> CreatesWithoutIdempotencyKey = new()
     {
         ["recordPlannedExpense"] = "guarded by the plan's version; a repeat finds the plan gone (ADR 0028)",
+        ["createTodoCategory"] = "a repeat hits the unique name and answers 409 (ADR 0030)",
+        ["addTodoTaskStep"] = "a duplicated step is visible in the task and removed with one tap (ADR 0030)",
     };
 
     /// <summary>Edits that carry no version, with the reason.</summary>
@@ -48,6 +50,7 @@ public sealed partial class OpenApiDocumentTests
     {
         ["renameGiftCategory"] = "a rename is a target value and a category has no other field to lose (ADR 0024)",
         ["setShoppingItemStatus"] = "a tick is a target value, so two people ticking the same item cannot undo each other (ADR 0031)",
+        ["updateTodoTaskStep"] = "a step tick or rename is a target value; quick ticks must never conflict (ADR 0030, R-010)",
         ["reorderShoppingDepartments"] = "the whole order is a target value; a concurrent save still meets the row version (ADR 0031)",
     };
 

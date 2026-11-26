@@ -3,7 +3,7 @@
 A .NET 10 modular monolith on PostgreSQL, built on
 [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). One deployable API (`Host.Api`)
 hosts the modules; each module owns its own schema, its own use cases and its own public surface. Modules so far:
-[Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md).
+[Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md).
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
@@ -14,7 +14,7 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 - [Quality targets](docs/architecture/quality-targets.md): latency, load, data and recovery numbers every audit starts from.
 - [Audits](docs/audits/): architecture audits of finished features and what was fixed.
 - [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints):
-  [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md).
+  [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md).
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
 ## Layout
@@ -22,7 +22,7 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 ```
 src/
   BuildingBlocks/   Result and Error, validation pipeline, outbox, persistence helpers, problem responses
-  Modules/          one folder per module, five projects each (Expenses, Shopping, Gifts)
+  Modules/          one folder per module, five projects each (Expenses, Shopping, Gifts, Todos)
     <Name>/         <Name>.Api, .Application, .Contracts, .Domain, .Infrastructure
   Host/Host.Api/    Composition only: registers modules, middleware, OpenAPI
 tests/

@@ -16,9 +16,6 @@ namespace Shopping.Infrastructure.Persistence.Migrations
             migrationBuilder.EnsureSchema(
                 name: "shopping");
 
-            migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,");
-
             migrationBuilder.CreateTable(
                 name: "create_requests",
                 schema: "shopping",
@@ -560,14 +557,6 @@ namespace Shopping.Infrastructure.Persistence.Migrations
                 schema: "shopping",
                 table: "department_keywords",
                 column: "department_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_department_keywords_keyword_trgm",
-                schema: "shopping",
-                table: "department_keywords",
-                column: "keyword")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ux_department_keywords_keyword",

@@ -19,6 +19,7 @@ internal static class MediatorSetup
                 typeof(Expenses.Application.ExpensesApplicationRegistration).Assembly,
                 typeof(Shopping.Application.ShoppingApplicationRegistration).Assembly,
                 typeof(Gifts.Application.GiftsApplicationRegistration).Assembly,
+                typeof(Todos.Application.TodosApplicationRegistration).Assembly,
             ];
             options.PipelineBehaviors = [typeof(LoggingBehavior<,>), typeof(ValidationBehavior<,>)];
         });

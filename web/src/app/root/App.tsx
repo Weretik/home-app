@@ -9,13 +9,16 @@ import { GiftsSection } from '../../features/gifts/section/GiftsSection';
 import { GiftSettingsPage } from '../../features/gifts/settings-page/GiftSettingsPage';
 import { ArchivePage } from '../../features/gifts/pages/ArchivePage';
 import { GiftsPage } from '../../features/gifts/pages/GiftsPage';
-import { ComingSoonPage } from '../../features/home/page/ComingSoonPage';
 import { HomePage } from '../../features/home/page/HomePage';
 import { HistoryPage } from '../../features/shopping/history-page/HistoryPage';
 import { ListPage } from '../../features/shopping/list-page/ListPage';
 import { ShoppingSection } from '../../features/shopping/section/ShoppingSection';
 import { SettingsPage as ShoppingSettingsPage } from '../../features/shopping/settings-page/SettingsPage';
 import { StatusPage } from '../../features/status/StatusPage';
+import { ArchivePage as TodosArchivePage } from '../../features/todos/archive/ArchivePage';
+import { CategoriesSettingsPage } from '../../features/todos/settings/CategoriesSettingsPage';
+import { TodosSection } from '../../features/todos/section/TodosSection';
+import { ActiveTasksPage } from '../../features/todos/task-list/ActiveTasksPage';
 import { AppLayout } from '../shell/AppLayout';
 
 export function App() {
@@ -35,11 +38,15 @@ export function App() {
           <Route path="history" element={<HistoryPage />} />
           <Route path="settings" element={<ShoppingSettingsPage />} />
         </Route>
-        <Route path="/todos" element={<ComingSoonPage title="Дела" />} />
         <Route path="/gifts" element={<GiftsSection />}>
           <Route index element={<GiftsPage />} />
           <Route path="archive" element={<ArchivePage />} />
           <Route path="settings" element={<GiftSettingsPage />} />
+        </Route>
+        <Route path="/todos" element={<TodosSection />}>
+          <Route index element={<ActiveTasksPage />} />
+          <Route path="archive" element={<TodosArchivePage />} />
+          <Route path="settings" element={<CategoriesSettingsPage />} />
         </Route>
         <Route path="/status" element={<StatusPage />} />
       </Route>
