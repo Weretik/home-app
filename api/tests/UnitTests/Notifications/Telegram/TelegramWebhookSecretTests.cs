@@ -1,6 +1,6 @@
 using Notifications.Infrastructure.Telegram;
 
-namespace UnitTests.Notifications.Planning;
+namespace UnitTests.Notifications.Telegram;
 
 public sealed class TelegramWebhookSecretTests
 {
