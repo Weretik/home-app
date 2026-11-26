@@ -4,6 +4,7 @@ using Expenses.Api;
 using Shopping.Api;
 using Gifts.Api;
 using Host.Api.Composition;
+using Todos.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ builder.Services.AddPlatform(builder.Configuration);
 builder.Services.AddExpensesModule(builder.Configuration);
 builder.Services.AddShoppingModule(builder.Configuration);
 builder.Services.AddGiftsModule(builder.Configuration);
+builder.Services.AddTodosModule(builder.Configuration);
 
 var app = builder.Build();
 
@@ -38,6 +40,7 @@ app.MapOutboxTick();
 app.MapExpensesModule();
 app.MapShoppingModule();
 app.MapGiftsModule();
+app.MapTodosModule();
 
 await app.RunAsync();
 

@@ -31,6 +31,13 @@
     <Project Path="src/Modules/Gifts/Gifts.Domain/Gifts.Domain.csproj" />
     <Project Path="src/Modules/Gifts/Gifts.Infrastructure/Gifts.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Todos/">
+    <Project Path="src/Modules/Todos/Todos.Api/Todos.Api.csproj" />
+    <Project Path="src/Modules/Todos/Todos.Application/Todos.Application.csproj" />
+    <Project Path="src/Modules/Todos/Todos.Contracts/Todos.Contracts.csproj" />
+    <Project Path="src/Modules/Todos/Todos.Domain/Todos.Domain.csproj" />
+    <Project Path="src/Modules/Todos/Todos.Infrastructure/Todos.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
     <Project Path="tests/IntegrationTests/IntegrationTests.csproj" />

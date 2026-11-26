@@ -26,12 +26,12 @@ src/
   platform/       the API client instance (VITE_API_URL), the query client and each backend module's query key
                   prefix (query-keys.ts)
   features/
-    home/         Главная: the section summaries and their switcher, the placeholder for sections not built yet
+    home/         Главная: the section summaries and their switcher
     status/       API and database status page
     expenses/     the «Бюджет» section, the Expenses module (below)
     shopping/     the «Покупки» section, the Shopping module (below)
     gifts/        the «Подарки» section, the Gifts module (below)
-    <area>/       one folder per backend module: todos
+    todos/        the «Дела» section, the Todos module (below)
 ```
 
 A feature folder holds its page components, its `<area>-api.ts` with React Query hooks, and tests next to the code.
@@ -55,7 +55,9 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 | `/gifts`             | Список: wanted gifts grouped by person, recipient and category filters, add / edit / delete, «Подарено» | `gifts/pages`            |
 | `/gifts/archive`     | Подаренные: gifted and dropped gifts, «Вернуть в список»                                                | `gifts/pages`            |
 | `/gifts/settings`    | Настройки (the gear next to the tabs): «Нюансы» and categories                                          | `gifts/settings-page`    |
-| `/todos`             | «Раздел скоро появится» placeholder                                                                     | `home/ComingSoonPage`    |
+| `/todos`             | Задачи: active tasks in due groups, «Кому» / category / search filters, quick add, done with undo       | `todos/task-list`        |
+| `/todos/archive`     | Архив: done and cancelled tasks, «Вернуть», «Показать ещё»                                              | `todos/archive`          |
+| `/todos/settings`    | Настройки (the gear next to the tabs): categories with emoji and active count                           | `todos/settings`         |
 | `/status`            | Состояние: API and database status                                                                      | `status`                 |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
@@ -68,7 +70,7 @@ The home page shows one section's summary at a time, picked with a switcher
 ```
 home/
   page/              HomePage (title, switcher, the open summary, the «Состояние» link for phones), the summary
-                     registry (summary-sections.ts), ?s= in the URL, the «Раздел скоро появится» placeholder
+                     registry (summary-sections.ts), ?s= in the URL
   shopping-summary/
     data/            shopping-summary-api.ts (GET /api/shopping/summary, key ['shopping', 'summary']), its labels
     overview/        ShoppingSummary («Открыть список», states), SummaryContent (which cards show), «Список пуст 🎉»
@@ -89,6 +91,9 @@ home/
     overview/        GiftsSummary (states, «Открыть подарки»), SummaryContent (which cards show), «Желаний пока нет»
     cards/           a figure card per person and «Всего», «🔥 Очень хочу», «Ближайшие поводы», «Нюансы» read-only
                      with «Изменить» → /gifts/settings, and the titled card they share
+  todos-summary/
+    data/            todos-summary-api.ts (GET /api/todos/summary, the in-place done tick), labels and due dates
+    view/            TodosSummary (states, «Сделано за неделю», «Открыть дела»), the three assignee cards, «В фокусе»
 ```
 
 - `summary-sections.ts` lists every section with its summary component, or `null` while it has none: the switcher
@@ -110,6 +115,9 @@ home/
   the month helpers and the month picker are copies of the `expenses` ones.
 - «Покупки» shows the list at a glance: three figure cards, the departments with needed items, up to eight next items
   (urgent first), the five most bought, and «Открыть список». An empty list says «Список пуст 🎉».
+- «Дела» (`?s=todos`): a card per Маша, Виталий, Общее with the active count, «просрочено N» in red and «сегодня N»;
+  «Сделано за неделю»; «В фокусе», up to eight tasks from the summary's `focus`, each ticked done in place (struck
+  through while saving). Its query key is `['todos', 'summary']`, so every Todos write refreshes it.
 
 ## Expenses (`src/features/expenses`)
 
@@ -271,6 +279,46 @@ gifts/
 `editing/EditDialog` (and `DeleteDialog`), `section/GiftsSection`; page tests of `pages/GiftsPage`,
 `pages/ArchivePage`, `settings-page/GiftSettingsPage` and `home/gifts-summary/overview/GiftsSummary` with a stubbed
 `fetch`.
+
+## Todos (`src/features/todos`)
+
+The family's to-do list «Дела» ([ADR 0011](decisions/0011-todos-grouped-list-quick-add-optimistic-done.md),
+[SDD](specs/todos/001-todos-section/README.md)).
+
+```
+todos/
+  data/          todos-api.ts (task list infinite query, one task), categories-api.ts, labels.ts (Russian enums,
+                 priority marks), due-date.ts (Kyiv today, due groups, «сегодня / завтра / пн 30.11»)
+  writes/        task-writes-api.ts (create / edit / delete, Idempotency-Key), status-api.ts (optimistic move between
+                 lists, undo), steps-api.ts, category-writes-api.ts, failures-api.ts (Russian text of a failed write)
+  section/       TodosSection (title, tabs «Задачи» / «Архив», the gear), the list of pages
+  url-state/     the filters (?who=&category=&q=) and their mapping to the API query, the debounced search
+  task-filters/  «Кому» chips, the category select, the search field
+  task-list/     «Задачи» page: quick add, the due groups, the done tick with «Отменить»
+  task-row/      a task row: round tick, title, the wrapping meta line (priority, date, category, steps, notes,
+                 assignee, status)
+  task-dialog/   the task dialog (full screen on a phone), its fields, the due date with quick chips, task-form.ts
+  task-steps/    «Шаги»: the checklist editor, saved at once for an existing task, kept in the form for a new one
+  feedback/      loading / empty / error states, «Показать ещё», the result snackbar, the delete confirmation
+  archive/       «Архив» page and its row with «Вернуть»
+  settings/      «Настройки»: categories list, add / change dialog, delete with the count of tasks that lose it
+```
+
+- Query keys: `['todos', 'tasks', view, query]`, `['todos', 'task', id]`, `['todos', 'categories']`; the home
+  summary's `['todos', 'summary']`. Every write invalidates `['todos']`.
+- Groups (FR-001): «Просрочено», «Сегодня», «Скоро» (next 7 days), «Позже», «Без срока»; empty ones hidden; today is
+  the Kyiv date. Lists load 50 tasks a page with «Показать ещё».
+- Filters: «Маша» and «Виталий» send `assignee` twice (the person and `Shared`), «Общее» only `Shared`; the category is
+  an id or `none` (`withoutCategory=true`); the search reaches the URL 300 ms after typing stops. Switching tabs keeps
+  them; the gear drops them.
+- Quick add creates a task for the chosen «Кому» («Общее» for «Все»), Обычно, no date, with an `Idempotency-Key`
+  renewed after each success; the field clears and keeps focus. The pencil opens the full form with the typed title.
+- The done tick and «Вернуть» are optimistic: the row leaves its list at once and comes back with the reason if the
+  write fails. «Отменить» waits for the tick to be saved, reads the task again (the tick changed its version) and
+  restores its previous status.
+- The task dialog edits title, «Кому», «Поставил(а)», status, priority, due date («Сегодня», «Завтра», «На выходных»,
+  «Без срока»), category, notes and steps. Edits send the version of the task as the dialog's query holds it now, so
+  steps saved meanwhile do not cause a conflict; a 409 reloads the task into the form, a 404 says it is gone.
 
 ## API client (`src/api-client`)
 

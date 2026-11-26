@@ -120,16 +120,19 @@ function renderHome(
 const plain = (element: HTMLElement) =>
   element.textContent?.replace(/\s/g, ' ');
 
-test('opens the expenses summary in the switcher, other sections are coming', async () => {
+test('opens the budget summary first, every section has its summary', async () => {
   renderHome('/');
 
   const switcher = screen.getByRole('group', { name: 'Сводка' });
   expect(
     within(switcher).getByRole('button', { name: /Бюджет/ }),
   ).toHaveAttribute('aria-pressed', 'true');
-  expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeDisabled();
   expect(
     within(switcher).getByRole('button', { name: /Подарки/ }),
+  ).toBeEnabled();
+  expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeEnabled();
+  expect(
+    within(switcher).getByRole('button', { name: /Покупки/ }),
   ).toBeEnabled();
   expect(screen.getByRole('link', { name: /Состояние/ })).toHaveAttribute(
     'href',
