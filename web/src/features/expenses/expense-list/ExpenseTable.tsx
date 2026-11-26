@@ -18,12 +18,17 @@ const amountCell = {
 /** Expenses as a table, for a computer. */
 export function ExpenseTable({
   items,
+  label,
   onEdit,
   onDelete,
-}: { items: ExpenseItem[] } & RowHandlers<ExpenseItem>) {
+}: {
+  items: ExpenseItem[];
+  /** The list's accessible name: «Расходы за месяц» or «Расходы за период». */
+  label: string;
+} & RowHandlers<ExpenseItem>) {
   return (
     <TableContainer>
-      <Table size="small" aria-label="Расходы за месяц">
+      <Table size="small" aria-label={label}>
         <TableHead>
           <TableRow>
             <TableCell>Дата</TableCell>

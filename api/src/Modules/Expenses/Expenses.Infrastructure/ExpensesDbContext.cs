@@ -1,6 +1,7 @@
 using BuildingBlocks.Infrastructure.Persistence;
 using Expenses.Application;
 using Expenses.Application.Idempotency;
+using Expenses.Domain.Budget;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Savings;
@@ -23,4 +24,8 @@ public sealed class ExpensesDbContext(DbContextOptions<ExpensesDbContext> option
     public DbSet<SavingsMovement> SavingsMovements => Set<SavingsMovement>();
 
     public DbSet<CreateRequest> CreateRequests => Set<CreateRequest>();
+
+    public DbSet<SpendingLimit> SpendingLimits => Set<SpendingLimit>();
+
+    public DbSet<BudgetSettings> BudgetSettings => Set<BudgetSettings>();
 }

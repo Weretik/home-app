@@ -7,7 +7,8 @@ rules and commands; read only the sources the current task needs. This file appl
 
 A private site for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping
 list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses, incomes and the «Копилка» savings jar,
-imported from the old Google Sheet and now added, edited and deleted on the site, see
+imported from the old Google Sheet and now added, edited and deleted on the site, plus spending limits, the savings
+goal and a computed month summary that replace the sheet's «Бюджет» and «Сводка» tabs, see
 [api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet, writes are open and rate
 limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.

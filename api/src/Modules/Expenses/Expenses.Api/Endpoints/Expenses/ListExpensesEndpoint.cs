@@ -14,15 +14,17 @@ internal static class ListExpensesEndpoint
     {
         group.MapGet("/", HandleAsync)
             .WithName("listExpenses")
-            .WithSummary("Lists one month's expenses, newest first, with the month's total.")
+            .WithSummary("Lists the expenses of one month (year, month) or of a period (from, to, both included), newest first, with their total.")
             .Produces<ExpenseList>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
         return group;
     }
 
     private static async Task<IResult> HandleAsync(
-        int year,
-        int month,
+        int? year,
+        int? month,
+        DateOnly? from,
+        DateOnly? to,
         Guid? categoryId,
         Payer? payer,
         ISender sender,
@@ -32,7 +34,7 @@ internal static class ListExpensesEndpoint
         int pageSize = 50)
     {
         var result = await sender.Send(
-            new ListExpensesQuery(year, month, categoryId, payer, page, pageSize), cancellationToken);
+            new ListExpensesQuery(year, month, from, to, categoryId, payer, page, pageSize), cancellationToken);
         return result.ToHttpResult(http);
     }
 }

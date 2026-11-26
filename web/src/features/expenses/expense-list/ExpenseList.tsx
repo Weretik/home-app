@@ -12,11 +12,16 @@ import type { RowHandlers } from '../entry-editing/use-entry-editor';
 /** Expenses as a compact list, for a phone. */
 export function ExpenseList({
   items,
+  label,
   onEdit,
   onDelete,
-}: { items: ExpenseItem[] } & RowHandlers<ExpenseItem>) {
+}: {
+  items: ExpenseItem[];
+  /** The list's accessible name: «Расходы за месяц» or «Расходы за период». */
+  label: string;
+} & RowHandlers<ExpenseItem>) {
   return (
-    <List disablePadding aria-label="Расходы за месяц">
+    <List disablePadding aria-label={label}>
       {items.map((item, index) => (
         <ListItem
           key={item.id}

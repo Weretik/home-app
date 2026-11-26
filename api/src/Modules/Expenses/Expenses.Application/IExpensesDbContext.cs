@@ -1,4 +1,5 @@
 using Expenses.Application.Idempotency;
+using Expenses.Domain.Budget;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Savings;
@@ -21,6 +22,10 @@ public interface IExpensesDbContext
     DbSet<SavingsMovement> SavingsMovements { get; }
 
     DbSet<CreateRequest> CreateRequests { get; }
+
+    DbSet<SpendingLimit> SpendingLimits { get; }
+
+    DbSet<BudgetSettings> BudgetSettings { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

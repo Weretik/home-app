@@ -4,7 +4,9 @@ The household's money: what Masha and Vitaliy spend, receive and put aside, by c
 Google Sheet «Учёт расходов» (and its Telegram bot), whose history starts on 1 October 2026. The module was added in
 [ADR 0013](../decisions/0013-expenses-module-model.md); its data came over from the sheet once, as
 [ADR 0014](../decisions/0014-one-time-sheet-import.md) describes. Since then the entries are added and edited on the
-site.
+site. The module also keeps the budget (spending limits, the monthly limit and the savings goal,
+[ADR 0019](../decisions/0019-spending-limits-as-category-sets.md)) and computes a month's summary from the entries
+([ADR 0020](../decisions/0020-month-summary-computed-on-read.md)).
 
 Code: [`src/Modules/Expenses`](../../src/Modules/Expenses). Schema: `expenses`.
 
@@ -49,7 +51,23 @@ classDiagram
         DateTimeOffset CreatedAtUtc
         uint Version
     }
+    class SpendingLimit {
+        Guid Id
+        string Name
+        LimitPeriod Period
+        decimal Amount
+        Guid[] CategoryIds
+        int SortOrder
+        uint Version
+    }
+    class BudgetSettings {
+        Guid Id  singleton
+        decimal MonthlyLimit
+        decimal SavingsGoal
+        uint Version
+    }
     Expense --> Category : CategoryId
+    SpendingLimit --> Category : CategoryIds (no FK)
 ```
 
 | Concept | Meaning | In the old sheet |
@@ -62,6 +80,10 @@ classDiagram
 | `Payer` | Whom an expense is booked to: `Vitaliy`, `Maria`, or `Shared` for household spending (groceries, home). | «Кто» in «Расходы» |
 | `Person` | `Vitaliy` or `Maria`; who received an income or moved money in the jar. | «Кто» in «Доходы» and «Копилка» |
 | `PaymentMethod` | `Card` or `Cash`. | «Оплата» |
+| `SpendingLimit` | How much may be spent on a named set of categories in a month or a quarter. Limits may overlap: one category can count towards several limits ([ADR 0019](../decisions/0019-spending-limits-as-category-sets.md)). | a row of «Бюджет» |
+| `LimitPeriod` | `Month` or `Quarter`: the calendar month or calendar quarter a limit covers. | monthly and quarterly limits in «Бюджет» |
+| `BudgetSettings` | The one row of budget numbers not tied to categories: `MonthlyLimit` on all expenses of a month and the `SavingsGoal` for the jar; `0` means none. | the overall limit and the jar goal of the sheet |
+| `MonthSummary` | A read model, never stored: one month's incomes, expenses, result, jar and limit usage ([ADR 0020](../decisions/0020-month-summary-computed-on-read.md)). | «Сводка» without «План / Факт / Прогноз» |
 | `Version` | The row version, PostgreSQL `xmin`; changes on every save ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)). | none |
 
 Rules (in `Expenses.Domain`, tested in `tests/UnitTests/Expenses`):
@@ -81,6 +103,37 @@ Rules (in `Expenses.Domain`, tested in `tests/UnitTests/Expenses`):
 - Personal spending categories («Личные Виталий», «Личные Маша») are ordinary categories, as in the sheet. `Payer`
   says whose money it was, the category says what it was for.
 
+Budget rules (`Domain/Budget/`):
+
+- A spending limit has a name (trimmed, 1–100 characters), a period, an amount greater than zero with the usual money
+  rules, and at least one category, each once. The categories must exist (`404` `expenses.category_not_found`);
+  they are a `uuid[]` of the same schema without a foreign key, checked on create and edit.
+- Limits may overlap. The seeded «Другое» counts ten categories, including «Кафе…», «Уходовые средства и косметика»
+  and «Зоотовары», which also have limits of their own, exactly as in the sheet. A limit's spending is the sum of
+  the expenses in its categories over its period, whoever paid.
+- A `Month` limit covers the calendar month; a `Quarter` limit covers the calendar quarter that holds the month
+  (January–March, April–June, …). Overspending is not carried into the next period.
+- A new limit goes to the end of the list (`SortOrder` of the last plus 10); an edit keeps its place.
+- The monthly limit and the savings goal are amounts from 0 (0 means none) with the usual money rules
+  (`expenses.budget_settings_invalid`). There is exactly one settings row, created by the `Budget` migration.
+
+Summary rules (`Features/Summary/`), as in «Сводка»:
+
+- Incomes are summed by person, expenses by payer, both over the calendar month.
+- `result` = incomes − expenses − the jar's net movement of the month (deposits minus withdrawals), so money put
+  aside lowers the result and money taken out raises it.
+- `savingsNet` is the month's net movement, `savingsBalance` the jar at the end of the month, `savingsGoal` the
+  target from the settings.
+- `monthlyLimit` comes from the settings; `daysLeft` counts the days to the end of the month including today, and is
+  `null` for any month but the current one.
+- Every limit gets a usage row: its period (`from`, `to`, both included), amount, spent, left (negative when
+  overspent), percent spent (rounded) and `perDay`, what may still be spent per day until the period ends (left
+  divided by the days left including today, never below 0; `null` when the period is not running now).
+- "Today" is the date in `Europe/Kyiv`, so the per-day figures change at local midnight.
+- The top five categories of the month by amount.
+- Nothing is stored: every request sums the entries in SQL. The sheet's «План / Факт / Прогноз» block is not
+  reproduced. The figures were checked against the sheet for November 2026.
+
 ## Use cases
 
 | Area | Commands | Queries |
@@ -89,32 +142,39 @@ Rules (in `Expenses.Domain`, tested in `tests/UnitTests/Expenses`):
 | `Features/Incomes` | `CreateIncome`, `UpdateIncome`, `DeleteIncome` | `ListIncomes` |
 | `Features/Savings` | `CreateSavingsMovement`, `UpdateSavingsMovement`, `DeleteSavingsMovement` | `ListSavingsMovements`, `ListSavingsMonths` |
 | `Features/Categories` | | `ListCategories` |
+| `Features/Budget` | `CreateSpendingLimit`, `UpdateSpendingLimit`, `DeleteSpendingLimit`, `UpdateBudgetSettings` | `GetBudget` |
+| `Features/Summary` | | `GetMonthSummary` (its response records in `Summary/Report/`) |
 | `Features/Imports` | `ImportSheet` | |
 
+- `ListExpenses` takes either `year` and `month`, or `from` and `to` (dates, both included, at most 366 days, within
+  2000–2100); any other combination answers `400`. The total is the sum of the whole filtered period.
 - **Creates** take an `Idempotency-Key` ([ADR 0007](../decisions/0007-idempotency-key-for-creates.md)). The key,
-  the kind (`expense`, `income`, `savings`), a SHA-256 fingerprint of the data and the new id are saved in
+  the kind (`expense`, `income`, `savings`, `limit`), a SHA-256 fingerprint of the data and the new id are saved in
   `create_requests` in the same transaction as the row (`Application/Idempotency/`). The same key with the same data
   returns the first id; with other data, or for another kind, it answers `409` `expenses.idempotency_key_reused`; a
-  racing copy hits the primary key and is answered like a repeat. One table serves all three kinds, instead of a key
+  racing copy hits the primary key and is answered like a repeat. One table serves all kinds, instead of a key
   column on each.
 - **Edits** carry the version the person started from; a mismatch, or a row changed between reading and saving,
   answers `409` `expenses.changed_meanwhile` ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).
 - An unknown id answers `404` (`expenses.expense_not_found`, `expenses.income_not_found`,
-  `expenses.savings_movement_not_found`); an unknown category `404` `expenses.category_not_found`.
+  `expenses.savings_movement_not_found`, `expenses.limit_not_found`); an unknown category `404`
+  `expenses.category_not_found`.
+- Edits of a spending limit and of the budget settings carry their version in `If-Match` like the entries; a limit
+  delete needs none.
 
 ## Layers
 
 | Project | What is there |
 | --- | --- |
-| `Expenses.Domain` | `Categories/` (`Category`, errors), `Entries/` (`Expense`, `Income`, `PaymentMethod`, shared rules and errors), `Parties/` (`Payer`, `Person`), `Savings/` (`SavingsMovement`, `SavingsDirection`). No EF Core, no ASP.NET Core. |
-| `Expenses.Application` | `IExpensesDbContext` (the unit of work), `Idempotency/` (`CreateRequest` and the repeat rules), and one folder per use case under `Features/` (table above). `Imports/SheetFormat/` reads the sheet's cells and makes import keys. |
-| `Expenses.Infrastructure` | `ExpensesDbContext` (schema `expenses`), entity configurations and the category seed in `Persistence/`, migrations in `Persistence/Migrations/`, the development initializer that applies them. |
-| `Expenses.Api` | `ExpensesModule` (`AddExpensesModule`, `MapExpensesModule`), endpoints in `Endpoints/Expenses/`, `Endpoints/Incomes/`, `Endpoints/Savings/`, the operator import in `Endpoints/Import/`, and `EntryVersionHeader` (reads `If-Match`). |
+| `Expenses.Domain` | `Budget/` (`SpendingLimit`, `LimitPeriod`, `BudgetSettings`, errors), `Categories/` (`Category`, errors), `Entries/` (`Expense`, `Income`, `PaymentMethod`, shared rules and errors), `Parties/` (`Payer`, `Person`), `Savings/` (`SavingsMovement`, `SavingsDirection`). No EF Core, no ASP.NET Core. |
+| `Expenses.Application` | `IExpensesDbContext` (the unit of work), `Idempotency/` (`CreateRequest` and the repeat rules), `BudgetCategories` (checks that a limit's categories exist), and one folder per use case under `Features/` (table above). `Imports/SheetFormat/` reads the sheet's cells and makes import keys. |
+| `Expenses.Infrastructure` | `ExpensesDbContext` (schema `expenses`); entity configurations in `Persistence/Entries/` (expenses, incomes, savings movements, create requests) and `Persistence/Reference/` (categories, spending limits, budget settings, with `CategorySeed` and `BudgetSeed`); migrations in `Persistence/Migrations/`; the development initializer that applies them. |
+| `Expenses.Api` | `ExpensesModule` (`AddExpensesModule`, `MapExpensesModule`), endpoints in `Endpoints/Expenses/`, `Endpoints/Incomes/`, `Endpoints/Savings/`, `Endpoints/Budget/Overview/` (budget, settings, month summary) and `Endpoints/Budget/Limits/`, the operator import in `Endpoints/Import/`, and `EntryVersionHeader` (reads `If-Match`). |
 | `Expenses.Contracts` | Empty: no other module uses Expenses yet. |
 
 ## Database
 
-Schema `expenses`, migration history in `expenses.__ef_migrations_history`. Migrations: `Initial`, `Savings`.
+Schema `expenses`, migration history in `expenses.__ef_migrations_history`. Migrations: `Initial`, `Savings`, `Budget`.
 
 | Table | Columns | Indexes and keys |
 | --- | --- | --- |
@@ -123,10 +183,28 @@ Schema `expenses`, migration history in `expenses.__ef_migrations_history`. Migr
 | `incomes` | `id`, `date`, `person` (text enum), `amount` numeric(12,2), `comment` (500), `import_key` (100), `created_at_utc` | `ix_incomes_date`, `ux_incomes_import_key` unique where not null |
 | `savings_movements` | `id`, `date`, `person` (text enum), `amount` numeric(12,2), signed, `comment` (500), `import_key` (100), `created_at_utc` | `ix_savings_movements_date`, `ux_savings_movements_import_key` unique where not null |
 | `create_requests` | `key` (100), `kind` (20), `fingerprint` (64, hex SHA-256), `entity_id`, `created_at_utc` | primary key `key` |
+| `spending_limits` | `id`, `name` (100), `period` (text enum, 20), `amount` numeric(12,2), `category_ids` uuid[], `sort_order` | primary key `id`; no foreign key on `category_ids` (an array, checked in the handlers); 7 rows inserted by the `Budget` migration |
+| `budget_settings` | `id`, `monthly_limit` numeric(12,2), `savings_goal` numeric(12,2) | primary key `id`; one row, inserted by the `Budget` migration |
 
-Enums are stored as their names (`Shared`, `Card`) so the data reads without the code. Ids are UUID v7. `Version` on
-expenses, incomes and savings movements is PostgreSQL's system column `xmin`, mapped as the row version: it has no
-column of its own and costs no storage.
+Enums are stored as their names (`Shared`, `Card`, `Quarter`) so the data reads without the code. Ids are UUID v7
+(the seeded limits and the settings row have fixed ids). `Version` on expenses, incomes, savings movements, spending
+limits and budget settings is PostgreSQL's system column `xmin`, mapped as the row version: it has no column of its
+own and costs no storage.
+
+The `Budget` migration seeds the limits of the old «Бюджет» sheet with plain SQL (EF seed data cannot hold the array
+column without reporting a model change on every build; the values are also in `BudgetSeed`):
+
+| Limit | Period | Amount | Categories |
+| --- | --- | --- | --- |
+| Еда и быт | month | 15 000 | Продукты, Быт |
+| Личные Виталий | month | 7 000 | Личные Виталий |
+| Личные Маша | month | 13 000 | Личные Маша |
+| Кафе, доставка, развлечения | month | 3 000 | Кафе, доставка, развлечения |
+| Уход и косметика | quarter | 3 000 | Уходовые средства и косметика |
+| Зоотовары | quarter | 2 500 | Зоотовары |
+| Другое | month | 15 000 | Коммуналка, Кафе…, Здоровье, Одежда, Ремонт, Подарки, Уходовые средства и косметика, Зоотовары, Мебель и техника, Сдаваемая квартира |
+
+and the settings: monthly limit 50 000, savings goal 100 000. Later changes are made on the «Настройки» page.
 
 ## HTTP API
 
@@ -136,7 +214,7 @@ requests a minute per client address in `appsettings.json`) and can answer `429`
 
 | Operation | Route | Notes |
 | --- | --- | --- |
-| `listExpenses` | `GET /api/expenses?year&month&categoryId&payer&page&pageSize` | Newest first; `totalAmount` is the sum of the whole filtered month, not of the page. Each item has its `version`. |
+| `listExpenses` | `GET /api/expenses?year&month&categoryId&payer&page&pageSize` or `GET /api/expenses?from&to&…` | One month, or a period `from`–`to` (both included, at most 366 days). Newest first; `totalAmount` is the sum of the whole filtered period, not of the page. Each item has its `version`. |
 | `createExpense` | `POST /api/expenses` | Header `Idempotency-Key`. `201` with `{ id }` and `Location`. |
 | `updateExpense` | `PUT /api/expenses/{id}` | Header `If-Match: <version>`. `204`. |
 | `deleteExpense` | `DELETE /api/expenses/{id}` | `204`. |
@@ -146,9 +224,15 @@ requests a minute per client address in `appsettings.json`) and can answer `429`
 | `listSavingsMonths` | `GET /api/expenses/savings/months` | `currentBalance` and every month with movements, newest first: deposits, withdrawals and closing balance. |
 | `createSavingsMovement`, `updateSavingsMovement`, `deleteSavingsMovement` | `POST /api/expenses/savings`, `PUT` and `DELETE /api/expenses/savings/{id}` | As for expenses; `amount` is signed and not zero. |
 | `listExpenseCategories` | `GET /api/expenses/categories` | In `sortOrder`. |
+| `getBudget` | `GET /api/expenses/budget` | The settings' `version`, `monthlyLimit`, `savingsGoal`, and every limit in order with its `version`, `period` and `categoryIds`. |
+| `updateBudgetSettings` | `PUT /api/expenses/budget/settings` | Body `{ monthlyLimit, savingsGoal }`, header `If-Match: <version>`. `204`. |
+| `createSpendingLimit` | `POST /api/expenses/budget/limits` | Body `{ name, period, amount, categoryIds }`, header `Idempotency-Key`. `201` with `{ id }`. |
+| `updateSpendingLimit` | `PUT /api/expenses/budget/limits/{id}` | Same body, header `If-Match: <version>`. `204`. |
+| `deleteSpendingLimit` | `DELETE /api/expenses/budget/limits/{id}` | `204`; the expenses stay. |
+| `getMonthSummary` | `GET /api/expenses/summary?year&month` | The month's `MonthSummary`: `incomes` and `incomesByPerson`, `expenses` and `expensesByPayer`, `monthlyLimit`, `daysLeft`, `result`, `savingsNet`, `savingsBalance`, `savingsGoal`, `limits` (usage per limit) and `topCategories`. See the summary rules above. |
 | (hidden) | `POST /api/expenses/imports/sheet` | The sheet import below. Not in the OpenAPI document. |
 
-`pageSize` is 1–100 (default 50), `month` 1–12, `year` 2000–2100. `If-Match` takes the item's `version` as is,
+`pageSize` is 1–100 (default 50), `month` 1–12, `year` 2000–2100, `period` `Month` or `Quarter`. `If-Match` takes the item's `version` as is,
 quoted or not (`W/` is ignored); without it an edit answers `400`.
 
 ## The one-time import from the sheet
@@ -204,8 +288,8 @@ and model changes.
 | Расходы | Расходы | list by month, filters by category and payer; add, edit, delete |
 | Доходы | Доходы | list by month, filter by person; add, edit, delete |
 | Копилка | Копилка | movements by month with balances, months overview; add, edit, delete |
-| Сводка | Обзор | planned |
-| Бюджет | Лимиты | planned (monthly and quarterly limits, overspend carried into the next period) |
+| Сводка | the home page summaries (a switcher between sections) | the month's incomes, expenses, result, jar and limit usage (`getMonthSummary`); the «План / Факт / Прогноз» block is not reproduced |
+| Бюджет | Настройки | spending limits (add, edit, delete) and the savings goal (`getBudget` and the budget writes); overspend is not carried into the next period |
 | План | План | planned |
 | Платежи | Платежи | planned (recurring mandatory payments) |
 | Баланс по месяцам | По месяцам | planned |

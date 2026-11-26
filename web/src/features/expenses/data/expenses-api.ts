@@ -32,10 +32,21 @@ export interface Paged {
 export const nextPage = (last: Paged) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
-/** One month's expenses, loaded page by page («Показать ещё»). */
-export function useExpenses(month: Month, filter: ExpenseFilter) {
+/** The days an expense list shows: a month, or a period from–to («YYYY-MM-DD», both included). */
+export type ExpenseDays = Month | { from: string; to: string };
+
+/**
+ * The expenses of a month or a period, loaded page by page («Показать ещё»). `enabled` false sends nothing (a
+ * period the page found invalid).
+ */
+export function useExpenses(
+  days: ExpenseDays,
+  filter: ExpenseFilter,
+  enabled = true,
+) {
   return useInfiniteQuery({
-    queryKey: ['expenses', 'list', month, filter],
+    queryKey: ['expenses', 'list', days, filter],
+    enabled,
     initialPageParam: 1,
     getNextPageParam: nextPage,
     queryFn: ({ pageParam, signal }) =>
@@ -43,7 +54,7 @@ export function useExpenses(month: Month, filter: ExpenseFilter) {
         api.GET('/api/expenses', {
           params: {
             query: {
-              ...month,
+              ...days,
               ...filter,
               page: pageParam,
               pageSize: PAGE_SIZE,

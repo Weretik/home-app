@@ -3,6 +3,7 @@ import {
   amountText,
   commentError,
   dateError,
+  defaultDateIn,
   defaultEntryDate,
   parseAmount,
 } from './entry-fields';
@@ -11,6 +12,15 @@ test('starts a new entry today in the current month, else on the 1st', () => {
   const today = new Date(2026, 10, 26);
   expect(defaultEntryDate({ year: 2026, month: 11 }, today)).toBe('2026-11-26');
   expect(defaultEntryDate({ year: 2026, month: 9 }, today)).toBe('2026-09-01');
+});
+
+test('starts a new entry today within a period, else on its first day', () => {
+  const today = new Date(2026, 10, 26);
+  const period = { from: '2026-11-20', to: '2026-12-05' };
+  expect(defaultDateIn(period, today)).toBe('2026-11-26');
+  expect(defaultDateIn({ from: '2026-10-01', to: '2026-10-31' }, today)).toBe(
+    '2026-10-01',
+  );
 });
 
 test('reads amounts the way people type them', () => {

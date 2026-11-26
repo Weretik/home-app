@@ -1,4 +1,4 @@
-import type { Month } from '../data/month';
+import { isoDay, monthDays, type Month } from '../data/month';
 
 /** Field messages of a form, by the contract's camelCase field name. */
 export type FieldErrors = Record<string, string | undefined>;
@@ -7,16 +7,22 @@ export type FieldErrors = Record<string, string | undefined>;
 export const MAX_AMOUNT = 10_000_000;
 export const MAX_COMMENT = 500;
 
-const isoDay = (year: number, month: number, day: number) =>
-  `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+/** The date a new entry starts with: today when it is within the days shown, else their first day. */
+export function defaultDateIn(
+  days: { from: string; to: string },
+  today: Date = new Date(),
+) {
+  const day = isoDay(
+    today.getFullYear(),
+    today.getMonth() + 1,
+    today.getDate(),
+  );
+  return day >= days.from && day <= days.to ? day : days.from;
+}
 
 /** The date a new entry starts with: today in the current month, else the 1st of the open month. */
 export function defaultEntryDate(month: Month, today: Date = new Date()) {
-  const isCurrent =
-    today.getFullYear() === month.year && today.getMonth() + 1 === month.month;
-  return isCurrent
-    ? isoDay(month.year, month.month, today.getDate())
-    : isoDay(month.year, month.month, 1);
+  return defaultDateIn(monthDays(month), today);
 }
 
 /**

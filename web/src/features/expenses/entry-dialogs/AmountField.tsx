@@ -7,22 +7,32 @@ interface AmountFieldProps {
   onChange: (value: string) => void;
   errors: FieldErrors;
   label?: string;
+  /** The contract's field name, whose message shows under the field. */
+  name?: string;
+  required?: boolean;
+  /** A hint under the field while it has no message. */
+  hint?: string;
 }
 
-/** A positive amount in hryvnias; the phone shows the decimal keypad. */
+/** An amount in hryvnias; the phone shows the decimal keypad. */
 export function AmountField({
   value,
   onChange,
   errors,
   label = 'Сумма',
+  name = 'amount',
+  required = true,
+  hint,
 }: AmountFieldProps) {
+  const message = fieldMessage(errors, name);
   return (
     <TextField
       label={label}
-      required
+      required={required}
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      {...fieldMessage(errors, 'amount')}
+      error={message.error}
+      helperText={message.helperText ?? hint}
       slotProps={{
         htmlInput: {
           inputMode: 'decimal',

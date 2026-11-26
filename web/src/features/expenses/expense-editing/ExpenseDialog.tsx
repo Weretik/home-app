@@ -7,7 +7,6 @@ import {
   type PaymentMethod,
 } from '../data/expenses-api';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
-import type { Month } from '../data/month';
 import { useSaveExpense } from '../data/writes-api';
 import { AmountField } from '../entry-dialogs/AmountField';
 import { EntryDialog } from '../entry-dialogs/EntryDialog';
@@ -22,15 +21,16 @@ import {
 interface ExpenseDialogProps {
   /** The expense to change; undefined adds a new one. */
   item?: ExpenseItem;
-  month: Month;
+  /** The date a new expense starts with. */
+  newDate: string;
   onClose: () => void;
 }
 
 /** Adds or changes an expense. */
-export function ExpenseDialog({ item, month, onClose }: ExpenseDialogProps) {
+export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
   const categories = useExpenseCategories();
   const form = useEntryForm({
-    initial: expenseFormValues(item, month),
+    initial: expenseFormValues(item, newDate),
     validate: validateExpense,
     toBody: toExpenseRequest,
     edit: item && { id: item.id, version: item.version },

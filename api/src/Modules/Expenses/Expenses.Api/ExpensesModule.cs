@@ -1,3 +1,5 @@
+using Expenses.Api.Endpoints.Budget.Limits;
+using Expenses.Api.Endpoints.Budget.Overview;
 using Expenses.Api.Endpoints.Expenses;
 using Expenses.Api.Endpoints.Import;
 using Expenses.Api.Endpoints.Incomes;
@@ -45,6 +47,12 @@ public static class ExpensesModule
             .MapCreateSavingsMovement()
             .MapUpdateSavingsMovement()
             .MapDeleteSavingsMovement()
+            .MapGetBudget()
+            .MapGetMonthSummary()
+            .MapUpdateBudgetSettings()
+            .MapCreateSpendingLimit()
+            .MapUpdateSpendingLimit()
+            .MapDeleteSpendingLimit()
             .MapImportSheet();
         return endpoints;
     }

@@ -82,8 +82,18 @@ Computer (md, 900px and wider)              Phone (below md)
 
 - A section with several pages shows them as tabs under the title (scrollable on a phone), one tab per built page,
   never a tab for a page that is not built ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)).
+- A section's settings are a page of their own, reached from a gear icon button («Настройки», tooltip and
+  `aria-label`) at the end of the tab row, not a tab; it is tinted while the settings are open, and the settings page
+  has no month picker.
+- A goal is shown as a ring: a determinate `CircularProgress` in `primary` with round ends over a full track tinted
+  `0.12`, the whole percent in the middle, and «Сейчас», «План», «Осталось» beside it (or «План выполнен!» with a check
+  icon). Without a goal the card says so and links to the settings.
 - A page that shows one month has a month picker next to the title: arrows with `aria-label` and tooltips around
   «Октябрь 2026», and «К текущему» when another month is open. The month and the filters are in the URL.
+- A list that can show any days (Расходы) has a «Период» button beside its filters. On, it becomes two date fields
+  «с» and «по» (the open month to start) with «К месяцу» to go back; the month picker hides meanwhile. A wrong period
+  says why under the fields («Выберите обе даты», «Дата «с» позже даты «по»», «Период не длиннее 366 дней») and the
+  list loads nothing.
 - Amounts are formatted as hryvnias with two decimals («95 024,00 ₴»), right-aligned and in tabular figures.
 - A month list starts with its filters and the add button («Добавить расход») on one row, then the list in a card.
   Below `md` the list is compact (title, a caption line, the amount on the right); from `md` it is a small table.
@@ -110,14 +120,32 @@ Computer (md, 900px and wider)              Phone (below md)
 - Only signed amounts use these colours (`savings-page/SignedAmount.tsx`); plain sums and balances stay
   `text.primary`. This is the one place `error` marks a direction instead of a problem.
 
+## Summaries on the home page
+
+- The home page shows one section's summary at a time. A `ToggleButtonGroup` («Сводка») under the title switches them;
+  it scrolls sideways on a phone instead of wrapping. Sections without a summary yet stay in it, disabled, with a
+  small «скоро» ([ADR 0008](decisions/0008-home-page-as-a-registry-of-section-summaries.md)).
+- A month summary has the month picker on the left and a link to the section's month («Открыть расходы») on the right.
+- A month with nothing in it still shows its figure cards (the jar's balance is real) and replaces the rest with the
+  empty state «За этот месяц записей нет».
+- Limits show how full they are with a thin bar in status colours: `success` under 80 %, `warning` from 80 % to
+  100 %, `error` past 100 %. A negative «Остаток» is `error`. «Можно в день» is «—» when the period is not running.
+  The last row «ИТОГО» is bold. Below `md` the table becomes a list: the name and the percent, the bar, then «X из
+  Y · остаток Z · в день W».
+- Amounts in summary tables and lists have kopecks like every list; only the figure cards round them.
+
 ## Cards
 
 - **Card**: `background.paper`, radius 16px, 1px `divider` border, a soft shadow in the light scheme and none in the
   dark one (set in the theme; do not override per card).
-- **Highlight card** (`features/home/HighlightCard.tsx` pattern): the top row of a dashboard, at most two to four.
-  A gradient in `primary` or `secondary`, two soft white circles in the top right corner, an icon tile, a big value,
-  a title and a caption. The whole card is a link to its section. In the dark scheme it uses the deep shade so white
-  text stays readable.
+- **Highlight card**: a gradient card in `primary` or `secondary` with two soft white circles in the top right corner,
+  an icon tile, a big value, a title and a caption; the whole card is a link. Kept as a pattern for a dashboard's top
+  row (at most two to four); no screen uses it now. In the dark scheme it uses the deep shade so white text stays
+  readable.
+- **Figure card** (`home/expenses-summary/view/KpiCards.tsx`): the top row of a summary, one to four in a row (one
+  column on a phone, two from `sm`, four from `lg`). An emoji and a title in `text.secondary` (the emoji is
+  `aria-hidden`), the rounded amount as `h4` («95 024 ₴», no kopecks), one caption line, an optional thin progress bar.
+  The value is `text.primary`, except a result that is good or bad: `success` from zero up, `error` below.
 - **Section card**: a light card with a tinted icon tile, a title, one line of caption and a chevron; a link.
 - Empty and loading states are designed, not blank: say what will appear and how to add the first item.
 

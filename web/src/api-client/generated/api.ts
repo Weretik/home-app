@@ -28,7 +28,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lists one month's expenses, newest first, with the month's total. */
+        /** Lists the expenses of one month (year, month) or of a period (from, to, both included), newest first, with their total. */
         get: operations["listExpenses"];
         put?: never;
         /** Adds an expense. Send a new Idempotency-Key per entry; a repeat returns the first id. */
@@ -163,10 +163,120 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/expenses/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The budget settings (monthly limit, savings goal) and every spending limit, in order. */
+        get: operations["getBudget"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One month at a glance: incomes, expenses, the month's result, the savings jar, limits and top categories. */
+        get: operations["getMonthSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/budget/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the monthly limit on all expenses and the savings goal. Send the budget version in If-Match. */
+        put: operations["updateBudgetSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/budget/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a spending limit at the end of the list. Send a new Idempotency-Key per limit. */
+        post: operations["createSpendingLimit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/budget/limits/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a spending limit. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateSpendingLimit"];
+        post?: never;
+        /** Deletes a spending limit for good; its expenses stay. */
+        delete: operations["deleteSpendingLimit"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        BudgetSettingsRequest: {
+            /** Format: double */
+            monthlyLimit: number;
+            /** Format: double */
+            savingsGoal: number;
+        };
+        /** @description The monthly limit on all expenses (0 = none), the savings goal (0 = none) and the category limits. */
+        BudgetView: {
+            /** Format: uint32 */
+            version: number;
+            /** Format: double */
+            monthlyLimit: number;
+            /** Format: double */
+            savingsGoal: number;
+            limits: components["schemas"]["SpendingLimitItem"][];
+        };
+        /** @description How much went to one category in the month. */
+        CategoryAmount: {
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            /** Format: double */
+            amount: number;
+        };
         /** @description A category as lists and pickers show it. */
         CategoryItem: {
             /** Format: uuid */
@@ -197,7 +307,7 @@ export interface components {
             paymentMethod: components["schemas"]["PaymentMethod"];
             comment: null | string;
         };
-        /** @description One page of a month's expenses, plus the sum of every expense that matches the filter (not just this page). */
+        /** @description One page of a month's or a period's expenses, plus the sum of every expense that matches the filter (not just this page). */
         ExpenseList: {
             items: components["schemas"]["ExpenseItem"][];
             /** Format: int32 */
@@ -267,11 +377,106 @@ export interface components {
             comment: null | string;
         };
         /**
+         * @description The stretch of time a spending limit covers: a calendar month or a calendar quarter.
+         * @enum {unknown}
+         */
+        LimitPeriod: "Month" | "Quarter";
+        /** @description A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month). */
+        LimitUsage: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            period: components["schemas"]["LimitPeriod"];
+            /**
+             * Format: date
+             * @description The first day of the limit's period.
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description The last day of the limit's period.
+             */
+            to: string;
+            /** Format: double */
+            amount: number;
+            /** Format: double */
+            spent: number;
+            /**
+             * Format: double
+             * @description The limit minus what was spent; negative when it is overspent.
+             */
+            left: number;
+            /**
+             * Format: int32
+             * @description Spent as a share of the limit, in percent, rounded.
+             */
+            percent: number;
+            /**
+             * Format: double
+             * @description What may still be spent per day until the period ends, or null when the period is not running now.
+             */
+            perDay: null | number;
+        };
+        /**
+         * @description One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they
+         *     belong to, the month's result after the savings jar, the jar itself, the spending limits and the top categories.
+         */
+        MonthSummary: {
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            /** Format: double */
+            incomes: number;
+            incomesByPerson: components["schemas"]["PersonAmount"][];
+            /** Format: double */
+            expenses: number;
+            expensesByPayer: components["schemas"]["PayerAmount"][];
+            /**
+             * Format: double
+             * @description The limit on all expenses of a month; 0 means none.
+             */
+            monthlyLimit: number;
+            /**
+             * Format: int32
+             * @description Days left in the month counting today, or null when the month is not the current one.
+             */
+            daysLeft: null | number;
+            /**
+             * Format: double
+             * @description Incomes minus expenses minus what was put into the jar (plus what was taken out).
+             */
+            result: number;
+            /**
+             * Format: double
+             * @description Put into the jar minus taken out during the month.
+             */
+            savingsNet: number;
+            /**
+             * Format: double
+             * @description What the jar held at the end of the month.
+             */
+            savingsBalance: number;
+            /**
+             * Format: double
+             * @description How much the jar should hold; 0 means no goal.
+             */
+            savingsGoal: number;
+            limits: components["schemas"]["LimitUsage"][];
+            topCategories: components["schemas"]["CategoryAmount"][];
+        };
+        /**
          * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
          *     shared spending such as groceries.
          * @enum {unknown}
          */
         Payer: "Vitaliy" | "Maria" | "Shared";
+        /** @description How much one payer (Виталий, Мария or the shared budget) spent in the month. */
+        PayerAmount: {
+            payer: components["schemas"]["Payer"];
+            /** Format: double */
+            amount: number;
+        };
         /**
          * @description How an expense was paid (the sheet's «Оплата» column).
          * @enum {unknown}
@@ -282,6 +487,12 @@ export interface components {
          * @enum {unknown}
          */
         Person: "Vitaliy" | "Maria";
+        /** @description How much one person earned in the month. */
+        PersonAmount: {
+            person: components["schemas"]["Person"];
+            /** Format: double */
+            amount: number;
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -359,6 +570,25 @@ export interface components {
             currentBalance: number;
             months: components["schemas"]["SavingsMonthSummary"][];
         };
+        /** @description One spending limit with the categories it counts. */
+        SpendingLimitItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uint32 */
+            version: number;
+            name: string;
+            period: components["schemas"]["LimitPeriod"];
+            /** Format: double */
+            amount: number;
+            categoryIds: string[];
+        };
+        SpendingLimitRequest: {
+            name: string;
+            period: components["schemas"]["LimitPeriod"];
+            /** Format: double */
+            amount: number;
+            categoryIds: string[];
+        };
         /** @description The overall status, the build version with its commit, the environment, and the status of each check. */
         SystemStatus: {
             status: components["schemas"]["HealthStatus"];
@@ -399,9 +629,11 @@ export interface operations {
     };
     listExpenses: {
         parameters: {
-            query: {
-                year: number;
-                month: number;
+            query?: {
+                year?: number;
+                month?: number;
+                from?: string;
+                to?: string;
                 categoryId?: string;
                 payer?: components["schemas"]["Payer"];
                 page?: number;
@@ -991,6 +1223,289 @@ export interface operations {
         };
     };
     deleteSavingsMovement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getBudget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetView"];
+                };
+            };
+        };
+    };
+    getMonthSummary: {
+        parameters: {
+            query: {
+                year: number;
+                month: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    updateBudgetSettings: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BudgetSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    createSpendingLimit: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpendingLimitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateSpendingLimit: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpendingLimitRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteSpendingLimit: {
         parameters: {
             query?: never;
             header?: never;

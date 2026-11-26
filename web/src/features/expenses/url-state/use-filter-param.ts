@@ -29,16 +29,16 @@ export function useFilterParam<T extends string>(
   return [value, setValue];
 }
 
-/** Removes every filter of the page and keeps the month (`year`, `month`). */
+/** Removes every filter of the page and keeps the month (`year`, `month`) and the period (`from`, `to`). */
 export function useClearFilters(): () => void {
   const [, setParams] = useSearchParams();
   return () =>
     setParams(
       (current) => {
         const kept = new URLSearchParams();
-        for (const name of ['year', 'month']) {
+        for (const name of ['year', 'month', 'from', 'to']) {
           const value = current.get(name);
-          if (value) kept.set(name, value);
+          if (value !== null) kept.set(name, value);
         }
         return kept;
       },

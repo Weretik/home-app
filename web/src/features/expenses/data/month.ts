@@ -34,6 +34,19 @@ export function parseMonth(
   return valid ? { year: y, month: m } : fallback;
 }
 
+/** A day as the API writes it: «2026-10-01». */
+export const isoDay = (year: number, month: number, day: number) =>
+  `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+/** The first and last day of a month, both as «YYYY-MM-DD». */
+export function monthDays({ year, month }: Month): {
+  from: string;
+  to: string;
+} {
+  const last = new Date(year, month, 0).getDate();
+  return { from: isoDay(year, month, 1), to: isoDay(year, month, last) };
+}
+
 /** «Октябрь 2026». */
 export function formatMonth({ year, month }: Month): string {
   const name = monthName.format(new Date(year, month - 1, 1));

@@ -24,7 +24,7 @@ src/
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/       the API client instance (VITE_API_URL) and the query client
   features/
-    home/         the dashboard and the placeholder for sections not built yet
+    home/         Главная: the section summaries and their switcher, the placeholder for sections not built yet
     status/       API and database status page
     expenses/     the Expenses section (below)
     <area>/       one folder per backend module: shopping, todos, gifts
@@ -35,16 +35,42 @@ When a feature grows past six files it splits by meaning (`list/`, `editor/`, `d
 
 ## Routes
 
-| Path                            | Page                                                                                 | Feature                 |
-| ------------------------------- | ------------------------------------------------------------------------------------ | ----------------------- |
-| `/`                             | Главная, the dashboard                                                               | `home`                  |
-| `/expenses`                     | Расходы: the month's expenses, category and «Кто» filters, add / edit / delete       | `expenses/expense-list` |
-| `/expenses/incomes`             | Доходы: the month's incomes, «Кто» filter, add / edit / delete                       | `expenses/income-list`  |
-| `/expenses/savings`             | Копилка: the balance now, the month's movements with add / edit / delete, the months | `expenses/savings-page` |
-| `/shopping`, `/todos`, `/gifts` | «Раздел скоро появится» placeholder                                                  | `home/ComingSoonPage`   |
-| `/status`                       | Состояние: API and database status                                                   | `status`                |
+| Path                            | Page                                                                                                   | Feature                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `/`                             | Главная, the dashboard                                                                                 | `home`                   |
+| `/expenses`                     | Расходы: the month's (or a period's) expenses, category and «Кто» filters, add / edit / delete         | `expenses/expense-list`  |
+| `/expenses/incomes`             | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                         | `expenses/income-list`   |
+| `/expenses/savings`             | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months | `expenses/savings-page`  |
+| `/expenses/settings`            | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                    | `expenses/settings-page` |
+| `/shopping`, `/todos`, `/gifts` | «Раздел скоро появится» placeholder                                                                    | `home/ComingSoonPage`    |
+| `/status`                       | Состояние: API and database status                                                                     | `status`                 |
 
 Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
+
+## Home (`src/features/home`)
+
+The home page shows one section's summary at a time, picked with a switcher
+([ADR 0008](decisions/0008-home-page-as-a-registry-of-section-summaries.md)).
+
+```
+home/
+  page/              HomePage (title, switcher, the open summary, the «Состояние» link for phones), the summary
+                     registry (summary-sections.ts), ?s= in the URL, the «Раздел скоро появится» placeholder
+  expenses-summary/
+    data/            summary-api.ts (GET /api/expenses/summary), the month and ?year=&month=, amounts, labels,
+                     the «Лимиты» rows with «ИТОГО»
+    view/            ExpensesSummary (month picker, states), the four figure cards, «Лимиты» (phone list, computer
+                     table), «Кто сколько потратил» and «Топ-5 категорий»
+```
+
+- `summary-sections.ts` lists every section with its summary component, or `null` while it has none: the switcher
+  shows those disabled, marked «скоро». A new summary is its own folder here plus one line in the list. A missing or
+  unknown `?s=` opens the first built summary.
+- «Расходы» is the old sheet's «Сводка» without its plan block: Доходы (by person), Расходы (against the monthly
+  limit), Итог месяца (after the jar), Копилка (against the goal); the limits, quarterly ones marked «(квартал)», with
+  «ИТОГО» = all expenses against the monthly limit and what may still be spent per day; who spent what; the top five
+  categories. Its query key is `['expenses', 'summary', month]`. «Открыть расходы» opens the same month.
+- The summary keeps its own labels and formatters: features never import each other.
 
 ## Expenses (`src/features/expenses`)
 
@@ -55,8 +81,9 @@ expenses/
   data/             expenses-api.ts and savings-api.ts (React Query reads), writes-api.ts (save / delete mutations,
                     the Idempotency-Key hook, Russian text of a failed write), formatting (signed amounts too),
                     Russian enum labels, months
-  section/          ExpensesSection (title, month picker, tabs, <Outlet />), the list of pages
-  url-state/        the month (?year=&month=) and filters (?category=&payer=, ?person=) in the URL
+  section/          ExpensesSection (title, month picker, tabs and the «Настройки» gear, <Outlet />), the list of pages
+  url-state/        the month (?year=&month=), the Расходы period (?from=&to=, its checks) and filters
+                    (?category=&payer=, ?person=) in the URL
   month-view/       parts every month page uses: filter select, loading/empty/error, «Показать ещё»
   entry-editing/    form logic shared by every entry: field checks, default date, the open-dialog state, useEntryForm
   entry-dialogs/    the add / edit dialog frame, the delete confirmation, the row «⋮» menu, amount and person fields
@@ -66,9 +93,17 @@ expenses/
   income-editing/   the income form and its dialogs
   savings-page/     «Копилка» page: balance card, movements (phone list, computer table), «По месяцам», signed amounts
   savings-editing/  the savings form (direction + positive amount → signed request) and its dialogs
+  savings-goal/     «План копилки» card on Копилка: percent ring, now / goal / left, or a link to set a goal
+  budget-data/      budget-api.ts (the budget read) and budget-writes-api.ts (settings and spending limit writes)
+  settings-page/    «Настройки» page: the monthly limit and savings goal form, the spending limits list
+  limit-editing/    the spending limit form (name, month / quarter, amount, categories) and its dialogs
 ```
 
 - The month defaults to the current one; the arrows change `?year=&month=`, so a link opens the same month.
+- «Расходы» can show any days instead of the month: «Период» adds `?from=&to=` (the open month's first and last day to
+  start), hides the month picker and sends `from`/`to` instead of `year`/`month`; the filters work with it and «К
+  месяцу» drops it. Both dates set, «с» not after «по» and at most 366 days are checked before anything loads.
+  Switching tabs keeps only the month, so Доходы and Копилка stay month-based.
 - Lists load 50 rows a page with `useInfiniteQuery` and «Показать ещё». The Расходы and Доходы pages show no month
   total; an overall summary will be a page of its own.
 - Expenses, incomes and savings movements are added, changed and deleted in dialogs
@@ -76,6 +111,11 @@ expenses/
   `Idempotency-Key` (one per opened form, kept while the same data is retried), an edit sends the row's `version` in
   `If-Match`, and a delete asks first. A success invalidates the kind's queries (`['expenses', 'list']`,
   `['expenses', 'incomes']`, `['expenses', 'savings']`); a 404 or `expenses.changed_meanwhile` reloads them too.
+- «Настройки» (`/expenses/settings`, no month picker, not a tab) reads `/api/expenses/budget`. The monthly limit and
+  the savings goal are one form saved with the budget's `version` in `If-Match` (empty = 0 = none); spending limits
+  are added (`Idempotency-Key`), changed (`If-Match`) and deleted in dialogs like entries. Every budget write
+  invalidates `['expenses', 'budget']`.
+- «Копилка» also shows «План копилки»: the balance today against the budget's savings goal.
 - «Копилка» shows the jar's balance today (`/api/expenses/savings/months`), the open month's movements with its
   start / in / out / end figures (`/api/expenses/savings`), and every month; a month in that list opens it.
 - Below `md` a list is a compact MUI `List`; from `md` it is a `Table` (`useMediaQuery`).
