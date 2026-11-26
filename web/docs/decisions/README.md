@@ -14,6 +14,7 @@ Next.js storefront.
 | 0006 | [Section pages as tabs, with the month and filters in the URL](0006-section-pages-as-tabs-with-state-in-the-url.md)                           |
 | 0007 | [Editing in dialogs, with an Idempotency-Key, If-Match versions and signed colours](0007-editing-in-dialogs-with-idempotency-and-versions.md) |
 | 0008 | [The home page as a registry of per-section summaries](0008-home-page-as-a-registry-of-section-summaries.md)                                  |
+| 0012 | [A live shared list: optimistic ticks, polling and «кто я» per device](0012-live-shared-list-with-optimistic-ticks-and-polling.md)            |
 
 ## Decisions that must have a record
 

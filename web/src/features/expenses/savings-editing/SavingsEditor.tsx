@@ -2,7 +2,7 @@ import { formatDay, formatSignedAmount } from '../data/formatting';
 import { personLabels } from '../data/labels';
 import type { Month } from '../data/month';
 import type { SavingsMovementItem } from '../data/savings-api';
-import { useDeleteSavingsMovement } from '../data/writes-api';
+import { useDeleteSavingsMovement } from '../data/savings-api';
 import { DeleteEntryDialog } from '../entry-dialogs/DeleteEntryDialog';
 import type { EntryEditor } from '../entry-editing/use-entry-editor';
 import { SavingsDialog } from './SavingsDialog';

@@ -11,6 +11,8 @@
   they do (`format-amount.ts`). **(checked)**
 - A feature never imports another feature. **(checked)**
 - One component or one responsibility per file; component files are PascalCase, the rest kebab-case.
+- **A component file (`.tsx`) has at most 150 lines, any other module (`.ts`) at most 200** (tests and generated code
+  are exempt). A longer file splits by responsibility. **(checked)**
 
 ## API
 

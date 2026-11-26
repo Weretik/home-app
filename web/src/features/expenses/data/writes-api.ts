@@ -11,11 +11,9 @@ import {
   type Schema,
 } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { savingsKey } from './savings-api';
 
 export type ExpenseRequest = Schema<'ExpenseRequest'>;
 export type IncomeRequest = Schema<'IncomeRequest'>;
-export type SavingsMovementRequest = Schema<'SavingsMovementRequest'>;
 
 /** The entry an edit starts from: its id and the version the list showed (sent in If-Match). */
 export interface EditedEntry {
@@ -79,38 +77,20 @@ const incomeWriter: Writer<IncomeRequest> = {
     ),
 };
 
-const savingsWriter: Writer<SavingsMovementRequest> = {
-  key: savingsKey,
-  create: (body, key) =>
-    apiCall(
-      api.POST('/api/expenses/savings', {
-        params: { header: { 'Idempotency-Key': key } },
-        body,
-      }),
-    ),
-  update: (entry, body) =>
-    apiCall(
-      api.PUT('/api/expenses/savings/{id}', { params: ifMatch(entry), body }),
-    ),
-  remove: (id) =>
-    apiCall(
-      api.DELETE('/api/expenses/savings/{id}', { params: { path: { id } } }),
-    ),
-};
-
 /** The entry is no longer what the list shows (changed or deleted elsewhere), so the list must reload. */
 export const isStale = (error: Error) =>
   error instanceof ApiError &&
   (error.status === 404 || error.code === 'expenses.changed_meanwhile');
 
-/** Adds or changes an entry of `writer`'s kind; refreshes its queries, also when the entry turned out stale. */
-export function useSave<Body>(writer: Writer<Body>) {
+/** A write of `key`'s kind that refreshes its queries on success, and on failure when the entry turned out stale. */
+function useWrite<Input>(
+  key: QueryKey,
+  mutationFn: (input: Input) => Promise<unknown>,
+) {
   const queryClient = useQueryClient();
-  const refresh = () =>
-    void queryClient.invalidateQueries({ queryKey: writer.key });
+  const refresh = () => void queryClient.invalidateQueries({ queryKey: key });
   return useMutation({
-    mutationFn: ({ body, edit, idempotencyKey }: SaveInput<Body>) =>
-      edit ? writer.update(edit, body) : writer.create(body, idempotencyKey),
+    mutationFn,
     onSuccess: refresh,
     onError: (error) => {
       if (isStale(error)) refresh();
@@ -118,19 +98,15 @@ export function useSave<Body>(writer: Writer<Body>) {
   });
 }
 
-/** Deletes an entry of `writer`'s kind; refreshes its queries. */
-export function useRemove(writer: Writer<unknown>) {
-  const queryClient = useQueryClient();
-  const refresh = () =>
-    void queryClient.invalidateQueries({ queryKey: writer.key });
-  return useMutation({
-    mutationFn: (id: string) => writer.remove(id),
-    onSuccess: refresh,
-    onError: (error) => {
-      if (isStale(error)) refresh();
-    },
-  });
-}
+/** Adds or changes an entry of `writer`'s kind. */
+export const useSave = <Body>(writer: Writer<Body>) =>
+  useWrite(writer.key, ({ body, edit, idempotencyKey }: SaveInput<Body>) =>
+    edit ? writer.update(edit, body) : writer.create(body, idempotencyKey),
+  );
+
+/** Deletes an entry of `writer`'s kind. */
+export const useRemove = (writer: Writer<unknown>) =>
+  useWrite(writer.key, (id: string) => writer.remove(id));
 
 /** Adds or changes an expense; refreshes the expense lists. */
 export const useSaveExpense = () => useSave(expenseWriter);
@@ -139,11 +115,6 @@ export const useDeleteExpense = () =>
 /** Adds or changes an income; refreshes the income lists. */
 export const useSaveIncome = () => useSave(incomeWriter);
 export const useDeleteIncome = () => useRemove(incomeWriter as Writer<unknown>);
-/** Adds or changes a savings movement; refreshes the movements and the months. */
-export const useSaveSavingsMovement = () => useSave(savingsWriter);
-export const useDeleteSavingsMovement = () =>
-  useRemove(savingsWriter as Writer<unknown>);
-
 /**
  * The Idempotency-Key of one opened add form (docs/rules.md, "Writes"): the same key while the same data is retried,
  * a new one when the data changes. A form that is opened again mounts again and starts with a new key.
