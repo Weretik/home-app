@@ -161,7 +161,7 @@ namespace Todos.Infrastructure.Persistence.Migrations
                 DO $$
                 BEGIN
                     CREATE EXTENSION IF NOT EXISTS pg_trgm;
-                EXCEPTION WHEN insufficient_privilege OR feature_not_supported OR undefined_file THEN
+                EXCEPTION WHEN OTHERS THEN
                     RAISE NOTICE 'pg_trgm is not available; todos.tasks gets no trigram index.';
                 END $$;
                 """);
