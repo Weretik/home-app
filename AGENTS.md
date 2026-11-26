@@ -7,8 +7,9 @@ rules and commands; read only the sources the current task needs. This file appl
 
 A private site for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping
 list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses, incomes and the «Копилка» savings jar,
-imported from the old Google Sheet and now added, edited and deleted on the site, plus spending limits, the savings
-goal and a computed month summary that replace the sheet's «Бюджет» and «Сводка» tabs, see
+imported from the old Google Sheet and now added, edited and deleted on the site, plus spending limits with the sheet's
+carry-over of overspend, expenses marked outside the limits, planned expenses for a month forecast, the savings goal
+and a computed month summary that replace the sheet's «Бюджет» and «Сводка» tabs, see
 [api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet, writes are open and rate
 limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
@@ -19,10 +20,10 @@ The repository follows [fullstack-modular-template](https://github.com/Weretik/f
 not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
-  [C4](api/docs/architecture/c4.md), [modules](api/docs/modules/expenses.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
+  [C4](api/docs/architecture/c4.md), [modules](api/docs/modules/expenses.md), [specs](api/docs/sdd/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
-  [design rules](web/docs/design.md) (every screen follows them), [decisions](web/docs/decisions/README.md).
+  [design rules](web/docs/design.md) (every screen follows them), [specs](web/docs/specs/README.md), [decisions](web/docs/decisions/README.md).
 - Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database), [deployment](docs/deploy.md).
 
 A new lasting decision (a module, an external system, a way of running work, hosting, authentication, a state or
@@ -47,6 +48,18 @@ transport approach) gets an ADR in the same change, in the half it belongs to, p
 A small fix that restores documented behavior needs no SDD, file map or audit: fix it, run the focused test, describe
 it briefly.
 
+## Feature delivery order (mandatory)
+
+Every feature, above all a new one, goes in this order ([ADR 0004](docs/decisions/0004-sdd-first-feature-delivery.md)):
+
+1. **SDD first:** backend and frontend specifications from the templates in
+   [Weretik/obsidian](https://github.com/Weretik/obsidian) (`Templates/backend-sdd`, `Templates/frontend-sdd`), stored
+   in [api/docs/sdd/specs](api/docs/sdd/specs/README.md) and [web/docs/specs](web/docs/specs/README.md); ADRs for every new lasting decision in the same change.
+2. **Implementation** from the SDD, with tests and docs in the same change.
+3. **Architecture audit** (`backend-code-audit`, `frontend-code-audit`, obsidian `Architecture/Checklists`): modules,
+   layers, folders and files, component split and size, contract, data, idempotency. Fix or record every finding.
+4. **Merge** only after the audit and green CI, on the user's explicit approval.
+
 ## Task routing
 
 | Task | Skill or process | Project rules |
@@ -70,7 +83,9 @@ from the code. Merge order for a contract change: API, then regenerate the web c
 
 **Folders:** at most 6 code files per folder; the seventh splits it by meaning into named subfolders of at least two
 files. No empty folders, wrapper folders or one-file folders; only generated code (`Migrations/`, `generated/`) is
-exempt. Tested in both halves.
+exempt. Tested in both halves. In `web/`, a component (`.tsx`) has at most 150 lines and any other module (`.ts`) at
+most 200 (tests and generated code exempt); a longer file is split by responsibility (checked by
+`npm run architecture:structure`).
 
 **Modules:** a module uses another one only through its `Contracts`; `Domain` knows no EF Core or ASP.NET Core; one
 schema per module, no foreign keys across schemas. **Web features** never import each other and reach the API only
