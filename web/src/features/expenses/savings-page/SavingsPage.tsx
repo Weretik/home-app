@@ -5,6 +5,7 @@ import Card from '@mui/material/Card';
 import type { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useBudget } from '../budget-data/budget-api';
 import {
   useSavingsMovements,
   useSavingsOverview,
@@ -14,17 +15,19 @@ import { useEntryEditor } from '../entry-editing/use-entry-editor';
 import { ListStatus } from '../month-view/ListStatus';
 import { LoadMoreButton } from '../month-view/LoadMoreButton';
 import { SavingsEditor } from '../savings-editing/SavingsEditor';
+import { GoalCard } from '../savings-goal/GoalCard';
 import { useMonthParam } from '../url-state/use-month-param';
 import { BalanceCard } from './BalanceCard';
 import { MovementList } from './MovementList';
 import { MovementTable } from './MovementTable';
 import { SavingsMonthsCard } from './SavingsMonthsCard';
 
-/** «Копилка»: what is in the jar now, the open month's movements with add / edit / delete, and every month's sums. */
+/** «Копилка»: what is in the jar now and how far to its goal, the open month's movements with add / edit / delete, and every month's sums. */
 export function SavingsPage() {
   const [month, setMonth] = useMonthParam();
   const movements = useSavingsMovements(month);
   const overview = useSavingsOverview();
+  const budget = useBudget();
   const editor = useEntryEditor<SavingsMovementItem>();
   const isComputer = useMediaQuery((theme: Theme) =>
     theme.breakpoints.up('md'),
@@ -33,13 +36,25 @@ export function SavingsPage() {
   const pages = movements.data?.pages ?? [];
   const items = pages.flatMap((page) => page.items);
   const first = pages[0];
+  const currentBalance = overview.data?.currentBalance ?? first?.currentBalance;
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <BalanceCard
-        currentBalance={overview.data?.currentBalance ?? first?.currentBalance}
-        month={first}
-      />
+      <Box
+        sx={{
+          display: 'grid',
+          gap: { xs: 2, md: 3 },
+          gridTemplateColumns: {
+            xs: 'minmax(0, 1fr)',
+            lg: 'minmax(0, 2fr) minmax(0, 1fr)',
+          },
+        }}
+      >
+        <BalanceCard currentBalance={currentBalance} month={first} />
+        {!budget.error && (
+          <GoalCard balance={currentBalance} goal={budget.data?.savingsGoal} />
+        )}
+      </Box>
       <Box
         sx={{
           display: 'grid',

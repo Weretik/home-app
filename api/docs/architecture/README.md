@@ -12,7 +12,7 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 
 | Module | Owns | Schema | Status |
 | --- | --- | --- | --- |
-| Expenses | Expenses, incomes, savings jar, categories, who paid; later limits, plan, payments | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
+| Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits and the month summary; later plan, payments | `expenses` | in place, see [expenses.md](../modules/expenses.md) |
 | Shopping | The shared shopping list | `shopping` | planned |
 | Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
 | Gifts | Gift wishlist | `gifts` | planned |

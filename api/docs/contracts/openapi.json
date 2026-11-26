@@ -31,13 +31,12 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "Lists one month's expenses, newest first, with the month's total.",
+        "summary": "Lists the expenses of one month (year, month) or of a period (from, to, both included), newest first, with their total.",
         "operationId": "listExpenses",
         "parameters": [
           {
             "name": "year",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -46,10 +45,25 @@
           {
             "name": "month",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           },
           {
@@ -918,10 +932,439 @@
           }
         }
       }
+    },
+    "/api/expenses/budget": {
+      "get": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "The budget settings (monthly limit, savings goal) and every spending limit, in order.",
+        "operationId": "getBudget",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/summary": {
+      "get": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "One month at a glance: incomes, expenses, the month's result, the savings jar, limits and top categories.",
+        "operationId": "getMonthSummary",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/budget/settings": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Sets the monthly limit on all expenses and the savings goal. Send the budget version in If-Match.",
+        "operationId": "updateBudgetSettings",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BudgetSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/budget/limits": {
+      "post": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Adds a spending limit at the end of the list. Send a new Idempotency-Key per limit.",
+        "operationId": "createSpendingLimit",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpendingLimitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expenses/budget/limits/{id}": {
+      "put": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Changes a spending limit. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "operationId": "updateSpendingLimit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpendingLimitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expenses"
+        ],
+        "summary": "Deletes a spending limit for good; its expenses stay.",
+        "operationId": "deleteSpendingLimit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "BudgetSettingsRequest": {
+        "required": [
+          "monthlyLimit",
+          "savingsGoal"
+        ],
+        "type": "object",
+        "properties": {
+          "monthlyLimit": {
+            "type": "number",
+            "format": "double"
+          },
+          "savingsGoal": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "BudgetView": {
+        "required": [
+          "version",
+          "monthlyLimit",
+          "savingsGoal",
+          "limits"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "monthlyLimit": {
+            "type": "number",
+            "format": "double"
+          },
+          "savingsGoal": {
+            "type": "number",
+            "format": "double"
+          },
+          "limits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpendingLimitItem"
+            }
+          }
+        },
+        "description": "The monthly limit on all expenses (0 = none), the savings goal (0 = none) and the category limits."
+      },
+      "CategoryAmount": {
+        "required": [
+          "categoryId",
+          "name",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "How much went to one category in the month."
+      },
       "CategoryItem": {
         "required": [
           "id",
@@ -1042,7 +1485,7 @@
             "format": "double"
           }
         },
-        "description": "One page of a month's expenses, plus the sum of every expense that matches the filter (not just this page)."
+        "description": "One page of a month's or a period's expenses, plus the sum of every expense that matches the filter (not just this page)."
       },
       "ExpenseRequest": {
         "required": [
@@ -1235,6 +1678,172 @@
           }
         }
       },
+      "LimitPeriod": {
+        "enum": [
+          "Month",
+          "Quarter"
+        ],
+        "description": "The stretch of time a spending limit covers: a calendar month or a calendar quarter."
+      },
+      "LimitUsage": {
+        "required": [
+          "id",
+          "name",
+          "period",
+          "from",
+          "to",
+          "amount",
+          "spent",
+          "left",
+          "percent",
+          "perDay"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/LimitPeriod"
+          },
+          "from": {
+            "type": "string",
+            "description": "The first day of the limit's period.",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "description": "The last day of the limit's period.",
+            "format": "date"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "spent": {
+            "type": "number",
+            "format": "double"
+          },
+          "left": {
+            "type": "number",
+            "description": "The limit minus what was spent; negative when it is overspent.",
+            "format": "double"
+          },
+          "percent": {
+            "type": "integer",
+            "description": "Spent as a share of the limit, in percent, rounded.",
+            "format": "int32"
+          },
+          "perDay": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "What may still be spent per day until the period ends, or null when the period is not running now.",
+            "format": "double"
+          }
+        },
+        "description": "A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month)."
+      },
+      "MonthSummary": {
+        "required": [
+          "year",
+          "month",
+          "incomes",
+          "incomesByPerson",
+          "expenses",
+          "expensesByPayer",
+          "monthlyLimit",
+          "daysLeft",
+          "result",
+          "savingsNet",
+          "savingsBalance",
+          "savingsGoal",
+          "limits",
+          "topCategories"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "incomes": {
+            "type": "number",
+            "format": "double"
+          },
+          "incomesByPerson": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonAmount"
+            }
+          },
+          "expenses": {
+            "type": "number",
+            "format": "double"
+          },
+          "expensesByPayer": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PayerAmount"
+            }
+          },
+          "monthlyLimit": {
+            "type": "number",
+            "description": "The limit on all expenses of a month; 0 means none.",
+            "format": "double"
+          },
+          "daysLeft": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Days left in the month counting today, or null when the month is not the current one.",
+            "format": "int32"
+          },
+          "result": {
+            "type": "number",
+            "description": "Incomes minus expenses minus what was put into the jar (plus what was taken out).",
+            "format": "double"
+          },
+          "savingsNet": {
+            "type": "number",
+            "description": "Put into the jar minus taken out during the month.",
+            "format": "double"
+          },
+          "savingsBalance": {
+            "type": "number",
+            "description": "What the jar held at the end of the month.",
+            "format": "double"
+          },
+          "savingsGoal": {
+            "type": "number",
+            "description": "How much the jar should hold; 0 means no goal.",
+            "format": "double"
+          },
+          "limits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LimitUsage"
+            }
+          },
+          "topCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryAmount"
+            }
+          }
+        },
+        "description": "One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they\nbelong to, the month's result after the savings jar, the jar itself, the spending limits and the top categories."
+      },
       "Payer": {
         "enum": [
           "Vitaliy",
@@ -1242,6 +1851,23 @@
           "Shared"
         ],
         "description": "Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for\nshared spending such as groceries."
+      },
+      "PayerAmount": {
+        "required": [
+          "payer",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "payer": {
+            "$ref": "#/components/schemas/Payer"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "How much one payer (Виталий, Мария or the shared budget) spent in the month."
       },
       "PaymentMethod": {
         "enum": [
@@ -1256,6 +1882,23 @@
           "Maria"
         ],
         "description": "One of the two people the household accounts belong to. Incomes always belong to one of them."
+      },
+      "PersonAmount": {
+        "required": [
+          "person",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "How much one person earned in the month."
       },
       "ProblemDetails": {
         "type": "object",
@@ -1478,6 +2121,73 @@
           }
         },
         "description": "The jar's balance today and its movement month by month, newest month first."
+      },
+      "SpendingLimitItem": {
+        "required": [
+          "id",
+          "version",
+          "name",
+          "period",
+          "amount",
+          "categoryIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/LimitPeriod"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "description": "One spending limit with the categories it counts."
+      },
+      "SpendingLimitRequest": {
+        "required": [
+          "name",
+          "period",
+          "amount",
+          "categoryIds"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/LimitPeriod"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
       },
       "SystemStatus": {
         "required": [

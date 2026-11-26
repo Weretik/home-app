@@ -5,10 +5,30 @@ namespace Expenses.Application.Features.Expenses.Queries.ListExpenses;
 
 internal sealed class ListExpensesValidator : AbstractValidator<ListExpensesQuery>
 {
+    public const int MaxPeriodDays = 366;
+
     public ListExpensesValidator()
     {
-        RuleFor(q => q.Year).InclusiveBetween(2000, 2100);
-        RuleFor(q => q.Month).InclusiveBetween(1, 12);
+        RuleFor(q => q)
+            .Must(q => (q.Year, q.Month, q.From, q.To) is (not null, not null, null, null) or (null, null, not null, not null))
+            .WithName("period")
+            .WithMessage("Send either year and month, or from and to.");
+
+        When(q => q.Year is not null || q.Month is not null, () =>
+        {
+            RuleFor(q => q.Year).NotNull().InclusiveBetween(2000, 2100);
+            RuleFor(q => q.Month).NotNull().InclusiveBetween(1, 12);
+        });
+
+        When(q => q.From is not null && q.To is not null, () =>
+        {
+            RuleFor(q => q.From).Must(d => d!.Value.Year is >= 2000 and <= 2100).WithMessage("The date must be in 2000–2100.");
+            RuleFor(q => q.To)
+                .Must((q, to) => to >= q.From).WithMessage("The period ends before it starts.")
+                .Must((q, to) => to!.Value.DayNumber - q.From!.Value.DayNumber < MaxPeriodDays)
+                .WithMessage($"A period is at most {MaxPeriodDays} days.");
+        });
+
         RuleFor(q => q.Payer).IsInEnum();
         RuleFor(q => q.Page).ValidPage();
         RuleFor(q => q.PageSize).ValidPageSize();

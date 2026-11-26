@@ -12,11 +12,26 @@ interface ListStatusProps {
   isEmpty: boolean;
   /** A filter is on, so an empty list offers to reset it. */
   isFiltered: boolean;
+  /** What the list shows, for the empty state's words: a month (default) or a period of days. */
+  scope?: 'month' | 'period';
   loadingLabel: string;
   onRetry: () => void;
   onResetFilters: () => void;
   children: ReactNode;
 }
+
+const emptyTexts = {
+  month: {
+    title: 'За этот месяц записей нет',
+    hint: 'Записи месяца появятся здесь. Стрелками выше можно открыть другой месяц.',
+    filteredHint: 'Сбросьте фильтр или выберите другой месяц.',
+  },
+  period: {
+    title: 'За этот период записей нет',
+    hint: 'Записи за выбранные дни появятся здесь. Даты можно изменить выше.',
+    filteredHint: 'Сбросьте фильтр или выберите другие даты.',
+  },
+} as const;
 
 /** Loading, error and empty states of a month list (docs/design.md: designed, not blank); the list otherwise. */
 export function ListStatus({
@@ -24,6 +39,7 @@ export function ListStatus({
   error,
   isEmpty,
   isFiltered,
+  scope = 'month',
   loadingLabel,
   onRetry,
   onResetFilters,
@@ -77,14 +93,10 @@ export function ListStatus({
           <EventNoteOutlinedIcon />
         </Box>
         <Typography variant="h6" component="p">
-          {isFiltered
-            ? 'С этим фильтром записей нет'
-            : 'За этот месяц записей нет'}
+          {isFiltered ? 'С этим фильтром записей нет' : emptyTexts[scope].title}
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
-          {isFiltered
-            ? 'Сбросьте фильтр или выберите другой месяц.'
-            : 'Записи месяца появятся здесь. Стрелками выше можно открыть другой месяц.'}
+          {isFiltered ? emptyTexts[scope].filteredHint : emptyTexts[scope].hint}
         </Typography>
         {isFiltered && (
           <Button onClick={onResetFilters} sx={{ mt: 1 }}>

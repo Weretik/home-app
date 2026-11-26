@@ -1,4 +1,10 @@
-import { currentMonth, formatMonth, parseMonth, shiftMonth } from './month';
+import {
+  currentMonth,
+  formatMonth,
+  monthDays,
+  parseMonth,
+  shiftMonth,
+} from './month';
 
 test('takes the current month from the date', () => {
   expect(currentMonth(new Date(2026, 10, 26))).toEqual({
@@ -37,4 +43,15 @@ test('reads a month from URL values and falls back on bad ones', () => {
 test('names the month in Russian with the year', () => {
   expect(formatMonth({ year: 2026, month: 10 })).toBe('Октябрь 2026');
   expect(formatMonth({ year: 2027, month: 1 })).toBe('Январь 2027');
+});
+
+test('gives the first and last day of a month', () => {
+  expect(monthDays({ year: 2026, month: 10 })).toEqual({
+    from: '2026-10-01',
+    to: '2026-10-31',
+  });
+  expect(monthDays({ year: 2024, month: 2 })).toEqual({
+    from: '2024-02-01',
+    to: '2024-02-29',
+  });
 });

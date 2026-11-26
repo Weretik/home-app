@@ -25,6 +25,8 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0016 | [Production migrations run as EF bundles in the deploy job](0016-migrations-as-bundles-in-deploy.md) |
 | 0017 | [Edits are guarded by a row version from PostgreSQL xmin](0017-row-version-via-xmin-for-edits.md) |
 | 0018 | [The savings jar is a log of signed movements](0018-savings-jar-as-signed-movements.md) |
+| 0019 | [Spending limits are named, overlapping category sets stored in the module](0019-spending-limits-as-category-sets.md) |
+| 0020 | [The month summary is computed on read, with no stored totals](0020-month-summary-computed-on-read.md) |
 
 ## Decisions that must have a record
 

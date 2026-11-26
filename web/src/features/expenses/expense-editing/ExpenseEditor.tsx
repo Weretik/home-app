@@ -1,6 +1,5 @@
 import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
-import type { Month } from '../data/month';
 import { useDeleteExpense } from '../data/writes-api';
 import { DeleteEntryDialog } from '../entry-dialogs/DeleteEntryDialog';
 import type { EntryEditor } from '../entry-editing/use-entry-editor';
@@ -9,10 +8,11 @@ import { ExpenseDialog } from './ExpenseDialog';
 /** The open dialog of the expense list: add, edit or delete. */
 export function ExpenseEditor({
   editor,
-  month,
+  newDate,
 }: {
   editor: EntryEditor<ExpenseItem>;
-  month: Month;
+  /** The date a new expense starts with. */
+  newDate: string;
 }) {
   const remove = useDeleteExpense();
   const { state, close } = editor;
@@ -30,7 +30,7 @@ export function ExpenseEditor({
   return (
     <ExpenseDialog
       item={state.mode === 'edit' ? state.item : undefined}
-      month={month}
+      newDate={newDate}
       onClose={close}
     />
   );

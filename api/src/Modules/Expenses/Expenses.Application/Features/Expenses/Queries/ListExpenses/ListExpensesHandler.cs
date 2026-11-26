@@ -9,8 +9,7 @@ public sealed class ListExpensesHandler(IExpensesDbContext db) : IQueryHandler<L
 {
     public async ValueTask<Result<ExpenseList>> Handle(ListExpensesQuery query, CancellationToken cancellationToken)
     {
-        var from = new DateOnly(query.Year, query.Month, 1);
-        var to = from.AddMonths(1);
+        var (from, to) = query.Period();
 
         var expenses = db.Expenses.AsNoTracking().Where(e => e.Date >= from && e.Date < to);
         if (query.CategoryId is { } categoryId)

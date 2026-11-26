@@ -19,3 +19,6 @@ export const sectionPath = '/expenses';
 
 export const pageUrl = (page: ExpensesPage) =>
   page.path ? `${sectionPath}/${page.path}` : sectionPath;
+
+/** «Настройки» of the section (limits, savings goal): reached from the gear next to the tabs, not a tab itself. */
+export const settingsPath = `${sectionPath}/settings`;

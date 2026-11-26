@@ -1,5 +1,4 @@
 import type { ExpenseItem, Payer, PaymentMethod } from '../data/expenses-api';
-import type { Month } from '../data/month';
 import type { ExpenseRequest } from '../data/writes-api';
 import {
   amountError,
@@ -7,7 +6,6 @@ import {
   commentError,
   commentValue,
   dateError,
-  defaultEntryDate,
   parseAmount,
   type FieldErrors,
 } from '../entry-editing/entry-fields';
@@ -22,10 +20,10 @@ export interface ExpenseFormValues {
   comment: string;
 }
 
-/** The form of an existing expense, or a new one: shared, by card, on the default date. */
+/** The form of an existing expense, or a new one: shared, by card, on `newDate` (the page's default date). */
 export function expenseFormValues(
   item: ExpenseItem | undefined,
-  month: Month,
+  newDate: string,
 ): ExpenseFormValues {
   return item
     ? {
@@ -37,7 +35,7 @@ export function expenseFormValues(
         comment: item.comment ?? '',
       }
     : {
-        date: defaultEntryDate(month),
+        date: newDate,
         categoryId: '',
         payer: 'Shared',
         amount: '',

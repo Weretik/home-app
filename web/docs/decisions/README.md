@@ -13,6 +13,7 @@ Next.js storefront.
 | 0005 | [The «Синий плащ» theme, light/dark/system, and a Berry-style dashboard shell](0005-blue-coat-theme-and-berry-style-shell.md)                 |
 | 0006 | [Section pages as tabs, with the month and filters in the URL](0006-section-pages-as-tabs-with-state-in-the-url.md)                           |
 | 0007 | [Editing in dialogs, with an Idempotency-Key, If-Match versions and signed colours](0007-editing-in-dialogs-with-idempotency-and-versions.md) |
+| 0008 | [The home page as a registry of per-section summaries](0008-home-page-as-a-registry-of-section-summaries.md)                                  |
 
 ## Decisions that must have a record
 

@@ -1,8 +1,14 @@
 import { ThemeProvider } from '@mui/material/styles';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
 import { createQueryClient } from '../../../platform/query-client';
@@ -47,6 +53,14 @@ const json = (body: unknown, status = 200) =>
     }),
   );
 
+/** Shows the current search string, so a test can read what the URL keeps. */
+function LocationProbe() {
+  return <output data-testid="location">{useLocation().search}</output>;
+}
+
+const urlParams = () =>
+  new URLSearchParams(screen.getByTestId('location').textContent ?? '');
+
 interface Sent {
   method: string;
   url: URL;
@@ -86,6 +100,7 @@ function renderSection(
               <Route index element={<ExpensesPage />} />
             </Route>
           </Routes>
+          <LocationProbe />
         </MemoryRouter>
       </QueryClientProvider>
     </ThemeProvider>,
@@ -427,4 +442,112 @@ test('deletes an expense only after the confirmation', async () => {
   expect(writes()).toHaveLength(1);
   expect(writes()[0]!.method).toBe('DELETE');
   expect(writes()[0]!.url.pathname).toBe(`/api/expenses/${item.id}`);
+});
+
+test('switches to a period of days and back to the month', async () => {
+  const { expenseUrls } = renderSection(() => json(page([expense()])));
+  await screen.findByRole('list', { name: 'Расходы за месяц' });
+
+  await userEvent.click(screen.getByRole('button', { name: 'Период' }));
+
+  const period = screen.getByRole('group', { name: 'Период' });
+  expect(within(period).getByLabelText('с')).toHaveValue('2026-10-01');
+  expect(within(period).getByLabelText('по')).toHaveValue('2026-10-31');
+  expect(
+    await screen.findByRole('list', { name: 'Расходы за период' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: 'Предыдущий месяц' }),
+  ).not.toBeInTheDocument();
+  const query = expenseUrls().at(-1)!.searchParams;
+  expect(query.get('from')).toBe('2026-10-01');
+  expect(query.get('to')).toBe('2026-10-31');
+  expect(query.has('year')).toBe(false);
+  expect(query.has('month')).toBe(false);
+  expect(urlParams().get('from')).toBe('2026-10-01');
+  expect(urlParams().get('to')).toBe('2026-10-31');
+
+  fireEvent.change(within(period).getByLabelText('по'), {
+    target: { value: '2026-10-10' },
+  });
+  await waitFor(() =>
+    expect(expenseUrls().at(-1)!.searchParams.get('to')).toBe('2026-10-10'),
+  );
+  expect(urlParams().get('to')).toBe('2026-10-10');
+
+  await userEvent.click(screen.getByRole('button', { name: 'К месяцу' }));
+
+  expect(
+    await screen.findByRole('list', { name: 'Расходы за месяц' }),
+  ).toBeInTheDocument();
+  expect(screen.getByText('Октябрь 2026')).toBeInTheDocument();
+  const back = expenseUrls().at(-1)!.searchParams;
+  expect(back.get('month')).toBe('10');
+  expect(back.has('from')).toBe(false);
+  expect(urlParams().has('from')).toBe(false);
+});
+
+test('opens the period from the URL together with the filters', async () => {
+  const { expenseUrls } = renderSection(
+    () => json(page([expense()])),
+    '/expenses?year=2026&month=10&from=2026-09-20&to=2026-10-05&payer=Maria',
+  );
+
+  await screen.findByRole('list', { name: 'Расходы за период' });
+  const period = screen.getByRole('group', { name: 'Период' });
+  expect(within(period).getByLabelText('с')).toHaveValue('2026-09-20');
+  expect(within(period).getByLabelText('по')).toHaveValue('2026-10-05');
+  const query = expenseUrls()[0]!.searchParams;
+  expect(query.get('from')).toBe('2026-09-20');
+  expect(query.get('to')).toBe('2026-10-05');
+  expect(query.get('payer')).toBe('Maria');
+  expect(query.has('year')).toBe(false);
+
+  await userEvent.click(screen.getByRole('combobox', { name: 'Категория' }));
+  await userEvent.click(await screen.findByRole('option', { name: 'Дом' }));
+  await waitFor(() =>
+    expect(expenseUrls().at(-1)!.searchParams.get('categoryId')).toBe('c-home'),
+  );
+  expect(expenseUrls().at(-1)!.searchParams.get('from')).toBe('2026-09-20');
+  expect(urlParams().get('from')).toBe('2026-09-20');
+});
+
+test('says why a period is wrong and loads nothing', async () => {
+  const { expenseUrls } = renderSection(
+    () => json(page([expense()])),
+    '/expenses?from=2026-10-12&to=2026-10-05',
+  );
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Дата «с» позже даты «по»',
+  );
+  const period = screen.getByRole('group', { name: 'Период' });
+  fireEvent.change(within(period).getByLabelText('с'), {
+    target: { value: '2025-01-01' },
+  });
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Период не длиннее 366 дней',
+  );
+  fireEvent.change(within(period).getByLabelText('с'), {
+    target: { value: '' },
+  });
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Выберите обе даты',
+  );
+  expect(expenseUrls()).toHaveLength(0);
+  expect(screen.queryByRole('list')).not.toBeInTheDocument();
+});
+
+test("starts a new expense on the period's first day when today is outside it", async () => {
+  renderSection(
+    () => json(page([expense()])),
+    '/expenses?from=2020-03-10&to=2020-03-20',
+  );
+  await screen.findByRole('list', { name: 'Расходы за период' });
+
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Добавить расход' }),
+  );
+  const dialog = await screen.findByRole('dialog', { name: 'Новый расход' });
+  expect(within(dialog).getByLabelText(/Дата/)).toHaveValue('2020-03-10');
 });

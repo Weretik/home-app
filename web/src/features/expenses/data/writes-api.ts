@@ -31,7 +31,8 @@ export interface SaveInput<Body> {
   idempotencyKey: string;
 }
 
-interface Writer<Body> {
+/** How one kind of entry is written; budget-data/ describes the spending limits with it too. */
+export interface Writer<Body> {
   /** The queries the entry shows in; a write refreshes them. */
   key: QueryKey;
   create: (body: Body, idempotencyKey: string) => Promise<unknown>;
@@ -39,7 +40,7 @@ interface Writer<Body> {
   remove: (id: string) => Promise<unknown>;
 }
 
-const ifMatch = (entry: EditedEntry) => ({
+export const ifMatch = (entry: EditedEntry) => ({
   path: { id: entry.id },
   header: { 'If-Match': String(entry.version) },
 });
@@ -98,11 +99,12 @@ const savingsWriter: Writer<SavingsMovementRequest> = {
 };
 
 /** The entry is no longer what the list shows (changed or deleted elsewhere), so the list must reload. */
-const isStale = (error: Error) =>
+export const isStale = (error: Error) =>
   error instanceof ApiError &&
   (error.status === 404 || error.code === 'expenses.changed_meanwhile');
 
-function useSave<Body>(writer: Writer<Body>) {
+/** Adds or changes an entry of `writer`'s kind; refreshes its queries, also when the entry turned out stale. */
+export function useSave<Body>(writer: Writer<Body>) {
   const queryClient = useQueryClient();
   const refresh = () =>
     void queryClient.invalidateQueries({ queryKey: writer.key });
@@ -116,7 +118,8 @@ function useSave<Body>(writer: Writer<Body>) {
   });
 }
 
-function useRemove(writer: Writer<unknown>) {
+/** Deletes an entry of `writer`'s kind; refreshes its queries. */
+export function useRemove(writer: Writer<unknown>) {
   const queryClient = useQueryClient();
   const refresh = () =>
     void queryClient.invalidateQueries({ queryKey: writer.key });

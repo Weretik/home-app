@@ -69,7 +69,7 @@ interface Sent {
   body: unknown;
 }
 
-function renderPage(items: unknown[]) {
+function renderPage(items: unknown[], savingsGoal = 100_000) {
   const sent: Sent[] = [];
   vi.stubGlobal('fetch', async (request: Request) => {
     const text = await request.text();
@@ -82,6 +82,13 @@ function renderPage(items: unknown[]) {
     sent.push(entry);
     if (entry.method === 'POST') return json({ id: crypto.randomUUID() }, 201);
     if (entry.method !== 'GET') return new Response(null, { status: 204 });
+    if (entry.url.pathname === '/api/expenses/budget')
+      return json({
+        version: 3,
+        monthlyLimit: 50_000,
+        savingsGoal,
+        limits: [],
+      });
     return entry.url.pathname === '/api/expenses/savings/months'
       ? json(overview)
       : json(movements(items));
@@ -210,4 +217,39 @@ test('edits a movement with If-Match and deletes after the confirmation', async 
   await waitFor(() =>
     expect(sent.some((s) => s.method === 'DELETE')).toBe(true),
   );
+});
+
+test('shows how far the jar is towards its goal', async () => {
+  renderPage([movement()]);
+
+  const card = await screen.findByRole('region', { name: 'План копилки' });
+  expect(
+    await within(card).findByRole('img', { name: 'Выполнено 12%' }),
+  ).toBeInTheDocument();
+  expect(within(card).getByText('Выполнено 12%')).toBeInTheDocument();
+  const figures = plain(card);
+  expect(figures).toContain('Сейчас12 345,67 ₴');
+  expect(figures).toContain('План100 000,00 ₴');
+  expect(figures).toContain('Осталось87 654,33 ₴');
+  expect(within(card).queryByText('План выполнен!')).not.toBeInTheDocument();
+});
+
+test('says the goal is reached', async () => {
+  renderPage([movement()], 10_000);
+
+  const card = await screen.findByRole('region', { name: 'План копилки' });
+  expect(await within(card).findByText('План выполнен!')).toBeInTheDocument();
+  expect(
+    within(card).getByRole('img', { name: 'Выполнено 123%' }),
+  ).toBeInTheDocument();
+  expect(within(card).queryByText('Осталось')).not.toBeInTheDocument();
+});
+
+test('offers to set a goal when there is none', async () => {
+  renderPage([movement()], 0);
+
+  const card = await screen.findByRole('region', { name: 'План копилки' });
+  expect(
+    await within(card).findByRole('link', { name: 'Задать план в настройках' }),
+  ).toHaveAttribute('href', '/expenses/settings');
 });
