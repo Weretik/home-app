@@ -10,7 +10,9 @@ list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (hea
 imported from the old Google Sheet and now added, edited and deleted on the site, plus spending limits with the sheet's
 carry-over of overspend, expenses marked outside the limits, planned expenses for a month forecast, the savings goal
 and a computed month summary that replace the sheet's «Бюджет» and «Сводка» tabs, see
-[api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet, writes are open and rate
+[api/docs/modules/expenses.md](api/docs/modules/expenses.md)), and the Gifts module (the gift wishlist for Masha,
+Vitaliy or both, with variants, an archive of what was given, gift categories, the personal details «нюансы» and a
+summary for the home page, see [api/docs/modules/gifts.md](api/docs/modules/gifts.md)); no authentication yet, writes are open and rate
 limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
 
@@ -20,7 +22,8 @@ The repository follows [fullstack-modular-template](https://github.com/Weretik/f
 not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
-  [C4](api/docs/architecture/c4.md), [modules](api/docs/modules/expenses.md), [specs](api/docs/sdd/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
+  [C4](api/docs/architecture/c4.md), modules ([Expenses](api/docs/modules/expenses.md), [Gifts](api/docs/modules/gifts.md)),
+  [specs](api/docs/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
   [design rules](web/docs/design.md) (every screen follows them), [specs](web/docs/specs/README.md), [decisions](web/docs/decisions/README.md).
@@ -54,7 +57,7 @@ Every feature, above all a new one, goes in this order ([ADR 0004](docs/decision
 
 1. **SDD first:** backend and frontend specifications from the templates in
    [Weretik/obsidian](https://github.com/Weretik/obsidian) (`Templates/backend-sdd`, `Templates/frontend-sdd`), stored
-   in [api/docs/sdd/specs](api/docs/sdd/specs/README.md) and [web/docs/specs](web/docs/specs/README.md); ADRs for every new lasting decision in the same change.
+   in [api/docs/specs](api/docs/specs/README.md) and [web/docs/specs](web/docs/specs/README.md); ADRs for every new lasting decision in the same change.
 2. **Implementation** from the SDD, with tests and docs in the same change.
 3. **Architecture audit** (`backend-code-audit`, `frontend-code-audit`, obsidian `Architecture/Checklists`): modules,
    layers, folders and files, component split and size, contract, data, idempotency. Fix or record every finding.

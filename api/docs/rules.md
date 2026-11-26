@@ -3,7 +3,7 @@
 Short, stable rules for every change. The ones marked **(tested)** are enforced by `tests/ArchitectureTests` (or
 `tests/IntegrationTests` where a database is needed) and fail CI when broken; the [enforcement table](#enforcement)
 names the test for each rule and the reason for each rule that is review only
-([ADR 0023](decisions/0023-every-rule-checked-by-a-test.md)).
+([ADR 0029](decisions/0029-every-rule-checked-by-a-test.md)).
 
 ## Structure
 
@@ -31,12 +31,15 @@ names the test for each rule and the reason for each rule that is review only
 - Commands change state and return little; queries never change state. **(tested: queries)**
 - The HTTP request record belongs to the endpoint and is mapped to the command; the command is not the request.
   **(tested)**
+- A record that travels over HTTP (request or response) has a name no other module uses: the OpenAPI document names a
+  schema by the type's simple name, so two modules' `CategoryItem` would silently become one schema. **(tested)**
 - Every input has a FluentValidation validator. Validators check shape (required, length, range); the domain checks
   business rules.
 - A command saves once (`SaveChangesAsync` a single time). There are no repositories that save on their own; the
   module's `DbContext` port is the unit of work. **(tested)**
 - Arithmetic that a handler does over what it read (sums, carry-over, forecasts) sits in a pure type beside the
-  handler, so it can be unit-tested with fixed input and a fixed day (`GetMonthSummary/SummaryFigures`).
+  handler, so it can be unit-tested with fixed input and a fixed day (`GetMonthSummary/SummaryFigures`,
+  `GetGiftsSummary/SummaryFigures`).
 
 ## Errors
 
@@ -56,7 +59,7 @@ names the test for each rule and the reason for each rule that is review only
 - An anonymous endpoint that writes, and every sign-in, opts into a rate limit policy
   (`RequireRateLimiting(RateLimitPolicies.PublicWrite)`) and lists `429` in its `Produces...`. **(tested)**
 - A create (`201`) takes an `Idempotency-Key` header and an edit (`PUT`) takes `If-Match` with the row version; an
-  exception is named in the test with its ADR (`recordPlannedExpense`, [ADR 0022](decisions/0022-planned-expenses-for-the-forecast.md)).
+  exception is named in the test with its ADR (`recordPlannedExpense`, [ADR 0028](decisions/0028-planned-expenses-for-the-forecast.md)).
   **(tested on the OpenAPI document)**
 - The OpenAPI document is generated on build and committed; CI fails when it differs from the code. Never edit it by
   hand. **(tested in CI: `git diff --exit-code`)**
@@ -101,7 +104,7 @@ names the test for each rule and the reason for each rule that is review only
 - Add an abstraction only when a third case needs it.
 - A lasting decision (a module, an external system, a way of running work, hosting) gets an ADR and a C4 update in
   the same change; every ADR has a status and is in the index. **(tested: status and index)**
-- A feature starts with its SDD in `docs/sdd/specs/` and ends with an audit; every SDD is in the specs index.
+- A feature starts with its SDD in `docs/specs/` and ends with an audit; every SDD is in the specs index.
   **(tested: index)**
 - Package versions only in `Directory.Packages.props`. **(tested)**
 
@@ -136,17 +139,18 @@ push. "Review only" rules are checked by the audit of each feature.
 | A command saves once | `HandlerRulesTests.A_Command_SavesOnce` |
 | Page size at most 100 | `HandlerRulesTests.A_PagedList_ServesAtMost100RowsAPage` |
 | No `throw` for business rules in `Domain`/`Application` | `HandlerRulesTests.Business_Rules_ReturnResults_InsteadOfThrowing` |
-| Validators check shape, the domain checks rules | `UnitTests/Expenses/Input/*`, `UnitTests/Expenses/Domain/*` (per rule); the split itself is review only (meaning) |
+| Validators check shape, the domain checks rules | `UnitTests/<Module>/Input/*`, `UnitTests/<Module>/Domain/*` (per rule); the split itself is review only (meaning) |
 | Unique `WithName` (camelCase) and `WithSummary` | `Http/OpenApiDocumentTests.Every_Operation_HasAUniqueCamelCaseId_AndASummary` |
 | `Produces…` for every body; errors are problem responses; input lists `400` | `OpenApiDocumentTests.Every_SuccessWithABody_HasASchema`, `.Every_Error_IsAProblemResponse`, `.Every_Operation_WithInput_ListsTheValidationProblem` |
 | Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
-| `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-list: `recordPlannedExpense`, ADR 0022) |
+| `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024) |
 | Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |
+| HTTP records have names no other module uses | `Http/ContractSchemaNameTests.Http_Records_HaveNames_NoOtherModuleUses` |
 | Numbers are JSON numbers | `OpenApiDocumentTests.Numbers_AreNotAlsoStrings` |
 | OpenAPI committed and current | CI `api.yml`: `git diff --exit-code -- docs/contracts/openapi.json` after the build |
 | No secrets in committed settings; production does not migrate on startup | `Hosting/ConfigurationRulesTests` |
-| Repeats: same key returns the first result, other data `409` | `IntegrationTests/Api/Expenses/*` (`A_Repeated_*Create*`, per kind) |
-| Race guards (row version, unique index) answer `409`, never `500` | `IntegrationTests/Api/Expenses/Entries/ExpensesRaceApiTests` |
+| Repeats: same key returns the first result, other data `409` | `IntegrationTests/Api/Expenses/*`, `IntegrationTests/Api/Gifts/GiftsApiTests` (`A_Repeated_*Create*`, per kind) |
+| Race guards (row version, unique index, foreign key) answer `409`, never `500` | `IntegrationTests/Api/Expenses/Entries/ExpensesRaceApiTests`, `IntegrationTests/Api/Gifts/GiftsRaceApiTests` |
 | ADRs have a status and are indexed; SDDs indexed; every module has a page | `Structure/DocumentationIndexTests` |
 | No query and no `SaveChanges` in a loop | review only: a loop over an in-memory list is fine, over a query is not; the text cannot tell them apart reliably |
 | Search: words, escaped `LIKE`, trigram index | `UnitTests/BuildingBlocks/SearchPatternTests` for the pattern; the index is review only (migration content) |

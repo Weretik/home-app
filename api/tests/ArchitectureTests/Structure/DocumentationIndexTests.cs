@@ -28,7 +28,7 @@ public sealed partial class DocumentationIndexTests
     [Fact]
     public void Every_Specification_IsInTheIndex()
     {
-        var specs = Docs("sdd/specs");
+        var specs = Docs("specs");
         if (!Directory.Exists(specs))
             return;
         var index = File.ReadAllText(Path.Combine(specs, "README.md"));

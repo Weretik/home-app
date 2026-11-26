@@ -7,16 +7,16 @@ Google Sheet «Учёт расходов» (and its Telegram bot), whose history
 site. The module also keeps the budget (spending limits, the monthly limit and the savings goal,
 [ADR 0019](../decisions/0019-spending-limits-as-category-sets.md)) and computes a month's summary from the entries
 ([ADR 0020](../decisions/0020-month-summary-computed-on-read.md)), with overspend carried into the next period like the
-sheet ([ADR 0021](../decisions/0021-limit-carry-over-like-the-sheet.md)) and a forecast from planned expenses
-([ADR 0022](../decisions/0022-planned-expenses-for-the-forecast.md)).
+sheet ([ADR 0027](../decisions/0027-limit-carry-over-like-the-sheet.md)) and a forecast from planned expenses
+([ADR 0028](../decisions/0028-planned-expenses-for-the-forecast.md)).
 
 Code: [`src/Modules/Expenses`](../../src/Modules/Expenses). Schema: `expenses`. Specifications (SDD), one per feature:
-[001 entries and the sheet import](../sdd/specs/expenses/001-entries-and-sheet-import/README.md),
-[002 savings jar](../sdd/specs/expenses/002-savings-jar/README.md),
-[003 budget settings and limits](../sdd/specs/expenses/003-budget-settings-and-limits/README.md),
-[004 month summary](../sdd/specs/expenses/004-month-summary/README.md),
-[005 forecast, carry-over, outside limits](../sdd/specs/expenses/005-budget-forecast-carryover/README.md)
-([index](../sdd/specs/README.md)).
+[001 entries and the sheet import](../specs/expenses/001-entries-and-sheet-import/README.md),
+[002 savings jar](../specs/expenses/002-savings-jar/README.md),
+[003 budget settings and limits](../specs/expenses/003-budget-settings-and-limits/README.md),
+[004 month summary](../specs/expenses/004-month-summary/README.md),
+[005 forecast, carry-over, outside limits](../specs/expenses/005-budget-forecast-carryover/README.md)
+([index](../specs/README.md)).
 
 ## Model
 
@@ -94,8 +94,8 @@ classDiagram
 | Concept | Meaning | In the old sheet |
 | --- | --- | --- |
 | `Expense` | Money spent on one day for one purpose. | a row of «Расходы» |
-| `Expense.OutsideLimits` | «Не в лимиты»: a deliberate one-off spend above the limits. Counts in the month's totals, but in no limit, not in the monthly limit and not in the carry-over ([ADR 0021](../decisions/0021-limit-carry-over-like-the-sheet.md)). | none (the sheet had no such mark) |
-| `PlannedExpense` | An expense expected in a month but not made yet: name, category, payer, amount. Counts toward its limits in the forecast; recorded as a real expense when paid ([ADR 0022](../decisions/0022-planned-expenses-for-the-forecast.md)). | «План / Факт / Прогноз» in «Сводка» |
+| `Expense.OutsideLimits` | «Не в лимиты»: a deliberate one-off spend above the limits. Counts in the month's totals, but in no limit, not in the monthly limit and not in the carry-over ([ADR 0027](../decisions/0027-limit-carry-over-like-the-sheet.md)). | none (the sheet had no such mark) |
+| `PlannedExpense` | An expense expected in a month but not made yet: name, category, payer, amount. Counts toward its limits in the forecast; recorded as a real expense when paid ([ADR 0028](../decisions/0028-planned-expenses-for-the-forecast.md)). | «План / Факт / Прогноз» in «Сводка» |
 | `Income` | Money one person received. No categories. | a row of «Доходы» |
 | `SavingsMovement` | Money put into the savings jar («Копилка», card *8140) or taken out of it. The amount is signed: plus is a deposit, minus a withdrawal ([ADR 0018](../decisions/0018-savings-jar-as-signed-movements.md)). | a row of «Копилка» |
 | `SavingsDirection` | `Deposit` or `Withdrawal`, derived from the sign; not stored. | the colour of the row |
@@ -143,7 +143,7 @@ Budget rules (`Domain/Budget/`):
   (`expenses.budget_settings_invalid`). `LimitsFrom` is a day in 2000–2100 (`expenses.limits_from_out_of_range`),
   seeded 2026-11-01 like the sheet. There is exactly one settings row, created by the `Budget` migration.
 
-Carry-over rules (`LimitCarryOver`, [ADR 0021](../decisions/0021-limit-carry-over-like-the-sheet.md)), exactly as
+Carry-over rules (`LimitCarryOver`, [ADR 0027](../decisions/0027-limit-carry-over-like-the-sheet.md)), exactly as
 the sheet's «Перенос с прошлого мес.»:
 
 - Periods are walked from the first counted one up to the period asked about: for a monthly limit the first month
@@ -158,7 +158,7 @@ the sheet's «Перенос с прошлого мес.»:
 - The monthly limit on all expenses carries the same way over months, with every expense the limits count; with no
   monthly limit both figures are 0.
 
-Planned expense rules (`Domain/Planning/`, [ADR 0022](../decisions/0022-planned-expenses-for-the-forecast.md)):
+Planned expense rules (`Domain/Planning/`, [ADR 0028](../decisions/0028-planned-expenses-for-the-forecast.md)):
 
 - A plan belongs to a month (stored as its first day; `expenses.planned_month_invalid` otherwise), has a name
   (trimmed, 1–100 characters, `expenses.planned_name_required`, `expenses.planned_name_too_long`), an existing

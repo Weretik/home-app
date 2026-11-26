@@ -302,6 +302,148 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gifts/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the wanted gifts (archived=false, by priority, then the nearest occasion) or the archive of gifted and dropped ones (archived=true, latest gifted first), with their variants. */
+        get: operations["listGifts"];
+        put?: never;
+        /** Adds a wanted gift with its variants. Send a new Idempotency-Key per gift; a repeat returns the first id. */
+        post: operations["createGift"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a gift and replaces its whole variant list; the status stays. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateGift"];
+        post?: never;
+        /** Deletes a gift and its variants for good. */
+        delete: operations["deleteGift"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/items/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Marks a gift Gifted (with giftedOn, today in Kyiv by default) or Dropped, which moves it to the archive, or Wanted, which returns it to the list. Send its version in If-Match. */
+        put: operations["changeGiftStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The wishlist for the home page: per recipient and in total the wanted and gifted counts and sums, the top High-priority wanted gifts, the upcoming occasions and all details. */
+        get: operations["getGiftsSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the gift categories in display order. */
+        get: operations["listGiftCategories"];
+        put?: never;
+        /** Adds a gift category at the end of the list. Send a new Idempotency-Key; 409 when the name is taken. */
+        post: operations["createGiftCategory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Renames a gift category; its gifts follow. 409 when the name is taken. */
+        put: operations["renameGiftCategory"];
+        post?: never;
+        /** Deletes a gift category; 409 while any gift (also an archived one) uses it. */
+        delete: operations["deleteGiftCategory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the personal details (sizes and other nuances) by recipient (Maria, Vitaliy, Together) and position. */
+        get: operations["listGiftDetails"];
+        put?: never;
+        /** Adds a detail at the end of the recipient's list. Send a new Idempotency-Key; a repeat returns the first id. */
+        post: operations["createGiftDetail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gifts/details/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a detail; its position stays. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateGiftDetail"];
+        post?: never;
+        /** Deletes a detail for good. */
+        delete: operations["deleteGiftDetail"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -350,6 +492,11 @@ export interface components {
             /** Format: uuid */
             id: string;
         };
+        /** @description The id of a created gift, category or detail. */
+        CreatedGiftsEntry: {
+            /** Format: uuid */
+            id: string;
+        };
         /** @description One expense row of the month list, with its category name. */
         ExpenseItem: {
             /** Format: uuid */
@@ -393,6 +540,129 @@ export interface components {
             comment: null | string;
             /** @default false */
             outsideLimits: boolean;
+        };
+        /** @description A gift category as lists and pickers show it. */
+        GiftCategoryItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: int32 */
+            sortOrder: number;
+        };
+        GiftCategoryRequest: {
+            name: string;
+        };
+        /**
+         * @description The figures of one recipient or of everyone. Sums count only the gifts with a known price; dropped gifts count
+         *     nowhere.
+         */
+        GiftCounts: {
+            /** Format: int32 */
+            wantedCount: number;
+            /** Format: double */
+            wantedPriceSum: number;
+            /** Format: int32 */
+            wantedWithoutPrice: number;
+            /** Format: int32 */
+            highCount: number;
+            /** Format: int32 */
+            giftedCount: number;
+            /** Format: double */
+            giftedPriceSum: number;
+        };
+        /** @description A detail («нюанс») as settings and the home summary show it. */
+        GiftDetailItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uint32 */
+            version: number;
+            recipient: components["schemas"]["Recipient"];
+            label: string;
+            value: string;
+            /** Format: int32 */
+            sortOrder: number;
+        };
+        GiftDetailRequest: {
+            recipient: components["schemas"]["Recipient"];
+            label: string;
+            value: string;
+        };
+        /** @description A gift as the list shows it, with its category name and its variants in order. */
+        GiftItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uint32 */
+            version: number;
+            recipient: components["schemas"]["Recipient"];
+            name: string;
+            /** Format: uuid */
+            categoryId: string;
+            categoryName: string;
+            priority: components["schemas"]["Priority"];
+            /** Format: double */
+            price: null | number;
+            link: null | string;
+            status: components["schemas"]["GiftStatus"];
+            /** Format: date */
+            giftedOn: null | string;
+            occasion: null | string;
+            /** Format: date */
+            occasionDate: null | string;
+            notes: null | string;
+            variants: components["schemas"]["GiftVariantItem"][];
+            /** Format: date-time */
+            createdAtUtc: string;
+        };
+        GiftRequest: {
+            recipient: components["schemas"]["Recipient"];
+            name: string;
+            /** Format: uuid */
+            categoryId: string;
+            priority: components["schemas"]["Priority"];
+            /** Format: double */
+            price: null | number;
+            link: null | string;
+            occasion: null | string;
+            /** Format: date */
+            occasionDate: null | string;
+            notes: null | string;
+            variants: null | components["schemas"]["GiftVariantRequest"][];
+        };
+        /**
+         * @description The home page's view of the wishlist: every recipient (Маша, Виталий, Вместе, always all three, in that order), the
+         *     total, up to five upcoming occasions, and all details. Computed on every read.
+         */
+        GiftsSummary: {
+            recipients: components["schemas"]["RecipientSummary"][];
+            total: components["schemas"]["GiftCounts"];
+            upcoming: components["schemas"]["UpcomingOccasion"][];
+            details: components["schemas"]["GiftDetailItem"][];
+        };
+        /**
+         * @description Where a gift idea stands. GiftStatus.Wanted is the active list; GiftStatus.Gifted (given or bought, the sheet's
+         *     «Куплено») and GiftStatus.Dropped («Не актуально») are the archive.
+         * @enum {unknown}
+         */
+        GiftStatus: "Wanted" | "Gifted" | "Dropped";
+        GiftStatusRequest: {
+            status: components["schemas"]["GiftStatus"];
+            /** Format: date */
+            giftedOn: null | string;
+        };
+        /** @description One variant of a gift: a link with an optional title and price. */
+        GiftVariantItem: {
+            /** Format: uuid */
+            id: string;
+            title: null | string;
+            link: string;
+            /** Format: double */
+            price: null | number;
+        };
+        GiftVariantRequest: {
+            title: null | string;
+            link: string;
+            /** Format: double */
+            price: null | number;
         };
         /** @enum {unknown} */
         HealthStatus: "Unhealthy" | "Degraded" | "Healthy";
@@ -665,6 +935,11 @@ export interface components {
             /** Format: double */
             amount: number;
         };
+        /**
+         * @description How much the recipient wants it: «🔥 Очень хочу», «⭐ Хочу», «💭 Когда-нибудь».
+         * @enum {unknown}
+         */
+        Priority: "High" | "Normal" | "Someday";
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -672,6 +947,17 @@ export interface components {
             status?: null | number;
             detail?: null | string;
             instance?: null | string;
+        };
+        /**
+         * @description Whom a gift or a detail is for: Маша, Виталий, or both («Вместе», things for the home).
+         * @enum {unknown}
+         */
+        Recipient: "Maria" | "Vitaliy" | "Together";
+        /** @description One recipient's figures and up to five of their High-priority wanted gifts, in the active list's order. */
+        RecipientSummary: {
+            recipient: components["schemas"]["Recipient"];
+            counts: components["schemas"]["GiftCounts"];
+            topWanted: components["schemas"]["SummaryGift"][];
         };
         RecordPlannedExpenseRequest: {
             /** Format: date */
@@ -767,6 +1053,15 @@ export interface components {
             amount: number;
             categoryIds: string[];
         };
+        /** @description A wanted «🔥» gift in a recipient's top list. */
+        SummaryGift: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: double */
+            price: null | number;
+            link: null | string;
+        };
         /** @description The overall status, the build version with its commit, the environment, and the status of each check. */
         SystemStatus: {
             status: components["schemas"]["HealthStatus"];
@@ -775,6 +1070,16 @@ export interface components {
             checks: {
                 [key: string]: components["schemas"]["HealthStatus"];
             };
+        };
+        /** @description A wanted gift whose occasion is today or later. */
+        UpcomingOccasion: {
+            /** Format: uuid */
+            id: string;
+            recipient: components["schemas"]["Recipient"];
+            name: string;
+            occasion: null | string;
+            /** Format: date */
+            occasionDate: string;
         };
     };
     responses: never;
@@ -1988,6 +2293,661 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listGifts: {
+        parameters: {
+            query?: {
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GiftItem"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    createGift: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedGiftsEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateGift: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteGift: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    changeGiftStatus: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getGiftsSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GiftsSummary"];
+                };
+            };
+        };
+    };
+    listGiftCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GiftCategoryItem"][];
+                };
+            };
+        };
+    };
+    createGiftCategory: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedGiftsEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    renameGiftCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftCategoryRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteGiftCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listGiftDetails: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GiftDetailItem"][];
+                };
+            };
+        };
+    };
+    createGiftDetail: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftDetailRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedGiftsEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateGiftDetail: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GiftDetailRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteGiftDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

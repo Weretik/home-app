@@ -5,7 +5,7 @@ The backend is a **modular monolith**, built exactly like
 several modules that keep to themselves. Each module could become its own service later, but until there is a reason
 to, one process is cheaper and simpler.
 
-Every feature starts as a specification in [../sdd/specs](../sdd/specs/README.md) and ends with an architecture audit in
+Every feature starts as a specification in [../specs](../specs/README.md) and ends with an architecture audit in
 [../audits](../audits/); the [rules](../rules.md#enforcement) list the test that checks each rule, and the
 [quality targets](quality-targets.md) give the numbers a design or an audit is measured against.
 
@@ -16,10 +16,10 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 
 | Module | Owns | Schema | Status |
 | --- | --- | --- | --- |
-| Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits with carry-over, planned expenses and the month summary; later payments | `expenses` | in place, see [expenses.md](../modules/expenses.md); specifications [001–005](../sdd/specs/README.md) |
+| Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits with carry-over, planned expenses and the month summary; later payments | `expenses` | in place, see [expenses.md](../modules/expenses.md); specifications [001–005](../specs/README.md) |
 | Shopping | The shared shopping list | `shopping` | planned |
 | Todos | To-dos for Masha, Vitaliy and both | `todos` | planned |
-| Gifts | Gift wishlist | `gifts` | planned |
+| Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md); specification [001](../specs/gifts/001-gifts-module/README.md) |
 | Identity | The two user accounts and the session | `identity` | planned, see [ADR 0009](../decisions/README.md) |
 
 Add a module as [the README](../../README.md#add-a-module) describes, then add it to this table, to
@@ -92,7 +92,7 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 ## Security
 
 - Authentication is not in place yet; it arrives with the Identity module and its ADR. The authentication and
-  authorization middleware is already in the pipeline. Until then the Expenses reads and writes are
+  authorization middleware is already in the pipeline. Until then the Expenses and Gifts reads and writes are
   anonymous; writes are rate limited ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
 - Edits of shared rows are guarded by a row version (`xmin`, `If-Match`)
   ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).

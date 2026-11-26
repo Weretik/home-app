@@ -5,6 +5,10 @@ import { IncomesPage } from '../../features/expenses/income-list/IncomesPage';
 import { SavingsPage } from '../../features/expenses/savings-page/SavingsPage';
 import { ExpensesSection } from '../../features/expenses/section/ExpensesSection';
 import { SettingsPage } from '../../features/expenses/settings-page/SettingsPage';
+import { GiftsSection } from '../../features/gifts/section/GiftsSection';
+import { GiftSettingsPage } from '../../features/gifts/settings-page/GiftSettingsPage';
+import { ArchivePage } from '../../features/gifts/pages/ArchivePage';
+import { GiftsPage } from '../../features/gifts/pages/GiftsPage';
 import { ComingSoonPage } from '../../features/home/page/ComingSoonPage';
 import { HomePage } from '../../features/home/page/HomePage';
 import { StatusPage } from '../../features/status/StatusPage';
@@ -24,7 +28,11 @@ export function App() {
         </Route>
         <Route path="/shopping" element={<ComingSoonPage title="Покупки" />} />
         <Route path="/todos" element={<ComingSoonPage title="Дела" />} />
-        <Route path="/gifts" element={<ComingSoonPage title="Подарки" />} />
+        <Route path="/gifts" element={<GiftsSection />}>
+          <Route index element={<GiftsPage />} />
+          <Route path="archive" element={<ArchivePage />} />
+          <Route path="settings" element={<GiftSettingsPage />} />
+        </Route>
         <Route path="/status" element={<StatusPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

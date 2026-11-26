@@ -1,0 +1,67 @@
+import { describe, expect, it } from 'vitest';
+import type { Recipient } from '../data/gifts-api';
+import { applyFilters, groupByRecipient, parseFilters } from './gift-filters';
+
+const gift = (id: string, recipient: Recipient, categoryId = 'c1') => ({
+  id,
+  recipient,
+  categoryId,
+});
+
+describe('parseFilters', () => {
+  it('reads a known recipient and category', () => {
+    const params = new URLSearchParams('recipient=Maria&category=c1');
+    expect(parseFilters(params, ['c1', 'c2'])).toEqual({
+      recipient: 'Maria',
+      categoryId: 'c1',
+    });
+  });
+
+  it('ignores an unknown recipient and a category that does not exist', () => {
+    const params = new URLSearchParams('recipient=Bob&category=nope');
+    expect(parseFilters(params, ['c1'])).toEqual({});
+  });
+
+  it('keeps any category while the categories are not loaded yet', () => {
+    const params = new URLSearchParams('category=c9');
+    expect(parseFilters(params)).toEqual({ categoryId: 'c9' });
+  });
+});
+
+describe('applyFilters', () => {
+  const items = [
+    gift('1', 'Maria', 'c1'),
+    gift('2', 'Vitaliy', 'c2'),
+    gift('3', 'Maria', 'c2'),
+  ];
+
+  it('keeps the server order of the matching items', () => {
+    expect(applyFilters(items, { categoryId: 'c2' }).map((g) => g.id)).toEqual([
+      '2',
+      '3',
+    ]);
+    expect(
+      applyFilters(items, { recipient: 'Maria', categoryId: 'c2' }).map(
+        (g) => g.id,
+      ),
+    ).toEqual(['3']);
+  });
+
+  it('returns everything without filters', () => {
+    expect(applyFilters(items, {})).toHaveLength(3);
+  });
+});
+
+describe('groupByRecipient', () => {
+  it('groups in the order Маша, Виталий, Вместе and leaves out empty groups', () => {
+    const groups = groupByRecipient([
+      gift('1', 'Together'),
+      gift('2', 'Maria'),
+      gift('3', 'Together'),
+    ]);
+    expect(groups.map((g) => [g.recipient, g.items.map((i) => i.id)])).toEqual([
+      ['Maria', ['2']],
+      ['Together', ['1', '3']],
+    ]);
+  });
+});

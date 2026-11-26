@@ -2,8 +2,8 @@
 
 - **Kind:** final feature audit (`backend-code-audit`) of the Expenses module, with the retroactive SDDs 001–004.
 - **Scope:** `api/src/Modules/Expenses`, the host composition, `api/tests`, `api/docs` (rules, architecture, module
-  page, ADR 0019–0022, SDD 001–005).
-- **Measured against:** [SDD 005](../sdd/specs/expenses/005-budget-forecast-carryover/README.md) and 001–004,
+  page, ADRs 0019, 0020, 0027, 0028, SDD 001–005).
+- **Measured against:** [SDD 005](../specs/expenses/005-budget-forecast-carryover/README.md) and 001–004,
   [rules](../rules.md), [architecture](../architecture/README.md), `AGENTS.md`, the owner's checklists
   (obsidian `Architecture/Checklists/backend/checks/new-feature.md` with T2 endpoint, T3 migration, T10 shared
   resource).
@@ -25,17 +25,17 @@ Severity: Critical, High, Medium, Low. Status: fixed (with evidence), open (owne
 | ID | Sev. | Finding | Evidence | Status |
 | --- | --- | --- | --- | --- |
 | AF-001 | High | No quality targets file; no numbers to measure against. | `docs/architecture/` had none; SDD 005 overview "the project has no quality targets file" | fixed: proposed targets, to confirm by Vitaliy |
-| AF-002 | High | SDD 005 contradicts the code on plan delete: R-FC-003/SC-FC-004, the contract and TS-010 require `If-Match` on `deletePlannedExpense`; the code, ADR 0022 and the module page delete without a version (like every delete of the module, 001 GAP-001, 003 GAP-010). | `DeletePlannedExpenseCommand.cs` (only `Id`), `DeletePlannedExpenseEndpoint.cs`, `contracts/api-contract.md:32` | open — product question 1; recorded in SDD 005 open questions |
+| AF-002 | High | SDD 005 contradicts the code on plan delete: R-FC-003/SC-FC-004, the contract and TS-010 require `If-Match` on `deletePlannedExpense`; the code, ADR 0028 and the module page delete without a version (like every delete of the module, 001 GAP-001, 003 GAP-010). | `DeletePlannedExpenseCommand.cs` (only `Id`), `DeletePlannedExpenseEndpoint.cs`, `contracts/api-contract.md:32` | open — product question 1; recorded in SDD 005 open questions |
 | AF-003 | Medium | `GetMonthSummaryHandler` (208 lines) mixed reading with per-limit usage, carry and forecast arithmetic; the arithmetic had no unit test (quarter usage, `daysLeft`, `perDay`, SDD 004 GAP-015; SC-CO-009 needed a fixed clock). | handler before the change | fixed: `GetMonthSummary/SummaryFigures.cs` (pure) + `CategoryMonthAmount.cs`; handler 142 lines; `UnitTests/Expenses/Summary/SummaryFiguresTests.cs` (7 tests), `MonthSummaryValidatorTests` |
 | AF-004 | Medium | The version race path (`DbUpdateConcurrencyException` → 409 between read and save) was never exercised (001 GAP-004), neither for entries nor for «record». | no test | fixed: `IntegrationTests/TestHost/RacingExpensesDb.cs` lets a second request in before the save; `ExpensesRaceApiTests` (edit race, record race) |
 | AF-005 | Medium | `SortOrder` of a new limit is read (`max + 10`) then written without a race guard (003 GAP-009); a racing copy would also have been answered `409 idempotency_key_reused`, a wrong message. | `CreateSpendingLimitHandler.cs` | fixed: unique index `ux_spending_limits_sort_order` (migration `LimitSortOrderUnique`, renumbers duplicates first), handler maps that violation to `409 expenses.limit_added_meanwhile`; `ExpensesRaceApiTests.Two_Limits_AddedAtOnce…` |
 | AF-006 | Low | `GetBudget` showed empty settings (version 0) when the row is missing while the edit answered 404, so the page could never save (003 GAP-012). | `GetBudgetHandler.cs` | fixed: both answer `404 expenses.budget_settings_not_found` (`BudgetErrors.SettingsNotFound`); contract: `getBudget` lists 404; web client regenerated; `ExpensesSummaryApiTests.Without_TheSettingsRow…` |
 | AF-007 | Medium | The host validated scopes and the container build only in Development (ASP.NET default); a singleton capturing a `DbContext` would reach production. | `Program.cs` | fixed: `UseDefaultServiceProvider(ValidateScopes, ValidateOnBuild)` in every environment; `HostRulesTests`; every integration test boots it |
-| AF-008 | Medium | Many documented rules had no automated check (one type per file, empty and wrapper folders, solution layout, central package versions, problem responses, `Idempotency-Key`/`If-Match`, rate limits, request ≠ command, queries never write, one save per command, page size, schema ownership, migrations vs model, host composition, secrets, ADR/SDD indexes). | `rules.md` before; 19 architecture tests | fixed: 55 architecture tests, [enforcement table](../rules.md#enforcement), [ADR 0023](../decisions/0023-every-rule-checked-by-a-test.md) |
+| AF-008 | Medium | Many documented rules had no automated check (one type per file, empty and wrapper folders, solution layout, central package versions, problem responses, `Idempotency-Key`/`If-Match`, rate limits, request ≠ command, queries never write, one save per command, page size, schema ownership, migrations vs model, host composition, secrets, ADR/SDD indexes). | `rules.md` before; 19 architecture tests | fixed: 55 architecture tests, [enforcement table](../rules.md#enforcement), [ADR 0029](../decisions/0029-every-rule-checked-by-a-test.md) |
 | AF-009 | Low | Two files declared two types each (`ImportReport.cs` + `ImportMonth`, `RateLimitOptions.cs` + `FixedWindowLimit`), against "one type per file". | found by the new `SourceFileRulesTests` | fixed: split into own files |
 | AF-010 | Medium | Missing tests: savings delete/repeat/stale/404 (002 GAP-007), income edit/delete and expense repeated create (001 GAP-003), entry and plan validators. | traceability of 001/002 | fixed: `ExpensesSavingsApiTests`, `ExpensesEditingApiTests` (+2), `EntryInputValidatorTests`, `PlannedInputValidatorTests` |
-| AF-011 | Low | ADR 0019 said overspend is not carried; ADR 0021 changed that without a status note. | ADR 0019 | fixed: 0019 status "carry-over part superseded by 0021", sentence struck through, index updated; 0021 refers back |
-| AF-012 | Low | API README, architecture README and the module page did not link the SDDs; ADR 0021/0022 did not link SDD 005. | the files | fixed |
+| AF-011 | Low | ADR 0019 said overspend is not carried; ADR 0027 changed that without a status note. | ADR 0019 | fixed: 0019 status "carry-over part superseded by 0027", sentence struck through, index updated; 0027 refers back |
+| AF-012 | Low | API README, architecture README and the module page did not link the SDDs; ADR 0027/0028 did not link SDD 005. | the files | fixed |
 | AF-013 | Low | `rules.md` asked for "handler tests in UnitTests" (001 GAP-002) while handlers are, rightly, tested on PostgreSQL (`xmin`, unique indexes, `ExecuteDelete` cannot be faked in memory). | `rules.md` Process | fixed: rule says what goes where; arithmetic is pulled out of handlers to be unit-tested |
 | AF-014 | Medium | SDD 005 delivery evidence is not filled in: every `traceability.md` row is `planned`, task Evidence sections empty, delivery readiness unchecked, although the integration tests (`ExpensesCarryOverApiTests`, `ExpensesForecastApiTests`) exist and pass. | `005…/traceability.md`, `tasks/*` | open — owner: the SDD 005 delivery (TS-016); fill evidence from the green runs below |
 | AF-015 | Low | An anonymous read endpoint has no rate-limit decision on record (ADR 0012/0015 cover writes); the summary reads history since `LimitsFrom`. | `GetMonthSummaryEndpoint.cs`, ADR 0015 | open — record "reads unlimited until sign-in" in ADR 0015, or a global soft limit |
@@ -51,7 +51,7 @@ Severity: Critical, High, Medium, Low. Status: fixed (with evidence), open (owne
 - ✅ Commands through aggregates (`Expense`, `BudgetSettings`, `PlannedExpense`), queries straight to DTOs; carry-over
   is a pure domain function (`LimitCarryOver`).
 - ✅ One `SaveChanges` per command (now tested); «record» changes two roots (adds `Expense`, removes `PlannedExpense`)
-  in one save, justified in SDD 005 R-FC-004 and ADR 0022.
+  in one save, justified in SDD 005 R-FC-004 and ADR 0028.
 - ✅ Errors as `Result` with codes; validators for every input (tested).
 - ✅ Endpoints: request records, 201 + `Location`, problem responses, `If-Match`/`Idempotency-Key` (tested on OpenAPI).
 - ✅ Migration `ForecastAndCarryOver`: add-only (`outside_limits` default false, `limits_from` default 2026-11-01, new

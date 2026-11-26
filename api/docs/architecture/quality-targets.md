@@ -20,7 +20,7 @@ against these targets in its SDD.
 ## Notes
 
 - The month summary reads one grouped sum per category and month since `LimitsFrom` (about 14 × 12 rows a year,
-  [ADR 0021](../decisions/0021-limit-carry-over-like-the-sheet.md)); at the volumes above it stays far inside the read
+  [ADR 0027](../decisions/0027-limit-carry-over-like-the-sheet.md)); at the volumes above it stays far inside the read
   target. Measure before storing monthly totals.
 - When a number is confirmed or measured, change "proposed" to the agreed value and fill the current value with its
   date and source.

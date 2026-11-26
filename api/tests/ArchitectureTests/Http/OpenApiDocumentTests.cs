@@ -40,7 +40,13 @@ public sealed partial class OpenApiDocumentTests
     /// <summary>Creates that are protected otherwise, with the reason.</summary>
     private static readonly Dictionary<string, string> CreatesWithoutIdempotencyKey = new()
     {
-        ["recordPlannedExpense"] = "guarded by the plan's version; a repeat finds the plan gone (ADR 0022)",
+        ["recordPlannedExpense"] = "guarded by the plan's version; a repeat finds the plan gone (ADR 0028)",
+    };
+
+    /// <summary>Edits that carry no version, with the reason.</summary>
+    private static readonly Dictionary<string, string> EditsWithoutVersion = new()
+    {
+        ["renameGiftCategory"] = "a rename is a target value and a category has no other field to lose (ADR 0024)",
     };
 
     private static IEnumerable<string> ResponseCodes(JsonElement operation) =>
@@ -114,6 +120,7 @@ public sealed partial class OpenApiDocumentTests
             .Select(o => $"{o.Route} has no Idempotency-Key");
         var edits = operations
             .Where(o => o.Route.StartsWith("PUT ", StringComparison.Ordinal) && !HeaderParameters(o.Operation).Contains("If-Match"))
+            .Where(o => !EditsWithoutVersion.ContainsKey(o.Operation.GetProperty("operationId").GetString()!))
             .Select(o => $"{o.Route} has no If-Match");
 
         Assert.Empty(creates.Concat(edits));

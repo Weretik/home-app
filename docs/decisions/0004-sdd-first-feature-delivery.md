@@ -15,7 +15,7 @@ templates and checklists live in the Weretik/obsidian repository: `Templates/bac
 Every feature, and above all a new one, is delivered in this order:
 
 1. **Specification.** A backend SDD and a frontend SDD (only the halves the feature touches) from the obsidian
-   templates (skills `backend-feature-spec`, `frontend-feature-spec`), stored in `api/docs/sdd/specs` and `web/docs/specs`.
+   templates (skills `backend-feature-spec`, `frontend-feature-spec`), stored in `api/docs/specs` and `web/docs/specs`.
    New lasting decisions get ADRs in the same change.
 2. **Implementation** from the SDD (skills `backend-feature-delivery`, `frontend-feature-delivery`), with tests and
    docs in the same change.
