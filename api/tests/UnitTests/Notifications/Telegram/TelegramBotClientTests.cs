@@ -11,7 +11,7 @@ public sealed class TelegramBotClientTests
 {
     // A real BotFather token has a colon; without a leading slash "bot123:ABC/getMe" parses as an absolute uri with
     // the scheme "bot123", and HttpClient refused it (the «Телеграм» page answered 500 in production).
-    private const string RealShapedToken = "123456789:AAH-real_Token";
+    private const string RealShapedToken = "7712345678:AAHk-real_Format_Token0123456789abcde";
 
     [Fact]
     public async Task A_Token_WithAColon_StaysInThePath_OfTheTelegramHost()

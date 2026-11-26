@@ -153,3 +153,24 @@ jobs:
             sleep 10
           done
           exit 1
+
+      # /health only proves the app and the database are up. Every section page reads one of these endpoints, so a 500
+      # in any module (a bad setting, a missing migration, an outside call that throws) fails the deploy instead of
+      # showing «Не удалось загрузить» on the site (docs/decisions/0005-post-deploy-smoke-reads-every-section.md).
+      - name: Smoke test the read endpoint of every section
+        run: |
+          year=$(date -u +%Y); month=$(date -u +%-m)
+          failed=0
+          for path in \
+            /api/system/status \
+            "/api/expenses/summary?year=$year&month=$month" \
+            /api/expenses/budget \
+            /api/shopping/summary \
+            /api/gifts/summary \
+            /api/todos/summary \
+            /api/notifications/status; do
+            code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 "$APP_URL$path" || echo 000)
+            echo "$code $path"
+            if [ "$code" != "200" ]; then failed=1; fi
+          done
+          exit $failed

@@ -19,7 +19,7 @@ namespace IntegrationTests.Api.Notifications;
 [Collection(ApiCollection.Name)]
 public sealed class NotificationsBotApiTests(ApiFactory api)
 {
-    private const string Token = "123456:integration-token";
+    private const string Token = "7712345678:AAHk-integration_Token0123456789abcd";
     private const long MashaChat = 5_001;
     private const long FamilyChat = -9_001;
 
