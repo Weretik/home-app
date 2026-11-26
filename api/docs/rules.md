@@ -143,7 +143,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | Validators check shape, the domain checks rules | `UnitTests/<Module>/Input/*`, `UnitTests/<Module>/Domain/*` (per rule); the split itself is review only (meaning) |
 | Unique `WithName` (camelCase) and `WithSummary` | `Http/OpenApiDocumentTests.Every_Operation_HasAUniqueCamelCaseId_AndASummary` |
 | `Produces…` for every body; errors are problem responses; input lists `400` | `OpenApiDocumentTests.Every_SuccessWithABody_HasASchema`, `.Every_Error_IsAProblemResponse`, `.Every_Operation_WithInput_ListsTheValidationProblem` |
-| Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
+| Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006; the keyed notifications tick, ADR 0034; the Telegram webhook, ADR 0033), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
 | `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024; `setShoppingItemStatus` and `reorderShoppingDepartments` without a version, target values, ADR 0031) |
 | Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |
 | HTTP records have names no other module uses | `Http/ContractSchemaNameTests.Http_Records_HaveNames_NoOtherModuleUses` |
@@ -156,7 +156,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | No query and no `SaveChanges` in a loop | review only: a loop over an in-memory list is fine, over a query is not; the text cannot tell them apart reliably |
 | Search: words, escaped `LIKE`, trigram index | `UnitTests/BuildingBlocks/SearchPatternTests` for the pattern; the index is review only (migration content) |
 | Migrations keep the previous release working (add first, remove later) | review only: needs judgement on each migration; the deploy runs them as a bundle before the code (ADR 0016) |
-| Side effects through the outbox; handlers safe twice | review only: no outbox message exists yet; the first one gets a test with its handler |
+| Side effects through the outbox; handlers safe twice | integration tests run each handler through `POST /internal/outbox/tick` (gift ↔ to-do flow, Telegram message); handlers are upserts or status checks (gifts/002 R-007) |
 | A unique violation becomes `Conflict` in the handler | integration tests of each existing race; a new unique index needs its race test (review) |
 | Commands return little; abstraction only for a third case; test first | review only: judgement and process |
 | ADR and C4 in the same change as a lasting decision | review only: whether a change is a lasting decision is judgement; the index and status are tested |

@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using Gifts.Application.Purchases;
 using Gifts.Domain.Categories;
 using Gifts.Domain.Wishlist;
 using Mediator;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gifts.Application.Features.Items.Commands.UpdateGift;
 
-public sealed class UpdateGiftHandler(IGiftsDbContext db, TimeProvider clock) : ICommandHandler<UpdateGiftCommand, Result>
+public sealed class UpdateGiftHandler(IGiftsDbContext db, TimeProvider clock, GiftLinks links) : ICommandHandler<UpdateGiftCommand, Result>
 {
     public async ValueTask<Result> Handle(UpdateGiftCommand c, CancellationToken cancellationToken)
     {
@@ -19,11 +20,17 @@ public sealed class UpdateGiftHandler(IGiftsDbContext db, TimeProvider clock) : 
         if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
             return CategoryErrors.NotFound(c.CategoryId);
 
+        var before = PurchasePlan.Of(gift);
         var updated = gift.Update(
             c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants,
             clock.GetUtcNow());
         if (updated.IsFailure)
             return updated;
+        var planned = gift.PlanPurchase(c.Giver, c.BuyBy);
+        if (planned.IsFailure)
+            return planned;
+
+        PurchasePlan.Publish(db, before, gift, links);
 
         try
         {

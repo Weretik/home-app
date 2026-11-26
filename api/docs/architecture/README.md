@@ -19,7 +19,8 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 | Expenses | Expenses, incomes, savings jar, categories, who paid, spending limits with carry-over, planned expenses and the month summary; later payments | `expenses` | in place, see [expenses.md](../modules/expenses.md); specifications [001–005](../specs/README.md) |
 | Shopping | The shared shopping list: items, cart and history (computed), departments, keywords, frequent items, summary | `shopping` | in place, see [shopping.md](../modules/shopping.md); specification [001](../specs/shopping/001-shopping-list/README.md) |
 | Todos | To-dos for Masha, Vitaliy and both: tasks with steps, statuses, priorities, categories and the home page summary | `todos` | in place, see [todos.md](../modules/todos.md) |
-| Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md); specification [001](../specs/gifts/001-gifts-module/README.md) |
+| Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md); specification [001](../specs/gifts/001-gifts-module/README.md), [002](../specs/gifts/002-gift-purchase-todo/README.md) |
+| Notifications | The family Telegram bot: linked chats, morning to-dos, gift reminders, evening shopping list, expenses summaries, the webhook and the scheduler tick | `notifications` | in place, see [notifications.md](../modules/notifications.md); specification [001](../specs/notifications/001-telegram-bot/README.md) |
 | Identity | The two user accounts and the session | `identity` | planned, see [ADR 0009](../decisions/README.md) |
 
 Add a module as [the README](../../README.md#add-a-module) describes, then add it to this table, to
@@ -54,9 +55,9 @@ OpenAPI, health and the outbox tick endpoint. It contains no business logic.
 | Project | Purpose |
 | --- | --- |
 | `BuildingBlocks.Domain` | `Result`, `Result<T>`, `Error`, `ErrorType`, `Entity<TId>`, `IAggregateRoot` |
-| `BuildingBlocks.Application` | Validation and logging pipeline, paging and search helpers, outbox handler interface |
-| `BuildingBlocks.Infrastructure` | `ModuleDbContext` (schema per module, unique-violation translation), outbox storage and dispatch, database health check |
-| `BuildingBlocks.Api` | Error-to-problem mapping, global exception handler, rate limit policies, outbox tick endpoint, `/health` and `/api/system/status` |
+| `BuildingBlocks.Application` | Validation and logging pipeline, paging and search helpers, outbox handler interface, `IOutboxPublisher` (publish an integration event in the same save) |
+| `BuildingBlocks.Infrastructure` | `ModuleDbContext` (schema per module, unique-violation translation, `Publish` into the module's own outbox table), outbox storage and dispatch, database health check |
+| `BuildingBlocks.Api` | Error-to-problem mapping, global exception handler, rate limit policies, outbox tick endpoint, `SchedulerKey` (the shared key check of both scheduler ticks), `/health` and `/api/system/status` |
 
 Building blocks know nothing about any module. Something enters them only when at least three places need it.
 
@@ -99,4 +100,7 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 - The one-time sheet import needs the `X-Import-Key` header, compared in constant time, and is hidden from the
   OpenAPI document ([ADR 0014](../decisions/0014-one-time-sheet-import.md)).
 - CORS allows only the origins in `Cors:Origins` (the web app), with credentials, ready for a cookie session.
-- The outbox tick endpoint needs a shared key, compared in constant time, and is hidden from the OpenAPI document.
+- The outbox tick and the notifications tick need the shared scheduler key (`X-Scheduler-Key`), compared in constant time,
+  and are hidden from the OpenAPI document. They are called by the GitHub Actions cron ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md)).
+- The Telegram webhook checks `X-Telegram-Bot-Api-Secret-Token`, derived from the bot token and compared in constant
+  time; without a token it answers `404` ([ADR 0033](../decisions/0033-notifications-module-and-telegram-webhook.md)).

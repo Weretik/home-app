@@ -30,6 +30,8 @@ internal sealed class GiftConfiguration : IEntityTypeConfiguration<Gift>
         builder.Property(g => g.Occasion).HasColumnName("occasion").HasMaxLength(Gift.MaxOccasionLength);
         builder.Property(g => g.OccasionDate).HasColumnName("occasion_date");
         builder.Property(g => g.Notes).HasColumnName("notes").HasMaxLength(Gift.MaxNotesLength);
+        builder.Property(g => g.Giver).HasColumnName("giver").HasConversion<string>().HasMaxLength(EnumLength);
+        builder.Property(g => g.BuyBy).HasColumnName("buy_by");
         builder.Property(g => g.CreatedAtUtc).HasColumnName("created_at_utc");
         builder.Property(g => g.Version).IsRowVersion();
 

@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
 using Gifts.Application.Idempotency;
+using Gifts.Application.Purchases;
 using Gifts.Domain.Categories;
 using Gifts.Domain.Wishlist;
 using Mediator;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gifts.Application.Features.Items.Commands.CreateGift;
 
-public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock)
+public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock, GiftLinks links)
     : ICommandHandler<CreateGiftCommand, Result<CreatedGiftsEntry>>
 {
     private const string Kind = "gift";
@@ -17,7 +18,7 @@ public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock)
     {
         var fingerprint = IdempotentCreates.Fingerprint(new object?[]
         {
-            c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants,
+            c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants, c.Giver, c.BuyBy,
         });
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
@@ -30,8 +31,12 @@ public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock)
             c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants, now);
         if (created.IsFailure)
             return created.Error!;
+        var planned = created.Value.PlanPurchase(c.Giver, c.BuyBy);
+        if (planned.IsFailure)
+            return planned.Error!;
 
         db.Gifts.Add(created.Value);
+        PurchasePlan.Publish(db, null, created.Value, links);
         db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
         try
         {

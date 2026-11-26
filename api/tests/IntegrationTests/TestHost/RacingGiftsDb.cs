@@ -24,6 +24,8 @@ internal sealed class RacingGiftsDb(IGiftsDbContext inner, Func<Task> meanwhile)
 
     public DbSet<CreateRequest> CreateRequests => inner.CreateRequests;
 
+    public void Publish(object message) => inner.Publish(message);
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         if (!_raced)

@@ -15,6 +15,9 @@ public sealed class GiftsDbContext(DbContextOptions<GiftsDbContext> options)
 {
     public const string Schema = "gifts";
 
+    /// <summary>The purchase events for Todos go out through the module's outbox (ADR 0035).</summary>
+    protected override bool HasOutbox => true;
+
     public DbSet<Gift> Gifts => Set<Gift>();
 
     public DbSet<Category> Categories => Set<Category>();

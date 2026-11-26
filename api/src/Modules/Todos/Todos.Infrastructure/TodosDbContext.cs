@@ -13,6 +13,9 @@ public sealed class TodosDbContext(DbContextOptions<TodosDbContext> options)
 {
     public const string Schema = "todos";
 
+    /// <summary>The task-completed events for Gifts go out through the module's outbox (ADR 0035).</summary>
+    protected override bool HasOutbox => true;
+
     public DbSet<TodoTask> Tasks => Set<TodoTask>();
 
     public DbSet<TodoCategory> Categories => Set<TodoCategory>();

@@ -26,6 +26,8 @@ classDiagram
         string? Occasion
         DateOnly? OccasionDate
         string? Notes
+        Recipient? Giver
+        DateOnly? BuyBy
         DateTimeOffset CreatedAtUtc
         uint Version
     }
@@ -78,6 +80,14 @@ Rules (in `Gifts.Domain`, tested in `tests/UnitTests/Gifts`):
 - A new gift is `Wanted`. An edit keeps the status and the gifted day. The status change sets `gifted_on` only for
   `Gifted`: the day sent, else the day it already had, else today in `Europe/Kyiv` (`gifts.gifted_on_out_of_range`
   outside 2000–2100); any other status clears it, and a `giftedOn` sent with it is ignored.
+- «Кто дарит» (`giver`: `Maria`, `Vitaliy`, `Together` or none) and «Купить до» (`buyBy`, a day in 2000–2100,
+  `gifts.buy_by_out_of_range`) are optional. A `Wanted` gift with both is **planned**: Todos keeps a to-do for the
+  giver and the Telegram bot reminds them 14 days before ([specs/gifts/002](../specs/gifts/002-gift-purchase-todo/README.md)).
+- Create, update, status change and delete compare the plan before and after (`Purchases/PurchasePlan`) and publish
+  `GiftPurchasePlanned` (planned, or its name, recipient, giver or date changed) or `GiftPurchaseClosed` (gifted,
+  dropped, unplanned, deleted) to the module's outbox in the same save ([ADR 0035](../decisions/0035-integration-events-through-the-outbox.md)).
+- `TodoTaskCompleted` from Todos (a gift's to-do ticked done) moves a `Wanted` gift to `Gifted` with today's date
+  (`Purchases/TodoTaskCompletedHandler`); anything else is left alone.
 - A category name is trimmed, 1–100 and unique (`409` `gifts.category_name_taken`); a used category cannot be deleted
   (`409` `gifts.category_in_use`). A new category goes to the end (last sort order + 10).
 - A detail has a label (1–100) and a value (1–200), both trimmed; a new one goes to the end of its recipient's list.
@@ -115,23 +125,24 @@ Summary rules (`Features/Summary/`):
 | Project | What is there |
 | --- | --- |
 | `Gifts.Domain` | `Wishlist/` (`Gift`, `GiftVariant`, `VariantDraft`, `GiftStatus`, `Priority`, `GiftErrors`), `Categories/` (`Category`, errors), `People/` (`Recipient`, `Detail`, errors). No EF Core, no ASP.NET Core. |
-| `Gifts.Application` | `IGiftsDbContext` (the unit of work), `HouseholdDay` (today in Kyiv), `Idempotency/`, and one folder per use case under `Features/` (table above); `Features/Items/VariantDraftValidator` (shared shape of a variant), `Features/Categories/CategoryNames` (the unique-name index). |
+| `Gifts.Application` | `IGiftsDbContext` (the unit of work, also `Publish` to the outbox), `HouseholdDay` (today in Kyiv), `Idempotency/`, `Purchases/` (the purchase plan and its events, `GiftsDigest` for the bot, the handler of `TodoTaskCompleted`, `GiftLinks`), and one folder per use case under `Features/` (table above); `Features/Items/VariantDraftValidator` (shared shape of a variant), `Features/Categories/CategoryNames` (the unique-name index). |
 | `Gifts.Infrastructure` | `GiftsDbContext` (schema `gifts`; marks a gift modified when only its variants changed), configurations in `Persistence/Wishlist/` (gifts with owned variants, create requests) and `Persistence/Reference/` (categories with `CategorySeed`, details), migrations in `Persistence/Migrations/`, the development initializer. |
 | `Gifts.Api` | `GiftsModule` (`AddGiftsModule`, `MapGiftsModule`), endpoints in `Endpoints/Items/`, `Endpoints/Status/` (status change and summary), `Endpoints/Categories/`, `Endpoints/Details/`, and `GiftVersionHeader` (reads `If-Match`). |
-| `Gifts.Contracts` | Empty: no other module uses Gifts. |
+| `Gifts.Contracts` | `GiftPurchasePlanned`, `GiftPurchaseClosed` (events for Todos), `IGiftsDigest` and `GiftPurchase` (read by Notifications), `GiftParty`. |
 
 ## Database
 
-Schema `gifts`, migration history in `gifts.__ef_migrations_history`. Migrations: `Initial`. The names are fixed:
+Schema `gifts`, migration history in `gifts.__ef_migrations_history`. Migrations: `Initial`, `GiftPurchasePlan` (giver, buy-by, outbox). The names are fixed:
 the import SQL writes into them.
 
 | Table | Columns | Indexes and keys |
 | --- | --- | --- |
 | `categories` | `id`, `name` (100), `sort_order` | `ux_categories_name` unique; 11 rows inserted by `Initial` |
-| `gifts` | `id`, `recipient` (16), `name` (200), `category_id`, `priority` (16), `price` numeric(12,2) null, `link` (2000) null, `status` (16), `gifted_on` date null, `occasion` (100) null, `occasion_date` date null, `notes` (2000) null, `created_at_utc` timestamptz | `fk_gifts_categories` (restrict), `ix_gifts_category_id`, `ix_gifts_status` |
+| `gifts` | `id`, `recipient` (16), `name` (200), `category_id`, `priority` (16), `price` numeric(12,2) null, `link` (2000) null, `status` (16), `gifted_on` date null, `occasion` (100) null, `occasion_date` date null, `notes` (2000) null, `giver` (16) null, `buy_by` date null, `created_at_utc` timestamptz | `fk_gifts_categories` (restrict), `ix_gifts_category_id`, `ix_gifts_status` |
 | `gift_variants` | `id`, `gift_id`, `title` (200) null, `link` (2000), `price` numeric(12,2) null, `sort_order` | `fk_gift_variants_gifts` (cascade), `ix_gift_variants_gift_id` |
 | `details` | `id`, `recipient` (16), `label` (100), `value` (200), `sort_order` | `ix_details_recipient_sort_order` |
 | `create_requests` | `key` (100), `kind` (20), `fingerprint` (64), `entity_id`, `created_at_utc` | primary key `key` |
+| `outbox_messages` | the shared outbox table ([ADR 0006](../decisions/0006-outbox-with-scheduled-tick.md)) | |
 
 Seeded categories (fixed ids, see `CategorySeed`): Техника 10, Дом и уют 20, Кухня 30, Мебель 40, Ванная 50, Одежда и
 аксессуары 60, Украшения 70, Уход и здоровье 80, Спорт 90, Хобби и игры 100, Другое 110. `Version` of gifts and
@@ -161,7 +172,7 @@ answer `429`.
 | `getGiftsSummary` | `GET /api/gifts/summary` | `recipients` (`recipient`, `counts`, `topWanted`), `total`, `upcoming`, `details`. See the summary rules. |
 
 `GiftRequest` is `{ recipient, name, categoryId, priority, price?, link?, occasion?, occasionDate?, notes?, variants:
-[{ title?, link, price? }] }`. Schema names start with `Gift`/`Gifts` (`GiftCategoryItem`, `GiftDetailItem`,
+[{ title?, link, price? }], giver?, buyBy? }`; `GiftItem` carries `giver` and `buyBy` too. Schema names start with `Gift`/`Gifts` (`GiftCategoryItem`, `GiftDetailItem`,
 `CreatedGiftsEntry` …), since two modules' types with one name would merge into one OpenAPI schema; an architecture
 test (`ContractSchemaNameTests`) keeps them apart.
 

@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Todos.Application.Integrations;
 using Todos.Domain.Categories;
 using Todos.Domain.Tasks;
 
@@ -19,10 +20,12 @@ public sealed class UpdateTodoTaskHandler(ITodosDbContext db, TimeProvider clock
         if (c.CategoryId is { } categoryId && !await db.Categories.AnyAsync(x => x.Id == categoryId, cancellationToken))
             return CategoryErrors.NotFound(categoryId);
 
+        var before = task.Status;
         var updated = task.Update(
             c.Title, c.Notes, c.Assignee, c.Author, c.Status, c.Priority, c.DueDate, c.CategoryId, clock.GetUtcNow());
         if (updated.IsFailure)
             return updated;
+        TaskCompletion.PublishIfCompleted(db, task, before);
 
         try
         {

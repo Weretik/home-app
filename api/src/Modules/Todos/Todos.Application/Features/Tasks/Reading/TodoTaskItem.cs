@@ -5,7 +5,8 @@ namespace Todos.Application.Features.Tasks.Reading;
 
 /// <summary>
 /// A task as lists show it, with its category, its steps in order and its version for <c>If-Match</c>. Lists carry
-/// notes and steps too, so opening a task needs no second request.
+/// notes and steps too, so opening a task needs no second request. <see cref="SourceKind"/> and <see cref="SourceId"/>
+/// name the record of another module the task was made for, such as <c>gift</c> and its id (spec gifts/002).
 /// </summary>
 public sealed record TodoTaskItem(
     Guid Id,
@@ -25,4 +26,6 @@ public sealed record TodoTaskItem(
     IReadOnlyList<TaskStepItem> Steps,
     int StepsDone,
     int StepsTotal,
-    uint Version);
+    uint Version,
+    string? SourceKind,
+    Guid? SourceId);

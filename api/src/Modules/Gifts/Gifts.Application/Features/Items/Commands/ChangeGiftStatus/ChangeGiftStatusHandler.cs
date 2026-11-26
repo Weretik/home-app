@@ -1,11 +1,12 @@
 using BuildingBlocks.Domain.Results;
+using Gifts.Application.Purchases;
 using Gifts.Domain.Wishlist;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gifts.Application.Features.Items.Commands.ChangeGiftStatus;
 
-public sealed class ChangeGiftStatusHandler(IGiftsDbContext db, TimeProvider clock)
+public sealed class ChangeGiftStatusHandler(IGiftsDbContext db, TimeProvider clock, GiftLinks links)
     : ICommandHandler<ChangeGiftStatusCommand, Result>
 {
     public async ValueTask<Result> Handle(ChangeGiftStatusCommand c, CancellationToken cancellationToken)
@@ -16,9 +17,12 @@ public sealed class ChangeGiftStatusHandler(IGiftsDbContext db, TimeProvider clo
         if (gift.Version != c.Version)
             return GiftErrors.ChangedMeanwhile;
 
+        var before = PurchasePlan.Of(gift);
         var changed = gift.ChangeStatus(c.Status, c.GiftedOn, HouseholdDay.Today(clock));
         if (changed.IsFailure)
             return changed;
+
+        PurchasePlan.Publish(db, before, gift, links);
 
         try
         {

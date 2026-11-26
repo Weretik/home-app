@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\Modules\Shopping\Shopping.Api\Shopping.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Gifts\Gifts.Api\Gifts.Api.csproj" />
     <ProjectReference Include="..\..\Modules\Todos\Todos.Api\Todos.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Notifications\Notifications.Api\Notifications.Api.csproj" />
   </ItemGroup>
 
   <!-- Endpoints live in the module assemblies, so the document is regenerated on every build. -->

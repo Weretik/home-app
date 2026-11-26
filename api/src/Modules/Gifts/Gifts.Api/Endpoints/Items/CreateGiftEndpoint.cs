@@ -45,7 +45,9 @@ internal static class CreateGiftEndpoint
                 request.Occasion,
                 request.OccasionDate,
                 request.Notes,
-                request.VariantDrafts()),
+                request.VariantDrafts(),
+                request.Giver,
+                request.BuyBy),
             cancellationToken);
         return result.ToCreatedHttpResult(http, created => $"/api/gifts/items/{created.Id}");
     }

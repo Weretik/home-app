@@ -32,6 +32,7 @@ src/
     shopping/     the «Покупки» section, the Shopping module (below)
     gifts/        the «Подарки» section, the Gifts module (below)
     todos/        the «Дела» section, the Todos module (below)
+    notifications/ the «Телеграм» service page, the Notifications module (below)
 ```
 
 A feature folder holds its page components, its `<area>-api.ts` with React Query hooks, and tests next to the code.
@@ -59,8 +60,10 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 | `/todos/archive`     | Архив: done and cancelled tasks, «Вернуть», «Показать ещё»                                                            | `todos/archive`          |
 | `/todos/settings`    | Настройки (the gear next to the tabs): categories with emoji and active count                                         | `todos/settings`         |
 | `/status`            | Состояние: API and database status                                                                                    | `status`                 |
+| `/notifications`     | Телеграм: the bot, linked chats with «Тест» / «Отвязать», the schedule, the last deliveries                           | `notifications/page`     |
 
-Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`.
+Unknown paths redirect to `/`. Routes are declared in `src/app/root/App.tsx`. A link to one gift is
+`/gifts?gift=<id>` ([ADR 0013](decisions/0013-deep-link-opens-a-record.md)): the tab that holds it opens its dialog.
 
 ## Home (`src/features/home`)
 
@@ -250,8 +253,10 @@ gifts/
                      useIdempotencyKey), gift-writes-api.ts (gift and status), settings-writes-api.ts (categories,
                      «нюансы»), write-errors-api.ts (Russian text of a failed write, isStale)
   display/           Russian labels of recipients, priorities and statuses; price, date, variant and plural formatting;
+                     purchase.ts (the «🛒 купить до 12.12 · дарит Виталий» line, Kyiv today);
                      recipient-tones.ts (the person → theme colour mapping) and RecipientAvatar
-  url-state/         ?recipient=&category=&priority= (unknown values ignored), filtering and grouping (with the price sum) in memory
+  url-state/         ?recipient=&category=&priority= (unknown values ignored), filtering and grouping (with the price sum) in memory;
+                     ?gift=<id> deep link (gift-link.ts, use-gift-link.ts, ADR 0013)
   section/           GiftsSection (title, tabs, gear, <Outlet />), the list of pages
   editing/           EditDialog, DeleteDialog, RowActions («⋮» with extra items), useEditForm, useEditorState, field checks
   gift-rows/         what a table row and a list row share: GiftName (link, notes), GiftActions (status, «⋮»),
@@ -262,7 +267,8 @@ gifts/
   list-view/         useGiftList (the controller of a tab), GiftFilters, GiftRows (table from md, list below), ListStatus,
                      StatusSnackbar
   pages/             GiftsPage («Список»), ArchivePage («Подаренные»)
-  gift-editing/      GiftEditor, GiftDialog (GiftFields, OccasionFields), gift-form.ts (values ↔ GiftRequest, checks)
+  gift-editing/      GiftEditor, GiftDialog (GiftFields, OccasionFields, PurchaseFields «Кто дарит» / «Купить до»),
+                     gift-form.ts (values ↔ GiftRequest, checks)
   variant-editing/   VariantsEditor (up to 20 rows), VariantRow, PriceField
   settings-page/     GiftSettingsPage, SettingsCard, DetailsCard («Нюансы» by person), CategoriesCard
   detail-editing/    the «нюанс» form and its dialogs
@@ -283,6 +289,9 @@ gifts/
   «Вернуть в список» send `Dropped` and `Wanted`. The edit dialog never changes the status.
 - The editing frame is a copy of the Expenses one adapted to the `gifts.*` codes, because features never import each
   other.
+- «Кто дарит» and «Купить до» ([SDD gifts 002](specs/gifts/002-gift-purchase-todo/README.md)): with both set the
+  server makes the giver's to-do and the Telegram reminder; a gift write therefore also invalidates the Todos prefix.
+  A wanted gift shows the purchase line under its name (red after the day).
 
 ### Tests
 
@@ -333,6 +342,25 @@ todos/
 - The task dialog edits title, «Кому», «Поставил(а)», status, priority, due date («Сегодня», «Завтра», «На выходных»,
   «Без срока»), category, notes and steps. Edits send the version of the task as the dialog's query holds it now, so
   steps saved meanwhile do not cause a conflict; a 409 reloads the task into the form, a 404 says it is gone.
+
+## Notifications (`src/features/notifications`)
+
+The «Телеграм» service page of the one Telegram bot ([SDD](specs/notifications/001-telegram-page/README.md)): linked
+in the side menu under «Состояние» and from the home page on a phone.
+
+```
+notifications/
+  data/   notifications-api.ts (GET /api/notifications/status under ['notifications']), notification-writes-api.ts
+          (unlink invalidates the prefix; the test is sent at once, no key), labels.ts (audiences, delivery titles,
+          Kyiv time)
+  page/   NotificationsPage, InfoCard, BotCard (not configured / @username and «Открыть бота» / Telegram unreachable,
+          the link steps), ScheduleCard, DeliveriesCard
+  chats/  ChatsCard (Виталий, Маша, Семейная группа; «Тест», «Отвязать» with UnlinkDialog and a snackbar), ChatRow
+```
+
+Chats are linked in Telegram (`/start`, «Я Виталий / Я Маша», the bot added to the group); the page never asks for a
+chat id. Todos marks a task made from a gift with 🎁 and links it back with `task-row/GiftSourceLink`
+(`/gifts?gift=<id>`).
 
 ## API client (`src/api-client`)
 

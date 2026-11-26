@@ -1,5 +1,10 @@
 import type { GiftRequest } from '../data/gift-writes-api';
-import type { GiftItem, GiftPriority, Recipient } from '../data/gifts-api';
+import type {
+  GiftItem,
+  GiftPriority,
+  Giver,
+  Recipient,
+} from '../data/gifts-api';
 import {
   checkLength,
   checkLink,
@@ -30,6 +35,9 @@ export interface GiftFormValues {
   link: string;
   occasion: string;
   occasionDate: string;
+  /** «Кто дарит»; with `buyBy` the server makes a to-do and a reminder (gifts 002). */
+  giver: Giver | '';
+  buyBy: string;
   notes: string;
   variants: VariantValues[];
 }
@@ -57,6 +65,8 @@ export const emptyGift = (preset: GiftPreset = {}): GiftFormValues => ({
   link: '',
   occasion: '',
   occasionDate: '',
+  giver: '',
+  buyBy: '',
   notes: '',
   variants: [],
 });
@@ -70,6 +80,8 @@ export const fromGift = (gift: GiftItem): GiftFormValues => ({
   link: gift.link ?? '',
   occasion: gift.occasion ?? '',
   occasionDate: gift.occasionDate ?? '',
+  giver: gift.giver ?? '',
+  buyBy: gift.buyBy ?? '',
   notes: gift.notes ?? '',
   variants: gift.variants.map((variant) => ({
     ...newVariant(),
@@ -89,6 +101,7 @@ export function validateGift(values: GiftFormValues): FieldErrors {
     link: checkLink(values.link),
     occasion: checkLength(values.occasion, 100),
     occasionDate: checkYear(values.occasionDate),
+    buyBy: checkYear(values.buyBy),
     notes: checkLength(values.notes, 2000),
     variants:
       values.variants.length > MAX_VARIANTS
@@ -118,6 +131,8 @@ export const toGiftRequest = (values: GiftFormValues): GiftRequest => ({
   link: orNull(values.link),
   occasion: orNull(values.occasion),
   occasionDate: values.occasionDate || null,
+  giver: values.giver || null,
+  buyBy: values.buyBy || null,
   notes: orNull(values.notes),
   variants: values.variants.map((variant) => ({
     title: orNull(variant.title),

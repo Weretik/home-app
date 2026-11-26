@@ -4606,6 +4606,145 @@
           }
         }
       }
+    },
+    "/api/notifications/status": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "The Telegram bot: whether its token is set, its @username and link, the three chats (Vitaliy, Maria, Family) linked or not, the schedule in Kyiv time and the last ten planned messages.",
+        "operationId": "getNotificationsStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/chats/{audience}": {
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Unlinks the Telegram chat of Vitaliy, Maria or Family, so another chat can be linked with /start. 404 when none is linked.",
+        "operationId": "unlinkNotificationsChat",
+        "parameters": [
+          {
+            "name": "audience",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Audience"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/test": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Sends «✅ Бот на связи» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused.",
+        "operationId": "sendNotificationsTest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationsTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4703,6 +4842,14 @@
           }
         },
         "description": "How many active tasks an assignee has, how many of them are overdue and how many are due today."
+      },
+      "Audience": {
+        "enum": [
+          "Vitaliy",
+          "Maria",
+          "Family"
+        ],
+        "description": "Who a message is for: Виталий or Маша in their private chats, or the family group."
       },
       "BudgetSettingsRequest": {
         "required": [
@@ -4945,6 +5092,17 @@
           }
         },
         "description": "The department the dictionary picks for a name."
+      },
+      "DigestKind": {
+        "enum": [
+          "TodosMorning",
+          "TodosCommon",
+          "GiftReminder",
+          "ShoppingEvening",
+          "ExpensesWeek",
+          "ExpensesMonth"
+        ],
+        "description": "The kinds of scheduled messages (spec notifications/001, R-008…R-013)."
       },
       "ExpenseItem": {
         "required": [
@@ -5256,7 +5414,9 @@
           "occasionDate",
           "notes",
           "variants",
-          "createdAtUtc"
+          "createdAtUtc",
+          "giver",
+          "buyBy"
         ],
         "type": "object",
         "properties": {
@@ -5335,9 +5495,26 @@
           "createdAtUtc": {
             "type": "string",
             "format": "date-time"
+          },
+          "giver": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Recipient"
+              }
+            ]
+          },
+          "buyBy": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         },
-        "description": "A gift as the list shows it, with its category name and its variants in order."
+        "description": "A gift as the list shows it, with its category name and its variants in order; Recipient? GiftItem.Giver and\nDateOnly? GiftItem.BuyBy plan its purchase (spec gifts/002)."
       },
       "GiftRequest": {
         "required": [
@@ -5407,6 +5584,23 @@
             "items": {
               "$ref": "#/components/schemas/GiftVariantRequest"
             }
+          },
+          "giver": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Recipient"
+              }
+            ]
+          },
+          "buyBy": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -5966,6 +6160,148 @@
           }
         },
         "description": "One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they\nbelong to, the month's result after the savings jar, the jar itself, the spending limits with their carry-over,\nthe top categories and the forecast with the planned expenses."
+      },
+      "NotificationChatItem": {
+        "required": [
+          "audience",
+          "linked",
+          "title",
+          "linkedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          },
+          "linked": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "linkedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        },
+        "description": "One of the three chats; string? NotificationChatItem.Title and DateTimeOffset? NotificationChatItem.LinkedAtUtc are null while it is not linked."
+      },
+      "NotificationDeliveryItem": {
+        "required": [
+          "kind",
+          "audience",
+          "key",
+          "createdAtUtc",
+          "sentAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DigestKind"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          },
+          "key": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sentAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        },
+        "description": "A planned message; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox."
+      },
+      "NotificationScheduleItem": {
+        "required": [
+          "kind",
+          "title",
+          "when"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DigestKind"
+          },
+          "title": {
+            "type": "string"
+          },
+          "when": {
+            "type": "string"
+          }
+        },
+        "description": "One line of the schedule: the kind, what it is and when it comes (Russian, Kyiv time)."
+      },
+      "NotificationsStatus": {
+        "required": [
+          "configured",
+          "botUsername",
+          "botLink",
+          "chats",
+          "schedule",
+          "deliveries"
+        ],
+        "type": "object",
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "botUsername": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "botLink": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "chats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationChatItem"
+            }
+          },
+          "schedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationScheduleItem"
+            }
+          },
+          "deliveries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NotificationDeliveryItem"
+            }
+          }
+        },
+        "description": "Whether the bot token is set, the bot's @username and link, the three chats (linked or not), the schedule and the\nlast ten planned messages."
+      },
+      "NotificationsTestRequest": {
+        "required": [
+          "audience"
+        ],
+        "type": "object",
+        "properties": {
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          }
+        }
       },
       "Payer": {
         "enum": [
@@ -7033,7 +7369,9 @@
           "steps",
           "stepsDone",
           "stepsTotal",
-          "version"
+          "version",
+          "sourceKind",
+          "sourceId"
         ],
         "type": "object",
         "properties": {
@@ -7127,9 +7465,22 @@
           "version": {
             "type": "integer",
             "format": "uint32"
+          },
+          "sourceKind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         },
-        "description": "A task as lists show it, with its category, its steps in order and its version for `If-Match`. Lists carry\nnotes and steps too, so opening a task needs no second request."
+        "description": "A task as lists show it, with its category, its steps in order and its version for `If-Match`. Lists carry\nnotes and steps too, so opening a task needs no second request. string? TodoTaskItem.SourceKind and Guid? TodoTaskItem.SourceId\nname the record of another module the task was made for, such as `gift` and its id (spec gifts/002)."
       },
       "TodoTaskList": {
         "required": [
@@ -7438,6 +7789,9 @@
     },
     {
       "name": "Todos"
+    },
+    {
+      "name": "Notifications"
     }
   ]
 }

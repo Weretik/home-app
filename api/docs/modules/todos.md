@@ -25,6 +25,8 @@ classDiagram
         DateTimeOffset UpdatedAtUtc
         DateTimeOffset? CompletedAtUtc
         string? ImportKey  unique
+        string? SourceKind
+        Guid? SourceId
         uint Version  xmin
     }
     class TaskStep {
@@ -65,6 +67,7 @@ classDiagram
 | A category name is trimmed, 1–50 characters, unique without regard to case; an optional emoji is at most 8 characters. A new category goes to the end (last `SortOrder` + 10). | `400` `todos.category_name_invalid`, `todos.category_emoji_too_long`; `409` `todos.category_name_taken` |
 | A task create takes an `Idempotency-Key`: the same key and body return the first id, another body answers `409`. Category and step creates take none. | `409` `todos.idempotency_key_reused` |
 | Unknown task or step. | `404` `todos.task_not_found`, `todos.step_not_found` |
+| A task created from another module keeps its source (`source_kind`, `source_id`, unique together; today only `gift`). Gifts' `GiftPurchasePlanned` creates or updates it, `GiftPurchaseClosed` closes it; a person moving a sourced task to `Done` publishes `TodoTaskCompleted` through the outbox ([gifts/002](../specs/gifts/002-gift-purchase-todo/README.md), [ADR 0035](../decisions/0035-integration-events-through-the-outbox.md)). | — |
 
 Lists (R-012): active tasks by priority (Urgent first), then due date (earliest first, none last), then creation
 (oldest first); the archive by completion time, newest first. Search splits the input into words; each word is an
@@ -90,21 +93,22 @@ order and returns at most 8 rows, so a long overdue backlog is never loaded whol
 | Project | What is there |
 | --- | --- |
 | `Todos.Domain` | `Tasks/` (`TodoTask`, `TaskStep`, `TodoStatus`, `TodoPriority`, `TodoErrors`), `Categories/` (`TodoCategory`, `CategoryErrors`), `Parties/` (`Assignee`, `Person`). No EF Core, no ASP.NET Core. |
-| `Todos.Application` | `ITodosDbContext` (the unit of work), `KyivCalendar` (today in Kyiv from `TimeProvider`), `Idempotency/` (`CreateRequest`, `TodoCreated`, the repeat rules), `Features/Steps/StepChanges` (the step write with its retry on a lost version race) and one folder per use case under `Features/`. |
+| `Todos.Application` | `ITodosDbContext` (the unit of work), `KyivCalendar` (today in Kyiv from `TimeProvider`), `Idempotency/` (`CreateRequest`, `TodoCreated`, the repeat rules), `Features/Steps/StepChanges` (the step write with its retry on a lost version race), one folder per use case under `Features/`, and `Integrations/` (`TaskCompletion`, the Gifts handlers in `Gifts/`, the bot's `TodosDigest` and `TodoCompletion` in `Bot/`). |
 | `Todos.Infrastructure` | `TodosDbContext` (schema `todos`); configurations in `Persistence/Tasks/` (tasks, steps, create requests) and `Persistence/Categories/` (categories, `CategorySeed`); migrations in `Persistence/Migrations/`; the development initializer. |
 | `Todos.Api` | `TodosModule` (`AddTodosModule`, `MapTodosModule`), endpoints in `Endpoints/Tasks/Reading/` (list, get, summary), `Endpoints/Tasks/Editing/`, `Endpoints/Tasks/Status/`, `Endpoints/Steps/`, `Endpoints/Categories/`, and `TodoVersionHeader` (reads `If-Match`). |
-| `Todos.Contracts` | Empty: no other module uses Todos yet. |
+| `Todos.Contracts` | `TodoTaskCompleted` (the event for Gifts), `ITodosDigest`, `ITodoCompletion`, `OpenTodo`, `TodoAssignee`, `TodoCompletionOutcome` (for Notifications). |
 
 ## Database
 
-Schema `todos`, migration history in `todos.__ef_migrations_history`. Migration: `Initial`.
+Schema `todos`, migration history in `todos.__ef_migrations_history`. Migrations: `Initial`, `TaskSourceAndOutbox`.
 
 | Table | Columns | Indexes and keys |
 | --- | --- | --- |
-| `tasks` | `id uuid`, `title varchar(200)`, `notes varchar(4000) null`, `assignee varchar(16)`, `author varchar(16) null`, `status varchar(16)`, `priority varchar(16)`, `due_date date null`, `category_id uuid null`, `created_at_utc timestamptz`, `updated_at_utc timestamptz`, `completed_at_utc timestamptz null`, `import_key varchar(64) null`, `xmin` (version) | `PK_tasks`; `fk_tasks_categories` → `categories(id)` `ON DELETE SET NULL`; `ix_tasks_status_due_date`; `ix_tasks_completed_at_utc` (desc); `ix_tasks_category_id`; `ux_tasks_import_key` (unique, no filter); `ix_tasks_lower_title_trgm` (GIN `lower(title) gin_trgm_ops`, when `pg_trgm` is available) |
+| `tasks` | `id uuid`, `title varchar(200)`, `notes varchar(4000) null`, `assignee varchar(16)`, `author varchar(16) null`, `status varchar(16)`, `priority varchar(16)`, `due_date date null`, `category_id uuid null`, `created_at_utc timestamptz`, `updated_at_utc timestamptz`, `completed_at_utc timestamptz null`, `import_key varchar(64) null`, `source_kind varchar(20) null`, `source_id uuid null`, `xmin` (version) | `PK_tasks`; `fk_tasks_categories` → `categories(id)` `ON DELETE SET NULL`; `ix_tasks_status_due_date`; `ix_tasks_completed_at_utc` (desc); `ix_tasks_category_id`; `ux_tasks_import_key` (unique, no filter); `ix_tasks_lower_title_trgm` (GIN `lower(title) gin_trgm_ops`, when `pg_trgm` is available); `ux_tasks_source` (unique on `source_kind, source_id`, where `source_kind` is not null) |
 | `task_steps` | `id uuid`, `task_id uuid`, `title varchar(200)`, `is_done boolean`, `sort_order integer` | `PK_task_steps`; `fk_task_steps_tasks` → `tasks(id)` `ON DELETE CASCADE`; `ix_task_steps_task_id_sort_order` |
 | `categories` | `id uuid`, `name varchar(50)`, `emoji varchar(8) null`, `sort_order integer`, `xmin` | `PK_categories`; `ux_categories_lower_name` (unique on `lower(name)`) |
 | `create_requests` | `key varchar(100)`, `kind varchar(20)` (`task`), `fingerprint varchar(64)`, `entity_id uuid`, `created_at_utc timestamptz` | `PK_create_requests` on `key` |
+| `outbox_messages` | the shared outbox table | |
 
 Enum values are stored exactly as the C# names above (`Maria`, `InProgress`, `Urgent`, …).
 
@@ -150,8 +154,8 @@ Group `/api/todos`, tag `Todos`. Every write is anonymous, uses the `PublicWrite
 | `deleteTodoCategory` | `DELETE /categories/{id}` | `If-Match` | `204`, `404`, `409` |
 | `getTodoSummary` | `GET /summary` | | `200 TodoSummary` (`today`, `assignees`, `doneLast7Days`, `focus`) |
 
-`TodoTaskItem` carries the notes, the category name and emoji, the steps in order, `stepsDone`, `stepsTotal` and
-`version`, so the web opens a task without a second request. `If-Match` takes the `version` quoted or not; a missing
+`TodoTaskItem` carries the notes, the category name and emoji, the steps in order, `stepsDone`, `stepsTotal`,
+`sourceKind` and `sourceId` (the gift a task came from, or null) and `version`, so the web opens a task without a second request. `If-Match` takes the `version` quoted or not; a missing
 header is a `400`.
 
 ## Import from the sheet

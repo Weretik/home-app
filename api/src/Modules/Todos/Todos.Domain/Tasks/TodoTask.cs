@@ -15,6 +15,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
     public const int MaxNotesLength = 4000;
     public const int MaxSteps = 50;
     public const int MaxImportKeyLength = 64;
+    public const int MaxSourceKindLength = 20;
 
     private static readonly DateOnly MinDueDate = new(2000, 1, 1);
     private static readonly DateOnly MaxDueDate = new(2100, 12, 31);
@@ -51,6 +52,15 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
 
     /// <summary>The sheet's row id when the task came from the import; a unique index makes a repeat skip it.</summary>
     public string? ImportKey { get; private init; }
+
+    /// <summary>
+    /// What module record the task was made for, such as <c>gift</c>; null for a task a person added. Set once
+    /// (<see cref="LinkSource"/>); a unique index keeps one task per record (spec gifts/002).
+    /// </summary>
+    public string? SourceKind { get; private set; }
+
+    /// <summary>The id of that record in its module, stored as a plain value (no foreign key across schemas).</summary>
+    public Guid? SourceId { get; private set; }
 
     /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
     public uint Version { get; private set; }
@@ -141,6 +151,19 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
     {
         MoveTo(status, now);
         UpdatedAtUtc = now;
+    }
+
+    /// <summary>Records which record of another module the task was made for; only once, on a task without one.</summary>
+    public Result LinkSource(string kind, Guid id)
+    {
+        if (SourceKind is not null)
+            return TodoErrors.SourceAlreadySet;
+        if (string.IsNullOrWhiteSpace(kind) || kind.Length > MaxSourceKindLength || id == Guid.Empty)
+            return TodoErrors.SourceInvalid;
+
+        SourceKind = kind;
+        SourceId = id;
+        return Result.Success();
     }
 
     /// <summary>Adds a step at the end of the checklist.</summary>

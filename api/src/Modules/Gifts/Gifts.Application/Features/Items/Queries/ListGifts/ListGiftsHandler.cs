@@ -50,7 +50,9 @@ public sealed class ListGiftsHandler(IGiftsDbContext db) : IQueryHandler<ListGif
                     .OrderBy(v => v.SortOrder)
                     .Select(v => new GiftVariantItem(v.Id, v.Title, v.Link, v.Price))
                     .ToList(),
-                x.Gift.CreatedAtUtc))
+                x.Gift.CreatedAtUtc,
+                x.Gift.Giver,
+                x.Gift.BuyBy))
             .ToListAsync(cancellationToken);
 
         return items;

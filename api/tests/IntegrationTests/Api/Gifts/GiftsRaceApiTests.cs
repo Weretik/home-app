@@ -1,3 +1,4 @@
+using Gifts.Application.Purchases;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -45,7 +46,7 @@ public sealed class GiftsRaceApiTests(ApiFactory api)
                 Assert.Equal(HttpStatusCode.NoContent,
                     (await PutAsync(client, $"/api/gifts/items/{id}", version, Gift("Гонка: раньше", category, "High"))).StatusCode));
 
-            var result = await new UpdateGiftHandler(db, TimeProvider.System).Handle(
+            var result = await new UpdateGiftHandler(db, TimeProvider.System, new GiftLinks("https://web.example")).Handle(
                 new UpdateGiftCommand(id, version, Recipient.Vitaliy, "Гонка: позже", category, Priority.Someday, null, null, null, null, null, []),
                 CancellationToken.None);
 
@@ -76,7 +77,7 @@ public sealed class GiftsRaceApiTests(ApiFactory api)
                 Assert.Equal(HttpStatusCode.NoContent,
                     (await PutAsync(client, $"/api/gifts/items/{id}", version, Gift("Гонка: статус, правка", category))).StatusCode));
 
-            var result = await new ChangeGiftStatusHandler(db, TimeProvider.System).Handle(
+            var result = await new ChangeGiftStatusHandler(db, TimeProvider.System, new GiftLinks("https://web.example")).Handle(
                 new ChangeGiftStatusCommand(id, version, GiftStatus.Gifted, null), CancellationToken.None);
 
             AssertConflict(result, GiftErrors.ChangedMeanwhile);

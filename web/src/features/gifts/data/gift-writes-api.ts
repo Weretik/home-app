@@ -1,7 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { giftKeys, type GiftItem, type GiftStatus } from './gifts-api';
+import { moduleKeys } from '../../../platform/query-keys';
+import {
+  giftKeys,
+  type GiftItem,
+  type GiftStatus,
+  type Giver,
+} from './gifts-api';
 import { isStale } from './write-errors-api';
 import {
   ifMatch,
@@ -11,12 +17,18 @@ import {
   type Writer,
 } from './writes-api';
 
-export type GiftRequest = Schema<'GiftRequest'>;
+// TEMP shim (notifications 001): `giver` and `buyBy` until the client is regenerated from the new contract.
+export type GiftRequest = Schema<'GiftRequest'> & {
+  giver: Giver | null;
+  buyBy: string | null;
+};
 export type GiftVariantRequest = Schema<'GiftVariantRequest'>;
 
-/** A gift write changes both tabs and the home summary. */
-/** Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. */
-const giftQueries = [giftKeys.all];
+/**
+ * Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. A gift
+ * with a giver and a buy-by day also has a to-do in the Todos module (gifts 002), so «Дела» refresh too.
+ */
+const giftQueries = [giftKeys.all, moduleKeys.todos];
 
 const giftWriter: Writer<GiftRequest> = {
   keys: giftQueries,

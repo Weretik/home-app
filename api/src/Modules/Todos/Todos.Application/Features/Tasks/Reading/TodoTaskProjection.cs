@@ -25,7 +25,9 @@ public static class TodoTaskProjection
         row.Task.Steps.OrderBy(s => s.SortOrder).Select(s => new TaskStepItem(s.Id, s.Title, s.IsDone)).ToList(),
         row.Task.Steps.Count(s => s.IsDone),
         row.Task.Steps.Count(),
-        row.Task.Version);
+        row.Task.Version,
+        row.Task.SourceKind,
+        row.Task.SourceId);
 
     public static IQueryable<TaskWithCategory> WithCategory(
         this IQueryable<TodoTask> tasks, IQueryable<TodoCategory> categories) =>

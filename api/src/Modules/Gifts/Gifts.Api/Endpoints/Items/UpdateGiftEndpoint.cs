@@ -46,7 +46,9 @@ internal static class UpdateGiftEndpoint
                 request.Occasion,
                 request.OccasionDate,
                 request.Notes,
-                request.VariantDrafts()),
+                request.VariantDrafts(),
+                request.Giver,
+                request.BuyBy),
             cancellationToken);
         return result.ToHttpResult(http);
     }

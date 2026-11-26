@@ -28,7 +28,7 @@ public sealed class DataOwnershipTests
         var schema = module.ToLowerInvariant();
 
         var violations = context.Model.GetEntityTypes()
-            .Where(e => e.GetSchema() != schema || !e.ClrType.Namespace!.StartsWith($"{module}.", StringComparison.Ordinal))
+            .Where(e => e.GetSchema() != schema || !IsOwnType(module, e.ClrType))
             .Select(e => $"{e.ClrType.FullName} in schema {e.GetSchema()}")
             .Concat(context.Model.GetEntityTypes()
                 .SelectMany(e => e.GetForeignKeys())
@@ -37,6 +37,14 @@ public sealed class DataOwnershipTests
 
         Assert.Empty(violations);
     }
+
+    /// <summary>
+    /// The module's own types, plus the shared outbox table that a publishing module maps into its own schema
+    /// (ADR 0035).
+    /// </summary>
+    private static bool IsOwnType(string module, Type type) =>
+        type.Namespace!.StartsWith($"{module}.", StringComparison.Ordinal)
+        || type.FullName == "BuildingBlocks.Infrastructure.Outbox.Storage.OutboxMessage";
 
     [Theory]
     [MemberData(nameof(Modules))]

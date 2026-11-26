@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Todos.Application.Integrations;
 using Todos.Domain.Tasks;
 
 namespace Todos.Application.Features.Tasks.Commands.ChangeTodoTaskStatus;
@@ -16,7 +17,9 @@ public sealed class ChangeTodoTaskStatusHandler(ITodosDbContext db, TimeProvider
         if (task.Version != c.Version)
             return TodoErrors.ChangedMeanwhile;
 
+        var before = task.Status;
         task.ChangeStatus(c.Status, clock.GetUtcNow());
+        TaskCompletion.PublishIfCompleted(db, task, before);
         try
         {
             await db.SaveChangesAsync(cancellationToken);

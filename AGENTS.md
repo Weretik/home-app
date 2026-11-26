@@ -17,7 +17,10 @@ keywords, replacing the «🛒 Список покупок» sheet and its bot, 
 Vitaliy or both, with variants, an archive of what was given, gift categories, the personal details «нюансы» and a
 summary for the home page, see [api/docs/modules/gifts.md](api/docs/modules/gifts.md)) and the Todos module (tasks for Masha, Vitaliy or both
 with steps, statuses, priorities, editable categories, an archive and a home page summary, replacing the «✅ Список
-дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); no authentication yet, writes are open and rate
+дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); gifts with a giver and a buy-by date become
+to-dos and close themselves when the to-do is done; and the Notifications module, the family Telegram bot (morning
+to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
+see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); no authentication yet, writes are open and rate
 limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
 
@@ -28,7 +31,7 @@ not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
   [C4](api/docs/architecture/c4.md), modules ([Expenses](api/docs/modules/expenses.md), [Shopping](api/docs/modules/shopping.md), [Gifts](api/docs/modules/gifts.md),
-  [Todos](api/docs/modules/todos.md)),
+  [Todos](api/docs/modules/todos.md), [Notifications](api/docs/modules/notifications.md)),
   [specs](api/docs/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
@@ -103,9 +106,10 @@ through `src/platform/api.ts` from their `*-api.ts`.
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
 transaction go through the outbox, and their handlers are safe to run twice.
 
-**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key` (and
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `Telegram__BotToken` (and
 `Expenses__Import__Key` only during an import) come from App Service environment variables; production migrations use
-the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
+the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; the scheduler cron uses the GitHub
+secret `SCHEDULER_KEY` (= `OutboxTick__Key`); locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
 `web/` (everything `VITE_*` ends up in the build). Never commit secrets.
 
 Commits, pushes, branches, PRs and other remote actions only on the user's direct request. Keep unrelated working tree

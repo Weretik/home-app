@@ -1,0 +1,49 @@
+name: Scheduler
+
+# The API runs on App Service F1, which sleeps when idle and has no background jobs, so this cron is its clock
+# (api/docs/decisions/0034-scheduler-github-actions-cron.md). Every 15 minutes it plans the Telegram digests that are
+# due, then sends the due outbox messages of all modules. Free for a public repository.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduler
+  cancel-in-progress: false
+
+env:
+  APP_URL: https://vitaliy-home-api-ase3bfeab4e9gren.polandcentral-01.azurewebsites.net
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Notifications tick, then outbox tick
+        env:
+          SCHEDULER_KEY: ${{ secrets.SCHEDULER_KEY }}
+        run: |
+          if [ -z "$SCHEDULER_KEY" ]; then
+            echo "::notice::Secret SCHEDULER_KEY is not set yet (see docs/deploy.md); nothing to do."
+            exit 0
+          fi
+          call() {
+            # The first call may wake the sleeping app, so give it time and a few tries.
+            for attempt in 1 2 3; do
+              if curl --fail --silent --show-error --max-time 100 -X POST -H "X-Scheduler-Key: $SCHEDULER_KEY" \
+                "$APP_URL$1"; then
+                echo
+                return 0
+              fi
+              echo "Attempt $attempt for $1 failed, retrying in 15s"
+              sleep 15
+            done
+            return 1
+          }
+          call /internal/notifications/tick
+          call /internal/outbox/tick

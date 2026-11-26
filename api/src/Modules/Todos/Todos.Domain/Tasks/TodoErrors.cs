@@ -17,6 +17,12 @@ public static class TodoErrors
     public static readonly Error ImportKeyTooLong = Error.Validation(
         "todos.import_key_too_long", $"The import key is longer than {TodoTask.MaxImportKeyLength} characters.", "importKey");
 
+    public static readonly Error SourceAlreadySet =
+        Error.Conflict("todos.source_already_set", "The task already belongs to another record.");
+
+    public static readonly Error SourceInvalid = Error.Validation(
+        "todos.source_invalid", $"A source is a kind of at most {TodoTask.MaxSourceKindLength} characters and an id.", "source");
+
     public static readonly Error TooManySteps = Error.Validation(
         "todos.too_many_steps", $"A task has at most {TodoTask.MaxSteps} steps.", "steps");
 

@@ -23,6 +23,52 @@ namespace Gifts.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BuildingBlocks.Infrastructure.Outbox.Storage.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ClaimToken")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("FailedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("NextAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("ProcessedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClaimToken");
+
+                    b.HasIndex("ProcessedAtUtc", "FailedAtUtc", "NextAttemptAtUtc");
+
+                    b.ToTable("outbox_messages", "gifts");
+                });
+
             modelBuilder.Entity("Gifts.Application.Idempotency.CreateRequest", b =>
                 {
                     b.Property<string>("Key")
@@ -196,6 +242,10 @@ namespace Gifts.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateOnly?>("BuyBy")
+                        .HasColumnType("date")
+                        .HasColumnName("buy_by");
+
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid")
                         .HasColumnName("category_id");
@@ -207,6 +257,11 @@ namespace Gifts.Infrastructure.Persistence.Migrations
                     b.Property<DateOnly?>("GiftedOn")
                         .HasColumnType("date")
                         .HasColumnName("gifted_on");
+
+                    b.Property<string>("Giver")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("giver");
 
                     b.Property<string>("Link")
                         .HasMaxLength(2000)

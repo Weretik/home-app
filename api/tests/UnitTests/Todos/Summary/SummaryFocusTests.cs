@@ -13,7 +13,7 @@ public sealed class SummaryFocusTests
     private static TodoTaskItem Task(
         string title, TodoPriority priority = TodoPriority.Normal, DateOnly? due = null, TodoStatus status = TodoStatus.Todo, int createdDay = 1) =>
         new(Guid.NewGuid(), title, null, Assignee.Shared, null, status, priority, due, null, null, null,
-            Created.AddDays(createdDay), Created, null, [], 0, 0, 1);
+            Created.AddDays(createdDay), Created, null, [], 0, 0, 1, null, null);
 
     [Fact]
     public void Overdue_ComeFirst_ByDueDate_ThenToday_ThenUrgent()

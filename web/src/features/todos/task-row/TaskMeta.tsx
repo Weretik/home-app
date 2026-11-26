@@ -21,7 +21,7 @@ const item = {
 } as const;
 
 /**
- * The wrapping line under a task's title (FR-004): priority mark, due date (red when overdue), category, steps,
+ * The wrapping line under a task's title (FR-004): a 🎁 for a gift's to-do (gifts 002), priority mark, due date (red when overdue), category, steps,
  * a notes icon, the assignee, and «В работе» / «Отложено». `extra` goes first (the archive's status and date, so an
  * archived row shows no status chip again).
  */
@@ -54,6 +54,16 @@ export function TaskMeta({
       }}
     >
       {extra && <Box component="span">{extra}</Box>}
+      {task.source?.kind === 'gift' && (
+        <Box
+          component="span"
+          role="img"
+          aria-label="Задача из подарков"
+          title="Задача из подарков"
+        >
+          🎁
+        </Box>
+      )}
       {mark && (
         <Box
           component="span"

@@ -12,6 +12,7 @@ import {
 } from './gift-form';
 import { GiftFields } from './GiftFields';
 import { OccasionFields } from './OccasionFields';
+import { PurchaseFields } from './PurchaseFields';
 
 interface GiftDialogProps {
   /** The gift to change; undefined adds a new one. */
@@ -58,6 +59,11 @@ export function GiftDialog({
         onChange={(variants) => form.set('variants', variants)}
       />
       <OccasionFields
+        values={form.values}
+        errors={form.errors}
+        set={form.set}
+      />
+      <PurchaseFields
         values={form.values}
         errors={form.errors}
         set={form.set}

@@ -21,4 +21,6 @@ public sealed record UpdateGiftCommand(
     string? Occasion,
     DateOnly? OccasionDate,
     string? Notes,
-    IReadOnlyList<VariantDraft> Variants) : ICommand<Result>;
+    IReadOnlyList<VariantDraft> Variants,
+    Recipient? Giver = null,
+    DateOnly? BuyBy = null) : ICommand<Result>;

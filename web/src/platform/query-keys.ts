@@ -8,4 +8,5 @@ export const moduleKeys = {
   shopping: ['shopping'],
   gifts: ['gifts'],
   todos: ['todos'],
+  notifications: ['notifications'],
 } as const;

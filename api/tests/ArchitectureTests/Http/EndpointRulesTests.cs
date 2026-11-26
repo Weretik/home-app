@@ -14,6 +14,8 @@ public sealed partial class EndpointRulesTests
     private static readonly Dictionary<string, string> UnlimitedWrites = new()
     {
         ["OutboxTickEndpoint.cs"] = "called by the scheduler with a secret key, hidden from OpenAPI (ADR 0006)",
+        ["NotificationsTickEndpoint.cs"] = "called by the scheduler with a secret key, hidden from OpenAPI (ADR 0034)",
+        ["TelegramWebhookEndpoint.cs"] = "called only by Telegram with the secret header, hidden from OpenAPI (ADR 0033)",
     };
 
     private static IEnumerable<(string File, string Text)> EndpointFiles() =>
