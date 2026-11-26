@@ -18,6 +18,7 @@ refactor → affected regression run. Evidence is the CI run of the pull request
 | TS-010 | Deploy: migrations bundle for `TodosDbContext` in `.github/workflows/api.yml` | workflow | CI | — |
 | TS-011 | Import script from the sheet, idempotent | project files `home-app/import/todos-import.sql` | run twice against a local PostgreSQL | R-016, SC-008 |
 | TS-012 | Docs: module page, ADR, C4, README module list | `api/docs/` | review | — |
+| TS-013 | Date filters of the list (2026-11-26): due period or none, completion day period in the archive; `KyivCalendar.StartOfDayInKyiv` turns a Kyiv day into the UTC bounds | `ListTodoTasks/`, `KyivCalendar.cs` | unit (validator, Kyiv midnight in winter and summer) + integration (`The_Due_Filter_…`, `The_Archive_Filters_ByTheKyivDay_…`) | R-017 |
 
 ## Readiness
 

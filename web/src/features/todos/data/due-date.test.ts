@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays,
-  dueBucket,
   formatDue,
-  groupByDue,
+  isOverdue,
   kyivDayOf,
   kyivToday,
   weekendOf,
@@ -35,32 +34,11 @@ describe('addDays and weekendOf', () => {
   });
 });
 
-describe('dueBucket', () => {
-  it.each([
-    [null, 'none'],
-    ['2026-11-25', 'overdue'],
-    ['2026-11-26', 'today'],
-    ['2026-11-27', 'soon'],
-    ['2026-12-03', 'soon'],
-    ['2026-12-04', 'later'],
-  ] as const)('%s is %s', (due, bucket) => {
-    expect(dueBucket(due, today)).toBe(bucket);
-  });
-});
-
-describe('groupByDue', () => {
-  it('keeps the order inside a group and leaves out empty groups', () => {
-    const items = [
-      { id: 'a', dueDate: null },
-      { id: 'b', dueDate: '2026-11-20' },
-      { id: 'c', dueDate: '2026-11-30' },
-      { id: 'd', dueDate: '2026-11-10' },
-    ];
-
-    const groups = groupByDue(items, today);
-
-    expect(groups.map((g) => g.bucket)).toEqual(['overdue', 'soon', 'none']);
-    expect(groups[0]!.items.map((i) => i.id)).toEqual(['b', 'd']);
+describe('isOverdue', () => {
+  it('is only a due date before today', () => {
+    expect(isOverdue('2026-11-25', today)).toBe(true);
+    expect(isOverdue('2026-11-26', today)).toBe(false);
+    expect(isOverdue(null, today)).toBe(false);
   });
 });
 

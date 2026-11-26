@@ -145,8 +145,8 @@ test('shows done and cancelled tasks with their completion and pages them', asyn
         }),
   );
 
-  const list = await screen.findByRole('list', { name: 'Архив задач' });
-  expect(list).toHaveTextContent('Сделано сегодня');
+  const list = await screen.findByRole('list', { name: 'Сегодня' });
+  expect(list).toHaveTextContent('Сделано');
   expect(lists()[0]!.url.searchParams.get('view')).toBe('archive');
   expect(screen.getByRole('tab', { name: 'Задачи' })).toHaveAttribute(
     'href',
@@ -156,7 +156,8 @@ test('shows done and cancelled tasks with their completion and pages them', asyn
   await userEvent.click(screen.getByRole('button', { name: 'Показать ещё' }));
 
   expect(await screen.findByText('Старый план')).toBeInTheDocument();
-  expect(list).toHaveTextContent('Не актуально');
+  const older = screen.getByRole('list', { name: /5 января/ });
+  expect(older).toHaveTextContent('Не актуально');
   expect(lists().at(-1)!.url.searchParams.get('page')).toBe('2');
 });
 
@@ -170,7 +171,7 @@ test('returns a task to the active list with «Вернуть»', async () => {
     }
     return json(page(returned ? [] : [item]));
   }, '/todos/archive?who=maria');
-  await screen.findByRole('list', { name: 'Архив задач' });
+  await screen.findByRole('list', { name: 'Сегодня' });
   expect(screen.getByRole('tab', { name: 'Задачи' })).toHaveAttribute(
     'href',
     '/todos?who=maria',
@@ -196,4 +197,23 @@ test('says the archive is empty', async () => {
   renderPage(() => json(page([])));
 
   expect(await screen.findByText('Архив пуст')).toBeInTheDocument();
+});
+
+test('filters the archive by the day of completion', async () => {
+  const { lists } = renderPage(() =>
+    json(page([archived({ title: 'Позвонить' })])),
+  );
+  await screen.findByRole('list', { name: 'Сегодня' });
+
+  await userEvent.click(
+    screen.getByRole('combobox', { name: 'Когда сделано' }),
+  );
+  await userEvent.click(screen.getByRole('option', { name: 'Вчера' }));
+
+  await vi.waitFor(() => {
+    const query = lists().at(-1)!.url.searchParams;
+    expect(query.get('completedFrom')).toBeTruthy();
+    expect(query.get('completedFrom')).toBe(query.get('completedTo'));
+    expect(query.get('dueTo')).toBeNull();
+  });
 });

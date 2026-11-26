@@ -51,6 +51,7 @@ place that is easier than the Google Sheet.
 | R-014 | A create takes an `Idempotency-Key`: a repeat with the same body returns the first result, the same key with another body answers `409`. |
 | R-015 | Every write is anonymous and rate limited (`PublicWrite`), like Expenses. |
 | R-016 | The import keeps the sheet's `ID` as `ImportKey` under a unique index, so running it twice adds nothing twice. |
+| R-017 | Lists narrow by date (added 2026-11-26): `dueFrom` / `dueTo` (days, both included, either open) or `withoutDueDate` on the due date; in the archive `completedFrom` / `completedTo` on the Europe/Kyiv day of completion. A period and `withoutDueDate` together, a period ending before it starts, or a completion period outside `view=archive` answer `400`. |
 
 ## Acceptance scenarios
 

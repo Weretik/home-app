@@ -1,4 +1,5 @@
-import type { Assignee, TaskQuery } from '../data/todos-api';
+import type { Assignee, TaskQuery, TaskView } from '../data/todos-api';
+import { dateQuery, type DateFilter } from './date-filter';
 
 /** «Кому» in the URL (`?who=`): lower-case words, so a link reads well. */
 export type Who = 'maria' | 'vitaliy' | 'shared';
@@ -12,7 +13,7 @@ export const whoLabels: Record<Who, string> = {
 };
 
 /** The filters of a task list as the URL keeps them (FR-002). `category` is an id or `none`. */
-export interface TodoFilters {
+export interface TodoFilters extends DateFilter {
   who?: Who;
   category?: string;
   q?: string;
@@ -26,10 +27,15 @@ const whoAssignee: Record<Who, Assignee> = {
 
 /**
  * The API query of the filters. «Маша» and «Виталий» also bring the shared tasks, as the old sheet's per-person tabs
- * did; «Общее» brings only the shared ones.
+ * did; «Общее» brings only the shared ones. The date filter reads `today` (Kyiv) and the list it is on.
  */
-export function toTaskQuery({ who, category, q }: TodoFilters): TaskQuery {
-  const query: TaskQuery = {};
+export function toTaskQuery(
+  filters: TodoFilters,
+  view: TaskView = 'active',
+  today = '',
+): TaskQuery {
+  const { who, category, q } = filters;
+  const query: TaskQuery = today ? dateQuery(view, filters, today) : {};
   if (who)
     query.assignee =
       who === 'shared' ? ['Shared'] : [whoAssignee[who], 'Shared'];
@@ -45,4 +51,4 @@ export const quickAddAssignee = (who: Who | undefined): Assignee =>
   who ? whoAssignee[who] : 'Shared';
 
 export const isFiltered = (filters: TodoFilters) =>
-  Boolean(filters.who || filters.category || filters.q?.trim());
+  Boolean(filters.who || filters.category || filters.q?.trim() || filters.when);

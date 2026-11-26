@@ -75,7 +75,7 @@ All writes: `RequireRateLimiting(PublicWrite)`, `429` listed. Edits send `If-Mat
 
 | Name | Method and path | Request | Response |
 | --- | --- | --- | --- |
-| `listTodoTasks` | `GET /tasks` | query: `view` (`active` default / `archive`), `assignee` (repeatable), `categoryId`, `withoutCategory` (bool), `search`, `page` (1), `pageSize` (50, ≤100) | `200 TodoTaskList { items: TodoTaskItem[], page, pageSize, totalCount }` |
+| `listTodoTasks` | `GET /tasks` | query: `view` (`active` default / `archive`), `assignee` (repeatable), `categoryId`, `withoutCategory` (bool), `search`, `dueFrom`, `dueTo`, `withoutDueDate` (bool), `completedFrom`, `completedTo` (archive only; Kyiv days, R-017), `page` (1), `pageSize` (50, ≤100) | `200 TodoTaskList { items: TodoTaskItem[], page, pageSize, totalCount }` |
 | `getTodoTask` | `GET /tasks/{id}` | | `200 TodoTaskItem`, `404` |
 | `createTodoTask` | `POST /tasks` | `Idempotency-Key`; `TodoTaskRequest { title, notes?, assignee, author?, status?, priority, dueDate?, categoryId?, steps?: string[] }` | `201 { id }`, `400`, `404` category, `409` key reuse |
 | `updateTodoTask` | `PUT /tasks/{id}` | `If-Match`; `TodoTaskRequest` without `steps` (status included) | `204`, `400`, `404`, `409` |
