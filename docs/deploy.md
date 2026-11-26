@@ -76,7 +76,7 @@ The API reads one connection string, `ConnectionStrings:Default`, in the Npgsql 
 
 The hosting plan allows several PostgreSQL databases, so this project gets its own database next to the other ones.
 
-1. **Database.** adm.tools → Databases → Create database (for example `home`). The panel creates an owner user of the
+1. **Database.** adm.tools → Databases → Create database (ours is `weretick`). The panel creates an owner user of the
    same name with all rights on it. Set its password with "Change password".
 2. **Access from other users (optional).** The panel gives `PUBLIC` the TEMPORARY & CONNECT rights on every database,
    so other database users on the account can connect to it. Remove the `PUBLIC` row on the new database if you want
@@ -88,7 +88,7 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
    it the password travels in clear text over the internet, so prefer SSL if at all possible.
 5. **Connection string**, then put it into the App Service as described below:
 
-   `Host=<host>;Port=5432;Database=home;Username=home;Password=<password>;SSL Mode=Require;Search Path=home`
+   `Host=<host>;Port=5432;Database=weretick;Username=weretick;Password=<password>;SSL Mode=Require;Search Path=home`
 
 The first EF migration creates the `home` schema itself, since the owner has all rights; nothing to run by hand. The
 schema is kept even in a separate database, so the data can move to a shared server later without changes.
