@@ -65,7 +65,8 @@ Computer (md, 900px and wider)              Phone (below md)
   button collapses it to 84px of icons with tooltips; the choice is remembered (`home.side-nav.collapsed`).
 - **Bottom bar** (phone): the five main sections with icon and label; the active one has a tinted pill behind the
   icon. It respects the safe area at the bottom.
-- **Page panel**: `background.default` with rounded top corners, content up to 1200px wide.
+- **Page panel**: `background.default` with rounded top corners. Content starts at the left edge next to the side
+  menu (never centred, which leaves a gap on wide screens) and stops at 1600px.
 - Sections are declared once in `src/app/shell/sections.ts`. `mainSections` (at most five) go to both menus;
   `serviceSections` go only to the side menu, and the home page links to them for phones.
 
