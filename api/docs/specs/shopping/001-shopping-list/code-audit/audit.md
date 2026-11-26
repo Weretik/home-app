@@ -42,7 +42,7 @@ rows a month, keyword dictionary of about 400 rows. See AF-001.
 | AF-011 | Low | accepted | queries | Keyword list and item list are not paged |
 | AF-012 | Low | accepted | application port | `IShoppingDbContext` exposes `Database` |
 | AF-013 | Low | accepted | queries | The matcher loads the whole dictionary per request |
-| AF-014 | Low | accepted | deployment | `CREATE EXTENSION pg_trgm` at deploy needs the right (pg_trgm is trusted; the migration user owns the database) |
+| AF-014 | High | fixed | deployment | `CREATE EXTENSION pg_trgm` failed in production; trigram index dropped |
 | AF-015 | Low | fixed | docs | Design named a wrong index and left out the trigram index |
 | AF-016 | Info | open (merge) | docs | `decisions/README.md` will conflict with `main` |
 
@@ -69,7 +69,7 @@ rows a month, keyword dictionary of about 400 rows. See AF-001.
   `dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 --project src/Modules/Shopping/Shopping.Infrastructure --startup-project src/Host/Host.Api --context ShoppingDbContext --output ${{ runner.temp }}/migrations/shopping`
   (same flags as the Expenses line). Outside `api/`, so not done by this change.
 - **Verification:** the CI deploy log shows "Migrating shopping" and `shopping.__ef_migrations_history` holds
-  `20261126213628_Initial`.
+  `20261126220437_Initial`.
 
 ### AF-003 — re-add rule in the handler (fixed)
 
@@ -85,8 +85,7 @@ rows a month, keyword dictionary of about 400 rows. See AF-001.
 ### AF-005 — keyword indexes overwrote each other (fixed)
 
 - **Evidence:** two unnamed `HasIndex(k => k.Keyword)` calls map to one EF index. **Fix:** named overloads
-  `ux_department_keywords_keyword` (unique) and `ix_department_keywords_keyword_trgm` (gin, `gin_trgm_ops`); both in
-  the migration.
+  `ux_department_keywords_keyword` (unique) in the migration (the trigram index was later dropped, AF-014).
 
 ### AF-006 — time precision (fixed)
 
@@ -132,10 +131,12 @@ rows a month, keyword dictionary of about 400 rows. See AF-001.
   request. Not measured (no targets, AF-001); at this size it is one small indexed read. A cache would need
   invalidation on every keyword edit.
 
-### AF-014 — `pg_trgm` at deploy (risk note)
+### AF-014 — `pg_trgm` at deploy (fixed)
 
-- The migration runs `CREATE EXTENSION IF NOT EXISTS pg_trgm`. The migration user needs the right to create it
-  (allowed on Azure Database for PostgreSQL once `pg_trgm` is in `azure.extensions`). Check before the first deploy.
+- The first production deploy failed: `CREATE EXTENSION IF NOT EXISTS pg_trgm` gave `3F000: no schema has been
+  selected to create in` on the hosting provider's server. **Fix:** the extension and the gin trigram index on
+  `department_keywords.keyword` were removed (the search scans about 400 rows); the unapplied `Initial` migration was
+  regenerated. Exception to the rules.md search rule recorded in ADR 0031.
 
 ### AF-015 — design index names (fixed)
 

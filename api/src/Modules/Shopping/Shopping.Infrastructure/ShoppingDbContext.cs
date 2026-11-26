@@ -23,11 +23,4 @@ public sealed class ShoppingDbContext(DbContextOptions<ShoppingDbContext> option
     public DbSet<ShoppingSettings> Settings => Set<ShoppingSettings>();
 
     public DbSet<CreateRequest> CreateRequests => Set<CreateRequest>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Trigram index on keywords for the settings search (docs/rules.md, Data).
-        modelBuilder.HasPostgresExtension("pg_trgm");
-        base.OnModelCreating(modelBuilder);
-    }
 }

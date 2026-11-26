@@ -38,5 +38,7 @@ urgent flag, editable departments and keywords, a history page and a home summar
   keeps the cart, history and frequent queries cheap.
 - Two simultaneous adds of the same new name can create two rows (no unique index on the name, since history repeats
   names); for two people this is visible at once and deleted by hand.
-- The deploy builds one more migration bundle (`ShoppingDbContext`) in `.github/workflows/api.yml`. The first
-  migration creates the `pg_trgm` extension, which a database owner may create (it is a trusted extension).
+- The deploy builds one more migration bundle (`ShoppingDbContext`) in `.github/workflows/api.yml`. The module
+  needs no database extension: the keyword search is a plain escaped `LIKE` over about 400 rows, without the
+  `pg_trgm` index the rules ask for, because the production server refused `CREATE EXTENSION pg_trgm`. Revisit if
+  the extension becomes available or the dictionary grows past a few thousand rows.
