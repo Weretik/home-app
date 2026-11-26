@@ -9,7 +9,7 @@ wish out of the list once it is gifted, and check the other person's sizes («н
 ## In scope
 
 - The «Подарки» section at `/gifts` replacing the «Раздел скоро появится» placeholder.
-- «Список»: the wishes still wanted, grouped by person (Маша, Виталий, Вместе), filterable by person and category,
+- «Список»: the wishes still wanted, as a table (a compact list on a phone) in a coloured block per person (Маша, Виталий, Вместе), filterable by person and category,
   each with priority, price or «цена не указана», link, variants, occasion with date, notes.
 - Add, edit and delete a gift, including adding and removing its variants.
 - Quick «Подарено» (moves the wish to «Подаренные» with today's date) and «Не актуально» (moves it too, marked).

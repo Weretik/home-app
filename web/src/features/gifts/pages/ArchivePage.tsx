@@ -1,13 +1,12 @@
 import Box from '@mui/material/Box';
-import { GiftCard } from '../gift-card/GiftCard';
 import { GiftEditor } from '../gift-editing/GiftEditor';
 import { GiftFilters } from '../list-view/GiftFilters';
-import { GiftGroups } from '../list-view/GiftGroups';
+import { GiftRows } from '../list-view/GiftRows';
 import { ListStatus } from '../list-view/ListStatus';
 import { StatusSnackbar } from '../list-view/StatusSnackbar';
 import { useGiftList } from '../list-view/use-gift-list';
 
-/** «Подаренные»: gifted and dropped gifts, the latest gifted first; «Вернуть в список» moves one back. */
+/** «Подаренные»: gifted and dropped gifts per person, the latest gifted first; «Вернуть в список» moves one back. */
 export function ArchivePage() {
   const list = useGiftList(true);
   const { filterState } = list;
@@ -28,21 +27,15 @@ export function ArchivePage() {
         onRetry={() => void list.gifts.refetch()}
         onReset={filterState.clear}
       >
-        <GiftGroups
+        <GiftRows
           items={list.items}
-          grouped={false}
-          renderCard={(gift) => (
-            <GiftCard
-              key={gift.id}
-              gift={gift}
-              variant="archive"
-              showRecipient={!filterState.filters.recipient}
-              isPending={list.isChanging(gift)}
-              onStatus={list.changeStatus}
-              onEdit={list.editor.edit}
-              onDelete={list.editor.remove}
-            />
-          )}
+          variant="archive"
+          label="Подаренные подарки"
+          grouped={!filterState.filters.recipient}
+          isChanging={list.isChanging}
+          onStatus={list.changeStatus}
+          onEdit={list.editor.edit}
+          onDelete={list.editor.remove}
         />
       </ListStatus>
       <GiftEditor

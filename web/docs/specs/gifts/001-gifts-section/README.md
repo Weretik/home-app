@@ -12,7 +12,7 @@
 - **Updated:** 2026-11-26
 
 Masha and Vitaliy keep a gift wishlist in the Google Sheet «🎁 Список подарков». This feature replaces it with a
-«Подарки» section: the active wishlist («Список») grouped by person with recipient and category filters, an archive
+«Подарки» section: the active wishlist («Список») as a table in a coloured block per person with recipient and category filters, an archive
 («Подаренные») where a gifted or dropped wish moves instead of being greyed out, and settings (the «нюансы» — ring
 size, clothes, shoes — and the categories). A gift has a recipient, name, category, priority, an optional price and
 link, any number of variants each with its own link, an occasion with a date, and notes; it is added, edited and
@@ -58,5 +58,8 @@ half and consumed here.
 
 ## Change history
 
+- 2026-11-26 — after the first review: the wish cards became a table (computer) and a compact list (phone) like
+  Expenses, with a coloured block per person (Виталий primary, Маша secondary, Вместе info); whole prices without
+  «,00»; audit pass 2 appended.
 - 2026-11-26 — implemented; file map synced with the code, audit AF-001…AF-006 recorded.
 - 2026-11-26 — first draft from the product brief; contract names assumed until the backend lands (EN-001).

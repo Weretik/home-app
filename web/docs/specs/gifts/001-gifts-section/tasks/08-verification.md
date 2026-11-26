@@ -6,7 +6,7 @@
 - **Covers:** all (documentation)
 - **Depends on:** TS-006…TS-014
 - **Exact paths:** `web/docs/architecture.md` (Gifts section with its folder tree, routes table `/gifts`,
-  `/gifts/archive`, `/gifts/settings`, home `gifts-summary/`); `web/docs/design.md` («Wish cards» under Cards);
+  `/gifts/archive`, `/gifts/settings`, home `gifts-summary/`); `web/docs/design.md` («Gift lists», «Person colours»);
   `web/docs/specs/README.md` (status); this SDD's `README.md` and `traceability.md`
 - **Test level:** documentation
 - **Baseline:** AGENTS.md (docs in the same change), [web rules](../../../../rules.md)
@@ -15,14 +15,14 @@
 
 - [ ] Write the actual folder map (from code, not this plan) into architecture.md; remove `gifts` from the «coming
       soon» route row.
-- [ ] Add the «Wish cards» pattern to design.md.
+- [ ] Add the «Gift lists» and «Person colours» patterns to design.md (replaced the first «Wish cards»).
 - [ ] Update statuses and evidence links.
 - [ ] Responsibility check of the docs (one place per fact).
 
 ### Evidence
 
 - `web/docs/architecture.md`: Gifts section (Mermaid, tree, rules, Tests), `/gifts*` routes, home `gifts-summary/`.
-- `web/docs/design.md`: «Wish card» pattern. `web/docs/specs/README.md`: status. Status: done.
+- `web/docs/design.md`: «Gift lists» and «Person colours» (the «Wish card» pattern was removed after the first review). `web/docs/specs/README.md`: status. Status: done.
 
 ### Done when
 

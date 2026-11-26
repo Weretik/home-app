@@ -12,9 +12,15 @@ interface Filterable {
   categoryId: string;
 }
 
+interface Priced {
+  price?: number | null;
+}
+
 export interface GiftGroup<T> {
   recipient: Recipient;
   items: T[];
+  /** The sum of the known prices in the group. */
+  priceSum: number;
 }
 
 const isRecipient = (value: string | null): value is Recipient =>
@@ -49,14 +55,15 @@ export function applyFilters<T extends Filterable>(
   );
 }
 
-/** The items per recipient (Маша, Виталий, Вместе), server order kept inside a group; empty groups left out. */
-export function groupByRecipient<T extends Filterable>(
+/** The items per recipient (Маша, Виталий, Вместе) with their price sum, server order kept; empty groups left out. */
+export function groupByRecipient<T extends Filterable & Priced>(
   items: readonly T[],
 ): GiftGroup<T>[] {
   return recipients
-    .map((recipient) => ({
-      recipient,
-      items: items.filter((item) => item.recipient === recipient),
-    }))
+    .map((recipient) => {
+      const own = items.filter((item) => item.recipient === recipient);
+      const priceSum = own.reduce((sum, item) => sum + (item.price ?? 0), 0);
+      return { recipient, items: own, priceSum };
+    })
     .filter((group) => group.items.length > 0);
 }

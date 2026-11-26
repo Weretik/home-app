@@ -4,15 +4,33 @@ const money = new Intl.NumberFormat('ru-RU', {
   currencyDisplay: 'narrowSymbol',
 });
 
+const whole = new Intl.NumberFormat('ru-RU', {
+  style: 'currency',
+  currency: 'UAH',
+  currencyDisplay: 'narrowSymbol',
+  maximumFractionDigits: 0,
+});
+
 const longDay = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
 });
 
-/** A price in hryvnias with kopecks («1 234,50 ₴»); an unknown price is never shown as zero. */
+/** A gift price: «1 625 ₴» when whole, «1 234,50 ₴» with real kopecks; an unknown price is never shown as zero. */
 export function formatPrice(value: number | null | undefined): string {
-  return value == null ? 'цена не указана' : money.format(value);
+  if (value == null) return 'цена не указана';
+  return Number.isInteger(value) ? whole.format(value) : money.format(value);
+}
+
+/** A rounded sum for a person's group header: «4 500 ₴». */
+export const formatWhole = (value: number) => whole.format(value);
+
+/** «1 подарок», «3 подарка», «12 подарков». */
+export function formatGiftsCount(count: number): string {
+  const forms = { one: 'подарок', few: 'подарка', many: 'подарков' } as const;
+  const rule = new Intl.PluralRules('ru-RU').select(count);
+  return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }
 
 /** A contract date (`2027-03-12`) as «12 марта 2027». Read as a calendar day, so no time zone shifts it. */
@@ -50,4 +68,17 @@ export function formatVariantsCount(count: number): string {
   const forms = { one: 'вариант', few: 'варианта', many: 'вариантов' } as const;
   const rule = new Intl.PluralRules('ru-RU').select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
+}
+
+/** How an archived gift ended: «Подарено 26 ноября 2026», «Подарено», «Не актуально»; undefined while wanted. */
+export function formatOutcome(gift: {
+  status: string;
+  giftedOn?: string | null;
+}): string | undefined {
+  if (gift.status === 'Gifted')
+    return gift.giftedOn
+      ? `Подарено ${formatLongDay(gift.giftedOn)}`
+      : 'Подарено';
+  if (gift.status === 'Dropped') return 'Не актуально';
+  return undefined;
 }

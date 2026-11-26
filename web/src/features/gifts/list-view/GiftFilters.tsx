@@ -6,6 +6,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import type { ReactNode } from 'react';
 import type { GiftCategoryItem, Recipient } from '../data/gifts-api';
 import { recipientLabels, recipients } from '../display/labels';
+import { RecipientAvatar } from '../display/RecipientAvatar';
+import { toneColor, toneTint } from '../display/recipient-tones';
 import type { GiftFilterState } from '../url-state/use-gift-filters';
 
 interface GiftFiltersProps {
@@ -15,7 +17,7 @@ interface GiftFiltersProps {
   action?: ReactNode;
 }
 
-/** «Для кого» (Все / Маша / Виталий / Вместе) and «Категория»; both live in the link. */
+/** «Для кого» (Все / Маша / Виталий / Вместе, each in the person's colour) and «Категория»; both live in the link. */
 export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
   const { filters } = state;
 
@@ -40,8 +42,19 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
             <ToggleButton
               key={recipient}
               value={recipient}
-              sx={{ textTransform: 'none', px: 1.5 }}
+              sx={(theme) => ({
+                textTransform: 'none',
+                px: 1.5,
+                gap: 0.75,
+                '&.Mui-selected, &.Mui-selected:hover': {
+                  color: 'text.primary',
+                  fontWeight: 600,
+                  bgcolor: toneTint(theme, recipient, 0.12),
+                  borderColor: toneColor(theme, recipient),
+                },
+              })}
             >
+              <RecipientAvatar recipient={recipient} size={20} />
               {recipientLabels[recipient]}
             </ToggleButton>
           ))}

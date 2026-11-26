@@ -1,15 +1,14 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { GiftCard } from '../gift-card/GiftCard';
 import { GiftEditor } from '../gift-editing/GiftEditor';
 import { GiftFilters } from '../list-view/GiftFilters';
-import { GiftGroups } from '../list-view/GiftGroups';
+import { GiftRows } from '../list-view/GiftRows';
 import { ListStatus } from '../list-view/ListStatus';
 import { StatusSnackbar } from '../list-view/StatusSnackbar';
 import { useGiftList } from '../list-view/use-gift-list';
 
-/** «Список»: the wanted gifts, per person unless one is picked; «Подарено» moves a gift to «Подаренные». */
+/** «Список»: the wanted gifts in a block per person unless one is picked; «Подарено» moves a gift to «Подаренные». */
 export function GiftsPage() {
   const list = useGiftList(false);
   const { filterState } = list;
@@ -42,20 +41,15 @@ export function GiftsPage() {
         onRetry={() => void list.gifts.refetch()}
         onReset={filterState.clear}
       >
-        <GiftGroups
+        <GiftRows
           items={list.items}
+          variant="active"
+          label="Список подарков"
           grouped={!filterState.filters.recipient}
-          renderCard={(gift) => (
-            <GiftCard
-              key={gift.id}
-              gift={gift}
-              variant="active"
-              isPending={list.isChanging(gift)}
-              onStatus={list.changeStatus}
-              onEdit={list.editor.edit}
-              onDelete={list.editor.remove}
-            />
-          )}
+          isChanging={list.isChanging}
+          onStatus={list.changeStatus}
+          onEdit={list.editor.edit}
+          onDelete={list.editor.remove}
         />
       </ListStatus>
       <GiftEditor

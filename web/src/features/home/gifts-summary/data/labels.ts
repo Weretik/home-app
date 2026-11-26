@@ -7,12 +7,6 @@ export const recipientLabels: Record<Recipient, string> = {
   Together: 'Вместе',
 };
 
-export const recipientEmoji: Record<Recipient, string> = {
-  Maria: '👩',
-  Vitaliy: '👨',
-  Together: '🏠',
-};
-
 export const recipientOrder: readonly Recipient[] = [
   'Maria',
   'Vitaliy',
