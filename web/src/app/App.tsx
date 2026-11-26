@@ -1,14 +1,15 @@
-import { HealthStatus } from '../features/health/HealthStatus';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { StatusPage } from '../features/status/StatusPage';
+import { AppLayout } from './AppLayout';
 
 export function App() {
   return (
-    <main>
-      <h1>Дом</h1>
-      <p>
-        Расходы, покупки, дела и подарки. Пока здесь только проверка связи с
-        API.
-      </p>
-      <HealthStatus />
-    </main>
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<Navigate to="/status" replace />} />
+        <Route path="/status" element={<StatusPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

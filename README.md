@@ -1,52 +1,47 @@
 # Home
 
 A family website that replaces Google Sheets and Apps Script Telegram bots: expenses, shopping list, to-dos (Masha,
-Vitaliy, shared) and a gift wishlist. For now the repository holds only the scaffold: an API with `/health` and a page
-that calls it.
+Vitaliy, shared) and a gift wishlist. Built on
+[fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). For now it holds the platform
+only: the API reports its health and the web app shows it; the feature modules come next.
 
-**Stack:** .NET 10 · ASP.NET Core · PostgreSQL (schema `home`) · EF Core · React 19 · Vite · TypeScript
+**Stack:** .NET 10 · ASP.NET Core · EF Core · PostgreSQL · Mediator · React 19 · Vite · TypeScript · Material UI ·
+React Query
 
 ```
-api/    ASP.NET Core API, one project, features in folders (api/src/HomeApp.Api/Features/<Area>/)
-web/    React + Vite, a plain static build into web/dist
-docs/   Architecture, deployment, decisions (ADRs)
+api/    .NET 10 modular monolith: BuildingBlocks, Host.Api, Modules/<Name>/ (five projects each), tests
+web/    React single-page app: app/, platform/, features/, a client generated from the API's OpenAPI document
+docs/   Repository-wide decisions and deployment
 ```
 
-`api/` and `web/` do not depend on each other: the front only knows the API address (`VITE_API_URL`), and the API
-allows the front's origin through CORS. Each half has its own workflow that runs only when its folder changes.
+`api/` and `web/` know nothing about each other except one file: the OpenAPI document `api/docs/contracts/openapi.json`.
+Each half has its own README, rules, decisions and workflow.
 
-| | Where |
-| --- | --- |
-| How it works | [docs/architecture.md](docs/architecture.md) |
-| Deployment and secrets | [docs/deploy.md](docs/deploy.md) |
-| Decisions | [docs/decisions/README.md](docs/decisions/README.md) |
-| Rules for AI agents | [AGENTS.md](AGENTS.md) |
+| | API | Web |
+| --- | --- | --- |
+| Start here | [api/README.md](api/README.md) | [web/README.md](web/README.md) |
+| Architecture | [Modules, layers, rules](api/docs/architecture/README.md), [C4](api/docs/architecture/c4.md) | [Folders and data flow](web/docs/architecture.md) |
+| Rules | [api/docs/rules.md](api/docs/rules.md) | [web/docs/rules.md](web/docs/rules.md) |
+| Decisions | [api/docs/decisions](api/docs/decisions/README.md) | [web/docs/decisions](web/docs/decisions/README.md) |
 
-## Run locally
+Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database) and [deployment](docs/deploy.md).
+Rules for AI agents: [AGENTS.md](AGENTS.md).
 
-You need the .NET 10 SDK, Node.js 22 and Docker (for the database).
+## Quick start
+
+You need the .NET 10 SDK, Node.js 22 and Docker.
 
 ```bash
-# Database (optional: without it /health reports database: Unhealthy)
+# 1. Database
 cd api
 docker compose up -d
 
-# API on http://localhost:5000
-dotnet run --project src/HomeApp.Api
+# 2. API on http://localhost:5000 (OpenAPI at /openapi/v1.json in Development)
+dotnet run --project src/Host/Host.Api
 
-# Front on http://localhost:5173 (in a second terminal)
+# 3. Web on http://localhost:5173 (in a second terminal)
 cd web
 cp .env.example .env.local
 npm ci
 npm run dev
-```
-
-Local secrets live in `dotnet user-secrets` (`cd api/src/HomeApp.Api && dotnet user-secrets set "Key" "value"`) and
-never reach the repository.
-
-## Checks
-
-```bash
-cd api && dotnet test HomeApp.slnx
-cd web && npm run typecheck && npm test && npm run format:check
 ```

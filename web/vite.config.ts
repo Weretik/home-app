@@ -3,9 +3,13 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
+  server: { port: 5173, host: 'localhost' },
+  build: { outDir: 'dist', emptyOutDir: true },
   test: {
-    environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test-setup.ts'],
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ['./vitest.setup.ts'],
+    env: { VITE_API_URL: 'http://api.test' },
   },
 });

@@ -1,0 +1,22 @@
+# Decisions
+
+Architecture decision records: why the web app is built the way it is. They follow the frontend of
+[fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template), without its Nx workspace and
+Next.js storefront.
+
+| #    | Decision                                                                                                     |
+| ---- | ------------------------------------------------------------------------------------------------------------ |
+| 0001 | [One Vite React app, no Nx](0001-single-vite-app-without-nx.md)                                              |
+| 0002 | [A React single-page app with Material UI and React Query, never indexed](0002-react-spa-mui-react-query.md) |
+| 0003 | [A typed API client generated from the backend contract](0003-typed-client-from-openapi.md)                  |
+| 0004 | [Feature folders with boundaries checked in CI](0004-feature-folders-checked-in-ci.md)                       |
+
+## Decisions that must have a record
+
+- A new app, or a new framework for an app.
+- Hosting or rendering strategy of an app.
+- A state management or data transport approach.
+- A rule that every change must follow.
+
+New record: copy the newest file, take the next number, and keep the sections Context, Decision, Consequences. A record
+that is replaced stays, with its status changed to `superseded by NNNN`.
