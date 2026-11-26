@@ -1,3 +1,5 @@
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import List from '@mui/material/List';
@@ -10,6 +12,19 @@ const checkNames: Record<string, string> = { database: 'База данных' }
 
 /** Shows whether the API and its dependencies answer; the first page until real features arrive. */
 export function StatusPage() {
+  return (
+    <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 } }}>
+      <Typography variant="h4" component="h1">
+        Состояние
+      </Typography>
+      <Card sx={{ p: { xs: 2, md: 3 } }}>
+        <StatusDetails />
+      </Card>
+    </Box>
+  );
+}
+
+function StatusDetails() {
   const { data, error, isPending } = useSystemStatus();
 
   if (isPending) return <CircularProgress aria-label="Проверяю API" />;
