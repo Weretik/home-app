@@ -17,11 +17,15 @@ backend contract.
 ```
 src/
   main.tsx        entry: router and providers
-  app/            layout, routes, providers (theme, React Query), theme
+  app/
+    root/         routes and providers (theme, React Query)
+    theme/        palette, theme, light/dark/system switch (docs/design.md)
+    shell/        header, side menu, bottom bar, the list of sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/       the API client instance (VITE_API_URL) and the query client
   features/
-    status/       API and database status page (the first page until real features arrive)
+    home/         the dashboard and the placeholder for sections not built yet
+    status/       API and database status page
     <area>/       one folder per backend module: expenses, shopping, todos, gifts
 ```
 
@@ -44,4 +48,4 @@ When a feature grows past six files it splits by meaning (`list/`, `editor/`, `d
 - `index.html` has `noindex` and `robots.txt` disallows everything.
 - `public/staticwebapp.config.json` sends unknown paths to `index.html` on Azure Static Web Apps; other static hosts
   ignore it.
-- UI text is Russian; screens are designed for a phone first.
+- UI text is Russian; screens are designed for a phone first. Look, theme and layout: [design rules](design.md).
