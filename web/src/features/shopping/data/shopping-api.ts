@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 
 export type ShoppingItem = Schema<'ShoppingItemView'>;
 export type ShoppingList = Schema<'ShoppingList'>;
@@ -9,7 +10,7 @@ export type DepartmentMatch = Schema<'DepartmentMatch'>;
 export type ShoppingPerson = ShoppingItem['addedBy'];
 
 /** Every shopping query starts with this key, so an item write refreshes the list, history, frequent and counts. */
-export const shoppingKey = ['shopping'] as const;
+export const shoppingKey = moduleKeys.shopping;
 export const listKey = [...shoppingKey, 'list'] as const;
 /** The key of the checkbox mutation; polling pauses while one is pending so it cannot undo the optimistic tick. */
 export const statusMutationKey = [...shoppingKey, 'status'] as const;

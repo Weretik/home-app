@@ -2,12 +2,12 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
-import type { LimitRow } from '../data/limit-rows';
 import { formatExact } from '../data/money';
 import { LimitFill } from './LimitFill';
-import { leftColor, limitsLabel, number } from './limit-format';
+import { LimitNotes } from './LimitNotes';
+import { leftColor, limitsLabel, numberSx, type LimitRow } from './limit-rows';
 
-/** «Лимиты» on a phone: the name and the percent, the bar, then «X из Y · остаток Z · в день W». */
+/** The limits on a phone: one list item per limit with its fill and sums, «ИТОГО» last. */
 export function LimitList({ rows }: { rows: LimitRow[] }) {
   return (
     <List aria-label={limitsLabel} sx={{ pb: 1 }}>
@@ -30,7 +30,7 @@ export function LimitList({ rows }: { rows: LimitRow[] }) {
             >
               {row.name}
             </Typography>
-            <Typography sx={{ ...number, fontWeight: 600 }}>
+            <Typography sx={{ ...numberSx, fontWeight: 600 }}>
               {row.percent === null
                 ? formatExact(row.spent)
                 : `${row.percent}%`}
@@ -45,26 +45,27 @@ export function LimitList({ rows }: { rows: LimitRow[] }) {
               color="text.secondary"
               sx={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              <Box component="span" sx={number}>
+              <Box component="span" sx={numberSx}>
                 {formatExact(row.spent)} из {formatExact(row.limit)}
               </Box>
               {' · '}
               <Box
                 component="span"
-                sx={{ ...number, color: leftColor(row.left) }}
+                sx={{ ...numberSx, color: leftColor(row.left) }}
               >
                 остаток {formatExact(row.left)}
               </Box>
               {row.perDay !== null && (
                 <>
                   {' · '}
-                  <Box component="span" sx={number}>
+                  <Box component="span" sx={numberSx}>
                     в день {formatExact(row.perDay)}
                   </Box>
                 </>
               )}
             </Typography>
           )}
+          <LimitNotes row={row} />
         </ListItem>
       ))}
     </List>

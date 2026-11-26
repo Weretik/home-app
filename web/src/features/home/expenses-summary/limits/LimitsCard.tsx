@@ -2,12 +2,15 @@ import Card from '@mui/material/Card';
 import type { Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { limitRows } from '../data/limit-rows';
 import type { MonthSummary } from '../data/summary-api';
 import { LimitList } from './LimitList';
 import { LimitTable } from './LimitTable';
+import { limitRows } from './limit-rows';
 
-/** «Лимиты»: every spending limit of the month, then «ИТОГО» against the monthly limit. */
+/**
+ * «Лимиты»: every spending limit of the month, then «ИТОГО» against the monthly limit; each row notes the overspend
+ * carried in, what moves on to the next period and what is planned, when there is any.
+ */
 export function LimitsCard({ summary }: { summary: MonthSummary }) {
   const isComputer = useMediaQuery((theme: Theme) =>
     theme.breakpoints.up('md'),

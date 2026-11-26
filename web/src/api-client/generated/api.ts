@@ -170,7 +170,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The budget settings (monthly limit, savings goal) and every spending limit, in order. */
+        /** The budget settings (monthly limit, savings goal, limits start day) and every spending limit, in order. */
         get: operations["getBudget"];
         put?: never;
         post?: never;
@@ -187,7 +187,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** One month at a glance: incomes, expenses, the month's result, the savings jar, limits and top categories. */
+        /** One month at a glance: incomes, expenses, the month's result, the savings jar, limits with carry-over, top categories and the forecast. */
         get: operations["getMonthSummary"];
         put?: never;
         post?: never;
@@ -205,7 +205,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets the monthly limit on all expenses and the savings goal. Send the budget version in If-Match. */
+        /** Sets the monthly limit on all expenses, the savings goal and the day limits start carrying overspend. Send the budget version in If-Match. */
         put: operations["updateBudgetSettings"];
         post?: never;
         delete?: never;
@@ -244,6 +244,59 @@ export interface paths {
         post?: never;
         /** Deletes a spending limit for good; its expenses stay. */
         delete: operations["deleteSpendingLimit"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/planned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the planned expenses of one month by name, with their total. */
+        get: operations["listPlannedExpenses"];
+        put?: never;
+        /** Plans an expense for a month. Send a new Idempotency-Key per plan; a repeat returns the first id. */
+        post: operations["createPlannedExpense"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/planned/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a planned expense. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updatePlannedExpense"];
+        post?: never;
+        /** Drops a planned expense for good; nothing is recorded. */
+        delete: operations["deletePlannedExpense"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/planned/{id}/record": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records a planned expense as a real one (counted in the limits) and drops the plan, in one transaction. Send the plan's version in If-Match; returns the new expense id. */
+        post: operations["recordPlannedExpense"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -658,8 +711,13 @@ export interface components {
             monthlyLimit: number;
             /** Format: double */
             savingsGoal: number;
+            /** Format: date */
+            limitsFrom?: null | string;
         };
-        /** @description The monthly limit on all expenses (0 = none), the savings goal (0 = none) and the category limits. */
+        /**
+         * @description The monthly limit on all expenses (0 = none), the savings goal (0 = none), the day limits start counting and
+         *     carrying overspend, and the category limits.
+         */
         BudgetView: {
             /** Format: uint32 */
             version: number;
@@ -667,6 +725,8 @@ export interface components {
             monthlyLimit: number;
             /** Format: double */
             savingsGoal: number;
+            /** Format: date */
+            limitsFrom: string;
             limits: components["schemas"]["SpendingLimitItem"][];
         };
         /** @description How much went to one category in the month. */
@@ -748,6 +808,8 @@ export interface components {
             amount: number;
             paymentMethod: components["schemas"]["PaymentMethod"];
             comment: null | string;
+            /** @description Counted in the totals but in no limit («Не в лимиты»). */
+            outsideLimits: boolean;
         };
         /** @description One page of a month's or a period's expenses, plus the sum of every expense that matches the filter (not just this page). */
         ExpenseList: {
@@ -771,6 +833,8 @@ export interface components {
             amount: number;
             paymentMethod: components["schemas"]["PaymentMethod"];
             comment: null | string;
+            /** @default false */
+            outsideLimits: boolean;
         };
         /** @description A name bought often, in its latest spelling and department; one tap adds it. */
         FrequentItem: {
@@ -971,7 +1035,11 @@ export interface components {
          * @enum {unknown}
          */
         LimitPeriod: "Month" | "Quarter";
-        /** @description A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month). */
+        /**
+         * @description A spending limit against what was spent in its month or quarter (the quarter that holds the summary's month),
+         *     with the overspend carried in from earlier periods like the old «Бюджет» sheet. Expenses marked «Не в лимиты»
+         *     never count here.
+         */
         LimitUsage: {
             /** Format: uuid */
             id: string;
@@ -989,16 +1057,24 @@ export interface components {
             to: string;
             /** Format: double */
             amount: number;
-            /** Format: double */
+            /**
+             * Format: double
+             * @description What was spent on the limit's categories in the period.
+             */
             spent: number;
             /**
              * Format: double
-             * @description The limit minus what was spent; negative when it is overspent.
+             * @description Overspend of earlier periods this period has to cover; 0 when there is none.
+             */
+            carriedIn: number;
+            /**
+             * Format: double
+             * @description The limit minus what was spent minus decimal LimitUsage.CarriedIn; negative when it is overspent.
              */
             left: number;
             /**
              * Format: int32
-             * @description Spent as a share of the limit, in percent, rounded.
+             * @description Spent plus decimal LimitUsage.CarriedIn as a share of the limit, in percent, rounded.
              */
             percent: number;
             /**
@@ -1006,10 +1082,45 @@ export interface components {
              * @description What may still be spent per day until the period ends, or null when the period is not running now.
              */
             perDay: null | number;
+            /**
+             * Format: double
+             * @description What this period passes on to the next one if nothing more is spent.
+             */
+            carriesOut: number;
+            /**
+             * Format: double
+             * @description Planned expenses of the limit's categories in the months of the period.
+             */
+            planned: number;
+        };
+        /** @description Where the month is heading once the planned expenses («Прогноз») are spent too. */
+        MonthForecast: {
+            /**
+             * Format: double
+             * @description The planned expenses of the month.
+             */
+            planned: number;
+            /**
+             * Format: double
+             * @description The month's expenses plus decimal MonthForecast.Planned.
+             */
+            expectedExpenses: number;
+            /**
+             * Format: double
+             * @description Incomes minus decimal MonthForecast.ExpectedExpenses minus what went into the savings jar.
+             */
+            expectedResult: number;
+            /**
+             * Format: double
+             * @description The monthly limit minus the expenses it counts, minus decimal MonthForecast.Planned, minus what was carried in from earlier
+             *     months; 0 when there is no monthly limit.
+             */
+            expectedTotalLeft: number;
         };
         /**
          * @description One month at a glance, like the old «Сводка» sheet without its plan block: incomes and expenses with who they
-         *     belong to, the month's result after the savings jar, the jar itself, the spending limits and the top categories.
+         *     belong to, the month's result after the savings jar, the jar itself, the spending limits with their carry-over,
+         *     the top categories and the forecast with the planned expenses.
          */
         MonthSummary: {
             /** Format: int32 */
@@ -1019,14 +1130,38 @@ export interface components {
             /** Format: double */
             incomes: number;
             incomesByPerson: components["schemas"]["PersonAmount"][];
-            /** Format: double */
+            /**
+             * Format: double
+             * @description Every expense of the month, those marked «Не в лимиты» included.
+             */
             expenses: number;
             expensesByPayer: components["schemas"]["PayerAmount"][];
+            /**
+             * Format: int32
+             * @description How many expenses of the month are marked «Не в лимиты».
+             */
+            outsideLimitsCount: number;
+            /**
+             * Format: double
+             * @description What those expenses add up to; they are part of decimal MonthSummary.Expenses.
+             */
+            outsideLimitsAmount: number;
             /**
              * Format: double
              * @description The limit on all expenses of a month; 0 means none.
              */
             monthlyLimit: number;
+            /**
+             * Format: double
+             * @description Overspend of the monthly limit carried in from earlier months; 0 when there is no monthly limit.
+             */
+            carriedIn: number;
+            /**
+             * Format: double
+             * @description What the month passes on to the next one: the expenses the limit counts plus decimal MonthSummary.CarriedIn over the
+             *     limit; 0 when there is no monthly limit.
+             */
+            carriesOut: number;
             /**
              * Format: int32
              * @description Days left in the month counting today, or null when the month is not the current one.
@@ -1054,6 +1189,7 @@ export interface components {
             savingsGoal: number;
             limits: components["schemas"]["LimitUsage"][];
             topCategories: components["schemas"]["CategoryAmount"][];
+            forecast: components["schemas"]["MonthForecast"];
         };
         /**
          * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
@@ -1083,6 +1219,42 @@ export interface components {
             /** Format: double */
             amount: number;
         };
+        /** @description One planned expense of the month, with its category name. */
+        PlannedExpenseItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uint32 */
+            version: number;
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            name: string;
+            /** Format: uuid */
+            categoryId: string;
+            categoryName: string;
+            payer: components["schemas"]["Payer"];
+            /** Format: double */
+            amount: number;
+        };
+        /** @description A month's planned expenses and what they add up to («Запланировано»). */
+        PlannedExpenseList: {
+            items: components["schemas"]["PlannedExpenseItem"][];
+            /** Format: double */
+            totalAmount: number;
+        };
+        PlannedExpenseRequest: {
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            name: string;
+            /** Format: uuid */
+            categoryId: string;
+            payer: components["schemas"]["Payer"];
+            /** Format: double */
+            amount: number;
+        };
         /**
          * @description How much the recipient wants it: «🔥 Очень хочу», «⭐ Хочу», «💭 Когда-нибудь».
          * @enum {unknown}
@@ -1106,6 +1278,12 @@ export interface components {
             recipient: components["schemas"]["Recipient"];
             counts: components["schemas"]["GiftCounts"];
             topWanted: components["schemas"]["SummaryGift"][];
+        };
+        RecordPlannedExpenseRequest: {
+            /** Format: date */
+            date: string;
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            comment: null | string;
         };
         ReorderShoppingDepartmentsRequest: {
             departmentIds: null | string[];
@@ -2030,6 +2208,15 @@ export interface operations {
                     "application/json": components["schemas"]["BudgetView"];
                 };
             };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getMonthSummary: {
@@ -2277,6 +2464,273 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listPlannedExpenses: {
+        parameters: {
+            query: {
+                year: number;
+                month: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlannedExpenseList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    createPlannedExpense: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlannedExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updatePlannedExpense: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlannedExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deletePlannedExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    recordPlannedExpense: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecordPlannedExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

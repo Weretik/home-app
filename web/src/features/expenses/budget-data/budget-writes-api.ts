@@ -1,30 +1,17 @@
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { ifMatch, useRemove, useSave, type Writer } from '../data/writes-api';
-import { budgetKey } from './budget-api';
+import {
+  ifMatch,
+  useChange,
+  useRemove,
+  useSave,
+  type Writer,
+} from '../write-data/write-hooks-api';
 
 export type BudgetSettingsRequest = Schema<'BudgetSettingsRequest'>;
 export type SpendingLimitRequest = Schema<'SpendingLimitRequest'>;
 
-/**
- * The monthly limit and the savings goal are one record without an id: only the edit is used, with the budget's
- * `version` in If-Match (the id is ignored).
- */
-const settingsWriter: Writer<BudgetSettingsRequest> = {
-  key: budgetKey,
-  create: () => Promise.reject(new Error('Budget settings are only changed.')),
-  update: (entry, body) =>
-    apiCall(
-      api.PUT('/api/expenses/budget/settings', {
-        params: { header: { 'If-Match': String(entry.version) } },
-        body,
-      }),
-    ),
-  remove: () => Promise.reject(new Error('Budget settings are only changed.')),
-};
-
 const limitWriter: Writer<SpendingLimitRequest> = {
-  key: budgetKey,
   create: (body, key) =>
     apiCall(
       api.POST('/api/expenses/budget/limits', {
@@ -47,9 +34,19 @@ const limitWriter: Writer<SpendingLimitRequest> = {
     ),
 };
 
-/** Changes the monthly limit and the savings goal; refreshes the budget. */
-export const useSaveBudgetSettings = () => useSave(settingsWriter);
-/** Adds or changes a spending limit; refreshes the budget. */
+/**
+ * Changes the monthly limit and the savings goal: one record without an id, only ever changed, sent with the budget's
+ * `version` in If-Match. Refreshes the Expenses module's queries (the settings, the summary's limits and goal).
+ */
+export const useSaveBudgetSettings = (version: number) =>
+  useChange((body: BudgetSettingsRequest) =>
+    apiCall(
+      api.PUT('/api/expenses/budget/settings', {
+        params: { header: { 'If-Match': String(version) } },
+        body,
+      }),
+    ),
+  );
+/** Adds or changes a spending limit; refreshes the Expenses module's queries. */
 export const useSaveSpendingLimit = () => useSave(limitWriter);
-export const useDeleteSpendingLimit = () =>
-  useRemove(limitWriter as Writer<unknown>);
+export const useDeleteSpendingLimit = () => useRemove(limitWriter.remove);

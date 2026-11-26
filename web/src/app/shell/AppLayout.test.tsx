@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { theme } from '../theme/theme';
 import { AppLayout } from './AppLayout';
 
-const mainSections = ['Главная', 'Расходы', 'Покупки', 'Дела', 'Подарки'];
+const mainSections = ['Главная', 'Бюджет', 'Покупки', 'Дела', 'Подарки'];
 
 function renderAt(path: string) {
   render(
@@ -54,7 +54,7 @@ test('marks the current section in both menus', () => {
   renderAt('/expenses');
 
   expect(
-    within(sideMenu()).getByRole('link', { name: 'Расходы' }),
+    within(sideMenu()).getByRole('link', { name: 'Бюджет' }),
   ).toHaveAttribute('aria-current', 'page');
   expect(
     within(sideMenu()).getByRole('link', { name: 'Главная' }),
@@ -62,7 +62,7 @@ test('marks the current section in both menus', () => {
   const selected = bottomBarLinks().filter((link) =>
     link.classList.contains('Mui-selected'),
   );
-  expect(selected.map((link) => link.textContent)).toEqual(['Расходы']);
+  expect(selected.map((link) => link.textContent)).toEqual(['Бюджет']);
 });
 
 test('collapses the side menu to icons and remembers it', async () => {
@@ -70,9 +70,9 @@ test('collapses the side menu to icons and remembers it', async () => {
 
   await userEvent.click(screen.getByRole('button', { name: 'Свернуть меню' }));
 
-  expect(within(sideMenu()).queryByText('Расходы')).not.toBeInTheDocument();
+  expect(within(sideMenu()).queryByText('Бюджет')).not.toBeInTheDocument();
   expect(
-    within(sideMenu()).getByRole('link', { name: 'Расходы' }),
+    within(sideMenu()).getByRole('link', { name: 'Бюджет' }),
   ).toBeInTheDocument();
   expect(localStorage.getItem('home.side-nav.collapsed')).toBe('true');
   expect(

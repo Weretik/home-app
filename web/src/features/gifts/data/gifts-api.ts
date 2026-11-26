@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
+import { moduleKeys } from '../../../platform/query-keys';
 
 export type Recipient = Schema<'Recipient'>;
 export type GiftPriority = Schema<'Priority'>;
@@ -10,14 +11,18 @@ export type GiftVariantItem = Schema<'GiftVariantItem'>;
 export type GiftCategoryItem = Schema<'GiftCategoryItem'>;
 export type GiftDetailItem = Schema<'GiftDetailItem'>;
 
-/** The query keys of the Gifts section; the home summary reads `['gifts', 'summary']` from its own feature. */
+/**
+ * The query keys of the Gifts section, all under the module prefix (`moduleKeys.gifts`), which every Gifts write
+ * refreshes (web ADR 0009); the home summary reads `[...moduleKeys.gifts, 'summary']` from its own feature.
+ */
 export const giftKeys = {
-  /** Both tabs; a gift write refreshes them together. */
-  items: ['gifts', 'items'] as const,
-  list: (archived: boolean) => ['gifts', 'items', { archived }] as const,
-  categories: ['gifts', 'categories'] as const,
-  details: ['gifts', 'details'] as const,
-  summary: ['gifts', 'summary'] as const,
+  all: moduleKeys.gifts,
+  /** Both tabs. */
+  items: [...moduleKeys.gifts, 'items'] as const,
+  list: (archived: boolean) =>
+    [...moduleKeys.gifts, 'items', { archived }] as const,
+  categories: [...moduleKeys.gifts, 'categories'] as const,
+  details: [...moduleKeys.gifts, 'details'] as const,
 };
 
 /** The wanted gifts («Список», archived=false) or the gifted and dropped ones («Подаренные»), in the server's order. */

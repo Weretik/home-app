@@ -1,14 +1,15 @@
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import {
-  useExpenseCategories,
-  type ExpenseItem,
-  type Payer,
-  type PaymentMethod,
-} from '../data/expenses-api';
+import { useId } from 'react';
+import type { ExpenseItem, Payer, PaymentMethod } from '../data/expenses-api';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
 import { useSaveExpense } from '../data/writes-api';
 import { AmountField } from '../entry-dialogs/AmountField';
+import { CategoryField } from '../entry-dialogs/CategoryField';
 import { EntryDialog } from '../entry-dialogs/EntryDialog';
 import { fieldMessage } from '../entry-editing/entry-fields';
 import { useEntryForm } from '../entry-editing/use-entry-form';
@@ -26,9 +27,9 @@ interface ExpenseDialogProps {
   onClose: () => void;
 }
 
-/** Adds or changes an expense. */
+/** Adds or changes an expense; «Не в лимиты» keeps it out of the limits and the carry-over. */
 export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
-  const categories = useExpenseCategories();
+  const outsideHintId = useId();
   const form = useEntryForm({
     initial: expenseFormValues(item, newDate),
     validate: validateExpense,
@@ -56,21 +57,11 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
         {...fieldMessage(errors, 'date')}
         slotProps={{ inputLabel: { shrink: true } }}
       />
-      <TextField
-        select
-        label="Категория"
-        required
+      <CategoryField
         value={values.categoryId}
-        disabled={categories.isPending}
-        onChange={(event) => set('categoryId', event.target.value)}
-        {...fieldMessage(errors, 'categoryId')}
-      >
-        {(categories.data ?? []).map((category) => (
-          <MenuItem key={category.id} value={category.id}>
-            {category.name}
-          </MenuItem>
-        ))}
-      </TextField>
+        onChange={(value) => set('categoryId', value)}
+        errors={errors}
+      />
       <TextField
         select
         label="Кто"
@@ -112,6 +103,23 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
         onChange={(event) => set('comment', event.target.value)}
         {...fieldMessage(errors, 'comment')}
       />
+      <Box>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={values.outsideLimits}
+              onChange={(event) => set('outsideLimits', event.target.checked)}
+              slotProps={{
+                input: { 'aria-describedby': outsideHintId },
+              }}
+            />
+          }
+          label="Не в лимиты"
+        />
+        <FormHelperText id={outsideHintId} sx={{ mt: 0, mx: 0 }}>
+          Считается в итогах, но не в лимитах и не переносится
+        </FormHelperText>
+      </Box>
     </EntryDialog>
   );
 }

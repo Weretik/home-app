@@ -82,10 +82,11 @@ public sealed class AddItemsHandler(IShoppingDbContext db, TimeProvider clock)
         }
         catch (UniqueConstraintViolationException)
         {
-            // A racing copy of the same request saved first: answer like a repeat.
+            // A racing copy of the same request saved first: answer like a repeat. Without a winner the clash was
+            // another row's unique key, a race like any other: 409, never 500.
             var winner = await IdempotentCreates.EarlierOutcomeAsync<AddItemsOutcome>(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken);
             if (winner is null)
-                throw;
+                return ShoppingItemErrors.ChangedMeanwhile;
             return winner.IsFailure ? winner.Error! : await ResultAsync(winner.Value, cancellationToken);
         }
         catch (DbUpdateConcurrencyException)

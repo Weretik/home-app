@@ -62,6 +62,10 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateOnly>("LimitsFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("limits_from");
+
                     b.Property<decimal>("MonthlyLimit")
                         .HasPrecision(12, 2)
                         .HasColumnType("numeric(12,2)")
@@ -86,6 +90,7 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = new Guid("5b0f3a2e-1c4d-4e8a-9f6b-2d7c8e9a0b1c"),
+                            LimitsFrom = new DateOnly(2026, 11, 1),
                             MonthlyLimit = 50000m,
                             SavingsGoal = 100000m
                         });
@@ -130,6 +135,10 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .HasColumnName("category_ids");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SortOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ux_spending_limits_sort_order");
 
                     b.ToTable("spending_limits", "expenses");
                 });
@@ -278,6 +287,10 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("import_key");
 
+                    b.Property<bool>("OutsideLimits")
+                        .HasColumnType("boolean")
+                        .HasColumnName("outside_limits");
+
                     b.Property<string>("Payer")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -366,6 +379,58 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                     b.ToTable("incomes", "expenses");
                 });
 
+            modelBuilder.Entity("Expenses.Domain.Planning.PlannedExpense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateOnly>("Month")
+                        .HasColumnType("date")
+                        .HasColumnName("month");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Payer")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("payer");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_planned_expenses_category_id");
+
+                    b.HasIndex("Month")
+                        .HasDatabaseName("ix_planned_expenses_month");
+
+                    b.ToTable("planned_expenses", "expenses");
+                });
+
             modelBuilder.Entity("Expenses.Domain.Savings.SavingsMovement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -428,6 +493,16 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_expenses_categories");
+                });
+
+            modelBuilder.Entity("Expenses.Domain.Planning.PlannedExpense", b =>
+                {
+                    b.HasOne("Expenses.Domain.Categories.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_planned_expenses_categories");
                 });
 #pragma warning restore 612, 618
         }

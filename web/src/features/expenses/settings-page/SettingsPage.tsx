@@ -34,10 +34,8 @@ export function SettingsPage() {
             isPending={budget.isPending}
             error={budget.error}
             isEmpty={false}
-            isFiltered={false}
             loadingLabel="Загружаю настройки"
             onRetry={() => void budget.refetch()}
-            onResetFilters={() => {}}
           >
             {null}
           </ListStatus>

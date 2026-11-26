@@ -1,6 +1,7 @@
 # 0019. Spending limits are named, overlapping category sets stored in the module
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; the part on carrying overspend is superseded by
+[0027](0027-limit-carry-over-like-the-sheet.md) (overspend now carries into the next period like the sheet)
 
 ## Context
 
@@ -26,8 +27,9 @@ categories (chosen).
   deleted today; when they can, the delete must handle the limits that name them.
 - `BudgetSettings` is a singleton row (fixed id) with the monthly limit on all expenses and the savings goal; `0`
   means none.
-- A limit holds one current amount, not a history. Changing it changes how past months compare with it; overspending
-  is not carried into the next period.
+- A limit holds one current amount, not a history. Changing it changes how past months compare with it.
+  ~~Overspending is not carried into the next period.~~ Superseded by [0027](0027-limit-carry-over-like-the-sheet.md):
+  overspend carries over from `BudgetSettings.LimitsFrom`.
 - Writes follow the module's entries: `Idempotency-Key` on create ([0007](0007-idempotency-key-for-creates.md)), the
   `xmin` row version in `If-Match` on edits ([0017](0017-row-version-via-xmin-for-edits.md)), the `PublicWrite` rate
   limit ([0015](0015-expenses-open-until-identity.md)).

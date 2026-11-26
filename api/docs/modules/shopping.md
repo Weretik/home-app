@@ -191,8 +191,11 @@ example `sheet:<ID column>`) with `ON CONFLICT DO NOTHING` makes a second run ch
 ## Tests
 
 - Unit: `dotnet test tests/UnitTests --filter "FullyQualifiedName~UnitTests.Shopping"` — parser, normaliser, matcher,
-  seed, item, cart window, department, keyword, settings rules, validators.
+  seed, item, cart window, department, keyword, settings rules, validators, and the summary's arithmetic
+  (`Summary/`: `GetSummary/SummaryFigures`, the pure type beside the handler).
 - Integration (Docker): `dotnet test tests/IntegrationTests --filter "FullyQualifiedName~Shopping"` —
-  `Api/Shopping/ShoppingItemsApiTests`, `ShoppingDictionaryApiTests`, `ShoppingSettingsApiTests`.
+  `Api/Shopping/ShoppingItemsApiTests`, `ShoppingDictionaryApiTests`, `ShoppingSettingsApiTests`, and
+  `ShoppingRaceApiTests` (an item edit raced by another edit, a department delete raced by a new item in it, each a
+  `409` through `TestHost/RacingShoppingDb`).
 - Architecture: the module is found by its folder; `ModuleBoundaryTests.Every_Module_IsComposedByTheHost` checks it is
   registered in the host.

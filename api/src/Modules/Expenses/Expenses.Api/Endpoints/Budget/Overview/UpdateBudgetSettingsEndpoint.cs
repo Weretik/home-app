@@ -15,7 +15,7 @@ internal static class UpdateBudgetSettingsEndpoint
     {
         group.MapPut("/budget/settings", HandleAsync)
             .WithName("updateBudgetSettings")
-            .WithSummary("Sets the monthly limit on all expenses and the savings goal. Send the budget version in If-Match.")
+            .WithSummary("Sets the monthly limit on all expenses, the savings goal and the day limits start carrying overspend. Send the budget version in If-Match.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
@@ -33,7 +33,7 @@ internal static class UpdateBudgetSettingsEndpoint
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(
-            new UpdateBudgetSettingsCommand(EntryVersionHeader.Parse(ifMatch), request.MonthlyLimit, request.SavingsGoal),
+            new UpdateBudgetSettingsCommand(EntryVersionHeader.Parse(ifMatch), request.MonthlyLimit, request.SavingsGoal, request.LimitsFrom),
             cancellationToken);
         return result.ToHttpResult(http);
     }

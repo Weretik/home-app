@@ -6,17 +6,17 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
-interface ListStatusProps {
+export interface ListStatusProps {
   isPending: boolean;
   error: Error | null;
   isEmpty: boolean;
-  /** A filter is on, so an empty list offers to reset it. */
-  isFiltered: boolean;
-  /** What the list shows, for the empty state's words: a month (default) or a period of days. */
-  scope?: 'month' | 'period';
+  /** A filter is on, so an empty list offers to reset it (`onResetFilters`). */
+  isFiltered?: boolean;
+  /** What the list shows, for the empty state's words: a month (default), a period of days or a month's plans. */
+  scope?: 'month' | 'period' | 'plan';
   loadingLabel: string;
   onRetry: () => void;
-  onResetFilters: () => void;
+  onResetFilters?: () => void;
   children: ReactNode;
 }
 
@@ -31,6 +31,11 @@ const emptyTexts = {
     hint: 'Записи за выбранные дни появятся здесь. Даты можно изменить выше.',
     filteredHint: 'Сбросьте фильтр или выберите другие даты.',
   },
+  plan: {
+    title: 'На этот месяц ничего не запланировано',
+    hint: 'Добавьте траты, которые ждёте в этом месяце: они войдут в прогноз и в лимиты.',
+    filteredHint: 'Сбросьте фильтр или выберите другой месяц.',
+  },
 } as const;
 
 /** Loading, error and empty states of a month list (docs/design.md: designed, not blank); the list otherwise. */
@@ -38,7 +43,7 @@ export function ListStatus({
   isPending,
   error,
   isEmpty,
-  isFiltered,
+  isFiltered = false,
   scope = 'month',
   loadingLabel,
   onRetry,

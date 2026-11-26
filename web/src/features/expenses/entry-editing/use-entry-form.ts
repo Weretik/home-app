@@ -1,11 +1,11 @@
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useState } from 'react';
+import { describeWriteError } from '../write-data/write-errors-api';
 import {
-  describeWriteError,
   useIdempotencyKey,
   type EditedEntry,
   type SaveInput,
-} from '../data/writes-api';
+} from '../write-data/write-hooks-api';
 import { isValid, type FieldErrors } from './entry-fields';
 
 interface EntryFormOptions<Values, Body> {

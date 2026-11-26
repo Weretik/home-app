@@ -56,7 +56,7 @@ list-page/            ListPage.tsx         the page: quick add, groups, cart, st
 item-editing/         ItemDialog.tsx       edit dialog + delete confirmation
                       ItemFields.tsx       name, quantity, note, department, Срочно
                       item-form.ts         pure: values ↔ request, checks
-page-parts/           FormDialog.tsx, ConfirmDialog.tsx, RowMenu.tsx, PageStatus.tsx (loading / error / empty),
+page-parts/           FormDialog.tsx, ConfirmDialog.tsx, RowMenu.tsx, PageStatus.tsx (loading / error / empty) with RetryButton.tsx,
                       use-checked-form.ts (values, own checks and API field errors of a form)
 history-page/         HistoryPage.tsx, HistoryDay.tsx, history-days.ts (pure day grouping), history-api.ts,
                       use-return-item.ts («Вернуть в список» controller)
@@ -70,13 +70,15 @@ keyword-settings/     KeywordsCard.tsx, KeywordFilters.tsx, KeywordRows.tsx, Key
 Home summary (`src/features/home/shopping-summary`):
 
 ```
-data/   shopping-summary-api.ts (GET /api/shopping/summary), summary-labels.ts (item caption, counts)
-view/   ShoppingSummary.tsx (states, layout, «Открыть список»), SummaryKpis.tsx, DepartmentsCard.tsx,
-        NextItemsCard.tsx, FrequentCard.tsx
+data/       shopping-summary-api.ts (GET /api/shopping/summary), summary-labels.ts (item caption, counts)
+overview/   ShoppingSummary.tsx (states, «Открыть список»), SummaryContent.tsx (layout), EmptyList.tsx
+cards/      SummaryKpis.tsx with FigureCard.tsx, DepartmentsCard.tsx, NextItemsCard.tsx, FrequentCard.tsx
 ```
 
 Tests next to the code: `item-status`, `list-groups`, `history-days`, `item-form`, `department-order`,
-`list-settings-form`, `use-me`, `ListPage`, `HistoryPage`, `SettingsPage`, `ShoppingSummary`.
+`list-settings-form`, `use-me`, `ListPage`, `HistoryPage`, `SettingsPage`, `ShoppingSummary`; after the merge with
+the stricter structure check also `labels`, `department-form`, `keyword-form`, `shopping-pages` and the summary's
+`summary-labels`.
 
 ## State and data
 

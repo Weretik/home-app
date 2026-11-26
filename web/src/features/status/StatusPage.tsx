@@ -1,16 +1,9 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { useSystemStatus } from './status-api';
+import { StatusDetails } from './StatusDetails';
 
-const checkNames: Record<string, string> = { database: 'База данных' };
-
-/** Shows whether the API and its dependencies answer; the first page until real features arrive. */
+/** «Состояние»: whether the API and its dependencies answer. */
 export function StatusPage() {
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 } }}>
@@ -21,37 +14,5 @@ export function StatusPage() {
         <StatusDetails />
       </Card>
     </Box>
-  );
-}
-
-function StatusDetails() {
-  const { data, error, isPending } = useSystemStatus();
-
-  if (isPending) return <CircularProgress aria-label="Проверяю API" />;
-  if (error)
-    return <Alert severity="error">API недоступен: {error.message}</Alert>;
-
-  const checks = Object.entries(data.checks);
-  return (
-    <section aria-label="Состояние API">
-      <Alert severity={data.status === 'Healthy' ? 'success' : 'warning'}>
-        API: <strong>{data.status}</strong>
-      </Alert>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        {data.environment}, версия {data.version}
-      </Typography>
-      {checks.length > 0 && (
-        <List dense>
-          {checks.map(([name, status]) => (
-            <ListItem key={name} disableGutters>
-              <ListItemText
-                primary={checkNames[name] ?? name}
-                secondary={status}
-              />
-            </ListItem>
-          ))}
-        </List>
-      )}
-    </section>
   );
 }

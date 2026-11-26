@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'tools/**/*.test.mjs'],
     setupFiles: ['./vitest.setup.ts'],
     env: { VITE_API_URL: 'http://api.test' },
   },
