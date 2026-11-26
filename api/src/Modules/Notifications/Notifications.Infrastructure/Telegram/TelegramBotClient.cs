@@ -129,7 +129,7 @@ internal sealed partial class TelegramBotClient(
         if (!IsConfigured)
             throw new InvalidOperationException("Telegram:BotToken is not set.");
 
-        using var response = await http.PostAsJsonAsync($"bot{Token}/{method}", payload, cancellationToken);
+        using var response = await http.PostAsJsonAsync($"/bot{Token}/{method}", payload, cancellationToken);
         var body = await response.Content.ReadFromJsonAsync<JsonObject>(cancellationToken);
         if (body?["ok"]?.GetValue<bool>() != true)
         {
