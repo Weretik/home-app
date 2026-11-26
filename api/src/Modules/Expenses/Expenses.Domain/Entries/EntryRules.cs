@@ -24,6 +24,15 @@ public static class EntryRules
             Result.Ensure(Normalize(comment) is not { Length: > MaxCommentLength }, EntryErrors.CommentTooLong),
             Result.Ensure(importKey is not { Length: > MaxImportKeyLength }, EntryErrors.ImportKeyTooLong));
 
+    /// <summary>
+    /// The same checks for a signed amount, such as a savings movement: plus puts money in, minus takes it out, and
+    /// zero means nothing happened.
+    /// </summary>
+    public static Result CheckSigned(DateOnly date, decimal amount, string? comment, string? importKey) =>
+        amount == 0
+            ? EntryErrors.AmountZero
+            : Check(date, Math.Abs(amount), comment, importKey);
+
     /// <summary>A comment is trimmed; an empty one is stored as no comment.</summary>
     public static string? Normalize(string? comment) =>
         string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();

@@ -57,7 +57,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | --- | --- | --- |
 | `Cors__Origins__0` | `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` | now, otherwise the front cannot reach the API |
 | `ConnectionStrings__Database` | PostgreSQL connection string | once the database is chosen |
-| `Expenses__Import__Key` | long random value | only while running the one-time sheet import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
+| `Expenses__Import__Key` | long random value | normally never: the sheet is imported on a local API and the rows reach production as a SQL script; set it only for a direct import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
 
 Or with one command:
 

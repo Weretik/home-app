@@ -24,6 +24,9 @@ public sealed class Income : Entity<Guid>, IAggregateRoot
 
     public DateTimeOffset CreatedAtUtc { get; private init; }
 
+    /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
+    public uint Version { get; private set; }
+
     public static Result<Income> Create(
         DateOnly date, Person person, decimal amount, string? comment, DateTimeOffset now, string? importKey = null)
     {
@@ -41,5 +44,19 @@ public sealed class Income : Entity<Guid>, IAggregateRoot
             ImportKey = importKey,
             CreatedAtUtc = now,
         };
+    }
+
+    /// <summary>Replaces what the person can edit; the import key and creation time stay.</summary>
+    public Result Update(DateOnly date, Person person, decimal amount, string? comment)
+    {
+        var check = EntryRules.Check(date, amount, comment, ImportKey);
+        if (check.IsFailure)
+            return check;
+
+        Date = date;
+        Person = person;
+        Amount = amount;
+        Comment = EntryRules.Normalize(comment);
+        return Result.Success();
     }
 }

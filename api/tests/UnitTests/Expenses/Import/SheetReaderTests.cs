@@ -1,4 +1,5 @@
 using Expenses.Application.Features.Imports.SheetFormat;
+using Expenses.Application.Features.Imports.SheetFormat.Rows;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 
@@ -81,5 +82,37 @@ public sealed class SheetReaderTests
     public void Amounts_UseCommaForThousands_AndPointForKopecks(string cell, double? expected)
     {
         Assert.Equal(expected is null ? null : (decimal)expected, SheetValues.ParseAmount(cell));
+    }
+
+    [Theory]
+    [InlineData("35,124.17", 35124.17)]
+    [InlineData("-111.10", -111.10)]
+    [InlineData("\u22129,399.60", -9399.60)]
+    [InlineData("+500", 500.0)]
+    [InlineData("- 5", -5.0)]
+    [InlineData("--5", null)]
+    [InlineData("1 000,00", null)]
+    public void Savings_Amounts_MayCarryASign(string cell, double? expected)
+    {
+        Assert.Equal(expected is null ? null : (decimal)expected, SheetValues.ParseSignedAmount(cell));
+    }
+
+    [Fact]
+    public void Savings_Rows_AreRead_WithTheirSign()
+    {
+        var read = SheetReader.ReadSavings(
+        [
+            ["Дата", "Кто", "Сумма, грн (+ отложили, - взяли)", "Комментарий"],
+            ["30.09.2026", "Виталий", "35,124.17", "остаток на начало учёта"],
+            ["03.10.2026", "Виталий", "-111.10"],
+        ]);
+
+        Assert.Empty(read.Problems);
+        Assert.Equal(
+            [
+                new SheetSavings(2, new DateOnly(2026, 9, 30), Person.Vitaliy, 35124.17m, "остаток на начало учёта"),
+                new SheetSavings(3, new DateOnly(2026, 10, 3), Person.Vitaliy, -111.10m, string.Empty),
+            ],
+            read.Items);
     }
 }

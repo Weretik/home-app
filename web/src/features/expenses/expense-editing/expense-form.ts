@@ -1,0 +1,67 @@
+import type { ExpenseItem, Payer, PaymentMethod } from '../data/expenses-api';
+import type { Month } from '../data/month';
+import type { ExpenseRequest } from '../data/writes-api';
+import {
+  amountError,
+  amountText,
+  commentError,
+  commentValue,
+  dateError,
+  defaultEntryDate,
+  parseAmount,
+  type FieldErrors,
+} from '../entry-editing/entry-fields';
+
+/** The expense form as typed: text fields stay text until the save. */
+export interface ExpenseFormValues {
+  date: string;
+  categoryId: string;
+  payer: Payer;
+  amount: string;
+  paymentMethod: PaymentMethod;
+  comment: string;
+}
+
+/** The form of an existing expense, or a new one: shared, by card, on the default date. */
+export function expenseFormValues(
+  item: ExpenseItem | undefined,
+  month: Month,
+): ExpenseFormValues {
+  return item
+    ? {
+        date: item.date,
+        categoryId: item.categoryId,
+        payer: item.payer,
+        amount: amountText(item.amount),
+        paymentMethod: item.paymentMethod,
+        comment: item.comment ?? '',
+      }
+    : {
+        date: defaultEntryDate(month),
+        categoryId: '',
+        payer: 'Shared',
+        amount: '',
+        paymentMethod: 'Card',
+        comment: '',
+      };
+}
+
+export function validateExpense(values: ExpenseFormValues): FieldErrors {
+  return {
+    date: dateError(values.date),
+    categoryId: values.categoryId ? undefined : 'Выберите категорию',
+    amount: amountError(values.amount),
+    comment: commentError(values.comment),
+  };
+}
+
+export function toExpenseRequest(values: ExpenseFormValues): ExpenseRequest {
+  return {
+    date: values.date,
+    payer: values.payer,
+    categoryId: values.categoryId,
+    amount: parseAmount(values.amount) ?? 0,
+    paymentMethod: values.paymentMethod,
+    comment: commentValue(values.comment),
+  };
+}

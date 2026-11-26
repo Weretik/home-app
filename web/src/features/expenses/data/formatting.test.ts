@@ -1,4 +1,9 @@
-import { formatAmount, formatDay, formatRecordCount } from './formatting';
+import {
+  formatAmount,
+  formatDay,
+  formatRecordCount,
+  formatSignedAmount,
+} from './formatting';
 
 // Intl separates groups and the symbol with non-breaking spaces.
 const plain = (text: string) => text.replace(/\s/g, ' ');
@@ -18,4 +23,10 @@ test('counts records with Russian plural forms', () => {
   expect(formatRecordCount(3)).toBe('3 записи');
   expect(formatRecordCount(12)).toBe('12 записей');
   expect(formatRecordCount(21)).toBe('21 запись');
+});
+
+test('writes the sign of a signed amount', () => {
+  expect(plain(formatSignedAmount(1500))).toBe('+1 500,00 ₴');
+  expect(plain(formatSignedAmount(-700))).toBe('\u2212700,00 ₴');
+  expect(plain(formatSignedAmount(0))).toBe('0,00 ₴');
 });

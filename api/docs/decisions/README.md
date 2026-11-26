@@ -21,8 +21,10 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0012 | [Rate limits on anonymous writes and sign-in](0012-rate-limits-on-anonymous-writes.md) |
 | 0013 | [The Expenses module and its model](0013-expenses-module-model.md) |
 | 0014 | [One-time import from the Google Sheet through a keyed endpoint](0014-one-time-sheet-import.md) |
-| 0015 | [Expenses are readable without sign-in until the Identity module](0015-expenses-open-until-identity.md) (temporary) |
+| 0015 | [Expenses are readable and editable without sign-in until the Identity module](0015-expenses-open-until-identity.md) (temporary) |
 | 0016 | [Production migrations run as EF bundles in the deploy job](0016-migrations-as-bundles-in-deploy.md) |
+| 0017 | [Edits are guarded by a row version from PostgreSQL xmin](0017-row-version-via-xmin-for-edits.md) |
+| 0018 | [The savings jar is a log of signed movements](0018-savings-jar-as-signed-movements.md) |
 
 ## Decisions that must have a record
 

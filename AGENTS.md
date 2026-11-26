@@ -6,8 +6,10 @@ rules and commands; read only the sources the current task needs. This file appl
 ## Product
 
 A private site for two people (Masha and Vitaliy) that replaces Google Sheets and Telegram bots: expenses, shopping
-list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses and incomes imported from
-the old Google Sheet, see [api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet. Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
+list, to-dos (Masha / Vitaliy / Shared), gift wishlist. Today: the platform (health and status) and the Expenses module (expenses, incomes and the «Копилка» savings jar,
+imported from the old Google Sheet and now added, edited and deleted on the site, see
+[api/docs/modules/expenses.md](api/docs/modules/expenses.md)); no authentication yet, writes are open and rate
+limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
 is English.
 
 ## Project context

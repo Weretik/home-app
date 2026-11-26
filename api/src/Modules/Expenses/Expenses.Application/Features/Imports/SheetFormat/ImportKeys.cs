@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Expenses.Application.Features.Imports.SheetFormat.Rows;
 
 namespace Expenses.Application.Features.Imports.SheetFormat;
 
@@ -33,6 +34,10 @@ internal static class ImportKeys
     public static string Income(SheetIncome i) =>
         Join(i.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), i.Person.ToString(), Money(i.Amount),
             i.Comment?.Trim() ?? string.Empty);
+
+    public static string Savings(SheetSavings s) =>
+        Join(s.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), s.Person.ToString(), Money(s.Amount),
+            s.Comment?.Trim() ?? string.Empty);
 
     private static string Money(decimal amount) => amount.ToString("0.00", CultureInfo.InvariantCulture);
 

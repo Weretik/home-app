@@ -24,6 +24,7 @@ second colour. Colours and mood only: no game art, logos or fonts.
   `` `rgba(${theme.vars.palette.primary.mainChannel} / 0.12)` ``). The only exception is the white overlay on the
   highlight cards.
 - Status colours (`success`, `warning`, `error`, `info`) are MUI's defaults and mean only status, never decoration.
+  The one exception is a signed amount, where `error` marks money going out (see «Signed amounts»).
 - Tints: `0.08` for hover, `0.12` for a selected item or an icon tile, `0.16` for a pressed state.
 
 ## Light, dark, system
@@ -84,11 +85,30 @@ Computer (md, 900px and wider)              Phone (below md)
 - A page that shows one month has a month picker next to the title: arrows with `aria-label` and tooltips around
   «Октябрь 2026», and «К текущему» when another month is open. The month and the filters are in the URL.
 - Amounts are formatted as hryvnias with two decimals («95 024,00 ₴»), right-aligned and in tabular figures.
-- A month list starts with a total card (tinted icon tile, caption, the sum, the record count), then the filters,
-  then the list in a card. Below `md` the list is compact (title, a caption line, the amount on the right); from `md`
-  it is a small table. More rows load with «Показать ещё».
+- A month list starts with its filters and the add button («Добавить расход») on one row, then the list in a card.
+  Below `md` the list is compact (title, a caption line, the amount on the right); from `md` it is a small table.
+  More rows load with «Показать ещё». Lists show no month total card; totals belong to a summary page.
 - An empty month says «За этот месяц записей нет»; an empty filtered list offers «Сбросить фильтр». An error shows
   the reason and «Повторить».
+
+## Editing entries
+
+- Add and edit happen in a dialog (`entry-dialogs/EntryDialog.tsx`): a title («Новый расход», «Изменить расход»),
+  the fields one per row, «Отмена» and «Сохранить» at the bottom. Below `sm` the dialog is full screen. While saving,
+  «Сохранить» reads «Сохраняю…» and both buttons are disabled.
+- Fields check themselves on «Сохранить»: the message sits under the field («Введите сумму», «Выберите категорию»);
+  the API's field errors go under the same fields, its message in an error `Alert` above them.
+- Amounts are typed as positive numbers with up to two decimals («1 234,5» works); the phone shows the decimal
+  keypad. Where the direction matters (the jar), it is a separate choice, not a minus sign.
+- Each row ends with a «⋮» button (`aria-label` «Действия: …» names the row) that opens «Изменить» and «Удалить».
+  Delete always asks in a small dialog with the entry in one line and a red «Удалить».
+
+## Signed amounts
+
+- Money that goes in is shown in `primary.main` (blue) with «+», money that goes out in `error.main` (red) with «−»
+  (a real minus sign). The sign is always written, so the colour is never the only hint. Zero is plain text.
+- Only signed amounts use these colours (`savings-page/SignedAmount.tsx`); plain sums and balances stay
+  `text.primary`. This is the one place `error` marks a direction instead of a problem.
 
 ## Cards
 

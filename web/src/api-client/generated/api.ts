@@ -31,25 +31,27 @@ export interface paths {
         /** Lists one month's expenses, newest first, with the month's total. */
         get: operations["listExpenses"];
         put?: never;
-        post?: never;
+        /** Adds an expense. Send a new Idempotency-Key per entry; a repeat returns the first id. */
+        post: operations["createExpense"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/expenses/incomes": {
+    "/api/expenses/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Lists one month's incomes, newest first, with the month's total. */
-        get: operations["listIncomes"];
-        put?: never;
+        get?: never;
+        /** Changes an expense. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateExpense"];
         post?: never;
-        delete?: never;
+        /** Deletes an expense for good. */
+        delete: operations["deleteExpense"];
         options?: never;
         head?: never;
         patch?: never;
@@ -72,6 +74,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/expenses/incomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists one month's incomes, newest first, with the month's total. */
+        get: operations["listIncomes"];
+        put?: never;
+        /** Adds an income. Send a new Idempotency-Key per entry; a repeat returns the first id. */
+        post: operations["createIncome"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/incomes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes an income. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateIncome"];
+        post?: never;
+        /** Deletes an income for good. */
+        delete: operations["deleteIncome"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/savings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists one month's savings movements, newest first, with the month's sums and balances. */
+        get: operations["listSavingsMovements"];
+        put?: never;
+        /** Adds a savings movement. Send a new Idempotency-Key per entry; a repeat returns the first id. */
+        post: operations["createSavingsMovement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/savings/months": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current savings balance and every month's deposits, withdrawals and closing balance. */
+        get: operations["listSavingsMonths"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/expenses/savings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a savings movement. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        put: operations["updateSavingsMovement"];
+        post?: never;
+        /** Deletes a savings movement for good. */
+        delete: operations["deleteSavingsMovement"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -84,10 +175,17 @@ export interface components {
             /** Format: int32 */
             sortOrder: number;
         };
+        /** @description The id of a created expense, income or savings movement. */
+        CreatedEntry: {
+            /** Format: uuid */
+            id: string;
+        };
         /** @description One expense row of the month list, with its category name. */
         ExpenseItem: {
             /** Format: uuid */
             id: string;
+            /** Format: uint32 */
+            version: number;
             /** Format: date */
             date: string;
             payer: components["schemas"]["Payer"];
@@ -111,6 +209,17 @@ export interface components {
             /** Format: double */
             totalAmount: number;
         };
+        ExpenseRequest: {
+            /** Format: date */
+            date: string;
+            payer: components["schemas"]["Payer"];
+            /** Format: uuid */
+            categoryId: string;
+            /** Format: double */
+            amount: number;
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            comment: null | string;
+        };
         /** @enum {unknown} */
         HealthStatus: "Unhealthy" | "Degraded" | "Healthy";
         HttpValidationProblemDetails: {
@@ -128,6 +237,8 @@ export interface components {
         IncomeItem: {
             /** Format: uuid */
             id: string;
+            /** Format: uint32 */
+            version: number;
             /** Format: date */
             date: string;
             person: components["schemas"]["Person"];
@@ -147,6 +258,14 @@ export interface components {
             /** Format: double */
             totalAmount: number;
         };
+        IncomeRequest: {
+            /** Format: date */
+            date: string;
+            person: components["schemas"]["Person"];
+            /** Format: double */
+            amount: number;
+            comment: null | string;
+        };
         /**
          * @description Who an expense is booked to (the sheet's «Кто» column): one of the two people, or the household as a whole for
          *     shared spending such as groceries.
@@ -163,6 +282,83 @@ export interface components {
          * @enum {unknown}
          */
         Person: "Vitaliy" | "Maria";
+        ProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number;
+            detail?: null | string;
+            instance?: null | string;
+        };
+        /**
+         * @description Whether a savings movement put money in or took it out; shown in blue and red on the page.
+         * @enum {unknown}
+         */
+        SavingsDirection: "Deposit" | "Withdrawal";
+        /** @description One month of the jar: put in, taken out (positive) and the balance at the month's end. */
+        SavingsMonthSummary: {
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            /** Format: double */
+            deposits: number;
+            /** Format: double */
+            withdrawals: number;
+            /** Format: double */
+            balanceAtEnd: number;
+        };
+        /** @description One movement of the savings jar; decimal SavingsMovementItem.Amount is signed (plus in, minus out). */
+        SavingsMovementItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uint32 */
+            version: number;
+            /** Format: date */
+            date: string;
+            person: components["schemas"]["Person"];
+            /** Format: double */
+            amount: number;
+            direction: components["schemas"]["SavingsDirection"];
+            comment: null | string;
+        };
+        /**
+         * @description One page of a month's savings movements, with the month's sums (decimal SavingsMovementList.Withdrawals as a positive number),
+         *     the balance before and after the month, and the jar's balance today.
+         */
+        SavingsMovementList: {
+            items: components["schemas"]["SavingsMovementItem"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: double */
+            deposits: number;
+            /** Format: double */
+            withdrawals: number;
+            /** Format: double */
+            balanceAtStart: number;
+            /** Format: double */
+            balanceAtEnd: number;
+            /** Format: double */
+            currentBalance: number;
+        };
+        SavingsMovementRequest: {
+            /** Format: date */
+            date: string;
+            person: components["schemas"]["Person"];
+            /** Format: double */
+            amount: number;
+            comment: null | string;
+        };
+        /** @description The jar's balance today and its movement month by month, newest month first. */
+        SavingsOverview: {
+            /** Format: double */
+            currentBalance: number;
+            months: components["schemas"]["SavingsMonthSummary"][];
+        };
         /** @description The overall status, the build version with its commit, the environment, and the status of each check. */
         SystemStatus: {
             status: components["schemas"]["HealthStatus"];
@@ -237,6 +433,197 @@ export interface operations {
             };
         };
     };
+    createExpense: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateExpense: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpenseRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteExpense: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listExpenseCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryItem"][];
+                };
+            };
+        };
+    };
     listIncomes: {
         parameters: {
             query: {
@@ -272,7 +659,256 @@ export interface operations {
             };
         };
     };
-    listExpenseCategories: {
+    createIncome: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncomeRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    updateIncome: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncomeRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteIncome: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listSavingsMovements: {
+        parameters: {
+            query: {
+                year: number;
+                month: number;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavingsMovementList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    createSavingsMovement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavingsMovementRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedEntry"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    listSavingsMonths: {
         parameters: {
             query?: never;
             header?: never;
@@ -287,7 +923,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CategoryItem"][];
+                    "application/json": components["schemas"]["SavingsOverview"];
+                };
+            };
+        };
+    };
+    updateSavingsMovement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "If-Match"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavingsMovementRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deleteSavingsMovement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
         };

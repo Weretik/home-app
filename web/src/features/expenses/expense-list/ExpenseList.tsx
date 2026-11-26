@@ -1,13 +1,20 @@
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
+import { RowActions } from '../entry-dialogs/RowActions';
+import type { RowHandlers } from '../entry-editing/use-entry-editor';
 
 /** Expenses as a compact list, for a phone. */
-export function ExpenseList({ items }: { items: ExpenseItem[] }) {
+export function ExpenseList({
+  items,
+  onEdit,
+  onDelete,
+}: { items: ExpenseItem[] } & RowHandlers<ExpenseItem>) {
   return (
     <List disablePadding aria-label="Расходы за месяц">
       {items.map((item, index) => (
@@ -35,15 +42,22 @@ export function ExpenseList({ items }: { items: ExpenseItem[] }) {
               </>
             }
           />
-          <Typography
-            sx={{
-              fontWeight: 600,
-              whiteSpace: 'nowrap',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {formatAmount(item.amount)}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {formatAmount(item.amount)}
+            </Typography>
+            <RowActions
+              label={`${item.categoryName}, ${formatAmount(item.amount)}`}
+              onEdit={() => onEdit(item)}
+              onDelete={() => onDelete(item)}
+            />
+          </Box>
         </ListItem>
       ))}
     </List>

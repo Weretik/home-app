@@ -44,12 +44,13 @@ internal static class ImportSheetEndpoint
             return TypedResults.Unauthorized();
 
         var result = await sender.Send(
-            new ImportSheetCommand(request.ExpenseRows ?? [], request.IncomeRows ?? []), cancellationToken);
+            new ImportSheetCommand(request.ExpenseRows ?? [], request.IncomeRows ?? [], request.SavingsRows), cancellationToken);
         return result.ToHttpResult(http);
     }
 
-    /// <summary>The two tabs as the Google Sheets API returns them: rows of cell text, header first.</summary>
+    /// <summary>The tabs as the Google Sheets API returns them: rows of cell text, header first.</summary>
     internal sealed record Request(
         IReadOnlyList<IReadOnlyList<string>>? ExpenseRows,
-        IReadOnlyList<IReadOnlyList<string>>? IncomeRows);
+        IReadOnlyList<IReadOnlyList<string>>? IncomeRows,
+        IReadOnlyList<IReadOnlyList<string>>? SavingsRows);
 }

@@ -1,14 +1,16 @@
-import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import type { Theme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useIncomes, type Person } from '../data/expenses-api';
+import { useIncomes, type IncomeItem, type Person } from '../data/expenses-api';
 import { personLabels } from '../data/labels';
+import { useEntryEditor } from '../entry-editing/use-entry-editor';
+import { IncomeEditor } from '../income-editing/IncomeEditor';
 import { FilterSelect } from '../month-view/FilterSelect';
 import { ListStatus } from '../month-view/ListStatus';
 import { LoadMoreButton } from '../month-view/LoadMoreButton';
-import { MonthTotalCard } from '../month-view/MonthTotalCard';
 import { useClearFilters, useFilterParam } from '../url-state/use-filter-param';
 import { useMonthParam } from '../url-state/use-month-param';
 import { IncomeList } from './IncomeList';
@@ -20,12 +22,13 @@ const personOptions = people.map((value) => ({
   label: personLabels[value],
 }));
 
-/** «Доходы»: the month's total, the person filter, and the incomes, newest first. */
+/** «Доходы»: the person filter, «Добавить», and the month's incomes, newest first, each with edit and delete. */
 export function IncomesPage() {
   const [month] = useMonthParam();
   const [person, setPerson] = useFilterParam<Person>('person', people);
   const clearFilters = useClearFilters();
   const query = useIncomes(month, { person });
+  const editor = useEntryEditor<IncomeItem>();
   const isComputer = useMediaQuery((theme: Theme) =>
     theme.breakpoints.up('md'),
   );
@@ -36,19 +39,30 @@ export function IncomesPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <MonthTotalCard
-        title="Доходы за месяц"
-        icon={SavingsOutlinedIcon}
-        color="secondary"
-        total={first && { amount: first.totalAmount, count: first.totalCount }}
-      />
-      <Box role="group" aria-label="Фильтры" sx={{ display: 'flex' }}>
-        <FilterSelect
-          label="Кто"
-          value={person}
-          options={personOptions}
-          onChange={setPerson}
-        />
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Box role="group" aria-label="Фильтры" sx={{ display: 'flex' }}>
+          <FilterSelect
+            label="Кто"
+            value={person}
+            options={personOptions}
+            onChange={setPerson}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddOutlinedIcon />}
+          onClick={editor.add}
+        >
+          Добавить доход
+        </Button>
       </Box>
       <Card>
         <ListStatus
@@ -61,9 +75,17 @@ export function IncomesPage() {
           onResetFilters={clearFilters}
         >
           {isComputer ? (
-            <IncomeTable items={items} />
+            <IncomeTable
+              items={items}
+              onEdit={editor.edit}
+              onDelete={editor.remove}
+            />
           ) : (
-            <IncomeList items={items} />
+            <IncomeList
+              items={items}
+              onEdit={editor.edit}
+              onDelete={editor.remove}
+            />
           )}
           {query.hasNextPage && first && (
             <LoadMoreButton
@@ -75,6 +97,7 @@ export function IncomesPage() {
           )}
         </ListStatus>
       </Card>
+      <IncomeEditor editor={editor} month={month} />
     </Box>
   );
 }

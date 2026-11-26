@@ -20,6 +20,7 @@ internal sealed class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
         builder.Property(e => e.Comment).HasColumnName("comment").HasMaxLength(EntryRules.MaxCommentLength);
         builder.Property(e => e.ImportKey).HasColumnName("import_key").HasMaxLength(EntryRules.MaxImportKeyLength);
         builder.Property(e => e.CreatedAtUtc).HasColumnName("created_at_utc");
+        builder.Property(e => e.Version).IsRowVersion();
 
         // Same schema, so a real foreign key: a category with expenses cannot disappear.
         builder.HasOne<Category>().WithMany().HasForeignKey(e => e.CategoryId).OnDelete(DeleteBehavior.Restrict)
