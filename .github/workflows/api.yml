@@ -65,6 +65,9 @@ jobs:
           dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
             --project src/Modules/Expenses/Expenses.Infrastructure --startup-project src/Host/Host.Api \
             --context ExpensesDbContext --output ${{ runner.temp }}/migrations/expenses
+          dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
+            --project src/Modules/Shopping/Shopping.Infrastructure --startup-project src/Host/Host.Api \
+            --context ShoppingDbContext --output ${{ runner.temp }}/migrations/shopping
 
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'

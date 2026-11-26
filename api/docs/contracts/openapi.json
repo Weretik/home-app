@@ -1292,10 +1292,1257 @@
           }
         }
       }
+    },
+    "/api/shopping/items": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Lists what is needed (by department in store order, urgent first) and what is in the cart (latest bought first).",
+        "operationId": "listShoppingItems",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Adds items typed as text («молоко, хлеб, яйца 10»). Send a new Idempotency-Key per add; a repeat returns the first result.",
+        "operationId": "addShoppingItems",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddShoppingItemsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddItemsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/items/{id}": {
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Changes an item in the list. Send its version in If-Match; moving it to another department teaches the dictionary its name.",
+        "operationId": "updateShoppingItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShoppingItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingItemView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Deletes a list or history row for good. Send its version in If-Match.",
+        "operationId": "deleteShoppingItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/items/{id}/status": {
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Ticks an item bought or needed. Sets a target value, so a repeat changes nothing; 404 for an item that is history.",
+        "operationId": "setShoppingItemStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetShoppingItemStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingItemView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/items/clear-cart": {
+      "post": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "«Убрать купленные»: moves everything in the cart to history now and says how many items left.",
+        "operationId": "clearShoppingCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClearCartResult"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/history": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Lists bought items that left the list, newest bought first, one page at a time.",
+        "operationId": "listShoppingHistory",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingHistoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/frequent": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Lists the 20 names bought most often in the frequent window, without names that are in the list now.",
+        "operationId": "listFrequentItems",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FrequentItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/summary": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "The list at a glance for the home page: counts, departments with needed items, next items and top frequent names.",
+        "operationId": "getShoppingSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/departments": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Lists the departments in store order, with their keyword and needed item counts.",
+        "operationId": "listShoppingDepartments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DepartmentItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Adds a department just before the fallback. Send a new Idempotency-Key; a repeat returns the first id.",
+        "operationId": "createShoppingDepartment",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShoppingDepartmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCreatedId"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/departments/match": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Says which department an item with this name would go to (the preview while typing).",
+        "operationId": "matchShoppingDepartment",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentMatch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/departments/{id}": {
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Renames a department or changes its icon. Send its version in If-Match.",
+        "operationId": "updateShoppingDepartment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShoppingDepartmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Deletes a department; its items and keywords move to the fallback. Send its version in If-Match; the fallback answers 409.",
+        "operationId": "deleteShoppingDepartment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/departments/order": {
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Sets the store walk: send every department id exactly once, in the new order.",
+        "operationId": "reorderShoppingDepartments",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderShoppingDepartmentsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/keywords": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Lists the keywords alphabetically, optionally of one department and containing every word of the search.",
+        "operationId": "listShoppingKeywords",
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KeywordItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Adds a keyword (stored normalised). Send a new Idempotency-Key; a repeat returns the first id, a taken keyword 409.",
+        "operationId": "createShoppingKeyword",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShoppingKeywordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCreatedId"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/keywords/{id}": {
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Changes a keyword's text or department. Send its version in If-Match.",
+        "operationId": "updateShoppingKeyword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShoppingKeywordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Deletes a keyword. Send its version in If-Match.",
+        "operationId": "deleteShoppingKeyword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping/settings": {
+      "get": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "The cart hours and the frequent window, with the version to edit them with.",
+        "operationId": "getShoppingSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingSettingsView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Shopping"
+        ],
+        "summary": "Sets how long bought items stay in the cart (1–72 hours) and the frequent window (30–730 days). Send the version in If-Match.",
+        "operationId": "updateShoppingSettings",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShoppingSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AddItemsResult": {
+        "required": [
+          "added",
+          "restored",
+          "updated"
+        ],
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          },
+          "restored": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          },
+          "updated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          }
+        },
+        "description": "What an add did: new rows, items brought back from the cart, and needed items it updated."
+      },
+      "AddShoppingItemsRequest": {
+        "required": [
+          "text",
+          "addedBy",
+          "departmentId",
+          "urgent"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "addedBy": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "departmentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "urgent": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
       "BudgetSettingsRequest": {
         "required": [
           "monthlyLimit",
@@ -1387,6 +2634,19 @@
         },
         "description": "A category as lists and pickers show it."
       },
+      "ClearCartResult": {
+        "required": [
+          "cleared"
+        ],
+        "type": "object",
+        "properties": {
+          "cleared": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "How many items left the cart."
+      },
       "CreatedEntry": {
         "required": [
           "id"
@@ -1399,6 +2659,106 @@
           }
         },
         "description": "The id of a created expense, income or savings movement."
+      },
+      "CreateShoppingDepartmentRequest": {
+        "required": [
+          "name",
+          "icon"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateShoppingKeywordRequest": {
+        "required": [
+          "keyword",
+          "departmentId"
+        ],
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "DepartmentItem": {
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "sortOrder",
+          "isFallback",
+          "keywordCount",
+          "neededCount",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isFallback": {
+            "type": "boolean"
+          },
+          "keywordCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "neededCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "description": "A department as the settings and pickers show it."
+      },
+      "DepartmentMatch": {
+        "required": [
+          "departmentId",
+          "departmentName",
+          "departmentIcon"
+        ],
+        "type": "object",
+        "properties": {
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "departmentName": {
+            "type": "string"
+          },
+          "departmentIcon": {
+            "type": "string"
+          }
+        },
+        "description": "The department the dictionary picks for a name."
       },
       "ExpenseItem": {
         "required": [
@@ -1523,6 +2883,41 @@
             ]
           }
         }
+      },
+      "FrequentItem": {
+        "required": [
+          "name",
+          "departmentId",
+          "departmentName",
+          "departmentIcon",
+          "timesBought",
+          "lastBoughtAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "departmentName": {
+            "type": "string"
+          },
+          "departmentIcon": {
+            "type": "string"
+          },
+          "timesBought": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastBoughtAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "A name bought often, in its latest spelling and department; one tap adds it."
       },
       "HealthStatus": {
         "enum": [
@@ -1677,6 +3072,45 @@
             ]
           }
         }
+      },
+      "KeywordItem": {
+        "required": [
+          "id",
+          "keyword",
+          "departmentId",
+          "departmentName",
+          "departmentIcon",
+          "learned",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "departmentName": {
+            "type": "string"
+          },
+          "departmentIcon": {
+            "type": "string"
+          },
+          "learned": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "description": "A keyword as the settings show it, with its department."
       },
       "LimitPeriod": {
         "enum": [
@@ -1936,6 +3370,24 @@
           }
         }
       },
+      "ReorderShoppingDepartmentsRequest": {
+        "required": [
+          "departmentIds"
+        ],
+        "type": "object",
+        "properties": {
+          "departmentIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
       "SavingsDirection": {
         "enum": [
           "Deposit",
@@ -2122,6 +3574,253 @@
         },
         "description": "The jar's balance today and its movement month by month, newest month first."
       },
+      "SetShoppingItemStatusRequest": {
+        "required": [
+          "status",
+          "by"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ShoppingItemStatus"
+          },
+          "by": {
+            "$ref": "#/components/schemas/Person"
+          }
+        }
+      },
+      "ShoppingCreatedId": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "description": "The id of a created department or keyword."
+      },
+      "ShoppingHistoryPage": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "One page of history, with the count of all history rows."
+      },
+      "ShoppingItemStatus": {
+        "enum": [
+          "Needed",
+          "Bought"
+        ],
+        "description": "«Нужно» or «Куплено». Whether a bought item is still in the cart or already history is computed (CartWindow)."
+      },
+      "ShoppingItemView": {
+        "required": [
+          "id",
+          "name",
+          "quantity",
+          "note",
+          "departmentId",
+          "departmentName",
+          "departmentIcon",
+          "departmentSortOrder",
+          "urgent",
+          "status",
+          "addedBy",
+          "addedAtUtc",
+          "boughtBy",
+          "boughtAtUtc",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "departmentName": {
+            "type": "string"
+          },
+          "departmentIcon": {
+            "type": "string"
+          },
+          "departmentSortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "urgent": {
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShoppingItemStatus"
+          },
+          "addedBy": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "addedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "boughtBy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Person"
+              }
+            ]
+          },
+          "boughtAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "description": "An item as the list, the cart, history and the summary show it, with its department."
+      },
+      "ShoppingList": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          }
+        },
+        "description": "Needed items (by department in store order, urgent first, then by when added), then the cart (latest bought first)."
+      },
+      "ShoppingSettingsView": {
+        "required": [
+          "cartKeepHours",
+          "frequentDays",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "cartKeepHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "frequentDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "description": "How long bought items stay in the cart, how far back frequent items count, and the version to edit with."
+      },
+      "ShoppingSummary": {
+        "required": [
+          "neededCount",
+          "urgentCount",
+          "inCartCount",
+          "boughtLast7Days",
+          "boughtLast30Days",
+          "departments",
+          "nextItems",
+          "topFrequent"
+        ],
+        "type": "object",
+        "properties": {
+          "neededCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "urgentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inCartCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "boughtLast7Days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "boughtLast30Days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SummaryDepartment"
+            }
+          },
+          "nextItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingItemView"
+            }
+          },
+          "topFrequent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SummaryFrequentItem"
+            }
+          }
+        },
+        "description": "Counts, departments with needed items in store order, the next items to buy and the top frequent names."
+      },
       "SpendingLimitItem": {
         "required": [
           "id",
@@ -2189,6 +3888,49 @@
           }
         }
       },
+      "SummaryDepartment": {
+        "required": [
+          "departmentId",
+          "name",
+          "icon",
+          "neededCount"
+        ],
+        "type": "object",
+        "properties": {
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "neededCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "A department with something to buy."
+      },
+      "SummaryFrequentItem": {
+        "required": [
+          "name",
+          "timesBought"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timesBought": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "A frequent name and how many times it was bought in the window."
+      },
       "SystemStatus": {
         "required": [
           "status",
@@ -2215,6 +3957,91 @@
           }
         },
         "description": "The overall status, the build version with its commit, the environment, and the status of each check."
+      },
+      "UpdateShoppingDepartmentRequest": {
+        "required": [
+          "name",
+          "icon"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UpdateShoppingItemRequest": {
+        "required": [
+          "name",
+          "quantity",
+          "note",
+          "departmentId",
+          "urgent"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "urgent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateShoppingKeywordRequest": {
+        "required": [
+          "keyword",
+          "departmentId"
+        ],
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "departmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateShoppingSettingsRequest": {
+        "required": [
+          "cartKeepHours",
+          "frequentDays"
+        ],
+        "type": "object",
+        "properties": {
+          "cartKeepHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "frequentDays": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       }
     }
   },
@@ -2224,6 +4051,9 @@
     },
     {
       "name": "Expenses"
+    },
+    {
+      "name": "Shopping"
     }
   ]
 }

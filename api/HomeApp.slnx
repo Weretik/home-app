@@ -17,6 +17,13 @@
     <Project Path="src/Modules/Expenses/Expenses.Domain/Expenses.Domain.csproj" />
     <Project Path="src/Modules/Expenses/Expenses.Infrastructure/Expenses.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Shopping/">
+    <Project Path="src/Modules/Shopping/Shopping.Api/Shopping.Api.csproj" />
+    <Project Path="src/Modules/Shopping/Shopping.Application/Shopping.Application.csproj" />
+    <Project Path="src/Modules/Shopping/Shopping.Contracts/Shopping.Contracts.csproj" />
+    <Project Path="src/Modules/Shopping/Shopping.Domain/Shopping.Domain.csproj" />
+    <Project Path="src/Modules/Shopping/Shopping.Infrastructure/Shopping.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests.csproj" />
     <Project Path="tests/IntegrationTests/IntegrationTests.csproj" />

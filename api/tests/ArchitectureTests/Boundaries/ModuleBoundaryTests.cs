@@ -47,4 +47,22 @@ public sealed class ModuleBoundaryTests
 
         Assert.Empty(missing);
     }
+
+    [Fact]
+    public void Every_Module_IsComposedByTheHost()
+    {
+        var hostReferences = Repository.ProjectReferences(Path.Combine(Repository.Root, "src/Host/Host.Api/Host.Api.csproj"));
+        var program = File.ReadAllText(Path.Combine(Repository.Root, "src/Host/Host.Api/Program.cs"));
+        var mediator = File.ReadAllText(Path.Combine(Repository.Root, "src/Host/Host.Api/Composition/MediatorSetup.cs"));
+
+        var missing =
+            from module in Repository.Modules
+            where !hostReferences.Contains($"{module}.Api")
+                || !program.Contains($"Add{module}Module(", StringComparison.Ordinal)
+                || !program.Contains($"Map{module}Module(", StringComparison.Ordinal)
+                || !mediator.Contains($"{module}.Application.{module}ApplicationRegistration", StringComparison.Ordinal)
+            select module;
+
+        Assert.Empty(missing);
+    }
 }
