@@ -10,8 +10,9 @@ import { AssigneeCards } from './AssigneeCards';
 import { FocusList } from './FocusList';
 
 /**
- * «Дела» on the home page (FR-008): per assignee the active, overdue and due-today counts, done in the last week, the
- * tasks to look at first, and «Открыть дела».
+ * «Дела» on the home page (FR-008): per assignee the active, overdue and due-today counts, done in the last week,
+ * «На сегодня» (overdue, today's and urgent tasks, each ticks done in place; the card is shown only when there are
+ * such tasks), and «Открыть дела».
  */
 export function TodosSummary() {
   const { data, error, isPending, refetch } = useTodoSummary();
@@ -55,23 +56,35 @@ export function TodosSummary() {
       ) : (
         <>
           <AssigneeCards counts={data.assignees} />
-          <Card component="section" aria-labelledby="todos-focus-title">
-            <Typography
-              id="todos-focus-title"
-              variant="subtitle1"
-              component="h2"
-              sx={{ fontWeight: 600, px: 2, pt: 2, pb: 1 }}
-            >
-              В фокусе
-            </Typography>
-            {data.focus.length > 0 ? (
+          {data.focus.length > 0 && (
+            <Card component="section" aria-labelledby="todos-focus-title">
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  columnGap: 1,
+                  px: 2,
+                  pt: 2,
+                  pb: 1,
+                }}
+              >
+                <Typography
+                  id="todos-focus-title"
+                  variant="subtitle1"
+                  component="h2"
+                  sx={{ fontWeight: 600 }}
+                >
+                  На сегодня
+                </Typography>
+                <Button component={Link} to="/todos?when=today" size="small">
+                  Все на сегодня
+                </Button>
+              </Box>
               <FocusList tasks={data.focus} today={data.today} />
-            ) : (
-              <Typography color="text.secondary" sx={{ px: 2, pb: 2 }}>
-                Ничего срочного: просроченных, сегодняшних и срочных задач нет.
-              </Typography>
-            )}
-          </Card>
+            </Card>
+          )}
         </>
       )}
     </Box>

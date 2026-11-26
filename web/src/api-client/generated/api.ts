@@ -696,7 +696,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat. */
+        /** Lists the active tasks (view=active, by priority, due date, creation) or the archive (view=archive, newest completion first). assignee may repeat; dueFrom/dueTo (both included) or withoutDueDate narrow by due date; in the archive completedFrom/completedTo (Kyiv days, both included) narrow by completion day. */
         get: operations["listTodoTasks"];
         put?: never;
         /** Adds a task with its first steps. Send a new Idempotency-Key per task; a repeat returns the first id. */
@@ -4642,6 +4642,11 @@ export interface operations {
                 categoryId?: string;
                 withoutCategory?: boolean;
                 search?: string;
+                dueFrom?: string;
+                dueTo?: string;
+                withoutDueDate?: boolean;
+                completedFrom?: string;
+                completedTo?: string;
                 page?: number;
                 pageSize?: number;
             };

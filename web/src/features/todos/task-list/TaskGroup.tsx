@@ -1,16 +1,17 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useId, type ReactNode } from 'react';
-import { dueBucketLabels, type DueBucket } from '../data/due-date';
 
 interface TaskGroupProps {
-  bucket: DueBucket;
+  label: string;
   count: number;
+  /** Red heading: the tasks are late. */
+  overdue?: boolean;
   children: ReactNode;
 }
 
-/** One due group of the active list: its heading («Просрочено · 2», red when overdue) and its rows. */
-export function TaskGroup({ bucket, count, children }: TaskGroupProps) {
+/** One day group of a list: its heading («Просрочено · 2» in red, «Сегодня · 3», «Пн, 30 ноября · 1») and its rows. */
+export function TaskGroup({ label, count, overdue, children }: TaskGroupProps) {
   const headingId = useId();
   return (
     <Box
@@ -27,10 +28,10 @@ export function TaskGroup({ bucket, count, children }: TaskGroupProps) {
           pt: 1.5,
           pb: 0.5,
           fontWeight: 600,
-          color: bucket === 'overdue' ? 'error.main' : 'text.secondary',
+          color: overdue ? 'error.main' : 'text.secondary',
         }}
       >
-        {dueBucketLabels[bucket]}{' '}
+        {label}{' '}
         <Box component="span" sx={{ fontVariantNumeric: 'tabular-nums' }}>
           · {count}
         </Box>

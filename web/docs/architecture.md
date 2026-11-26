@@ -96,7 +96,7 @@ home/
     top-wishes/      «🔥 Очень хочу»: a tinted block per person (side by side from md), PersonWishes
   todos-summary/
     data/            todos-summary-api.ts (GET /api/todos/summary, the in-place done tick), labels and due dates
-    view/            TodosSummary (states, «Сделано за неделю», «Открыть дела»), the three assignee cards, «В фокусе»
+    view/            TodosSummary (states, «Сделано за неделю», «Открыть дела»), the three assignee cards, «На сегодня»
 ```
 
 - `summary-sections.ts` lists every section with its summary component, or `null` while it has none: the switcher
@@ -119,8 +119,9 @@ home/
 - «Покупки» shows the list at a glance: three figure cards, the departments with needed items, up to eight next items
   (urgent first), the five most bought, and «Открыть список». An empty list says «Список пуст 🎉».
 - «Дела» (`?s=todos`): a card per Маша, Виталий, Общее with the active count, «просрочено N» in red and «сегодня N»;
-  «Сделано за неделю»; «В фокусе», up to eight tasks from the summary's `focus`, each ticked done in place (struck
-  through while saving). Its query key is `['todos', 'summary']`, so every Todos write refreshes it.
+  «Сделано за неделю»; «На сегодня», up to eight overdue, today's and urgent tasks from the summary's `focus`, each
+  ticked done in place (struck through while saving), with «Все на сегодня» (`/todos?when=today`); the card is left out
+  when there are none. Its query key is `['todos', 'summary']`, so every Todos write refreshes it.
 
 ## Expenses (`src/features/expenses`)
 
@@ -320,11 +321,13 @@ todos/
 
 - Query keys: `['todos', 'tasks', view, query]`, `['todos', 'task', id]`, `['todos', 'categories']`; the home
   summary's `['todos', 'summary']`. Every write invalidates `['todos']`.
-- Groups (FR-001): «Просрочено», «Сегодня», «Скоро» (next 7 days), «Позже», «Без срока»; empty ones hidden; today is
-  the Kyiv date. Lists load 50 tasks a page with «Показать ещё».
+- Day headings (FR-001, `data/day-groups.ts`): «Просрочено», «Сегодня», «Завтра», one per later due day («Пн, 30
+  ноября»), «Без срока»; the archive by the Kyiv day of completion («Сегодня», «Вчера», …). Today is the Kyiv date. Lists load 50 tasks a page with «Показать ещё».
 - Filters: «Маша» and «Виталий» send `assignee` twice (the person and `Shared`), «Общее» only `Shared`; the category is
-  an id or `none` (`withoutCategory=true`); the search reaches the URL 300 ms after typing stops. Switching tabs keeps
-  them; the gear drops them.
+  an id or `none` (`withoutCategory=true`); the search reaches the URL 300 ms after typing stops. The date filter
+  (`url-state/date-filter.ts`, `?when=&from=&to=`) is «Срок» on the active list (`dueFrom` / `dueTo` /
+  `withoutDueDate`) and «Когда сделано» in the archive (`completedFrom` / `completedTo`). Switching tabs keeps «Кому»,
+  category and search, not the date choice; the gear drops them all.
 - Quick add creates a task for the chosen «Кому» («Общее» for «Все»), Обычно, no date, with an `Idempotency-Key`
   renewed after each success; the field clears and keeps focus. The pencil opens the full form with the typed title.
 - The done tick and «Вернуть» are optimistic: the row leaves its list at once and comes back with the reason if the

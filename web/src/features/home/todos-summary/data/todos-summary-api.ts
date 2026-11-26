@@ -20,7 +20,7 @@ export function useTodoSummary() {
   });
 }
 
-/** Ticks a focus task done in place (FR-008), with its version; then everything under the module prefix reloads. */
+/** Ticks a task of «На сегодня» done in place (FR-008), with its version; then everything under the module prefix reloads. */
 export function useCompleteFocusTask() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -39,7 +39,7 @@ export function useCompleteFocusTask() {
   });
 }
 
-/** Why a tick in «В фокусе» failed, in Russian (the API's own messages are English). The summary reloads after it. */
+/** Why a tick in «На сегодня» failed, in Russian (the API's own messages are English). The summary reloads after it. */
 export function describeTickError(error: Error): string {
   if (!(error instanceof ApiError))
     return 'Нет связи с сервером. Проверьте интернет и попробуйте снова.';

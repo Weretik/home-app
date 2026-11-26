@@ -11,6 +11,13 @@ public static class KyivCalendar
 
     public static DateTimeOffset ToKyiv(DateTimeOffset moment) => TimeZoneInfo.ConvertTime(moment, Zone);
 
+    /// <summary>The UTC moment a calendar day starts in Kyiv (midnight there), for filtering stored UTC times by day.</summary>
+    public static DateTimeOffset StartOfDayInKyiv(DateOnly day)
+    {
+        var midnight = day.ToDateTime(TimeOnly.MinValue);
+        return new DateTimeOffset(midnight, Zone.GetUtcOffset(midnight)).ToUniversalTime();
+    }
+
     private static TimeZoneInfo FindZone()
     {
         // Older time zone data knows the city only by its former spelling.

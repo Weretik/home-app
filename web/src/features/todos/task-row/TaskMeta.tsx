@@ -3,7 +3,7 @@ import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import { categoryLabel } from '../data/categories-api';
-import { dueBucket, formatDue } from '../data/due-date';
+import { formatDue, isOverdue } from '../data/due-date';
 import {
   activeStatuses,
   priorityLabels,
@@ -35,8 +35,7 @@ export function TaskMeta({
   extra?: string;
 }) {
   const mark = priorityMarks[task.priority];
-  const overdue =
-    task.completedAtUtc == null && dueBucket(task.dueDate, today) === 'overdue';
+  const overdue = task.completedAtUtc == null && isOverdue(task.dueDate, today);
 
   return (
     <Box

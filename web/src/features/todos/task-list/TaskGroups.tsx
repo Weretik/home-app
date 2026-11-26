@@ -1,5 +1,5 @@
 import List from '@mui/material/List';
-import { dueBucketLabels, groupByDue } from '../data/due-date';
+import { groupByDueDay } from '../data/day-groups';
 import type { TodoTaskItem } from '../data/todos-api';
 import { TaskRow } from '../task-row/TaskRow';
 import { TaskGroup } from './TaskGroup';
@@ -11,15 +11,16 @@ interface TaskGroupsProps {
   onOpen: (task: TodoTaskItem) => void;
 }
 
-/** The active tasks in their groups (FR-001): Просрочено, Сегодня, Скоро, Позже, Без срока; empty ones hidden. */
+/** The active tasks by due day (FR-001): Просрочено, Сегодня, Завтра, one group per later day, Без срока. */
 export function TaskGroups({ items, today, onDone, onOpen }: TaskGroupsProps) {
-  return groupByDue(items, today).map((group) => (
+  return groupByDueDay(items, today).map((group) => (
     <TaskGroup
-      key={group.bucket}
-      bucket={group.bucket}
+      key={group.key}
+      label={group.label}
       count={group.items.length}
+      overdue={group.overdue}
     >
-      <List disablePadding aria-label={dueBucketLabels[group.bucket]}>
+      <List disablePadding aria-label={group.label}>
         {group.items.map((task, index) => (
           <TaskRow
             key={task.id}

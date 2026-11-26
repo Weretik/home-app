@@ -29,6 +29,11 @@ export interface TaskQuery {
   categoryId?: string;
   withoutCategory?: boolean;
   search?: string;
+  dueFrom?: string;
+  dueTo?: string;
+  withoutDueDate?: boolean;
+  completedFrom?: string;
+  completedTo?: string;
 }
 
 /** The next page number of a paged list, or undefined after the last page. */

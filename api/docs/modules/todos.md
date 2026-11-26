@@ -68,7 +68,9 @@ classDiagram
 
 Lists (R-012): active tasks by priority (Urgent first), then due date (earliest first, none last), then creation
 (oldest first); the archive by completion time, newest first. Search splits the input into words; each word is an
-escaped `LIKE` on `lower(title)`.
+escaped `LIKE` on `lower(title)`. Date filters (R-017): `dueFrom` / `dueTo` (both included) or `withoutDueDate`; in
+the archive `completedFrom` / `completedTo` are Kyiv days, turned into UTC bounds from Kyiv midnight to the midnight
+after the last day (`KyivCalendar.StartOfDayInKyiv`).
 
 Summary (R-013): "today" is the date in `Europe/Kyiv`. Per assignee (always Maria, Vitaliy, Shared in that order):
 active tasks, overdue (active with a due date before today) and due today. `doneLast7Days` counts tasks with status
@@ -135,7 +137,7 @@ Group `/api/todos`, tag `Todos`. Every write is anonymous, uses the `PublicWrite
 
 | Operation | Method and path | Request | Response |
 | --- | --- | --- | --- |
-| `listTodoTasks` | `GET /tasks` | query `view` (`active` default, `archive`), `assignee` (repeatable), `categoryId`, `withoutCategory`, `search`, `page` (1), `pageSize` (50, at most 100) | `200 TodoTaskList`, `400` |
+| `listTodoTasks` | `GET /tasks` | query `view` (`active` default, `archive`), `assignee` (repeatable), `categoryId`, `withoutCategory`, `search`, `dueFrom`, `dueTo`, `withoutDueDate`, `completedFrom`, `completedTo` (archive only), `page` (1), `pageSize` (50, at most 100) | `200 TodoTaskList`, `400` |
 | `getTodoTask` | `GET /tasks/{id}` | | `200 TodoTaskItem`, `404` |
 | `createTodoTask` | `POST /tasks` | `Idempotency-Key`; `TodoTaskRequest` (`title`, `notes?`, `assignee`, `author?`, `status?`, `priority`, `dueDate?`, `categoryId?`, `steps?`) | `201 TodoCreated`, `400`, `404`, `409` |
 | `updateTodoTask` | `PUT /tasks/{id}` | `If-Match`; `TodoTaskUpdateRequest` (the same without `steps`, `status` required) | `204`, `400`, `404`, `409` |
