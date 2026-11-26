@@ -115,12 +115,19 @@ function LimitList({ rows }: { rows: LimitRow[] }) {
         <ListItem
           key={row.key}
           divider={!row.isTotal}
-          sx={{ display: 'grid', gap: 0.75, px: 2 }}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr)',
+            gap: 0.75,
+            px: 2,
+          }}
         >
           <Box
             sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}
           >
-            <Typography sx={{ fontWeight: row.isTotal ? 700 : 600 }}>
+            <Typography
+              sx={{ fontWeight: row.isTotal ? 700 : 600, minWidth: 0 }}
+            >
               {row.name}
             </Typography>
             <Typography sx={{ ...number, fontWeight: 600 }}>
@@ -133,12 +140,29 @@ function LimitList({ rows }: { rows: LimitRow[] }) {
             <LimitFill name={row.name} percent={row.percent} />
           )}
           {row.limit !== null && row.left !== null && (
-            <Typography variant="body2" color="text.secondary" sx={number}>
-              {formatExact(row.spent)} из {formatExact(row.limit)} ·{' '}
-              <Box component="span" sx={{ color: leftColor(row.left) }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              <Box component="span" sx={number}>
+                {formatExact(row.spent)} из {formatExact(row.limit)}
+              </Box>
+              {' · '}
+              <Box
+                component="span"
+                sx={{ ...number, color: leftColor(row.left) }}
+              >
                 остаток {formatExact(row.left)}
               </Box>
-              {row.perDay !== null && ` · в день ${formatExact(row.perDay)}`}
+              {row.perDay !== null && (
+                <>
+                  {' · '}
+                  <Box component="span" sx={number}>
+                    в день {formatExact(row.perDay)}
+                  </Box>
+                </>
+              )}
             </Typography>
           )}
         </ListItem>

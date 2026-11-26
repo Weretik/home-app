@@ -52,7 +52,13 @@ export function EntryDialog({
       >
         <DialogTitle id={titleId}>{title}</DialogTitle>
         <DialogContent
-          sx={{ display: 'grid', gap: 2, alignContent: 'start', pt: 1 }}
+          sx={{
+            display: 'grid',
+            gap: 2,
+            alignContent: 'start',
+            // MUI zeroes the top padding after a title, which clips the first field's label.
+            '.MuiDialogTitle-root + &': { pt: 1 },
+          }}
         >
           {error && <Alert severity="error">{error}</Alert>}
           {children}
