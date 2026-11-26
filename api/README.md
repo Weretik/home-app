@@ -3,14 +3,14 @@
 A .NET 10 modular monolith on PostgreSQL, built on
 [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). One deployable API (`Host.Api`)
 hosts the modules; each module owns its own schema, its own use cases and its own public surface. Modules so far:
-[Expenses](docs/modules/expenses.md), [Gifts](docs/modules/gifts.md).
+[Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md).
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
 - [Rules](docs/rules.md): the conventions every change follows; most are checked by tests.
 - [Decisions](docs/decisions/README.md): why it is built this way.
 - [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints):
-  [Expenses](docs/modules/expenses.md), [Gifts](docs/modules/gifts.md).
+  [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md).
 - [Feature specifications](docs/specs/README.md): the SDD of each feature, with its traceability and audit.
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
@@ -19,7 +19,7 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 ```
 src/
   BuildingBlocks/   Result and Error, validation pipeline, outbox, persistence helpers, problem responses
-  Modules/          one folder per module, five projects each (Expenses, Gifts)
+  Modules/          one folder per module, five projects each (Expenses, Shopping, Gifts)
     <Name>/         <Name>.Api, .Application, .Contracts, .Domain, .Infrastructure
   Host/Host.Api/    Composition only: registers modules, middleware, OpenAPI
 tests/
@@ -57,7 +57,7 @@ environments migrations run as a separate step before the deploy (see [Deploy](#
 | `Cors:Origins` | Browser origins allowed to call the API with credentials. |
 | `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. |
 | `Expenses:Import:Key` | Shared secret for the sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing, normally on a local run ([module page](docs/modules/expenses.md#the-one-time-import-from-the-sheet)). |
-| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes (60 a minute, for the open Expenses edits) and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
+| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes (60 a minute, for the open Expenses, Shopping and Gifts edits) and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
 | `ForwardedHeaders:Enabled`, `:KnownProxies`, `:KnownNetworks` | Read the client address and scheme from a trusted reverse proxy (see [Deploy behind a reverse proxy](#deploy-behind-a-reverse-proxy)). |
 
 Keep real values in user secrets or environment variables (`ConnectionStrings__Database=...`), never in the

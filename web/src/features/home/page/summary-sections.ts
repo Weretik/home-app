@@ -4,6 +4,7 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import type { ComponentType } from 'react';
 import { ExpensesSummary } from '../expenses-summary/view/ExpensesSummary';
+import { ShoppingSummary } from '../shopping-summary/view/ShoppingSummary';
 import { GiftsSummary } from '../gifts-summary/view/GiftsSummary';
 
 export interface SummarySection {
@@ -31,7 +32,7 @@ export const summarySections: SummarySection[] = [
     key: 'shopping',
     label: 'Покупки',
     icon: ShoppingCartOutlinedIcon,
-    Summary: null,
+    Summary: ShoppingSummary,
   },
   {
     key: 'gifts',
