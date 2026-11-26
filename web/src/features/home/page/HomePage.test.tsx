@@ -107,6 +107,9 @@ test('opens the expenses summary in the switcher, other sections are coming', as
     within(switcher).getByRole('button', { name: /Расходы/ }),
   ).toHaveAttribute('aria-pressed', 'true');
   expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeDisabled();
+  expect(
+    within(switcher).getByRole('button', { name: /Подарки/ }),
+  ).toBeEnabled();
   expect(screen.getByRole('link', { name: /Состояние/ })).toHaveAttribute(
     'href',
     '/status',
@@ -173,4 +176,46 @@ test('says why the summary did not load and offers to retry', async () => {
     'Не удалось загрузить сводку',
   );
   expect(screen.getByRole('button', { name: 'Повторить' })).toBeInTheDocument();
+});
+
+test('opens the gifts summary from ?s=gifts', async () => {
+  const counts = {
+    wantedCount: 0,
+    wantedPriceSum: 0,
+    wantedWithoutPrice: 0,
+    highCount: 0,
+    giftedCount: 0,
+    giftedPriceSum: 0,
+  };
+  const urls: URL[] = [];
+  vi.stubGlobal('fetch', (request: Request) => {
+    urls.push(new URL(request.url));
+    return json({
+      recipients: ['Maria', 'Vitaliy', 'Together'].map((recipient) => ({
+        recipient,
+        counts,
+        topWanted: [],
+      })),
+      total: counts,
+      upcoming: [],
+      details: [],
+    });
+  });
+  const client = createQueryClient();
+  render(
+    <ThemeProvider theme={theme}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={['/?s=gifts']}>
+          <HomePage />
+        </MemoryRouter>
+      </QueryClientProvider>
+    </ThemeProvider>,
+  );
+
+  const switcher = screen.getByRole('group', { name: 'Сводка' });
+  expect(
+    within(switcher).getByRole('button', { name: /Подарки/ }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  expect(await screen.findByText('Желаний пока нет')).toBeInTheDocument();
+  expect(urls.map((url) => url.pathname)).toEqual(['/api/gifts/summary']);
 });

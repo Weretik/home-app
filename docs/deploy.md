@@ -99,11 +99,17 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
 Each module's first migration creates its schema itself, since the owner has all rights; nothing to run by hand.
 
 **Migrations.** Production never migrates on start (`Database:InitializeOnStartup` is off). The API workflow builds
-one EF migrations bundle per module and, in the deploy job, runs them against the `DATABASE_CONNECTION_STRING` secret
+one EF migrations bundle per module (today `expenses` and `gifts`, listed in `.github/workflows/api.yml`) and, in the
+deploy job, runs them against the `DATABASE_CONNECTION_STRING` secret
 before the new version is deployed. Without that secret the deploy stops with an error, and the running version stays.
 Add it once: Settings → Environments → `production` → Environment secrets → `DATABASE_CONNECTION_STRING` (the GitHub
 runner reaches the database because the server accepts remote connections). See
 [ADR 0016](../api/docs/decisions/0016-migrations-as-bundles-in-deploy.md).
+
+**Gifts import.** After the first deploy that creates the schema `gifts`, the gift wishlist from the old sheet is
+loaded once by running its SQL script by hand (DBeaver) against the production database; every insert is
+`ON CONFLICT DO NOTHING`, so a second run changes nothing
+([ADR 0026](../api/docs/decisions/0026-gifts-import-as-sql-script.md)).
 
 ### Alternative: Neon
 

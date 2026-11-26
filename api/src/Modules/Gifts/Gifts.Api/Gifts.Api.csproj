@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
+    <ProjectReference Include="..\Gifts.Application\Gifts.Application.csproj" />
+    <ProjectReference Include="..\Gifts.Infrastructure\Gifts.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

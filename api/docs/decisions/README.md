@@ -29,6 +29,12 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0020 | [The month summary is computed on read, with no stored totals](0020-month-summary-computed-on-read.md) |
 | 0031 | [The Shopping module, with the list, cart and history computed on read](0031-shopping-module-model.md) |
 | 0032 | [Text parsing and department matching are pure domain services with learned keywords](0032-text-parsing-and-department-matching.md) |
+| 0021 | [The Gifts module and its model](0021-gifts-module-model.md) |
+| 0022 | [Gift variants belong to the gift and are replaced as a whole](0022-gift-variants-owned-by-gift.md) |
+| 0023 | [A gifted or dropped gift moves to an archive by its status](0023-gifted-gifts-move-to-archive.md) |
+| 0024 | [Gift categories are editable data with a seeded start](0024-gift-categories-as-editable-data.md) |
+| 0025 | [Personal details are reference data of the Gifts module, shown read-only on the home page](0025-gift-details-as-reference-data.md) |
+| 0026 | [The gifts sheet is imported once by a hand-run SQL script](0026-gifts-import-as-sql-script.md) |
 
 ## Decisions that must have a record
 
