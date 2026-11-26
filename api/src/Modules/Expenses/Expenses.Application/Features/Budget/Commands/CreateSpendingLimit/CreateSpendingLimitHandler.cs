@@ -9,9 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Application.Features.Budget.Commands.CreateSpendingLimit;
 
+/// <summary>
+/// Adds a limit at the end of the list (<c>max + 10</c>). The read of the max and the insert race when two limits are
+/// added at once; the unique index <see cref="SortOrderIndex"/> stops the second one, which answers 409.
+/// </summary>
 public sealed class CreateSpendingLimitHandler(IExpensesDbContext db, TimeProvider clock)
     : ICommandHandler<CreateSpendingLimitCommand, Result<CreatedEntry>>
 {
+    /// <summary>The unique index on <c>spending_limits.sort_order</c>, the race guard of the list order.</summary>
+    public const string SortOrderIndex = "ux_spending_limits_sort_order";
+
     private const string Kind = "limit";
 
     public async ValueTask<Result<CreatedEntry>> Handle(CreateSpendingLimitCommand c, CancellationToken cancellationToken)
@@ -34,6 +41,10 @@ public sealed class CreateSpendingLimitHandler(IExpensesDbContext db, TimeProvid
         try
         {
             await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (UniqueConstraintViolationException violation) when (violation.ConstraintName == SortOrderIndex)
+        {
+            return BudgetErrors.LimitAddedMeanwhile;
         }
         catch (UniqueConstraintViolationException)
         {

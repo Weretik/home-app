@@ -34,7 +34,7 @@ internal static class CreateExpenseEndpoint
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(
-            new CreateExpenseCommand(idempotencyKey ?? string.Empty, request.Date, request.Payer, request.CategoryId, request.Amount, request.PaymentMethod, request.Comment), cancellationToken);
+            new CreateExpenseCommand(idempotencyKey ?? string.Empty, request.Date, request.Payer, request.CategoryId, request.Amount, request.PaymentMethod, request.Comment, request.OutsideLimits), cancellationToken);
         return result.ToCreatedHttpResult(http, created => $"/api/expenses/{created.Id}");
     }
 }

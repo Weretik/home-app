@@ -26,6 +26,12 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
 
     public string? Comment { get; private set; }
 
+    /// <summary>
+    /// A one-off spend that was meant to go over the limits («Не в лимиты»): it counts in the month's totals but in no
+    /// spending limit, not in the monthly total limit and not in the carry-over to the next period.
+    /// </summary>
+    public bool OutsideLimits { get; private set; }
+
     /// <summary>Set when the expense came from an import; a unique index makes a repeated import skip it.</summary>
     public string? ImportKey { get; private init; }
 
@@ -42,7 +48,8 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
         PaymentMethod paymentMethod,
         string? comment,
         DateTimeOffset now,
-        string? importKey = null)
+        string? importKey = null,
+        bool outsideLimits = false)
     {
         var check = EntryRules.Check(date, amount, comment, importKey);
         if (check.IsFailure)
@@ -57,6 +64,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
             Amount = amount,
             PaymentMethod = paymentMethod,
             Comment = EntryRules.Normalize(comment),
+            OutsideLimits = outsideLimits,
             ImportKey = importKey,
             CreatedAtUtc = now,
         };
@@ -64,7 +72,13 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
 
     /// <summary>Replaces what the person can edit; the import key and creation time stay.</summary>
     public Result Update(
-        DateOnly date, Payer payer, Guid categoryId, decimal amount, PaymentMethod paymentMethod, string? comment)
+        DateOnly date,
+        Payer payer,
+        Guid categoryId,
+        decimal amount,
+        PaymentMethod paymentMethod,
+        string? comment,
+        bool outsideLimits)
     {
         var check = EntryRules.Check(date, amount, comment, ImportKey);
         if (check.IsFailure)
@@ -76,6 +90,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
         Amount = amount;
         PaymentMethod = paymentMethod;
         Comment = EntryRules.Normalize(comment);
+        OutsideLimits = outsideLimits;
         return Result.Success();
     }
 }

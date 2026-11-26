@@ -1,7 +1,9 @@
 # Backend rules
 
-Short, stable rules for every change. The ones marked **(tested)** are enforced by `tests/ArchitectureTests` and
-fail the build when broken.
+Short, stable rules for every change. The ones marked **(tested)** are enforced by `tests/ArchitectureTests` (or
+`tests/IntegrationTests` where a database is needed) and fail CI when broken; the [enforcement table](#enforcement)
+names the test for each rule and the reason for each rule that is review only
+([ADR 0023](decisions/0023-every-rule-checked-by-a-test.md)).
 
 ## Structure
 
@@ -17,46 +19,59 @@ fail the build when broken.
 - **A folder holds at most six code files.** When a seventh arrives, split the folder by meaning into named
   subfolders of at least two files each. No empty folders, no folder that only wraps one subfolder, no new one-file
   folders. Only generated EF `Migrations/` are exempt. This applies to `src/` and `tests/`. **(tested)**
-- One type per file; the file has the type's name.
-- All projects live under `src/` or `tests/`, and solution folders mirror the disk.
+- One type per file; the file has the type's name, and its file-scoped namespace follows its folders. **(tested)**
+- All projects live under `src/` or `tests/`, and solution folders mirror the disk. **(tested)**
 
 ## Use cases
 
 - One use case is one folder under `Commands/` or `Queries/` with its command or query, its validator and its
-  handler. Every use case returns a `Result`, and every use case with input has a validator. **(tested)**
-- Commands change state and return little; queries never change state.
+  handler, named after the folder (`CreateExpense/`: `CreateExpenseCommand`, `CreateExpenseHandler`,
+  `CreateExpenseValidator`). Every use case returns a `Result`, and every use case with input has a validator.
+  **(tested)**
+- Commands change state and return little; queries never change state. **(tested: queries)**
 - The HTTP request record belongs to the endpoint and is mapped to the command; the command is not the request.
+  **(tested)**
 - Every input has a FluentValidation validator. Validators check shape (required, length, range); the domain checks
   business rules.
 - A command saves once (`SaveChangesAsync` a single time). There are no repositories that save on their own; the
-  module's `DbContext` port is the unit of work.
+  module's `DbContext` port is the unit of work. **(tested)**
+- Arithmetic that a handler does over what it read (sums, carry-over, forecasts) sits in a pure type beside the
+  handler, so it can be unit-tested with fixed input and a fixed day (`GetMonthSummary/SummaryFigures`).
 
 ## Errors
 
 - A broken business rule returns `Result` / `Result<T>` with a typed `Error` (`Validation`, `NotFound`, `Conflict`,
   `Forbidden`, `Unauthorized`) and a stable code such as `catalog.slug_taken`.
-- Exceptions are for bugs and outages. One global handler logs them and answers 500 without internals.
-- A unique index violation becomes a `Conflict` result in the handler, so a race never returns 500.
+- Exceptions are for bugs and outages; `Domain` and `Application` never `throw` for a business rule. **(tested)** One
+  global handler logs them and answers 500 without internals.
+- A unique index violation becomes a `Conflict` result in the handler, so a race never returns 500. **(tested on
+  the races that exist: `ExpensesRaceApiTests`)**
 
 ## API
 
-- Minimal APIs, one endpoint per file, grouped by feature.
+- Minimal APIs, one endpoint per file (`<Name>Endpoint.cs`), grouped by feature. **(tested)**
 - Every endpoint has a unique camelCase `WithName`, a `WithSummary`, and `Produces...` for every response it can
   give. **(tested on the generated OpenAPI document)**
-- Errors are RFC 9457 problem responses with `code` and, for validation, `errors` by field.
+- Errors are RFC 9457 problem responses with `code` and, for validation, `errors` by field. **(tested)**
 - An anonymous endpoint that writes, and every sign-in, opts into a rate limit policy
-  (`RequireRateLimiting(RateLimitPolicies.PublicWrite)`) and lists `429` in its `Produces...`.
+  (`RequireRateLimiting(RateLimitPolicies.PublicWrite)`) and lists `429` in its `Produces...`. **(tested)**
+- A create (`201`) takes an `Idempotency-Key` header and an edit (`PUT`) takes `If-Match` with the row version; an
+  exception is named in the test with its ADR (`recordPlannedExpense`, [ADR 0022](decisions/0022-planned-expenses-for-the-forecast.md)).
+  **(tested on the OpenAPI document)**
 - The OpenAPI document is generated on build and committed; CI fails when it differs from the code. Never edit it by
-  hand.
+  hand. **(tested in CI: `git diff --exit-code`)**
 
 ## Data
 
-- One schema per module and no foreign keys across schemas.
-- Reads use projections or `AsNoTracking` and page in SQL (page size at most 100).
+- One schema per module and no foreign keys across schemas; a module's `DbContext` maps only the module's types.
+  **(tested)**
+- The committed migrations match the model (no change without a migration). **(tested)**
+- Reads use projections or `AsNoTracking` and page in SQL (page size at most 100). **(tested)**
 - No query and no `SaveChanges` inside a loop.
 - Search splits the input into words; each word is an escaped `LIKE` on a lower-cased,
   `pg_trgm`-indexed column.
-- Shared state gets a named race guard: unique index, row version, or conditional `UPDATE`.
+- Shared state gets a named race guard: unique index, row version, or conditional `UPDATE`. The guard is tested by
+  letting a second request in between the read and the save (`TestHost/RacingExpensesDb`).
 - Migrations are a separate step before a deploy and must keep the previous release working (add first, remove
   later).
 
@@ -68,12 +83,75 @@ fail the build when broken.
 - Side effects outside the transaction (notifications, calls to other systems) go through the outbox, and their
   handlers are safe to run twice.
 - Work that runs on a schedule is an HTTP endpoint called by an external scheduler, not a background thread.
+  **(tested)**
+
+## Host and configuration
+
+- The host only composes modules: it calls `Add<Module>Module()` and `Map<Module>Module()` for each module. **(tested)**
+- The host validates scopes and the container build in every environment, so a singleton that captures a scoped
+  service fails at startup. **(tested)**
+- Committed settings outside `appsettings.Development.json` hold no secrets (connection strings, keys) and do not
+  migrate on startup. **(tested)**
 
 ## Process
 
-- Write the test first: domain tests and handler tests in `UnitTests`, a few end-to-end checks in
-  `IntegrationTests`.
+- Write the test first: domain rules, validators and handler arithmetic in `UnitTests`; handler orchestration over the
+  database (repeats, versions, races, not found) in `IntegrationTests` on real PostgreSQL, since an in-memory
+  database cannot check `xmin`, unique indexes or `ExecuteDelete`.
 - Add an abstraction only when a third case needs it.
 - A lasting decision (a module, an external system, a way of running work, hosting) gets an ADR and a C4 update in
-  the same change.
-- Package versions only in `Directory.Packages.props`.
+  the same change; every ADR has a status and is in the index. **(tested: status and index)**
+- A feature starts with its SDD in `docs/sdd/specs/` and ends with an audit; every SDD is in the specs index.
+  **(tested: index)**
+- Package versions only in `Directory.Packages.props`. **(tested)**
+
+## Enforcement
+
+One row per rule. Tests are in `tests/ArchitectureTests` unless the path says otherwise; CI runs all of them on every
+push. "Review only" rules are checked by the audit of each feature.
+
+| Rule | Checked by |
+| --- | --- |
+| Five projects per module | `Boundaries/ModuleBoundaryTests.Every_Module_HasAllFiveLayers` |
+| Other modules only through `Contracts`; `Contracts` reference nothing | `ModuleBoundaryTests.A_Module_ReferencesOtherModules_OnlyThroughTheirContracts`, `.Contracts_AreLeaf_Projects…` |
+| `Domain` without EF Core, ASP.NET Core, Mediator, FluentValidation | `Boundaries/LayerDependencyTests.Domain_DependsOnNoFrameworks` |
+| `Application` without the driver, the web, `Infrastructure`, `Api` | `LayerDependencyTests.Application_DoesNotKnowTheDatabaseDriverOrTheWeb` |
+| `Infrastructure` without `Api` | `LayerDependencyTests.Infrastructure_DoesNotDependOnApi` |
+| Host references only module `Api` projects and shared infrastructure | `LayerDependencyTests.The_Host_OnlyComposes…` |
+| Host calls `Add<Module>Module` / `Map<Module>Module` for every module | `Hosting/HostRulesTests.The_Host_AddsAndMapsEveryModule…` |
+| Host validates scopes and the build in every environment | `HostRulesTests.The_Host_ValidatesScopesAndTheBuild_InEveryEnvironment`; every integration test boots the host with it |
+| No background threads; scheduled work is an HTTP endpoint | `HostRulesTests.Nothing_RunsInTheBackground` (allow-list: `DatabaseStartup`, a development-only startup step) |
+| No public setters in `Domain` | `Boundaries/DomainEncapsulationTests.Domain_Properties_HaveNoPublicSetters` |
+| One schema per module, only own types, no FK across schemas | `Boundaries/DataOwnershipTests.A_Module_MapsOnlyItsOwnTypes_InItsOwnSchema` |
+| Migrations match the model | `DataOwnershipTests.The_Migrations_MatchTheModel` |
+| At most six code files per folder | `Structure/FolderRulesTests.A_Folder_HoldsAtMostSixCodeFiles` (`src`, `tests`) |
+| No one-file, empty or wrapper folders | `FolderRulesTests.No_Folder_HoldsASingleCodeFile`, `.No_Folder_IsEmpty`, `.No_Folder_OnlyWrapsOneSubfolder` |
+| Folders named by meaning (no `Helpers`, `Services`, `Entities` …) | `FolderRulesTests.Folders_AreNamedByMeaning_NotByKindOfClass` |
+| One type per file, named like the file; namespace follows the folders | `Structure/SourceFileRulesTests` |
+| Projects under `src/`/`tests/`, in the solution, solution folders mirror the disk | `Structure/SolutionLayoutTests` |
+| Package versions only in `Directory.Packages.props` | `SolutionLayoutTests.Package_Versions_LiveOnlyInDirectoryPackagesProps` |
+| Use case folder, names, handler and validator beside it | `UseCases/UseCaseRulesTests.Every_UseCase_SitsInItsOwnFolder…`, `.Every_UseCase_IsNamedAfterItsFolder…` |
+| Every use case returns a `Result`; every use case with input has a validator | `UseCaseRulesTests.Every_UseCase_ReturnsAResult`, `.Every_UseCase_WithInput_HasAValidator` |
+| Queries never write; reads without tracking or through a projection | `UseCases/HandlerRulesTests.A_Query_NeverChangesState`, `.A_Query_ReadsWithoutTracking_OrThroughAProjection` |
+| A command saves once | `HandlerRulesTests.A_Command_SavesOnce` |
+| Page size at most 100 | `HandlerRulesTests.A_PagedList_ServesAtMost100RowsAPage` |
+| No `throw` for business rules in `Domain`/`Application` | `HandlerRulesTests.Business_Rules_ReturnResults_InsteadOfThrowing` |
+| Validators check shape, the domain checks rules | `UnitTests/Expenses/Input/*`, `UnitTests/Expenses/Domain/*` (per rule); the split itself is review only (meaning) |
+| Unique `WithName` (camelCase) and `WithSummary` | `Http/OpenApiDocumentTests.Every_Operation_HasAUniqueCamelCaseId_AndASummary` |
+| `Produces…` for every body; errors are problem responses; input lists `400` | `OpenApiDocumentTests.Every_SuccessWithABody_HasASchema`, `.Every_Error_IsAProblemResponse`, `.Every_Operation_WithInput_ListsTheValidationProblem` |
+| Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
+| `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-list: `recordPlannedExpense`, ADR 0022) |
+| Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |
+| Numbers are JSON numbers | `OpenApiDocumentTests.Numbers_AreNotAlsoStrings` |
+| OpenAPI committed and current | CI `api.yml`: `git diff --exit-code -- docs/contracts/openapi.json` after the build |
+| No secrets in committed settings; production does not migrate on startup | `Hosting/ConfigurationRulesTests` |
+| Repeats: same key returns the first result, other data `409` | `IntegrationTests/Api/Expenses/*` (`A_Repeated_*Create*`, per kind) |
+| Race guards (row version, unique index) answer `409`, never `500` | `IntegrationTests/Api/Expenses/Entries/ExpensesRaceApiTests` |
+| ADRs have a status and are indexed; SDDs indexed; every module has a page | `Structure/DocumentationIndexTests` |
+| No query and no `SaveChanges` in a loop | review only: a loop over an in-memory list is fine, over a query is not; the text cannot tell them apart reliably |
+| Search: words, escaped `LIKE`, trigram index | `UnitTests/BuildingBlocks/SearchPatternTests` for the pattern; the index is review only (migration content) |
+| Migrations keep the previous release working (add first, remove later) | review only: needs judgement on each migration; the deploy runs them as a bundle before the code (ADR 0016) |
+| Side effects through the outbox; handlers safe twice | review only: no outbox message exists yet; the first one gets a test with its handler |
+| A unique violation becomes `Conflict` in the handler | integration tests of each existing race; a new unique index needs its race test (review) |
+| Commands return little; abstraction only for a third case; test first | review only: judgement and process |
+| ADR and C4 in the same change as a lasting decision | review only: whether a change is a lasting decision is judgement; the index and status are tested |

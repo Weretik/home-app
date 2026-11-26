@@ -5,6 +5,14 @@ using Host.Api.Composition;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// In every environment, not only Development: a singleton that captures a scoped service (a DbContext) or a missing
+// registration fails at startup instead of on the first request.
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
+
 // Each module adds itself here: .Add<Module>Module(builder.Configuration).
 builder.Services.AddPlatform(builder.Configuration);
 builder.Services.AddExpensesModule(builder.Configuration);

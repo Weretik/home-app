@@ -16,7 +16,7 @@ public sealed class CreateExpenseHandler(IExpensesDbContext db, TimeProvider clo
 
     public async ValueTask<Result<CreatedEntry>> Handle(CreateExpenseCommand c, CancellationToken cancellationToken)
     {
-        var fingerprint = IdempotentCreates.Fingerprint(new object?[] { c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment });
+        var fingerprint = IdempotentCreates.Fingerprint(new object?[] { c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment, c.OutsideLimits });
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
@@ -24,7 +24,7 @@ public sealed class CreateExpenseHandler(IExpensesDbContext db, TimeProvider clo
             return CategoryErrors.NotFoundById(c.CategoryId);
 
         var now = clock.GetUtcNow();
-        var created = Expense.Create(c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment, now);
+        var created = Expense.Create(c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment, now, outsideLimits: c.OutsideLimits);
         if (created.IsFailure)
             return created.Error!;
 

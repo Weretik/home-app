@@ -13,8 +13,9 @@ internal static class GetBudgetEndpoint
     {
         group.MapGet("/budget", HandleAsync)
             .WithName("getBudget")
-            .WithSummary("The budget settings (monthly limit, savings goal) and every spending limit, in order.")
-            .Produces<BudgetView>(StatusCodes.Status200OK);
+            .WithSummary("The budget settings (monthly limit, savings goal, limits start day) and every spending limit, in order.")
+            .Produces<BudgetView>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound);
         return group;
     }
 

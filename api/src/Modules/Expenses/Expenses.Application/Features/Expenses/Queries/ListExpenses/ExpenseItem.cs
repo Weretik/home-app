@@ -4,6 +4,7 @@ using Expenses.Domain.Parties;
 namespace Expenses.Application.Features.Expenses.Queries.ListExpenses;
 
 /// <summary>One expense row of the month list, with its category name.</summary>
+/// <param name="OutsideLimits">Counted in the totals but in no limit («Не в лимиты»).</param>
 public sealed record ExpenseItem(
     Guid Id,
     uint Version,
@@ -13,4 +14,5 @@ public sealed record ExpenseItem(
     string CategoryName,
     decimal Amount,
     PaymentMethod PaymentMethod,
-    string? Comment);
+    string? Comment,
+    bool OutsideLimits);

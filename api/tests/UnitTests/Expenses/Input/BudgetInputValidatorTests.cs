@@ -37,9 +37,11 @@ public sealed class BudgetInputValidatorTests
     {
         var validator = new UpdateBudgetSettingsValidator();
 
-        Assert.True(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, 0m)).IsValid);
-        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(0, 50_000m, 100_000m)).IsValid);
-        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(5, -1m, 0m)).IsValid);
-        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, -1m)).IsValid);
+        Assert.True(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, 0m, null)).IsValid);
+        Assert.True(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, 0m, new DateOnly(2026, 11, 1))).IsValid);
+        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, 0m, new DateOnly(1999, 1, 1))).IsValid);
+        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(0, 50_000m, 100_000m, null)).IsValid);
+        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(5, -1m, 0m, null)).IsValid);
+        Assert.False(validator.Validate(new UpdateBudgetSettingsCommand(5, 0m, -1m, null)).IsValid);
     }
 }
