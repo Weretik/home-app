@@ -4,16 +4,17 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { useState, type FormEvent } from 'react';
+import { NameField } from '../name-suggestions/NameField';
 import { DepartmentPreview } from './DepartmentPreview';
 import { FrequentChips } from './FrequentChips';
 import type { QuickAddController } from './use-quick-add';
 
 /**
  * The sticky field on top of the list (R-1): several items at once («молоко, хлеб, яйца 10»), Enter adds, the «!»
- * flag marks them urgent; the matched department of a single item and the ⭐ chips are under it.
+ * flag marks them urgent; names ever added are suggested while typing (SDD 002); the matched department of a single
+ * item and the ⭐ chips are under it.
  */
 export function QuickAdd({ quickAdd }: { quickAdd: QuickAddController }) {
   const [text, setText] = useState('');
@@ -42,18 +43,11 @@ export function QuickAdd({ quickAdd }: { quickAdd: QuickAddController }) {
       }}
     >
       <Box component="form" onSubmit={submit} sx={{ display: 'flex', gap: 1 }}>
-        <TextField
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
+        <NameField
+          text={text}
+          onTextChange={(next) => {
+            setText(next);
             quickAdd.clearError();
-          }}
-          placeholder="Что купить? молоко, хлеб, яйца 10"
-          size="small"
-          fullWidth
-          autoComplete="off"
-          slotProps={{
-            htmlInput: { 'aria-label': 'Что купить', enterKeyHint: 'done' },
           }}
         />
         <Tooltip title={urgent ? 'Срочно: да' : 'Срочно'}>

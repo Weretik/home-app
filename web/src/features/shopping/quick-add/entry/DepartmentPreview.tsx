@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
-import { useDepartmentMatch } from '../data/shopping-api';
-import { useDebouncedValue } from './use-debounced-value';
+import { useDepartmentMatch } from '../../data/shopping-api';
+import { useDebouncedValue } from '../name-suggestions/use-debounced-value';
 
 /** Under the field: the department a single typed item will go to («→ 🥛 Молочка»). Several items show nothing. */
 export function DepartmentPreview({ text }: { text: string }) {

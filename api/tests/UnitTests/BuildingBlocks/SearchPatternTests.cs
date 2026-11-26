@@ -14,4 +14,15 @@ public sealed class SearchPatternTests
 
     [Fact]
     public void Empty_Input_GivesNoPatterns() => Assert.Empty(SearchPattern.ContainsEachWord(" "));
+
+    [Fact]
+    public void StartsWith_MatchesTheWholeValuesStart_WithWildcardsEscaped()
+    {
+        Assert.Equal("мол%", SearchPattern.StartsWith("Мол"));
+        Assert.Equal("50\\%\\_\\\\x%", SearchPattern.StartsWith("50%_\\x"));
+    }
+
+    [Fact]
+    public void WordStartsWith_MatchesAWordAfterASpace() =>
+        Assert.Equal("% чай\\_%", SearchPattern.WordStartsWith("Чай_"));
 }

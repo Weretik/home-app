@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { describeWriteError } from '../data/write-failure-api';
 import { useDepartments } from '../department-settings/departments-api';
 import { ConfirmDialog } from '../page-parts/ConfirmDialog';
-import { useDebouncedValue } from '../quick-add/use-debounced-value';
+import { useDebouncedValue } from '../quick-add/name-suggestions/use-debounced-value';
 import { KeywordDialog } from './KeywordDialog';
 import { KeywordFilters } from './KeywordFilters';
 import { KeywordRows } from './KeywordRows';
