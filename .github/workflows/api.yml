@@ -30,9 +30,9 @@ jobs:
       run:
         working-directory: api
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: api/global.json
 
@@ -84,14 +84,14 @@ jobs:
             --project src/Modules/Notifications/Notifications.Infrastructure --startup-project src/Host/Host.Api \
             --context NotificationsDbContext --output ${{ runner.temp }}/migrations/notifications
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: github.event_name != 'pull_request'
         with:
           name: api
           path: ${{ runner.temp }}/api
           retention-days: 3
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: github.event_name != 'pull_request'
         with:
           name: migrations
@@ -109,12 +109,12 @@ jobs:
       contents: read
       id-token: write # OIDC sign-in to Azure, no stored password
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: api
           path: api
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: migrations
           path: migrations
@@ -135,7 +135,7 @@ jobs:
             ConnectionStrings__Database="$DATABASE_CONNECTION_STRING" "$bundle" --connection "$DATABASE_CONNECTION_STRING"
           done
 
-      - uses: azure/login@v2
+      - uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
