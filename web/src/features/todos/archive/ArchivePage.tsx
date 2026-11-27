@@ -15,9 +15,9 @@ import { useMoveTask } from '../writes/status-api';
 import { ArchiveGroups } from './ArchiveGroups';
 
 /**
- * «Архив»: done and cancelled tasks by the day they were completed, the latest first, with the same filters (the
- * date filter reads the completion day) and «Показать ещё» (FR-006).
- * «Вернуть» makes a task «Ждёт» again; it leaves the archive at once.
+ * «Архів»: done and cancelled tasks by the day they were completed, the latest first, with the same filters (the
+ * date filter reads the completion day) and «Показати ще» (FR-006).
+ * «Повернути» makes a task «Чекає» again; it leaves the archive at once.
  */
 export function ArchivePage() {
   const filterState = useTodoFilters('archive');
@@ -34,14 +34,14 @@ export function ArchivePage() {
 
   const giveBack = (task: TodoTaskItem) => {
     setMessage({
-      text: `Вернули в задачи: ${task.title}`,
+      text: `Повернули до справ: ${task.title}`,
       severity: 'success',
     });
     void move
       .mutateAsync({ id: task.id, version: task.version, status: 'Todo' })
       .catch((error: Error) =>
         setMessage({
-          text: describeWriteError(error, 'вернуть задачу').message,
+          text: describeWriteError(error, 'повернути справу').message,
           severity: 'error',
         }),
       );
@@ -57,10 +57,10 @@ export function ArchivePage() {
           isEmpty={items.length === 0}
           isFiltered={isFiltered(filters)}
           empty={{
-            title: 'Архив пуст',
-            hint: 'Сделанные и неактуальные задачи появятся здесь.',
+            title: 'Архів порожній',
+            hint: 'Зроблені й неактуальні справи з’являться тут.',
           }}
-          loadingLabel="Загружаю архив"
+          loadingLabel="Завантажую архів"
           onRetry={() => void query.refetch()}
           onResetFilters={filterState.clear}
         >

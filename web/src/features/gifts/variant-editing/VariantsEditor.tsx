@@ -50,7 +50,7 @@ export function VariantsEditor({
       sx={{ border: 0, m: 0, p: 0, display: 'grid', gap: 1.5 }}
     >
       <Typography component="legend" variant="subtitle2" sx={{ mb: 1 }}>
-        Варианты
+        Варіанти
       </Typography>
       {variants.length > 0 && (
         <Box
@@ -77,10 +77,10 @@ export function VariantsEditor({
           onClick={add}
           disabled={isFull}
         >
-          Добавить вариант
+          Додати варіант
         </Button>
         {isFull && (
-          <FormHelperText>Не больше {MAX_VARIANTS} вариантов</FormHelperText>
+          <FormHelperText>Не більше {MAX_VARIANTS} варіантів</FormHelperText>
         )}
         {errors.variants && (
           <FormHelperText error>{errors.variants}</FormHelperText>

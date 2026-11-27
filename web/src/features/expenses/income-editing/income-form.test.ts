@@ -6,7 +6,7 @@ import {
 
 const month = { year: 2026, month: 10 };
 
-test('a new income is for Виталий on a day of the open month', () => {
+test('a new income is for Віталій on a day of the open month', () => {
   const values = incomeFormValues(undefined, month);
   expect(values).toMatchObject({ person: 'Vitaliy', amount: '', comment: '' });
   expect(values.date.startsWith('2026-10-')).toBe(true);

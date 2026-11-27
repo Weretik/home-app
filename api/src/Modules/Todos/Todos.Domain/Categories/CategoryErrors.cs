@@ -6,14 +6,14 @@ namespace Todos.Domain.Categories;
 public static class CategoryErrors
 {
     public static readonly Error NameInvalid = Error.Validation(
-        "todos.category_name_invalid", $"The category name must be 1–{TodoCategory.MaxNameLength} characters.", "name");
+        "todos.category_name_invalid", $"Назва категорії має містити від 1 до {TodoCategory.MaxNameLength} символів.", "name");
 
     public static readonly Error EmojiTooLong = Error.Validation(
-        "todos.category_emoji_too_long", $"The emoji is longer than {TodoCategory.MaxEmojiLength} characters.", "emoji");
+        "todos.category_emoji_too_long", $"Емодзі задовге: не більше {TodoCategory.MaxEmojiLength} символів.", "emoji");
 
     public static readonly Error NameTaken = Error.Conflict(
-        "todos.category_name_taken", "A category with this name already exists.");
+        "todos.category_name_taken", "Категорія з такою назвою вже є.");
 
     public static Error NotFound(Guid id) =>
-        Error.NotFound("todos.category_not_found", $"There is no category {id}.");
+        Error.NotFound("todos.category_not_found", $"Категорії {id} немає.");
 }

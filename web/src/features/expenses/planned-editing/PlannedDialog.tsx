@@ -37,14 +37,14 @@ export function PlannedDialog({ item, month, onClose }: PlannedDialogProps) {
 
   return (
     <EntryDialog
-      title={item ? 'Изменить план' : 'Новый план'}
+      title={item ? 'Змінити план' : 'Новий план'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
       onClose={onClose}
     >
       <TextField
-        label="Название"
+        label="Назва"
         required
         value={values.name}
         onChange={(event) => set('name', event.target.value)}
@@ -57,7 +57,7 @@ export function PlannedDialog({ item, month, onClose }: PlannedDialogProps) {
       />
       <TextField
         select
-        label="Кто"
+        label="Хто"
         value={values.payer}
         onChange={(event) => set('payer', event.target.value as Payer)}
         {...fieldMessage(errors, 'payer')}

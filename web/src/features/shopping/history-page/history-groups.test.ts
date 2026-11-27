@@ -44,15 +44,15 @@ test('groups rows by local day, newest day first, today and yesterday named', ()
   );
 
   expect(days.map((d) => d.label)).toEqual([
-    'Сегодня',
-    'Вчера',
-    'пятница, 20 ноября',
+    'Сьогодні',
+    'Вчора',
+    'пʼятниця, 20 листопада',
   ]);
   expect(days[0]!.items.map((i) => i.id)).toEqual(['a', 'b']);
 });
 
 test('another year is written out', () => {
-  expect(dayLabel(new Date(2025, 0, 3), now)).toBe('пятница, 3 января 2025');
+  expect(dayLabel(new Date(2025, 0, 3), now)).toBe('пʼятниця, 3 січня 2025');
 });
 
 const on = (year: number, month: number, day: number) =>
@@ -71,13 +71,13 @@ test('groups days under their month, newest month first, with counts', () => {
 
   expect(months.map((m) => m.key)).toEqual(['2026-11', '2026-10', '2025-12']);
   expect(months.map(monthHeading)).toEqual([
-    'Ноябрь 2026 · 2 покупки',
-    'Октябрь 2026 · 1 покупка',
-    'Декабрь 2025 · 1 покупка',
+    'Листопад 2026 · 2 покупки',
+    'Жовтень 2026 · 1 покупка',
+    'Грудень 2025 · 1 покупка',
   ]);
   expect(months[0]!.days.map((d) => d.label)).toEqual([
-    'Сегодня',
-    'понедельник, 2 ноября',
+    'Сьогодні',
+    'понеділок, 2 листопада',
   ]);
 });
 
@@ -93,19 +93,19 @@ test('the last month may continue on the next page; rows without a time come las
   );
 
   expect(months.map((m) => [m.label, m.partial])).toEqual([
-    ['Ноябрь 2026', false],
-    ['Октябрь 2026', true],
-    ['Без даты', false],
+    ['Листопад 2026', false],
+    ['Жовтень 2026', true],
+    ['Без дати', false],
   ]);
-  expect(monthHeading(months[1]!)).toBe('Октябрь 2026 · 1+ покупок');
+  expect(monthHeading(months[1]!)).toBe('Жовтень 2026 · 1+ покупок');
   expect(groupByMonth([], now, true)).toEqual([]);
 });
 
-test('counts purchases in Russian plural', () => {
+test('counts purchases in Ukrainian plural', () => {
   expect(purchaseCount(1)).toBe('1 покупка');
   expect(purchaseCount(4)).toBe('4 покупки');
   expect(purchaseCount(11)).toBe('11 покупок');
   expect(purchaseCount(21)).toBe('21 покупка');
   expect(purchaseCount(50, true)).toBe('50+ покупок');
-  expect(monthLabel('2026-05-01')).toBe('Май 2026');
+  expect(monthLabel('2026-05-01')).toBe('Травень 2026');
 });

@@ -27,7 +27,7 @@ interface ExpenseDialogProps {
   onClose: () => void;
 }
 
-/** Adds or changes an expense; «Не в лимиты» keeps it out of the limits and the carry-over. */
+/** Adds or changes an expense; «Не в ліміти» keeps it out of the limits and the carry-over. */
 export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
   const outsideHintId = useId();
   const form = useEntryForm({
@@ -42,7 +42,7 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
 
   return (
     <EntryDialog
-      title={item ? 'Изменить расход' : 'Новый расход'}
+      title={item ? 'Змінити витрату' : 'Нова витрата'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
@@ -64,7 +64,7 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
       />
       <TextField
         select
-        label="Кто"
+        label="Хто"
         value={values.payer}
         onChange={(event) => set('payer', event.target.value as Payer)}
         {...fieldMessage(errors, 'payer')}
@@ -96,7 +96,7 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
         ))}
       </TextField>
       <TextField
-        label="Комментарий"
+        label="Коментар"
         multiline
         minRows={2}
         value={values.comment}
@@ -114,10 +114,10 @@ export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
               }}
             />
           }
-          label="Не в лимиты"
+          label="Не в ліміти"
         />
         <FormHelperText id={outsideHintId} sx={{ mt: 0, mx: 0 }}>
-          Считается в итогах, но не в лимитах и не переносится
+          Враховується в підсумках, але не в лімітах і не переноситься
         </FormHelperText>
       </Box>
     </EntryDialog>

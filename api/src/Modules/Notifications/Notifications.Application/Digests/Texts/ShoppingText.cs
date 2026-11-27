@@ -11,7 +11,7 @@ public static class ShoppingText
         if (items.Count == 0)
             return null;
 
-        var text = new StringBuilder($"🛒 <b>В списке покупок: {items.Count}</b>\n");
+        var text = new StringBuilder($"🛒 <b>У списку покупок: {items.Count}</b>\n");
         var lines = new List<string>();
         foreach (var department in items.GroupBy(i => (i.Department, i.DepartmentIcon)))
         {
@@ -20,7 +20,7 @@ public static class ShoppingText
         }
 
         TextFormat.AppendLines(text, lines, TextFormat.MaxListLines * 2);
-        text.Append('\n').Append(TextFormat.Link(shoppingUrl, "Открыть список"));
+        text.Append('\n').Append(TextFormat.Link(shoppingUrl, "Відкрити список"));
         return text.ToString();
     }
 

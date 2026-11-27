@@ -9,7 +9,7 @@ export interface WriteFailure {
 }
 
 const staleText =
-  'Подарок или запись изменили в другом месте — список обновлён, откройте снова.';
+  'Подарунок або запис змінили в іншому місці — список оновлено, відкрийте знову.';
 
 /** The item is no longer what the page shows (changed or deleted elsewhere), so its list must reload. */
 export const isStale = (error: Error) =>
@@ -21,11 +21,12 @@ export const isStale = (error: Error) =>
 /** Turns a failed Gifts write into Russian text (docs/rules.md, "API"); `action` names the failed step. */
 export function describeWriteError(
   error: Error,
-  action = 'сохранить',
+  action = 'зберегти',
 ): WriteFailure {
   if (!(error instanceof ApiError))
     return {
-      message: 'Нет связи с сервером. Проверьте интернет и попробуйте снова.',
+      message:
+        'Немає зв’язку із сервером. Перевірте інтернет і спробуйте знову.',
       fieldErrors: {},
     };
   const fieldErrors = error.fieldErrors;
@@ -33,32 +34,31 @@ export function describeWriteError(
     return { message: staleText, fieldErrors };
   if (error.status === 404)
     return {
-      message: 'Этого уже нет: его удалили в другом месте.',
+      message: 'Цього вже немає: його видалили в іншому місці.',
       fieldErrors,
     };
   if (error.code === 'gifts.category_in_use')
     return {
-      message:
-        'Эта категория есть у подарков — сначала перенесите их в другую.',
+      message: 'Ця категорія є в подарунків — спершу перенесіть їх в іншу.',
       fieldErrors,
     };
   if (error.code === 'gifts.category_name_taken')
     return {
-      message: 'Такая категория уже есть.',
-      fieldErrors: { name: ['Такая категория уже есть'] },
+      message: 'Така категорія вже є.',
+      fieldErrors: { name: ['Така категорія вже є'] },
     };
   if (error.code === 'gifts.idempotency_key_reused')
     return {
-      message: 'Это уже отправляли с другими данными. Попробуйте ещё раз.',
+      message: 'Це вже надсилали з іншими даними. Спробуйте ще раз.',
       fieldErrors,
       renewKey: true,
     };
   if (error.status === 429)
     return {
-      message: 'Слишком много изменений подряд. Подождите минуту и повторите.',
+      message: 'Забагато змін поспіль. Зачекайте хвилину й повторіть.',
       fieldErrors,
     };
   if (error.status === 400)
-    return { message: `Проверьте поля: ${error.message}`, fieldErrors };
-  return { message: `Не удалось ${action}: ${error.message}`, fieldErrors };
+    return { message: `Перевірте поля: ${error.message}`, fieldErrors };
+  return { message: `Не вдалося ${action}: ${error.message}`, fieldErrors };
 }

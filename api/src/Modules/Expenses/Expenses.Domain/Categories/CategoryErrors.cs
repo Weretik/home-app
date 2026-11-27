@@ -5,14 +5,14 @@ namespace Expenses.Domain.Categories;
 public static class CategoryErrors
 {
     public static readonly Error NameRequired =
-        Error.Validation("expenses.category_name_required", "The category needs a name.", "name");
+        Error.Validation("expenses.category_name_required", "Категорії потрібна назва.", "name");
 
     public static readonly Error NameTooLong =
-        Error.Validation("expenses.category_name_too_long", $"The category name is longer than {Category.MaxNameLength} characters.", "name");
+        Error.Validation("expenses.category_name_too_long", $"Назва категорії задовга: не більше {Category.MaxNameLength} символів.", "name");
 
     public static Error NotFound(string name) =>
-        Error.NotFound("expenses.category_not_found", $"There is no category «{name}».");
+        Error.NotFound("expenses.category_not_found", $"Категорії «{name}» немає.");
 
     public static Error NotFoundById(Guid id) =>
-        Error.NotFound("expenses.category_not_found", $"There is no category {id}.");
+        Error.NotFound("expenses.category_not_found", $"Категорії {id} немає.");
 }

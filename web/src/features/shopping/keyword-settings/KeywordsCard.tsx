@@ -17,7 +17,7 @@ import { useDeleteKeyword, useKeywords, type Keyword } from './keywords-api';
 const STEP = 50;
 type Open = { kind: 'add' } | { kind: 'edit' | 'delete'; keyword: Keyword };
 
-/** «Слова для отделов»: search, department filter, add / edit / delete; learned words carry «выучено» (R-12). */
+/** «Слова для відділів»: search, department filter, add / edit / delete; learned words carry «вивчено» (R-12). */
 export function KeywordsCard() {
   const [search, setSearch] = useState('');
   const [departmentId, setDepartmentId] = useState('');
@@ -57,13 +57,13 @@ export function KeywordsCard() {
           component="h2"
           sx={{ fontWeight: 600 }}
         >
-          Слова для отделов
+          Слова для відділів
         </Typography>
         <Button
           startIcon={<AddOutlinedIcon />}
           onClick={() => setOpen({ kind: 'add' })}
         >
-          Добавить слово
+          Додати слово
         </Button>
       </Box>
       <KeywordFilters
@@ -81,12 +81,12 @@ export function KeywordsCard() {
       />
       {keywords.error && (
         <Alert severity="error" sx={{ mx: 2 }}>
-          Не удалось загрузить слова: {keywords.error.message}
+          Не вдалося завантажити слова: {keywords.error.message}
         </Alert>
       )}
       {keywords.isSuccess && rows.length === 0 && (
         <Typography sx={{ color: 'text.secondary', px: 2 }}>
-          Слов не найдено. Измените поиск или добавьте слово.
+          Слів не знайдено. Змініть пошук або додайте слово.
         </Typography>
       )}
       <KeywordRows
@@ -99,7 +99,7 @@ export function KeywordsCard() {
           onClick={() => setShown(shown + STEP)}
           sx={{ justifySelf: 'center', mb: 1 }}
         >
-          Показать ещё ({rows.length - shown})
+          Показати ще ({rows.length - shown})
         </Button>
       )}
       {(open?.kind === 'add' || open?.kind === 'edit') && (
@@ -112,12 +112,12 @@ export function KeywordsCard() {
       )}
       {open?.kind === 'delete' && (
         <ConfirmDialog
-          title="Удалить слово?"
+          title="Видалити слово?"
           summary={`${open.keyword.keyword} → ${open.keyword.departmentName}`}
-          consequence="Товары с этим словом будут попадать в отдел по другим словам или в «Другое»."
+          consequence="Товари з цим словом потраплятимуть до відділу за іншими словами або в «Другое»."
           error={
             remove.error
-              ? describeWriteError(remove.error, 'удалить').message
+              ? describeWriteError(remove.error, 'видалити').message
               : undefined
           }
           isPending={remove.isPending}

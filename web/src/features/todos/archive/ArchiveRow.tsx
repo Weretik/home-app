@@ -12,7 +12,7 @@ interface ArchiveRowProps {
   onReturn: (task: TodoTaskItem) => void;
 }
 
-/** A done or cancelled task under its completion day: «Сделано» / «Не актуально», then «Вернуть» (FR-006). */
+/** A done or cancelled task under its completion day: «Зроблено» / «Неактуально», then «Повернути» (FR-006). */
 export function ArchiveRow({
   task,
   today,
@@ -32,9 +32,9 @@ export function ArchiveRow({
           size="small"
           startIcon={<ReplayOutlinedIcon fontSize="small" />}
           onClick={() => onReturn(task)}
-          aria-label={`Вернуть: ${task.title}`}
+          aria-label={`Повернути: ${task.title}`}
         >
-          Вернуть
+          Повернути
         </Button>
       }
     />

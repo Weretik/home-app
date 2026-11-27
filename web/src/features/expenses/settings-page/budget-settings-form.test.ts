@@ -21,13 +21,13 @@ test('an empty amount is fine; a wrong or too big one is not', () => {
   expect(optionalAmountError('')).toBeUndefined();
   expect(optionalAmountError('0')).toBeUndefined();
   expect(optionalAmountError('много')).toBe(
-    'Сумма — число, не больше двух знаков после запятой',
+    'Сума — число, не більше двох знаків після коми',
   );
-  expect(optionalAmountError('999999999999')).toBe('Слишком большая сумма');
+  expect(optionalAmountError('999999999999')).toBe('Завелика сума');
   expect(
     validateBudgetSettings({ monthlyLimit: 'x', savingsGoal: '' }),
   ).toEqual({
-    monthlyLimit: 'Сумма — число, не больше двух знаков после запятой',
+    monthlyLimit: 'Сума — число, не більше двох знаків після коми',
     savingsGoal: undefined,
   });
 });

@@ -46,11 +46,11 @@ export function LimitsCard({
             component="h3"
             sx={{ fontWeight: 600 }}
           >
-            Лимиты по категориям
+            Ліміти за категоріями
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Сколько можно потратить на группу категорий; лимиты могут
-            пересекаться.
+            Скільки можна витратити на групу категорій; ліміти можуть
+            перетинатися.
           </Typography>
         </Box>
         <Button
@@ -58,15 +58,16 @@ export function LimitsCard({
           startIcon={<AddOutlinedIcon />}
           onClick={onAdd}
         >
-          Добавить лимит
+          Додати ліміт
         </Button>
       </Box>
       {limits.length === 0 ? (
         <Typography color="text.secondary" sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
-          Лимитов пока нет. Добавьте первый, например «Еда» — 15 000 ₴ в месяц.
+          Лімітів поки немає. Додайте перший, наприклад «Їжа» — 15 000 ₴ на
+          місяць.
         </Typography>
       ) : (
-        <List aria-label="Лимиты" sx={{ px: { md: 1 } }}>
+        <List aria-label="Ліміти" sx={{ px: { md: 1 } }}>
           {limits.map((limit, index) => (
             <LimitRow
               key={limit.id}

@@ -16,7 +16,7 @@ interface Paged {
 export const nextPage = (last: Paged) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
-/** Bought items that left the cart, newest first, page by page («Показать ещё»). */
+/** Bought items that left the cart, newest first, page by page («Показати ще»). */
 export function useShoppingHistory() {
   return useInfiniteQuery({
     queryKey: [...shoppingKey, 'history'],

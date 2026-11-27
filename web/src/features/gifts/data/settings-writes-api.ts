@@ -30,7 +30,7 @@ const categoryWriter: Writer<GiftCategoryRequest> = {
     ),
 };
 
-/** The home summary shows the «нюансы», so a detail write refreshes it too. */
+/** The home summary shows the «нюанси», so a detail write refreshes it too. */
 const detailWriter: Writer<GiftDetailRequest> = {
   keys: [giftKeys.all],
   create: (body, key) =>

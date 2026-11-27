@@ -6,14 +6,14 @@ import Tooltip from '@mui/material/Tooltip';
 import { useState } from 'react';
 
 interface RowMenuProps {
-  /** Names the row for the button's label: «Действия: Молочка». */
+  /** Names the row for the button's label: «Дії: Молочка». */
   name: string;
   onEdit: () => void;
   /** Left out when the row cannot be deleted (the fallback department). */
   onDelete?: () => void;
 }
 
-/** The «⋮» button at the end of a row with «Изменить» and «Удалить». */
+/** The «⋮» button at the end of a row with «Змінити» and «Видалити». */
 export function RowMenu({ name, onEdit, onDelete }: RowMenuProps) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const pick = (action: () => void) => () => {
@@ -23,9 +23,9 @@ export function RowMenu({ name, onEdit, onDelete }: RowMenuProps) {
 
   return (
     <>
-      <Tooltip title="Действия">
+      <Tooltip title="Дії">
         <IconButton
-          aria-label={`Действия: ${name}`}
+          aria-label={`Дії: ${name}`}
           onClick={(event) => setAnchor(event.currentTarget)}
         >
           <MoreVertOutlinedIcon fontSize="small" />
@@ -36,8 +36,8 @@ export function RowMenu({ name, onEdit, onDelete }: RowMenuProps) {
         open={anchor !== null}
         onClose={() => setAnchor(null)}
       >
-        <MenuItem onClick={pick(onEdit)}>Изменить</MenuItem>
-        {onDelete && <MenuItem onClick={pick(onDelete)}>Удалить</MenuItem>}
+        <MenuItem onClick={pick(onEdit)}>Змінити</MenuItem>
+        {onDelete && <MenuItem onClick={pick(onDelete)}>Видалити</MenuItem>}
       </Menu>
     </>
   );

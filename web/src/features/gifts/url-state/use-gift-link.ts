@@ -10,7 +10,7 @@ const withoutLink = (current: URLSearchParams) => {
 
 /**
  * Follows a link to one gift (`?gift=<id>`, web ADR 0013) once the tab's list is loaded: opens it with `open` and
- * drops the parameter (replace), or moves to «Подаренные» when the list does not hold it. A gift no tab holds keeps
+ * drops the parameter (replace), or moves to «Подаровані» when the list does not hold it. A gift no tab holds keeps
  * the parameter and comes back as `missing` until `clearMissing` drops it.
  */
 export function useGiftLink<T extends { id: string }>(

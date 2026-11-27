@@ -8,7 +8,7 @@ internal sealed class UpdateIncomeValidator : AbstractValidator<UpdateIncomeComm
     public UpdateIncomeValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the entry you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого запису у заголовку If-Match.");
         RuleFor(c => c.Person).IsInEnum();
         RuleFor(c => c.Amount).GreaterThan(0);
         RuleFor(c => c.Comment).MaximumLength(EntryRules.MaxCommentLength);

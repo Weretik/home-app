@@ -17,7 +17,7 @@ export function MovementList({
   onDelete,
 }: { items: SavingsMovementItem[] } & RowHandlers<SavingsMovementItem>) {
   return (
-    <List disablePadding aria-label="Движения копилки за месяц">
+    <List disablePadding aria-label="Операції скарбнички за місяць">
       {items.map((item, index) => (
         <ListItem
           key={item.id}

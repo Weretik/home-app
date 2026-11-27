@@ -2,13 +2,13 @@ import type { LimitUsage, Payer, Person } from './summary-api';
 
 /** Russian names of the contract's enums, worded like the Expenses pages. */
 export const payerLabels: Record<Payer, string> = {
-  Vitaliy: 'Виталий',
+  Vitaliy: 'Віталій',
   Maria: 'Маша',
-  Shared: 'Общее',
+  Shared: 'Спільне',
 };
 
 export const personLabels: Record<Person, string> = {
-  Vitaliy: 'Виталий',
+  Vitaliy: 'Віталій',
   Maria: 'Маша',
 };
 

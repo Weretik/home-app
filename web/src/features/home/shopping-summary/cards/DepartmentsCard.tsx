@@ -5,7 +5,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import type { ShoppingSummary } from '../data/shopping-summary-api';
 
-/** «По отделам»: departments with needed items in store order and their counts. */
+/** «За відділами»: departments with needed items in store order and their counts. */
 export function DepartmentsCard({ summary }: { summary: ShoppingSummary }) {
   return (
     <Card component="section" aria-labelledby="shopping-departments-title">
@@ -15,7 +15,7 @@ export function DepartmentsCard({ summary }: { summary: ShoppingSummary }) {
         component="h2"
         sx={{ fontWeight: 600, px: 2, pt: 2 }}
       >
-        По отделам
+        За відділами
       </Typography>
       <List aria-labelledby="shopping-departments-title" dense>
         {summary.departments.map((department) => (

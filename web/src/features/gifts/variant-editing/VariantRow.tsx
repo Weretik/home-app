@@ -28,7 +28,7 @@ export function VariantRow({
   onRemove,
 }: VariantRowProps) {
   const linkRef = useRef<HTMLInputElement>(null);
-  // Focus once, when the row appears after «Добавить вариант».
+  // Focus once, when the row appears after «Додати варіант».
   useEffect(() => {
     if (focusLink) linkRef.current?.focus();
   }, [focusLink]);
@@ -48,7 +48,7 @@ export function VariantRow({
     >
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
         <TextField
-          label={`Ссылка варианта ${number}`}
+          label={`Посилання варіанта ${number}`}
           value={variant.link}
           size="small"
           fullWidth
@@ -58,9 +58,9 @@ export function VariantRow({
           helperText={errors[`${at}.link`]}
           slotProps={{ htmlInput: { inputMode: 'url' } }}
         />
-        <Tooltip title="Удалить вариант">
+        <Tooltip title="Видалити варіант">
           <IconButton
-            aria-label={`Удалить вариант ${number}`}
+            aria-label={`Видалити варіант ${number}`}
             onClick={onRemove}
           >
             <DeleteOutlineOutlinedIcon fontSize="small" />
@@ -76,7 +76,7 @@ export function VariantRow({
         }}
       >
         <TextField
-          label="Название варианта"
+          label="Назва варіанта"
           value={variant.title}
           size="small"
           onChange={(event) => onChange({ title: event.target.value })}
@@ -84,7 +84,7 @@ export function VariantRow({
           helperText={errors[`${at}.title`]}
         />
         <PriceField
-          label="Цена варианта"
+          label="Ціна варіанта"
           size="small"
           value={variant.price}
           error={errors[`${at}.price`]}

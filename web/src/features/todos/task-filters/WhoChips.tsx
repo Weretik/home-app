@@ -3,11 +3,11 @@ import Chip from '@mui/material/Chip';
 import { whoLabels, whoValues, type Who } from '../url-state/filters';
 
 const options: { value: Who | undefined; label: string }[] = [
-  { value: undefined, label: 'Все' },
+  { value: undefined, label: 'Усі' },
   ...whoValues.map((value) => ({ value, label: whoLabels[value] })),
 ];
 
-/** «Кому»: Все · Маша · Виталий · Общее, one chip pressed. */
+/** «Кому»: Усі · Маша · Віталій · Спільне, one chip pressed. */
 export function WhoChips({
   value,
   onChange,

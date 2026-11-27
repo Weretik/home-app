@@ -11,7 +11,7 @@ interface SuggestionOptionProps {
   option: NameSuggestion;
 }
 
-/** One suggestion (FR-203): the department icon and the name, «Отдел · брали N раз», and «уже в списке». */
+/** One suggestion (FR-203): the department icon and the name, «Відділ · брали N разів», and «вже в списку». */
 export function SuggestionOption({ props, option }: SuggestionOptionProps) {
   return (
     <Box
@@ -32,7 +32,7 @@ export function SuggestionOption({ props, option }: SuggestionOptionProps) {
       </Box>
       {option.inList && (
         <Chip
-          label="уже в списке"
+          label="вже в списку"
           size="small"
           variant="outlined"
           sx={{ flex: 'none' }}

@@ -25,7 +25,7 @@ Code: [`src/Modules/Notifications`](../../src/Modules/Notifications). Schema: `n
 | --- | --- | --- |
 | Personal to-dos: overdue and today's, then shared ones, with «✅» buttons | every day 08:00–11:59 | each linked person |
 | Common to-dos: open per person, everything overdue | every day 08:00–11:59 | family group, or both people |
-| Gift reminder with the link to the gift | 0–14 days before the gift's buy-by date, 08:00–11:59, once per date | the giver (both for «Вместе»), else the group |
+| Gift reminder with the link to the gift | 0–14 days before the gift's buy-by date, 08:00–11:59, once per date | the giver (both for «Разом»), else the group |
 | Shopping list by department (only when not empty) | every day 18:00–21:59 | family group, or both people |
 | Expenses of the week (Monday–Sunday) and the month so far | Sunday 20:00–23:59 | family group, or both people |
 | Full month summary | last day of the month 20:00–23:59, catch-up on the 1st until 11:59 | family group, or both people |
@@ -55,8 +55,8 @@ sequenceDiagram
 - The module reads other modules only through their `Contracts`: `ITodosDigest`, `ITodoCompletion` (Todos),
   `IGiftsDigest` (Gifts), `IShoppingDigest` (Shopping), `IExpensesDigest` (Expenses); each owner implements its
   interface.
-- Texts are built by pure types in `Application/Digests/Texts` (HTML, Russian) and tested with fixed input and day.
-- Commands: `/start` (link; a private chat chooses «Я Виталий» / «Я Маша»; a group becomes `Family`), `/today`,
+- Texts are built by pure types in `Application/Digests/Texts` (HTML, Ukrainian, api ADR 0037) and tested with fixed input and day.
+- Commands: `/start` (link; a private chat chooses «Я Віталій» / «Я Маша»; a group becomes `Family`), `/today`,
   `/help`. Removing the bot from a group unlinks it.
 
 ## HTTP API

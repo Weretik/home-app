@@ -16,7 +16,7 @@ interface CartCardProps {
   onOpen: (item: ShoppingItem) => void;
 }
 
-/** «В корзине (N)»: what was bought lately, struck through; a tap unticks it; «Убрать купленные» clears it (R-7). */
+/** «У кошику (N)»: what was bought lately, struck through; a tap unticks it; «Прибрати куплене» clears it (R-7). */
 export function CartCard({ items, onToggle, onOpen }: CartCardProps) {
   const clear = useClearCart();
   if (items.length === 0) return null;
@@ -40,7 +40,7 @@ export function CartCard({ items, onToggle, onOpen }: CartCardProps) {
           component="h2"
           sx={{ fontWeight: 600 }}
         >
-          В корзине ({items.length})
+          У кошику ({items.length})
         </Typography>
         <Button
           size="small"
@@ -48,12 +48,12 @@ export function CartCard({ items, onToggle, onOpen }: CartCardProps) {
           disabled={clear.isPending}
           onClick={() => clear.mutate()}
         >
-          {clear.isPending ? 'Убираю…' : 'Убрать купленные'}
+          {clear.isPending ? 'Прибираю…' : 'Прибрати куплене'}
         </Button>
       </Box>
       {clear.error && (
         <Alert severity="error" sx={{ mx: 2, mt: 1 }}>
-          {describeWriteError(clear.error, 'убрать купленные').message}
+          {describeWriteError(clear.error, 'прибрати куплене').message}
         </Alert>
       )}
       <List aria-labelledby="shopping-cart-title" sx={{ pt: 0.5 }}>

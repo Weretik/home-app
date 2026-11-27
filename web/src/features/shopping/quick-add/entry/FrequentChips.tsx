@@ -3,7 +3,7 @@ import Chip from '@mui/material/Chip';
 import { useFrequentItems } from '../../data/shopping-api';
 import type { QuickAddController } from './use-quick-add';
 
-/** ⭐ Частые: one tap adds the item with its usual department (R-8). Scrolls sideways on a phone. */
+/** ⭐ Часті: one tap adds the item with its usual department (R-8). Scrolls sideways on a phone. */
 export function FrequentChips({ quickAdd }: { quickAdd: QuickAddController }) {
   const { data } = useFrequentItems();
   if (!data || data.length === 0) return null;
@@ -11,7 +11,7 @@ export function FrequentChips({ quickAdd }: { quickAdd: QuickAddController }) {
   return (
     <Box
       component="ul"
-      aria-label="Частые"
+      aria-label="Часті"
       sx={{
         display: 'flex',
         gap: 1,
@@ -32,7 +32,7 @@ export function FrequentChips({ quickAdd }: { quickAdd: QuickAddController }) {
             onClick={() =>
               quickAdd.submit(item.name, { departmentId: item.departmentId })
             }
-            aria-label={`Добавить ${item.name}`}
+            aria-label={`Додати ${item.name}`}
           />
         </Box>
       ))}

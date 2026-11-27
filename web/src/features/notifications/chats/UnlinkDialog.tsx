@@ -24,17 +24,17 @@ export function UnlinkDialog(props: UnlinkDialogProps) {
       onClose={props.isPending ? undefined : props.onClose}
       aria-labelledby={titleId}
     >
-      <DialogTitle id={titleId}>Отвязать чат «{props.name}»?</DialogTitle>
+      <DialogTitle id={titleId}>Відв’язати чат «{props.name}»?</DialogTitle>
       <DialogContent sx={{ display: 'grid', gap: 2 }}>
         <DialogContentText>
-          Бот перестанет туда писать. Подключить снова можно командой /start в
-          Телеграме.
+          Бот перестане туди писати. Підключити знову можна командою /start у
+          Телеграмі.
         </DialogContentText>
         {props.error && <Alert severity="error">{props.error}</Alert>}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={props.onClose} disabled={props.isPending}>
-          Отмена
+          Скасувати
         </Button>
         <Button
           color="error"
@@ -42,7 +42,7 @@ export function UnlinkDialog(props: UnlinkDialogProps) {
           onClick={props.onConfirm}
           disabled={props.isPending}
         >
-          {props.isPending ? 'Отвязываю…' : 'Отвязать'}
+          {props.isPending ? 'Відв’язую…' : 'Відв’язати'}
         </Button>
       </DialogActions>
     </Dialog>

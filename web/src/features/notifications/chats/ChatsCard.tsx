@@ -8,7 +8,7 @@ import { InfoCard } from '../page/InfoCard';
 import { ChatRow } from './ChatRow';
 import { UnlinkDialog } from './UnlinkDialog';
 
-/** «Чаты» (FR-004): Виталий, Маша and the family group in a fixed order, with «Тест» and «Отвязать». */
+/** «Чати» (FR-004): Віталій, Маша and the family group in a fixed order, with «Тест» and «Відв’язати». */
 export function ChatsCard({ chats }: { chats: NotificationChatItem[] }) {
   const unlink = useUnlinkChat();
   const test = useSendTest();
@@ -30,15 +30,15 @@ export function ChatsCard({ chats }: { chats: NotificationChatItem[] }) {
   };
   const sendTest = (audience: Audience) =>
     test.mutate(audience, {
-      onSuccess: () => setMessage('Тест отправлен: проверьте Телеграм'),
+      onSuccess: () => setMessage('Тест надіслано: перевірте Телеграм'),
       onError: (error) =>
-        setMessage(`Не удалось отправить тест: ${error.message}`),
+        setMessage(`Не вдалося надіслати тест: ${error.message}`),
     });
 
   return (
     <InfoCard
-      title="Чаты"
-      caption="Куда бот пишет: каждому лично; общие сводки — в группу, если она есть"
+      title="Чати"
+      caption="Куди бот пише: кожному особисто; спільні зведення — у групу, якщо вона є"
     >
       <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {rows.map((chat, index) => (
@@ -60,7 +60,7 @@ export function ChatsCard({ chats }: { chats: NotificationChatItem[] }) {
           onConfirm={() =>
             unlink.mutate(unlinking, {
               onSuccess: () => {
-                setMessage(`Чат «${audienceLabels[unlinking]}» отвязан`);
+                setMessage(`Чат «${audienceLabels[unlinking]}» відв’язано`);
                 closeUnlink();
               },
             })

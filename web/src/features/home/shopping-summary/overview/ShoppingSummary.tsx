@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useShoppingSummary } from '../data/shopping-summary-api';
 import { SummaryContent } from './SummaryContent';
 
-/** «Покупки» on the home page (R-14): the figures, departments, next items, the most bought, «Открыть список». */
+/** «Покупки» on the home page (R-14): the figures, departments, next items, the most bought, «Відкрити список». */
 export function ShoppingSummary() {
   const { data, error, isPending, refetch } = useShoppingSummary();
 
@@ -14,23 +14,23 @@ export function ShoppingSummary() {
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 } }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button component={Link} to="/shopping">
-          Открыть список
+          Відкрити список
         </Button>
       </Box>
       {isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
-          <CircularProgress aria-label="Загружаю сводку" />
+          <CircularProgress aria-label="Завантажую зведення" />
         </Box>
       ) : error ? (
         <Alert
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить сводку: {error.message}
+          Не вдалося завантажити зведення: {error.message}
         </Alert>
       ) : (
         <SummaryContent summary={data} />

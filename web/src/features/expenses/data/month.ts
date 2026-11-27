@@ -1,10 +1,12 @@
+import { locale } from '../../../platform/locale';
+
 /** A calendar month, the unit every Expenses page shows. `month` is 1–12. */
 export interface Month {
   year: number;
   month: number;
 }
 
-const monthName = new Intl.DateTimeFormat('ru-RU', { month: 'long' });
+const monthName = new Intl.DateTimeFormat(locale, { month: 'long' });
 
 export function currentMonth(today: Date = new Date()): Month {
   return { year: today.getFullYear(), month: today.getMonth() + 1 };
@@ -47,7 +49,7 @@ export function monthDays({ year, month }: Month): {
   return { from: isoDay(year, month, 1), to: isoDay(year, month, last) };
 }
 
-/** «Октябрь 2026». */
+/** «Жовтень 2026». */
 export function formatMonth({ year, month }: Month): string {
   const name = monthName.format(new Date(year, month - 1, 1));
   return `${name.charAt(0).toUpperCase()}${name.slice(1)} ${year}`;

@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import type { ShoppingSummary } from '../data/shopping-summary-api';
 import { FigureCard } from './FigureCard';
 
-/** Нужно купить, Срочно, Куплено за 7 дней. */
+/** Треба купити, Терміново, Куплено за 7 днів. */
 export function SummaryKpis({ summary }: { summary: ShoppingSummary }) {
   return (
     <Box
@@ -18,23 +18,23 @@ export function SummaryKpis({ summary }: { summary: ShoppingSummary }) {
     >
       <FigureCard
         emoji="🛒"
-        title="Нужно купить"
+        title="Треба купити"
         value={summary.neededCount}
-        caption={`в корзине ${summary.inCartCount}`}
+        caption={`у кошику ${summary.inCartCount}`}
       />
       <FigureCard
         emoji="❗"
-        title="Срочно"
+        title="Терміново"
         value={summary.urgentCount}
         caption={
-          summary.urgentCount > 0 ? 'купить в первую очередь' : 'срочного нет'
+          summary.urgentCount > 0 ? 'купити насамперед' : 'термінового немає'
         }
       />
       <FigureCard
         emoji="✅"
-        title="Куплено за 7 дней"
+        title="Куплено за 7 днів"
         value={summary.boughtLast7Days}
-        caption={`за 30 дней ${summary.boughtLast30Days}`}
+        caption={`за 30 днів ${summary.boughtLast30Days}`}
       />
     </Box>
   );

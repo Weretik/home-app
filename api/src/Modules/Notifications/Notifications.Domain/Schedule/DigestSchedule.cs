@@ -19,12 +19,12 @@ public static class DigestSchedule
 
     public static IReadOnlyList<DigestWindow> Windows { get; } =
     [
-        new(DigestKind.TodosMorning, "Дела на сегодня — каждому лично", "каждый день в 8:00"),
-        new(DigestKind.TodosCommon, "Общие: что не закрыто и что просрочено", "каждый день в 8:00, после личных"),
-        new(DigestKind.GiftReminder, "Купить подарок — тому, кто дарит", "за 14 дней до даты «Купить до», в 8:00"),
-        new(DigestKind.ShoppingEvening, "Что осталось в списке покупок", "каждый вечер в 18:00, если список не пуст"),
-        new(DigestKind.ExpensesWeek, "Расходы за неделю", "воскресенье в 20:00"),
-        new(DigestKind.ExpensesMonth, "Полная сводка за месяц", "последний день месяца в 20:00"),
+        new(DigestKind.TodosMorning, "Справи на сьогодні — кожному особисто", "щодня о 8:00"),
+        new(DigestKind.TodosCommon, "Спільні: що не закрито і що прострочено", "щодня о 8:00, після особистих"),
+        new(DigestKind.GiftReminder, "Купити подарунок — тому, хто дарує", "за 14 днів до дати «Купити до», о 8:00"),
+        new(DigestKind.ShoppingEvening, "Що лишилося в списку покупок", "щовечора о 18:00, якщо список не порожній"),
+        new(DigestKind.ExpensesWeek, "Витрати за тиждень", "щонеділі о 20:00"),
+        new(DigestKind.ExpensesMonth, "Повний підсумок за місяць", "в останній день місяця о 20:00"),
     ];
 
     /// <summary>The digests due at <paramref name="kyivNow"/>, the local time in Kyiv.</summary>

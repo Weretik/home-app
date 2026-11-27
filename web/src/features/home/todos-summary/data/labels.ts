@@ -3,8 +3,8 @@ import type { Assignee, TodoPriority } from './todos-summary-api';
 /** Russian names worded like the Todos section (features never import each other, so they are repeated here). */
 export const assigneeLabels: Record<Assignee, string> = {
   Maria: 'Маша',
-  Vitaliy: 'Виталий',
-  Shared: 'Общее',
+  Vitaliy: 'Віталій',
+  Shared: 'Спільне',
 };
 
 export const assigneeEmoji: Record<Assignee, string> = {
@@ -21,13 +21,13 @@ export const priorityMarks: Record<TodoPriority, string> = {
 };
 
 export const priorityLabels: Record<TodoPriority, string> = {
-  Urgent: 'Срочно',
-  High: 'Важно',
-  Normal: 'Обычно',
-  Low: 'Когда-нибудь',
+  Urgent: 'Терміново',
+  High: 'Важливо',
+  Normal: 'Звичайна',
+  Low: 'Колись',
 };
 
-const weekdays = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
+const weekdays = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
 const utc = (day: string) => {
   const [year = 2000, month = 1, date = 1] = day.split('-').map(Number);
@@ -40,11 +40,11 @@ const shift = (day: string, days: number) => {
   return date.toISOString().slice(0, 10);
 };
 
-/** «сегодня», «завтра», «вчера», else «пн 30.11» (with the year outside this one). `today` is the summary's. */
+/** «сьогодні», «завтра», «вчора», else «пн 30.11» (with the year outside this one). `today` is the summary's. */
 export function formatDue(day: string, today: string): string {
-  if (day === today) return 'сегодня';
+  if (day === today) return 'сьогодні';
   if (day === shift(today, 1)) return 'завтра';
-  if (day === shift(today, -1)) return 'вчера';
+  if (day === shift(today, -1)) return 'вчора';
   const [year, month, date] = day.split('-');
   const suffix = year === today.slice(0, 4) ? '' : `.${year}`;
   return `${weekdays[utc(day).getUTCDay()]} ${date}.${month}${suffix}`;

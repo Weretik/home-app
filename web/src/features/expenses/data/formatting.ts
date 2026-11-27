@@ -1,10 +1,12 @@
-const amount = new Intl.NumberFormat('ru-RU', {
+import { locale } from '../../../platform/locale';
+
+const amount = new Intl.NumberFormat(locale, {
   style: 'currency',
   currency: 'UAH',
   currencyDisplay: 'narrowSymbol',
 });
 
-const day = new Intl.DateTimeFormat('ru-RU', {
+const day = new Intl.DateTimeFormat(locale, {
   weekday: 'short',
   day: 'numeric',
   month: 'short',
@@ -25,15 +27,15 @@ export function formatSignedAmount(value: number): string {
   return amount.format(0);
 }
 
-/** A contract date (`2026-10-01`) as a short day: «чт, 1 окт.». Read as a local date, so no time zone shifts it. */
+/** A contract date (`2026-10-01`) as a short day: «чт, 1 жовт.». Read as a local date, so no time zone shifts it. */
 export function formatDay(isoDate: string): string {
   const [year = 0, month = 1, date = 1] = isoDate.split('-').map(Number);
   return day.format(new Date(year, month - 1, date));
 }
 
-/** «1 запись», «3 записи», «12 записей». */
+/** «1 запис», «3 записи», «12 записів». */
 export function formatRecordCount(count: number): string {
-  const forms = { one: 'запись', few: 'записи', many: 'записей' } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const forms = { one: 'запис', few: 'записи', many: 'записів' } as const;
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }

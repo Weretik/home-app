@@ -20,14 +20,12 @@ export function NotificationsPage() {
           Телеграм
         </Typography>
         <Typography color="text.secondary">
-          Бот присылает дела, покупки, сводки расходов и напоминания о подарках
+          Бот надсилає справи, покупки, зведення витрат і нагадування про
+          подарунки
         </Typography>
       </Box>
       {status.isPending ? (
-        <Box
-          aria-label="Загружаю состояние бота"
-          sx={{ display: 'grid', gap: 2 }}
-        >
+        <Box aria-label="Завантажую стан бота" sx={{ display: 'grid', gap: 2 }}>
           <Skeleton variant="rounded" height={120} />
           <Skeleton variant="rounded" height={180} />
         </Box>
@@ -40,11 +38,11 @@ export function NotificationsPage() {
               size="small"
               onClick={() => void status.refetch()}
             >
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить: {status.error.message}
+          Не вдалося завантажити: {status.error.message}
         </Alert>
       ) : (
         <Box

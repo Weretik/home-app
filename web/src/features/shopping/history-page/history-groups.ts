@@ -1,14 +1,15 @@
+import { locale } from '../../../platform/locale';
 import type { ShoppingItem } from '../data/shopping-api';
 
 export interface HistoryDay {
   /** The local date, «2026-11-26». */
   key: string;
-  /** «Сегодня», «Вчера» or «вторник, 24 ноября». */
+  /** «Сьогодні», «Вчора» or «вівторок, 24 листопада». */
   label: string;
   items: ShoppingItem[];
 }
 
-const dayName = new Intl.DateTimeFormat('ru-RU', {
+const dayName = new Intl.DateTimeFormat(locale, {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
@@ -21,8 +22,8 @@ const localKey = (date: Date) =>
 export function dayLabel(date: Date, now: Date = new Date()): string {
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
-  if (localKey(date) === localKey(now)) return 'Сегодня';
-  if (localKey(date) === localKey(yesterday)) return 'Вчера';
+  if (localKey(date) === localKey(now)) return 'Сьогодні';
+  if (localKey(date) === localKey(yesterday)) return 'Вчора';
   const text = dayName.format(date);
   return date.getFullYear() === now.getFullYear()
     ? text
@@ -31,7 +32,7 @@ export function dayLabel(date: Date, now: Date = new Date()): string {
 
 /**
  * History rows by the local day they were bought, newest day first, the API's order kept inside a day (newest
- * first). Rows without a time (should not happen) go under «Без даты» at the end.
+ * first). Rows without a time (should not happen) go under «Без дати» at the end.
  */
 export function groupByDay(
   items: ShoppingItem[],
@@ -52,14 +53,14 @@ export function groupByDay(
   }
   const sorted = [...days.values()].sort((a, b) => b.key.localeCompare(a.key));
   if (undated.length > 0)
-    sorted.push({ key: 'undated', label: 'Без даты', items: undated });
+    sorted.push({ key: 'undated', label: 'Без дати', items: undated });
   return sorted;
 }
 
 export interface HistoryMonth {
   /** The local month, «2026-11»; «undated» for rows without a time. */
   key: string;
-  /** «Ноябрь 2026» or «Без даты». */
+  /** «Листопад 2026» or «Без дати». */
   label: string;
   /** Loaded rows of the month. */
   count: number;
@@ -68,9 +69,9 @@ export interface HistoryMonth {
   days: HistoryDay[];
 }
 
-const monthName = new Intl.DateTimeFormat('ru-RU', { month: 'long' });
+const monthName = new Intl.DateTimeFormat(locale, { month: 'long' });
 
-/** «Ноябрь 2026» for the month of a «2026-11-26» day key. */
+/** «Листопад 2026» for the month of a «2026-11-26» day key. */
 export function monthLabel(dayKey: string): string {
   const [year, month] = dayKey.split('-').map(Number);
   const name = monthName.format(new Date(year!, month! - 1, 1));
@@ -94,7 +95,7 @@ export function groupByMonth(
     if (month?.key !== key) {
       month = {
         key,
-        label: key === 'undated' ? 'Без даты' : monthLabel(day.key),
+        label: key === 'undated' ? 'Без дати' : monthLabel(day.key),
         count: 0,
         partial: false,
         days: [],
@@ -113,10 +114,10 @@ export function groupByMonth(
 export function purchaseCount(count: number, partial = false): string {
   if (partial) return `${count}+ покупок`;
   const forms = { one: 'покупка', few: 'покупки', many: 'покупок' } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }
 
-/** The heading of a month: «Ноябрь 2026 · 38 покупок». */
+/** The heading of a month: «Листопад 2026 · 38 покупок». */
 export const monthHeading = (month: HistoryMonth) =>
   `${month.label} · ${purchaseCount(month.count, month.partial)}`;

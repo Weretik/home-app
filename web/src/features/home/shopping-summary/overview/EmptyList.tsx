@@ -14,10 +14,10 @@ export function EmptyList() {
       }}
     >
       <Typography variant="h6" component="p">
-        Список пуст 🎉
+        Список порожній 🎉
       </Typography>
       <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
-        Всё куплено. Новое добавляется в разделе «Покупки».
+        Усе куплено. Нове додається в розділі «Покупки».
       </Typography>
     </Card>
   );

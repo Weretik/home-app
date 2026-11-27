@@ -7,6 +7,6 @@ internal sealed class DeleteKeywordValidator : AbstractValidator<DeleteKeywordCo
     public DeleteKeywordValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the keyword in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію ключового слова у заголовку If-Match.");
     }
 }

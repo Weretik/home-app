@@ -7,7 +7,7 @@ import { shoppingKey } from '../data/shopping-api';
 export type ShoppingSettings = Schema<'ShoppingSettingsView'>;
 export type ShoppingSettingsRequest = Schema<'UpdateShoppingSettingsRequest'>;
 
-/** How long a bought item stays in the cart and how far back ⭐ Частые look. */
+/** How long a bought item stays in the cart and how far back ⭐ Часті look. */
 export function useShoppingSettings() {
   return useQuery({
     queryKey: [...shoppingKey, 'settings'],

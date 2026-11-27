@@ -18,7 +18,7 @@ import {
   type FocusTask,
 } from '../data/todos-summary-api';
 
-/** «На сегодня»: up to 8 tasks to look at first; each ticks done in place (FR-008). */
+/** «На сьогодні»: up to 8 tasks to look at first; each ticks done in place (FR-008). */
 export function FocusList({
   tasks,
   today,
@@ -37,7 +37,7 @@ export function FocusList({
           {describeTickError(complete.error)}
         </Alert>
       )}
-      <List disablePadding aria-label="На сегодня">
+      <List disablePadding aria-label="На сьогодні">
         {tasks.map((task, index) => {
           const overdue = task.dueDate !== null && task.dueDate < today;
           const mark = priorityMarks[task.priority];

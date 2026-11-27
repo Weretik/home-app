@@ -6,7 +6,7 @@ import { NextItemsCard } from '../cards/NextItemsCard';
 import { SummaryKpis } from '../cards/SummaryKpis';
 import { EmptyList } from './EmptyList';
 
-/** The loaded summary: the figures, then the next items, departments and most bought, or «Список пуст». */
+/** The loaded summary: the figures, then the next items, departments and most bought, or «Список порожній». */
 export function SummaryContent({ summary }: { summary: Summary }) {
   return (
     <>

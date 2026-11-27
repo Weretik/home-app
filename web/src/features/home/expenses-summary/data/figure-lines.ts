@@ -1,3 +1,4 @@
+import { locale } from '../../../../platform/locale';
 import { formatWhole } from './money';
 import type { MonthSummary } from './summary-api';
 
@@ -13,23 +14,23 @@ export const isEmptyMonth = (
   summary.savingsNet === 0 &&
   summary.forecast.planned === 0;
 
-const spendings = { one: 'трата', few: 'траты', many: 'трат' } as const;
+const spendings = { one: 'витрата', few: 'витрати', many: 'витрат' } as const;
 
-/** «1 трата», «3 траты», «12 трат». */
+/** «1 витрата», «3 витрати», «12 витрат». */
 export function formatSpendingCount(count: number): string {
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${spendings[rule as keyof typeof spendings] ?? spendings.many}`;
 }
 
 /**
- * «Вне лимитов: 2 траты на 3 500 ₴»: the month's expenses marked «Не в лимиты». Null when there are none, so the
+ * «Поза лімітами: 2 витрати на 3 500 ₴»: the month's expenses marked «Не в ліміти». Null when there are none, so the
  * line is not shown at all.
  */
 export function outsideLimitsLine(
   summary: Pick<MonthSummary, 'outsideLimitsCount' | 'outsideLimitsAmount'>,
 ): string | null {
   if (summary.outsideLimitsCount <= 0) return null;
-  return `Вне лимитов: ${formatSpendingCount(summary.outsideLimitsCount)} на ${formatWhole(summary.outsideLimitsAmount)}`;
+  return `Поза лімітами: ${formatSpendingCount(summary.outsideLimitsCount)} на ${formatWhole(summary.outsideLimitsAmount)}`;
 }
 
 /** One line of the «Прогноз» card. `tone` marks a result that is good or bad. */
@@ -49,13 +50,13 @@ export function forecastLines(summary: MonthSummary): ForecastLine[] {
   const lines: ForecastLine[] = [
     {
       key: 'expected',
-      name: 'Ожидаемые расходы',
+      name: 'Очікувані витрати',
       amount: forecast.expectedExpenses,
     },
-    { key: 'planned', name: 'Запланировано', amount: forecast.planned },
+    { key: 'planned', name: 'Заплановано', amount: forecast.planned },
     {
       key: 'result',
-      name: 'Ожидаемый итог месяца',
+      name: 'Очікуваний підсумок місяця',
       amount: forecast.expectedResult,
       tone: forecast.expectedResult >= 0 ? 'success' : 'error',
     },
@@ -63,7 +64,7 @@ export function forecastLines(summary: MonthSummary): ForecastLine[] {
   if (summary.monthlyLimit > 0)
     lines.push({
       key: 'left',
-      name: 'Останется от лимита',
+      name: 'Залишиться від ліміту',
       amount: forecast.expectedTotalLeft,
       tone: forecast.expectedTotalLeft < 0 ? 'error' : undefined,
     });

@@ -8,7 +8,7 @@ import { RecordDialog } from './RecordDialog';
 
 interface PlannedEditorProps {
   editor: EntryEditor<PlannedExpenseItem>;
-  /** The plan «Записать как расход» is open for; null when it is closed. */
+  /** The plan «Записати як витрату» is open for; null when it is closed. */
   recording: PlannedExpenseItem | null;
   onRecordClose: () => void;
   /** The open month, where a new plan goes. */
@@ -39,7 +39,7 @@ export function PlannedEditor({
   if (state.mode === 'delete')
     return (
       <DeleteEntryDialog
-        title="Удалить план?"
+        title="Видалити план?"
         summary={describe(state.item)}
         id={state.item.id}
         remove={remove}

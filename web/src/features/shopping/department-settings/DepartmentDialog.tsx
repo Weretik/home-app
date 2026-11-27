@@ -15,7 +15,7 @@ interface DepartmentDialogProps {
   onClose: () => void;
 }
 
-/** «Новый отдел» / «Изменить отдел»: the name and an emoji icon; a new one sends an Idempotency-Key. */
+/** «Новий відділ» / «Змінити відділ»: the name and an emoji icon; a new one sends an Idempotency-Key. */
 export function DepartmentDialog({
   department,
   onClose,
@@ -44,14 +44,14 @@ export function DepartmentDialog({
 
   return (
     <FormDialog
-      title={department ? 'Изменить отдел' : 'Новый отдел'}
+      title={department ? 'Змінити відділ' : 'Новий відділ'}
       error={form.message}
       isPending={save.isPending}
       onSubmit={submit}
       onClose={onClose}
     >
       <TextField
-        label="Название"
+        label="Назва"
         required
         value={values.name}
         onChange={(e) => setValues({ ...values, name: e.target.value })}
@@ -65,7 +65,7 @@ export function DepartmentDialog({
         onChange={(e) => setValues({ ...values, icon: e.target.value })}
         error={!!errorOf('icon')}
         helperText={
-          errorOf('icon') ?? 'Эмодзи перед названием, можно оставить пустым'
+          errorOf('icon') ?? 'Емодзі перед назвою, можна залишити порожнім'
         }
       />
     </FormDialog>

@@ -15,7 +15,7 @@ import {
   type BudgetSettingsValues,
 } from './budget-settings-form';
 
-/** «Общий лимит расходов в месяц» and «План копилки»: one small form, saved with the budget's version in If-Match. */
+/** «Загальний ліміт витрат на місяць» and «План скарбнички»: one small form, saved with the budget's version in If-Match. */
 export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
   const [saved, setSaved] = useState(false);
   const form = useEntryForm({
@@ -48,7 +48,7 @@ export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
         component="h3"
         sx={{ fontWeight: 600 }}
       >
-        Бюджет и копилка
+        Бюджет і скарбничка
       </Typography>
       {form.message && <Alert severity="error">{form.message}</Alert>}
       <Box
@@ -60,19 +60,19 @@ export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
         }}
       >
         <AmountField
-          label="Общий лимит расходов в месяц"
+          label="Загальний ліміт витрат на місяць"
           name="monthlyLimit"
           required={false}
-          hint="Пусто — без лимита"
+          hint="Порожньо — без ліміту"
           value={form.values.monthlyLimit}
           onChange={(value) => set('monthlyLimit', value)}
           errors={form.errors}
         />
         <AmountField
-          label="План копилки"
+          label="План скарбнички"
           name="savingsGoal"
           required={false}
-          hint="Сколько хотим накопить; пусто — без плана"
+          hint="Скільки хочемо накопичити; порожньо — без плану"
           value={form.values.savingsGoal}
           onChange={(value) => set('savingsGoal', value)}
           errors={form.errors}
@@ -80,11 +80,11 @@ export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Button type="submit" variant="contained" disabled={form.isPending}>
-          {form.isPending ? 'Сохраняю…' : 'Сохранить'}
+          {form.isPending ? 'Зберігаю…' : 'Зберегти'}
         </Button>
         {saved && (
           <Typography role="status" color="text.secondary">
-            Сохранено
+            Збережено
           </Typography>
         )}
       </Box>

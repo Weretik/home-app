@@ -12,45 +12,45 @@ public static class ExpensesTexts
     public static string Week(ExpensesPeriodReport week, ExpensesMonthReport month, string budgetUrl)
     {
         var text = new StringBuilder(
-            $"📊 <b>Расходы за неделю</b> {TextFormat.Day(week.From)}–{TextFormat.Day(week.To)}\n");
-        text.Append($"Всего: <b>{TextFormat.Money(week.Total)}</b> ({week.Count} зап.)\n");
+            $"📊 <b>Витрати за тиждень</b> {TextFormat.Day(week.From)}–{TextFormat.Day(week.To)}\n");
+        text.Append($"Усього: <b>{TextFormat.Money(week.Total)}</b> ({week.Count} зап.)\n");
         AppendPayers(text, week.ByPayer);
         AppendTop(text, week.TopCategories);
 
-        text.Append($"\n<b>{Capital(TextFormat.MonthName(month.Month))} пока:</b> {TextFormat.Money(month.Expenses)}");
+        text.Append($"\n<b>{Capital(TextFormat.MonthName(month.Month))} поки що:</b> {TextFormat.Money(month.Expenses)}");
         if (month.MonthlyLimit > 0)
-            text.Append($" из {TextFormat.Money(month.MonthlyLimit)} ({Percent(month.Expenses + month.CarriedIn, month.MonthlyLimit)}%)");
+            text.Append($" з {TextFormat.Money(month.MonthlyLimit)} ({Percent(month.Expenses + month.CarriedIn, month.MonthlyLimit)}%)");
         text.Append('\n');
 
         var hot = month.Limits.Where(l => l.Percent >= WarnPercent).ToList();
         if (hot.Count > 0)
-            text.Append("⚠️ Лимиты: ").Append(string.Join(", ", hot.Select(l => $"{TextFormat.Escape(l.Name)} — {l.Percent}%"))).Append('\n');
+            text.Append("⚠️ Ліміти: ").Append(string.Join(", ", hot.Select(l => $"{TextFormat.Escape(l.Name)} — {l.Percent}%"))).Append('\n');
 
-        text.Append('\n').Append(TextFormat.Link(budgetUrl, "Открыть бюджет"));
+        text.Append('\n').Append(TextFormat.Link(budgetUrl, "Відкрити бюджет"));
         return text.ToString();
     }
 
     public static string Month(ExpensesMonthReport m, string budgetUrl)
     {
-        var text = new StringBuilder($"🗓 <b>Итоги за {TextFormat.MonthName(m.Month)} {m.Year}</b>\n\n");
-        text.Append($"💰 Доходы: <b>{TextFormat.Money(m.Incomes)}</b>{Split(m.IncomesByPerson)}\n");
-        text.Append($"💸 Расходы: <b>{TextFormat.Money(m.Expenses)}</b>{Split(m.ExpensesByPayer)}\n");
-        text.Append($"➡️ Итог месяца: <b>{TextFormat.Signed(m.Result)}</b>\n");
-        text.Append($"🐷 Копилка: {TextFormat.Signed(m.SavingsNet)} за месяц, всего {TextFormat.Money(m.SavingsBalance)}");
+        var text = new StringBuilder($"🗓 <b>Підсумки за {TextFormat.MonthName(m.Month)} {m.Year}</b>\n\n");
+        text.Append($"💰 Доходи: <b>{TextFormat.Money(m.Incomes)}</b>{Split(m.IncomesByPerson)}\n");
+        text.Append($"💸 Витрати: <b>{TextFormat.Money(m.Expenses)}</b>{Split(m.ExpensesByPayer)}\n");
+        text.Append($"➡️ Підсумок місяця: <b>{TextFormat.Signed(m.Result)}</b>\n");
+        text.Append($"🐷 Скарбничка: {TextFormat.Signed(m.SavingsNet)} за місяць, усього {TextFormat.Money(m.SavingsBalance)}");
         if (m.SavingsGoal > 0)
-            text.Append($" из {TextFormat.Money(m.SavingsGoal)}");
+            text.Append($" з {TextFormat.Money(m.SavingsGoal)}");
         text.Append('\n');
 
         if (m.Limits.Count > 0)
         {
-            text.Append("\n<b>Лимиты</b>\n");
+            text.Append("\n<b>Ліміти</b>\n");
             TextFormat.AppendLines(text, [.. m.Limits.Select(l =>
                 $"{Mark(l.Percent)} {TextFormat.Escape(l.Name)}{(l.Quarterly ? " (кв.)" : string.Empty)}: "
-                + $"{TextFormat.Money(l.Spent)} из {TextFormat.Money(l.Amount)} ({l.Percent}%)")]);
+                + $"{TextFormat.Money(l.Spent)} з {TextFormat.Money(l.Amount)} ({l.Percent}%)")]);
         }
 
         AppendTop(text, m.TopCategories);
-        text.Append('\n').Append(TextFormat.Link(budgetUrl, "Открыть бюджет"));
+        text.Append('\n').Append(TextFormat.Link(budgetUrl, "Відкрити бюджет"));
         return text.ToString();
     }
 
@@ -64,7 +64,7 @@ public static class ExpensesTexts
     {
         if (categories.Count == 0)
             return;
-        text.Append("\n<b>Больше всего</b>\n");
+        text.Append("\n<b>Найбільше</b>\n");
         TextFormat.AppendLines(text, [.. categories.Select(c => $"• {TextFormat.Escape(c.Name)} — {TextFormat.Money(c.Amount)}")]);
     }
 

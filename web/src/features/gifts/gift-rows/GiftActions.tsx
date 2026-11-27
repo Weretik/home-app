@@ -15,7 +15,7 @@ export interface GiftHandlers {
 
 interface GiftActionsProps extends GiftHandlers {
   gift: GiftItem;
-  /** «Список» offers «Подарено» and «Не актуально»; «Подаренные» offers «Вернуть в список». */
+  /** «Список» offers «Подаровано» and «Неактуально»; «Подаровані» offers «Повернути до списку». */
   variant: 'active' | 'archive';
   /** The gift's status change is being sent. */
   isPending: boolean;
@@ -36,19 +36,19 @@ export function GiftActions({
   const isActive = variant === 'active';
   const main: RowAction = isActive
     ? {
-        label: 'Подарено',
+        label: 'Подаровано',
         icon: <CheckCircleOutlineOutlinedIcon fontSize="small" />,
         onClick: () => onStatus(gift, 'Gifted'),
         disabled: isPending,
       }
     : {
-        label: 'Вернуть в список',
+        label: 'Повернути до списку',
         icon: <UndoOutlinedIcon fontSize="small" />,
         onClick: () => onStatus(gift, 'Wanted'),
         disabled: isPending,
       };
   const dropped: RowAction = {
-    label: 'Не актуально',
+    label: 'Неактуально',
     icon: <BlockOutlinedIcon fontSize="small" />,
     onClick: () => onStatus(gift, 'Dropped'),
     disabled: isPending,

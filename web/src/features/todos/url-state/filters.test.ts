@@ -6,7 +6,7 @@ describe('toTaskQuery', () => {
     expect(toTaskQuery({})).toEqual({});
   });
 
-  it('brings the shared tasks with a person, only shared ones with «Общее»', () => {
+  it('brings the shared tasks with a person, only shared ones with «Спільне»', () => {
     expect(toTaskQuery({ who: 'maria' }).assignee).toEqual(['Maria', 'Shared']);
     expect(toTaskQuery({ who: 'vitaliy' }).assignee).toEqual([
       'Vitaliy',
@@ -15,7 +15,7 @@ describe('toTaskQuery', () => {
     expect(toTaskQuery({ who: 'shared' }).assignee).toEqual(['Shared']);
   });
 
-  it('maps the category and «Без категории»', () => {
+  it('maps the category and «Без категорії»', () => {
     expect(toTaskQuery({ category: 'c1' })).toEqual({ categoryId: 'c1' });
     expect(toTaskQuery({ category: 'none' })).toEqual({
       withoutCategory: true,
@@ -40,7 +40,7 @@ describe('toTaskQuery', () => {
 });
 
 describe('quickAddAssignee and isFiltered', () => {
-  it('gives a quick-added task the chosen person, else «Общее»', () => {
+  it('gives a quick-added task the chosen person, else «Спільне»', () => {
     expect(quickAddAssignee('maria')).toBe('Maria');
     expect(quickAddAssignee(undefined)).toBe('Shared');
   });

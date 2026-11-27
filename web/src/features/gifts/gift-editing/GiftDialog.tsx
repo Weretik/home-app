@@ -22,7 +22,7 @@ interface GiftDialogProps {
   onClose: () => void;
 }
 
-/** «Новый подарок» / «Изменить подарок»: every field of a gift and its variants. */
+/** «Новий подарунок» / «Змінити подарунок»: every field of a gift and its variants. */
 export function GiftDialog({
   gift,
   preset,
@@ -41,7 +41,7 @@ export function GiftDialog({
 
   return (
     <EditDialog
-      title={gift ? 'Изменить подарок' : 'Новый подарок'}
+      title={gift ? 'Змінити подарунок' : 'Новий подарунок'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}

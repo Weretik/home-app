@@ -16,7 +16,7 @@ interface TaskRowProps {
   onOpen: (task: TodoTaskItem) => void;
   /** The first part of the meta line (the archive's completion date). */
   extra?: string;
-  /** An action at the end of the row (the archive's «Вернуть»). */
+  /** An action at the end of the row (the archive's «Повернути»). */
   action?: ReactNode;
 }
 

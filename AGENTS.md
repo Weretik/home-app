@@ -21,7 +21,7 @@ with steps, statuses, priorities, editable categories, an archive and a home pag
 to-dos and close themselves when the to-do is done; and the Notifications module, the family Telegram bot (morning
 to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
 see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); no authentication yet, writes are open and rate
-limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
+limited until Google sign-in ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)). Not indexed, no SEO. UI text is Ukrainian ([web ADR 0014](web/docs/decisions/0014-ukrainian-interface.md)); everything else (docs, comments, commits)
 is English.
 
 ## Project context

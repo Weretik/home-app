@@ -9,8 +9,8 @@ export const recipients: readonly Recipient[] = [
 
 export const recipientLabels: Record<Recipient, string> = {
   Maria: 'Маша',
-  Vitaliy: 'Виталий',
-  Together: 'Вместе',
+  Vitaliy: 'Віталій',
+  Together: 'Разом',
 };
 
 /** The priorities from the most wanted, as the form offers them. */
@@ -21,13 +21,13 @@ export const priorities: readonly GiftPriority[] = [
 ];
 
 export const priorityLabels: Record<GiftPriority, string> = {
-  High: '🔥 Очень хочу',
+  High: '🔥 Дуже хочу',
   Normal: '⭐ Хочу',
-  Someday: '💭 Когда-нибудь',
+  Someday: '💭 Колись',
 };
 
 export const statusLabels: Record<GiftStatus, string> = {
-  Wanted: 'Ждёт',
-  Gifted: 'Подарено',
-  Dropped: 'Не актуально',
+  Wanted: 'Чекає',
+  Gifted: 'Подаровано',
+  Dropped: 'Неактуально',
 };

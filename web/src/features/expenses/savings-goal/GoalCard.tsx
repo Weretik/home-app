@@ -17,7 +17,7 @@ interface GoalCardProps {
 
 const RING = 132;
 
-/** «План копилки»: a ring of the percent done, with now, the goal and what is left. No goal: a link to set one. */
+/** «План скарбнички»: a ring of the percent done, with now, the goal and what is left. No goal: a link to set one. */
 export function GoalCard({ balance, goal }: GoalCardProps) {
   const loading = balance === undefined || goal === undefined;
 
@@ -38,7 +38,7 @@ export function GoalCard({ balance, goal }: GoalCardProps) {
         component="h2"
         sx={{ fontWeight: 600 }}
       >
-        План копилки
+        План скарбнички
       </Typography>
       {loading ? (
         <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
@@ -68,12 +68,12 @@ export function GoalCard({ balance, goal }: GoalCardProps) {
             <FlagOutlinedIcon />
           </Box>
           <Box>
-            <Typography>План не задан.</Typography>
+            <Typography>План не задано.</Typography>
             <Typography variant="body2" color="text.secondary">
-              Задайте, сколько хотите накопить, и здесь появится, сколько уже
-              сделано.{' '}
+              Задайте, скільки хочете накопичити, і тут з’явиться, скільки вже
+              зроблено.{' '}
               <Link component={RouterLink} to={settingsPath}>
-                Задать план в настройках
+                Задати план у налаштуваннях
               </Link>
             </Typography>
           </Box>

@@ -38,7 +38,7 @@ export function PageStatus({
   if (error && !hasData)
     return (
       <Alert severity="error" action={<RetryButton onRetry={onRetry} />}>
-        Не удалось загрузить: {error.message}
+        Не вдалося завантажити: {error.message}
       </Alert>
     );
 
@@ -46,7 +46,7 @@ export function PageStatus({
     <>
       {error && (
         <Alert severity="warning" action={<RetryButton onRetry={onRetry} />}>
-          Нет связи с сервером — показано последнее, что удалось загрузить.
+          Немає зв’язку з сервером — показано останнє, що вдалося завантажити.
         </Alert>
       )}
       {isEmpty ? (

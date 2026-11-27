@@ -37,11 +37,11 @@ public static class ErrorProblems
 
     private static string TitleOf(int status) => status switch
     {
-        StatusCodes.Status400BadRequest => "The request is invalid.",
-        StatusCodes.Status401Unauthorized => "Sign in first.",
-        StatusCodes.Status403Forbidden => "You do not have access.",
-        StatusCodes.Status404NotFound => "Not found.",
-        StatusCodes.Status409Conflict => "The request conflicts with the current data.",
-        _ => "An unexpected error occurred.",
+        StatusCodes.Status400BadRequest => "Запит некоректний.",
+        StatusCodes.Status401Unauthorized => "Спершу увійдіть.",
+        StatusCodes.Status403Forbidden => "Немає доступу.",
+        StatusCodes.Status404NotFound => "Не знайдено.",
+        StatusCodes.Status409Conflict => "Запит суперечить поточним даним.",
+        _ => "Сталася неочікувана помилка.",
     };
 }

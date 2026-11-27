@@ -15,17 +15,17 @@ export function DeleteCategoryDialog({
   const remove = useDeleteCategory();
   const warning =
     item.activeCount > 0
-      ? `${formatTaskCount(item.activeCount)} останутся без категории. Сами задачи не удалятся.`
-      : 'Активных задач в ней нет. Задачи из архива останутся без категории.';
+      ? `${formatTaskCount(item.activeCount)} залишаться без категорії. Самі справи не видаляться.`
+      : 'Активних справ у ній немає. Справи з архіву залишаться без категорії.';
 
   return (
     <ConfirmDeleteDialog
-      title="Удалить категорию?"
+      title="Видалити категорію?"
       summary={categoryLabel(item)}
       warning={warning}
       error={
         remove.error
-          ? describeWriteError(remove.error, 'удалить', 'category').message
+          ? describeWriteError(remove.error, 'видалити', 'category').message
           : undefined
       }
       isPending={remove.isPending}

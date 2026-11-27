@@ -26,7 +26,7 @@ interface GiftFiltersProps {
   action?: ReactNode;
 }
 
-/** «Для кого» (Все / Маша / Виталий / Вместе, each in the person's colour), «Категория» and «Приоритет»; all live in the link. */
+/** «Для кого» (Усі / Маша / Віталій / Разом, each in the person's colour), «Категорія» and «Пріоритет»; all live in the link. */
 export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
   const { filters } = state;
 
@@ -45,7 +45,7 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
           }}
         >
           <ToggleButton value="all" sx={{ textTransform: 'none', px: 1.5 }}>
-            Все
+            Усі
           </ToggleButton>
           {recipients.map((recipient) => (
             <ToggleButton
@@ -72,7 +72,7 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
       <TextField
         select
         size="small"
-        label="Категория"
+        label="Категорія"
         value={filters.categoryId ?? ''}
         onChange={(event) => state.setCategory(event.target.value || undefined)}
         sx={{ minWidth: { xs: 160, sm: 200 } }}
@@ -81,7 +81,7 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
           inputLabel: { shrink: true },
         }}
       >
-        <MenuItem value="">Все</MenuItem>
+        <MenuItem value="">Усі</MenuItem>
         {categories.map((category) => (
           <MenuItem key={category.id} value={category.id}>
             {category.name}
@@ -91,7 +91,7 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
       <TextField
         select
         size="small"
-        label="Приоритет"
+        label="Пріоритет"
         value={filters.priority ?? ''}
         onChange={(event) =>
           state.setPriority((event.target.value as GiftPriority) || undefined)
@@ -102,7 +102,7 @@ export function GiftFilters({ state, categories, action }: GiftFiltersProps) {
           inputLabel: { shrink: true },
         }}
       >
-        <MenuItem value="">Все</MenuItem>
+        <MenuItem value="">Усі</MenuItem>
         {priorities.map((priority) => (
           <MenuItem key={priority} value={priority}>
             {priorityLabels[priority]}

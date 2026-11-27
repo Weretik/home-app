@@ -25,10 +25,10 @@ public static class TodoTexts
         if (mine.Count == 0 && shared.Count == 0)
             return null;
 
-        var text = new StringBuilder($"☀️ <b>Доброе утро, {TextFormat.Escape(name)}!</b> Дела на сегодня:\n");
-        AppendSection(text, "🔴 <b>Просрочено</b>", mine.Where(t => t.DueDate < today).ToList(), today);
-        AppendSection(text, "📌 <b>Сегодня</b>", mine.Where(t => t.DueDate == today).ToList(), today);
-        AppendSection(text, "👥 <b>Общие</b>", shared, today);
+        var text = new StringBuilder($"☀️ <b>Доброго ранку, {TextFormat.Escape(name)}!</b> Справи на сьогодні:\n");
+        AppendSection(text, "🔴 <b>Прострочено</b>", mine.Where(t => t.DueDate < today).ToList(), today);
+        AppendSection(text, "📌 <b>Сьогодні</b>", mine.Where(t => t.DueDate == today).ToList(), today);
+        AppendSection(text, "👥 <b>Спільні</b>", shared, today);
 
         var buttons = mine.Concat(shared)
             .Take(MaxButtons)
@@ -43,22 +43,22 @@ public static class TodoTexts
         if (active.Count == 0)
             return null;
 
-        var text = new StringBuilder("📋 <b>Дела семьи</b>\n");
+        var text = new StringBuilder("📋 <b>Справи родини</b>\n");
         var counts = new[] { TodoAssignee.Vitaliy, TodoAssignee.Maria, TodoAssignee.Shared }
             .Select(a => $"{TextFormat.Person(a.ToString())} — {active.Count(t => t.Assignee == a)}");
-        text.Append("Открыто: ").Append(string.Join(", ", counts)).Append('\n');
+        text.Append("Відкрито: ").Append(string.Join(", ", counts)).Append('\n');
 
         var overdue = active.Where(t => t.DueDate < today).ToList();
         if (overdue.Count == 0)
-            text.Append("\nПросроченных нет 👍\n");
+            text.Append("\nПрострочених немає 👍\n");
         else
         {
-            text.Append("\n🔴 <b>Просрочено</b>\n");
+            text.Append("\n🔴 <b>Прострочено</b>\n");
             TextFormat.AppendLines(text, [.. overdue.Select(t =>
-                $"• {TextFormat.Escape(t.Title)} — {TextFormat.Person(t.Assignee.ToString())}, с {TextFormat.Day(t.DueDate!.Value)}")]);
+                $"• {TextFormat.Escape(t.Title)} — {TextFormat.Person(t.Assignee.ToString())}, з {TextFormat.Day(t.DueDate!.Value)}")]);
         }
 
-        text.Append('\n').Append(TextFormat.Link(todosUrl, "Открыть дела"));
+        text.Append('\n').Append(TextFormat.Link(todosUrl, "Відкрити справи"));
         return text.ToString();
     }
 
@@ -73,6 +73,6 @@ public static class TodoTexts
     private static string Line(OpenTodo task, DateOnly today)
     {
         var line = $"• {(task.Urgent ? "❗ " : string.Empty)}{TextFormat.Escape(task.Title)}";
-        return task.DueDate < today ? $"{line} — с {TextFormat.Day(task.DueDate.Value)}" : line;
+        return task.DueDate < today ? $"{line} — з {TextFormat.Day(task.DueDate.Value)}" : line;
     }
 }

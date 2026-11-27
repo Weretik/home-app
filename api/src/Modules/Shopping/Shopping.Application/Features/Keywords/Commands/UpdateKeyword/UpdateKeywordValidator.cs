@@ -8,7 +8,7 @@ internal sealed class UpdateKeywordValidator : AbstractValidator<UpdateKeywordCo
     public UpdateKeywordValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the keyword in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію ключового слова у заголовку If-Match.");
         RuleFor(c => c.Keyword).NotEmpty().MaximumLength(DepartmentKeyword.MaxInputLength);
         RuleFor(c => c.DepartmentId).NotEmpty();
     }

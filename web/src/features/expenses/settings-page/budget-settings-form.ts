@@ -27,8 +27,8 @@ export function optionalAmountError(text: string): string | undefined {
   if (text.trim() === '') return undefined;
   const value = parseAmount(text);
   if (value === undefined)
-    return 'Сумма — число, не больше двух знаков после запятой';
-  if (value > MAX_AMOUNT) return 'Слишком большая сумма';
+    return 'Сума — число, не більше двох знаків після коми';
+  if (value > MAX_AMOUNT) return 'Завелика сума';
   return undefined;
 }
 

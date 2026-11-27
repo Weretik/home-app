@@ -17,7 +17,7 @@ const personOptions = people.map((value) => ({
   label: personLabels[value],
 }));
 
-/** «Доходы»: the person filter, «Добавить», and the month's incomes, newest first, each with edit and delete. */
+/** «Доходи»: the person filter, «Додати», and the month's incomes, newest first, each with edit and delete. */
 export function IncomesPage() {
   const [month] = useMonthParam();
   const [person, setPerson] = useFilterParam<Person>('person', people);
@@ -27,10 +27,10 @@ export function IncomesPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <PageToolbar addLabel="Добавить доход" onAdd={editor.add}>
-        <Box role="group" aria-label="Фильтры" sx={{ display: 'flex' }}>
+      <PageToolbar addLabel="Додати дохід" onAdd={editor.add}>
+        <Box role="group" aria-label="Фільтри" sx={{ display: 'flex' }}>
           <FilterSelect
-            label="Кто"
+            label="Хто"
             value={person}
             options={personOptions}
             onChange={setPerson}
@@ -40,7 +40,7 @@ export function IncomesPage() {
       <PagedListCard
         query={query}
         isFiltered={Boolean(person)}
-        loadingLabel="Загружаю доходы"
+        loadingLabel="Завантажую доходи"
         onResetFilters={clearFilters}
       >
         {(items, isComputer) =>

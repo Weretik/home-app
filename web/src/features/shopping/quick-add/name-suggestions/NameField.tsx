@@ -14,7 +14,7 @@ const nameOf = (option: NameSuggestion | string) =>
   typeof option === 'string' ? option : option.name;
 
 /**
- * «Что купить?» with suggestions for the segment being typed (FR-201…FR-206). The field is free text: it never holds a
+ * «Що купити?» with suggestions for the segment being typed (FR-201…FR-206). The field is free text: it never holds a
  * chosen option, a choice only rewrites the current segment, and Enter without a highlighted option submits the form.
  */
 export function NameField({ text, onTextChange }: NameFieldProps) {
@@ -51,12 +51,12 @@ export function NameField({ text, onTextChange }: NameFieldProps) {
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder="Что купить? молоко, хлеб, яйца 10"
+          placeholder="Що купити? молоко, хліб, яйця 10"
           slotProps={{
             ...params.slotProps,
             htmlInput: {
               ...params.slotProps.htmlInput,
-              'aria-label': 'Что купить',
+              'aria-label': 'Що купити',
               enterKeyHint: 'done',
             },
           }}

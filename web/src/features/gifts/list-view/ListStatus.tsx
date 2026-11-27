@@ -34,11 +34,11 @@ export function ListStatus(props: ListStatusProps) {
         severity="error"
         action={
           <Button color="inherit" size="small" onClick={props.onRetry}>
-            Повторить
+            Повторити
           </Button>
         }
       >
-        Не удалось загрузить: {error.message}
+        Не вдалося завантажити: {error.message}
       </Alert>
     );
   if (!isEmpty) return children;
@@ -67,16 +67,16 @@ export function ListStatus(props: ListStatusProps) {
         <CardGiftcardOutlinedIcon />
       </Box>
       <Typography variant="h6" component="p">
-        {isFiltered ? 'С этими фильтрами подарков нет' : empty.title}
+        {isFiltered ? 'З цими фільтрами подарунків немає' : empty.title}
       </Typography>
       <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
         {isFiltered
-          ? 'Сбросьте фильтры, чтобы увидеть все подарки.'
+          ? 'Скиньте фільтри, щоб побачити всі подарунки.'
           : empty.hint}
       </Typography>
       {isFiltered && (
         <Button onClick={props.onReset} sx={{ mt: 1 }}>
-          Сбросить фильтры
+          Скинути фільтри
         </Button>
       )}
     </Card>

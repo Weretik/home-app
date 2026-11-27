@@ -145,7 +145,7 @@ function renderList(options: { items?: unknown[]; failStatus?: boolean } = {}) {
     if (path.endsWith('/status')) {
       if (options.failStatus)
         return json(
-          { title: 'Ошибка', detail: 'Сервер упал', status: 500 },
+          { title: 'Помилка', detail: 'Сервер упав', status: 500 },
           500,
         );
       const id = path.split('/')[4];
@@ -202,19 +202,19 @@ test('shows departments in store order with urgent items first, the cart and the
     ),
   ).toHaveLength(2);
   expect(rows[0]).toHaveTextContent('Сыр');
-  expect(rows[0]).toHaveTextContent('Срочно');
+  expect(rows[0]).toHaveTextContent('Терміново');
   expect(rows[0]).toHaveTextContent('для пасты');
   expect(rows[1]).toHaveTextContent('Молоко2 л');
-  expect(rows[1]).toHaveTextContent('добавил(а) Маша');
+  expect(rows[1]).toHaveTextContent('додав(ла) Маша');
   const regions = screen
     .getAllByRole('region')
     .map((r) => r.getAttribute('aria-label') ?? r.textContent?.slice(0, 12));
   expect(regions.findIndex((r) => r?.includes('Молочка'))).toBeLessThan(
     regions.findIndex((r) => r?.includes('Хлеб')),
   );
-  expect(within(group('В корзине')).getByText('Кефир')).toBeInTheDocument();
+  expect(within(group('У кошику')).getByText('Кефир')).toBeInTheDocument();
   expect(
-    screen.getByText(/Нужно 3 · срочно 1 · в корзине 1/),
+    screen.getByText(/Потрібно 3 · терміново 1 · у кошику 1/),
   ).toBeInTheDocument();
 });
 
@@ -224,7 +224,7 @@ test('a tick moves the item to the cart at once and sends who bought it', async 
 
   await userEvent.click(screen.getByRole('checkbox', { name: 'Молоко' }));
 
-  expect(within(group('В корзине')).getByText('Молоко')).toBeInTheDocument();
+  expect(within(group('У кошику')).getByText('Молоко')).toBeInTheDocument();
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.url.pathname).toBe('/api/shopping/items/milk/status');
   expect(writes()[0]!.body).toEqual({ status: 'Bought', by: 'Vitaliy' });
@@ -236,23 +236,23 @@ test('a failed tick puts the item back and says why', async () => {
 
   await userEvent.click(screen.getByRole('checkbox', { name: 'Молоко' }));
 
-  expect(await screen.findByText(/Не удалось отметить/)).toBeInTheDocument();
+  expect(await screen.findByText(/Не вдалося позначити/)).toBeInTheDocument();
   expect(
     within(group('Молочка')).getByRole('checkbox', { name: 'Молоко' }),
   ).not.toBeChecked();
 });
 
-test('adds from the field as «Я» with an Idempotency-Key, then «Отменить» deletes the added row', async () => {
+test('adds from the field as «Я» with an Idempotency-Key, then «Скасувати» deletes the added row', async () => {
   const { writes } = renderList();
   await screen.findByRole('region', { name: /Молочка/ });
   await userEvent.click(screen.getByRole('button', { name: 'Маша' }));
 
   await userEvent.type(
-    screen.getByRole('combobox', { name: 'Что купить' }),
+    screen.getByRole('combobox', { name: 'Що купити' }),
     'творог{Enter}',
   );
 
-  expect(await screen.findByText('Добавлено: Творог')).toBeInTheDocument();
+  expect(await screen.findByText('Додано: Творог')).toBeInTheDocument();
   const [post] = writes();
   expect(post!.headers.get('Idempotency-Key')).toBeTruthy();
   expect(post!.body).toEqual({
@@ -261,9 +261,9 @@ test('adds from the field as «Я» with an Idempotency-Key, then «Отмени
     departmentId: null,
     urgent: false,
   });
-  expect(screen.getByRole('combobox', { name: 'Что купить' })).toHaveValue('');
+  expect(screen.getByRole('combobox', { name: 'Що купити' })).toHaveValue('');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Отменить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Скасувати' }));
   await waitFor(() => expect(writes()).toHaveLength(2));
   expect(writes()[1]!.method).toBe('DELETE');
   expect(writes()[1]!.url.pathname).toBe('/api/shopping/items/new');
@@ -275,14 +275,14 @@ test('shows the department of a single typed item and adds a frequent one with i
   await screen.findByRole('region', { name: /Молочка/ });
 
   await userEvent.type(
-    screen.getByRole('combobox', { name: 'Что купить' }),
+    screen.getByRole('combobox', { name: 'Що купити' }),
     'йогурт',
   );
   expect(
-    await screen.findByText(/Отдел: 🥛 Молочка/, {}, { timeout: 2000 }),
+    await screen.findByText(/Відділ: 🥛 Молочка/, {}, { timeout: 2000 }),
   ).toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить Батон' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Додати Батон' }));
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.body).toEqual({
     text: 'Батон',
@@ -297,14 +297,14 @@ test('edits an item with its version and clears the cart', async () => {
   await screen.findByRole('region', { name: /Молочка/ });
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Изменить: Молоко' }),
+    screen.getByRole('button', { name: 'Змінити: Молоко' }),
   );
-  const dialog = await screen.findByRole('dialog', { name: 'Изменить товар' });
-  const quantity = within(dialog).getByLabelText('Количество');
+  const dialog = await screen.findByRole('dialog', { name: 'Змінити товар' });
+  const quantity = within(dialog).getByLabelText('Кількість');
   await userEvent.clear(quantity);
   await userEvent.type(quantity, '3 л');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -322,7 +322,7 @@ test('edits an item with its version and clears the cart', async () => {
   });
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Убрать купленные' }),
+    screen.getByRole('button', { name: 'Прибрати куплене' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(2));
   expect(writes()[1]!.url.pathname).toBe('/api/shopping/items/clear-cart');
@@ -331,5 +331,5 @@ test('edits an item with its version and clears the cart', async () => {
 test('an empty list says so', async () => {
   renderList({ items: [] });
 
-  expect(await screen.findByText('Список пуст 🎉')).toBeInTheDocument();
+  expect(await screen.findByText('Список порожній 🎉')).toBeInTheDocument();
 });

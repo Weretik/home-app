@@ -4,8 +4,8 @@ import type { Recipient } from '../data/gifts-api';
 type Tone = 'primary' | 'secondary' | 'info';
 
 /**
- * One colour per person on every Gifts screen (docs/design.md, «Person colours»): Виталий primary, Маша secondary,
- * Вместе info. The home summary keeps its own copy of this mapping, since features never import each other.
+ * One colour per person on every Gifts screen (docs/design.md, «Person colours»): Віталій primary, Маша secondary,
+ * Разом info. The home summary keeps its own copy of this mapping, since features never import each other.
  */
 export const recipientTones: Record<Recipient, Tone> = {
   Vitaliy: 'primary',

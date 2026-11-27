@@ -29,10 +29,10 @@ const summary = (overrides: Partial<MonthSummary> = {}): MonthSummary => ({
   ...overrides,
 });
 
-test('adds the ИТОГО row from all expenses against the monthly limit', () => {
+test('adds the РАЗОМ row from all expenses against the monthly limit', () => {
   expect(limitRows(summary()).at(-1)).toEqual({
     key: 'total',
-    name: 'ИТОГО',
+    name: 'РАЗОМ',
     spent: 9000,
     limit: 12000,
     left: 3000,
@@ -83,7 +83,7 @@ test('labels quarterly limits and colours the fill by how much is spent', () => 
   ]);
 });
 
-test('ИТОГО leaves out expenses outside the limits and counts the overspend carried in', () => {
+test('РАЗОМ leaves out expenses outside the limits and counts the overspend carried in', () => {
   const total = limitRows(
     summary({
       expenses: 9000,
@@ -140,7 +140,11 @@ test('notes only the carry-over and plans that are there', () => {
     limitNotes({ carriedIn: 1200, carriesOut: 300.5, planned: 500 }).map(
       (note) => note.text.replace(/\s/g, ' '),
     ),
-  ).toEqual(['перенос 1 200,00 ₴', '→ след. мес. 300,50 ₴', 'план 500,00 ₴']);
+  ).toEqual([
+    'перенесення 1 200,00 ₴',
+    '→ наст. міс. 300,50 ₴',
+    'план 500,00 ₴',
+  ]);
   expect(
     limitNotes({ carriedIn: 0, carriesOut: 0, planned: 250 }).map(
       (note) => note.key,

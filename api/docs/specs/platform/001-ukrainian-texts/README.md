@@ -16,7 +16,7 @@ condensed: no contract, schema or data change.
 
 | ID     | Requirement |
 | ------ | ----------- |
-| FR-001 | Every Telegram message, button and command reply the bot writes is Ukrainian: `/start` and the «Хто ви?» buttons («Я Віталій», «Я Маша»), link replies, the test message «✅ Бот на зв'язку», the morning to-dos, the evening shopping list, the weekly and monthly expenses summaries, the gift reminders. |
+| FR-001 | Every Telegram message, button and command reply the bot writes is Ukrainian: `/start` and the «Хто ви?» buttons («Я Віталій», «Я Маша»), link replies, the test message «✅ Бот на зв’язку», the morning to-dos, the evening shopping list, the weekly and monthly expenses summaries, the gift reminders. |
 | FR-002 | The schedule titles and «when» texts the API returns for the «Телеграм» page are Ukrainian. |
 | FR-003 | Problem details the site shows (`title`, `detail`, validation messages, domain error messages) are Ukrainian. Error `code`s do not change. |
 | FR-004 | Texts the API creates as data from now on are Ukrainian: the to-do made from a gift («Купити подарунок …»). Rows already stored stay as they are. |

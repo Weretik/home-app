@@ -20,7 +20,7 @@ interface ListStatusProps {
   children: ReactNode;
 }
 
-/** Loading rows, the error with «Повторить», the designed empty state (FR-009); the list otherwise. */
+/** Loading rows, the error with «Повторити», the designed empty state (FR-009); the list otherwise. */
 export function ListStatus({
   isPending,
   error,
@@ -58,11 +58,11 @@ export function ListStatus({
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={onRetry}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить: {error.message}
+          Не вдалося завантажити: {error.message}
         </Alert>
       </Box>
     );
@@ -92,14 +92,14 @@ export function ListStatus({
           <ChecklistOutlinedIcon />
         </Box>
         <Typography variant="h6" component="p">
-          {isFiltered ? 'С этим фильтром задач нет' : empty.title}
+          {isFiltered ? 'З цим фільтром справ немає' : empty.title}
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
-          {isFiltered ? 'Сбросьте фильтр, чтобы увидеть все.' : empty.hint}
+          {isFiltered ? 'Скиньте фільтр, щоб побачити всі.' : empty.hint}
         </Typography>
         {isFiltered && (
           <Button onClick={onResetFilters} sx={{ mt: 1 }}>
-            Сбросить фильтр
+            Скинути фільтр
           </Button>
         )}
       </Box>

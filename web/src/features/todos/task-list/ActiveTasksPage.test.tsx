@@ -148,17 +148,17 @@ test('groups the active tasks by due date and hides empty groups', async () => {
     ),
   );
 
-  const overdue = await screen.findByRole('list', { name: 'Просрочено' });
+  const overdue = await screen.findByRole('list', { name: 'Прострочено' });
   expect(within(overdue).getByText('Оплатить свет')).toBeInTheDocument();
   expect(
-    within(overdue).getByRole('img', { name: 'Срочно' }),
+    within(overdue).getByRole('img', { name: 'Терміново' }),
   ).toBeInTheDocument();
-  expect(within(overdue).getByText(/просрочено:/).parentElement).toHaveStyle({
+  expect(within(overdue).getByText(/прострочено:/).parentElement).toHaveStyle({
     color: theme.colorSchemes.light!.palette.error.main,
   });
-  const todayList = screen.getByRole('list', { name: 'Сегодня' });
-  expect(todayList).toHaveTextContent('сегодня');
-  expect(todayList).toHaveTextContent('В работе');
+  const todayList = screen.getByRole('list', { name: 'Сьогодні' });
+  expect(todayList).toHaveTextContent('сьогодні');
+  expect(todayList).toHaveTextContent('В роботі');
   expect(
     within(todayList).getByRole('img', { name: 'Кому: Маша' }),
   ).toBeInTheDocument();
@@ -166,9 +166,9 @@ test('groups the active tasks by due date and hides empty groups', async () => {
     name: dayHeading(addDays(today, 3), today),
   });
   expect(soon).toHaveTextContent('🏠 Дом');
-  expect(within(soon).getByLabelText('Шаги: 2 из 3')).toHaveTextContent('2/3');
-  expect(within(soon).getByTitle('Есть заметка')).toBeInTheDocument();
-  expect(screen.getByRole('list', { name: 'Без срока' })).toBeInTheDocument();
+  expect(within(soon).getByLabelText('Кроки: 2 з 3')).toHaveTextContent('2/3');
+  expect(within(soon).getByTitle('Є нотатка')).toBeInTheDocument();
+  expect(screen.getByRole('list', { name: 'Без терміну' })).toBeInTheDocument();
 
   const query = lists()[0]!.url.searchParams;
   expect(query.get('view')).toBe('active');
@@ -180,7 +180,7 @@ test('keeps the filters in the URL and sends them to the API', async () => {
     () => json(page([task()])),
     '/todos?category=none',
   );
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
   expect(lists()[0]!.url.searchParams.get('withoutCategory')).toBe('true');
 
   await userEvent.click(screen.getByRole('button', { name: 'Маша' }));
@@ -193,7 +193,7 @@ test('keeps the filters in the URL and sends them to the API', async () => {
   expect(screen.getByTestId('location').textContent).toContain('who=maria');
 
   await userEvent.type(
-    screen.getByRole('searchbox', { name: 'Поиск' }),
+    screen.getByRole('searchbox', { name: 'Пошук' }),
     'балкон',
   );
   await waitFor(
@@ -205,25 +205,25 @@ test('keeps the filters in the URL and sends them to the API', async () => {
   expect(screen.getByTestId('location').textContent).toContain('q=');
 });
 
-test('filters by due date from the URL and from «Срок»', async () => {
+test('filters by due date from the URL and from «Термін»', async () => {
   const { lists } = renderPage(
     () => json(page([task()])),
     '/todos?when=period&from=2026-12-01&to=2026-12-07',
   );
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
   expect(lists()[0]!.url.searchParams.get('dueFrom')).toBe('2026-12-01');
   expect(lists()[0]!.url.searchParams.get('dueTo')).toBe('2026-12-07');
-  expect(screen.getByLabelText('С')).toHaveValue('2026-12-01');
+  expect(screen.getByLabelText('З')).toHaveValue('2026-12-01');
 
-  await userEvent.click(screen.getByRole('combobox', { name: 'Срок' }));
-  await userEvent.click(screen.getByRole('option', { name: 'Без срока' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Термін' }));
+  await userEvent.click(screen.getByRole('option', { name: 'Без терміну' }));
 
   await waitFor(() =>
     expect(lists().at(-1)!.url.searchParams.get('withoutDueDate')).toBe('true'),
   );
   expect(lists().at(-1)!.url.searchParams.get('dueFrom')).toBeNull();
   expect(screen.getByTestId('location').textContent).not.toContain('from=');
-  expect(screen.queryByLabelText('С')).not.toBeInTheDocument();
+  expect(screen.queryByLabelText('З')).not.toBeInTheDocument();
 });
 
 test('quick-adds a task for the chosen person and keeps the field ready', async () => {
@@ -234,9 +234,9 @@ test('quick-adds a task for the chosen person and keeps the field ready', async 
         : json(page([task()])),
     '/todos?who=vitaliy',
   );
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
 
-  const field = screen.getByRole('textbox', { name: 'Новая задача' });
+  const field = screen.getByRole('textbox', { name: 'Нова справа' });
   await userEvent.type(field, 'Купить хлеб{Enter}');
   await waitFor(() => expect(field).toHaveValue(''));
   expect(field).toHaveFocus();
@@ -260,7 +260,7 @@ test('quick-adds a task for the chosen person and keeps the field ready', async 
   await waitFor(() => expect(lists().length).toBeGreaterThan(1));
 });
 
-test('ticks a task done at once and puts it back with «Отменить»', async () => {
+test('ticks a task done at once and puts it back with «Скасувати»', async () => {
   const item = task({
     title: 'Разобрать балкон',
     status: 'InProgress',
@@ -276,7 +276,7 @@ test('ticks a task done at once and puts it back with «Отменить»', asy
       return json({ ...item, version: 6 });
     return json(page(done ? [] : [item]));
   });
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
 
   await userEvent.click(
     screen.getByRole('checkbox', { name: 'Готово: Разобрать балкон' }),
@@ -293,7 +293,7 @@ test('ticks a task done at once and puts it back with «Отменить»', asy
 
   await userEvent.click(
     within(snackbar.closest('[role="alert"]')!).getByRole('button', {
-      name: 'Отменить',
+      name: 'Скасувати',
     }),
   );
 
@@ -301,11 +301,11 @@ test('ticks a task done at once and puts it back with «Отменить»', asy
   expect(writes()[1]!.headers.get('If-Match')).toBe('6');
   expect(writes()[1]!.body).toEqual({ status: 'InProgress' });
   expect(
-    await screen.findByRole('list', { name: 'Без срока' }),
+    await screen.findByRole('list', { name: 'Без терміну' }),
   ).toHaveTextContent('Разобрать балкон');
 });
 
-test('«Отменить» waits for the tick to be saved before it restores the status', async () => {
+test('«Скасувати» waits for the tick to be saved before it restores the status', async () => {
   const item = task({ title: 'Полить цветы', version: 2 });
   let release: () => void = () => undefined;
   let reads = 0;
@@ -321,7 +321,7 @@ test('«Отменить» waits for the tick to be saved before it restores the
     }
     return json(page([item]));
   });
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
 
   await userEvent.click(
     screen.getByRole('checkbox', { name: 'Готово: Полить цветы' }),
@@ -329,7 +329,7 @@ test('«Отменить» waits for the tick to be saved before it restores the
   const snackbar = await screen.findByText('Готово: Полить цветы');
   await userEvent.click(
     within(snackbar.closest('[role="alert"]')!).getByRole('button', {
-      name: 'Отменить',
+      name: 'Скасувати',
     }),
   );
 
@@ -357,17 +357,17 @@ test('brings a ticked task back and says why when it changed elsewhere', async (
         )
       : json(page([task({ title: 'Оплатить свет' })])),
   );
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
 
   await userEvent.click(
     screen.getByRole('checkbox', { name: 'Готово: Оплатить свет' }),
   );
 
   expect(
-    await screen.findByText(/Задачу изменили в другом месте/),
+    await screen.findByText(/Справу змінили в іншому місці/),
   ).toBeInTheDocument();
   expect(
-    await screen.findByRole('list', { name: 'Без срока' }),
+    await screen.findByRole('list', { name: 'Без терміну' }),
   ).toHaveTextContent('Оплатить свет');
 });
 
@@ -379,17 +379,15 @@ test('says the list is empty, offers to reset a filter and retries an error', as
   );
 
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Не удалось загрузить',
+    'Не вдалося завантажити',
   );
   fail = false;
-  await userEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Повторити' }));
 
   expect(
-    await screen.findByText('С этим фильтром задач нет'),
+    await screen.findByText('З цим фільтром справ немає'),
   ).toBeInTheDocument();
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Сбросить фильтр' }),
-  );
-  expect(await screen.findByText('Задач нет')).toBeInTheDocument();
-  expect(screen.getByText('Добавьте первую выше.')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Скинути фільтр' }));
+  expect(await screen.findByText('Справ немає')).toBeInTheDocument();
+  expect(screen.getByText('Додайте першу вище.')).toBeInTheDocument();
 });

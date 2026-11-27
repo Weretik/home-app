@@ -61,9 +61,9 @@ export function taskFormValues(
 
 export function titleError(title: string): string | undefined {
   const trimmed = title.trim();
-  if (trimmed === '') return 'Введите название';
+  if (trimmed === '') return 'Введіть назву';
   if (trimmed.length > MAX_TITLE)
-    return `Название не длиннее ${MAX_TITLE} символов`;
+    return `Назва не довша за ${MAX_TITLE} символів`;
   return undefined;
 }
 
@@ -71,14 +71,14 @@ export function titleError(title: string): string | undefined {
 export function validateTask(values: TaskFormValues): FieldErrors {
   const errors: FieldErrors = { title: titleError(values.title) };
   if (values.notes.trim().length > MAX_NOTES)
-    errors.notes = `Заметка не длиннее ${MAX_NOTES} символов`;
+    errors.notes = `Нотатка не довша за ${MAX_NOTES} символів`;
   if (
     values.dueDate &&
     (!/^\d{4}-\d{2}-\d{2}$/.test(values.dueDate) ||
       values.dueDate < FIRST_DAY ||
       values.dueDate > LAST_DAY)
   )
-    errors.dueDate = 'Дата между 2000 и 2100 годом';
+    errors.dueDate = 'Дата між 2000 і 2100 роком';
   return errors;
 }
 
@@ -108,7 +108,7 @@ export function toTaskCreate(
   return { ...toTaskUpdate(values), steps: [...steps] };
 }
 
-/** The create request of a quick-added title (FR-003): Обычно, no date, no category. */
+/** The create request of a quick-added title (FR-003): Звичайна, no date, no category. */
 export function quickTask(title: string, assignee: Assignee): TodoTaskRequest {
   return toTaskCreate({ ...taskFormValues(undefined, assignee), title }, []);
 }

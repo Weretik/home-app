@@ -16,7 +16,7 @@ export function PlannedList({
   onRecord,
 }: PlannedRowsProps) {
   return (
-    <List disablePadding aria-label="Запланированные расходы">
+    <List disablePadding aria-label="Заплановані витрати">
       {items.map((item, index) => (
         <ListItem
           key={item.id}

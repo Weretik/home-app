@@ -8,8 +8,8 @@ export const whoValues: readonly Who[] = ['maria', 'vitaliy', 'shared'];
 
 export const whoLabels: Record<Who, string> = {
   maria: 'Маша',
-  vitaliy: 'Виталий',
-  shared: 'Общее',
+  vitaliy: 'Віталій',
+  shared: 'Спільне',
 };
 
 /** The filters of a task list as the URL keeps them (FR-002). `category` is an id or `none`. */
@@ -26,8 +26,8 @@ const whoAssignee: Record<Who, Assignee> = {
 };
 
 /**
- * The API query of the filters. «Маша» and «Виталий» also bring the shared tasks, as the old sheet's per-person tabs
- * did; «Общее» brings only the shared ones. The date filter reads `today` (Kyiv) and the list it is on.
+ * The API query of the filters. «Маша» and «Віталій» also bring the shared tasks, as the old sheet's per-person tabs
+ * did; «Спільне» brings only the shared ones. The date filter reads `today` (Kyiv) and the list it is on.
  */
 export function toTaskQuery(
   filters: TodoFilters,
@@ -46,7 +46,7 @@ export function toTaskQuery(
   return query;
 }
 
-/** The assignee of a quick-added task: the chosen «Кому», or «Общее» when the list shows everyone (FR-003). */
+/** The assignee of a quick-added task: the chosen «Кому», or «Спільне» when the list shows everyone (FR-003). */
 export const quickAddAssignee = (who: Who | undefined): Assignee =>
   who ? whoAssignee[who] : 'Shared';
 

@@ -10,7 +10,7 @@ interface CategoryDialogProps {
   onClose: () => void;
 }
 
-/** «Новая категория» / «Переименовать категорию»: the name only. */
+/** «Нова категорія» / «Перейменувати категорію»: the name only. */
 export function CategoryDialog({ category, onClose }: CategoryDialogProps) {
   const form = useEditForm({
     initial: { name: category?.name ?? '' },
@@ -24,14 +24,14 @@ export function CategoryDialog({ category, onClose }: CategoryDialogProps) {
 
   return (
     <EditDialog
-      title={category ? 'Переименовать категорию' : 'Новая категория'}
+      title={category ? 'Перейменувати категорію' : 'Нова категорія'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
       onClose={onClose}
     >
       <TextField
-        label="Название"
+        label="Назва"
         value={form.values.name}
         onChange={(event) => form.set('name', event.target.value)}
         error={Boolean(form.errors.name)}

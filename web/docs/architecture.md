@@ -24,7 +24,7 @@ src/
     shell/        header, side menu, bottom bar, the list of sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/       the API client instance (VITE_API_URL), the query client and each backend module's query key
-                  prefix (query-keys.ts)
+                  prefix (query-keys.ts), the interface locale `uk-UA` (locale.ts)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -134,10 +134,10 @@ tabs of one section ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-
 ```
 expenses/
   data/             expenses-api.ts and savings-api.ts (React Query reads), writes-api.ts (save / delete hooks of
-                    expenses, incomes and savings movements), formatting (signed amounts too), Russian enum labels,
+                    expenses, incomes and savings movements), formatting (signed amounts too), Ukrainian enum labels,
                     months
   write-data/       what every write shares: write-hooks-api.ts (the Writer shape, useSave / useChange / useRemove,
-                    If-Match, the Idempotency-Key hook, the module refresh) and write-errors-api.ts (Russian text of
+                    If-Match, the Idempotency-Key hook, the module refresh) and write-errors-api.ts (Ukrainian text of
                     a failed write)
   section/          ExpensesSection (title, month picker, tabs and the «Настройки» gear, <Outlet />), the list of pages
   url-state/        the month (?year=&month=), the Расходы period (?from=&to=, its checks) and filters
@@ -215,7 +215,7 @@ shopping/
   data/                 shopping-api.ts (the list with 20 s polling, ⭐ Частые, department match, name suggestions),
                         item-writes-api.ts (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo,
                         the shared write hook),
-                        status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Russian text), labels
+                        status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Ukrainian text), labels
   section/              ShoppingSection (title with counts, «Я», tabs, gear, <Outlet />), the page list, use-me.ts
   quick-add/
     entry/              the sticky card: field, «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
@@ -264,8 +264,8 @@ flowchart LR
 gifts/
   data/              gifts-api.ts (types from the contract, reads, query keys), writes-api.ts (Writer, useSave/useRemove,
                      useIdempotencyKey), gift-writes-api.ts (gift and status), settings-writes-api.ts (categories,
-                     «нюансы»), write-errors-api.ts (Russian text of a failed write, isStale)
-  display/           Russian labels of recipients, priorities and statuses; price, date, variant and plural formatting;
+                     «нюансы»), write-errors-api.ts (Ukrainian text of a failed write, isStale)
+  display/           Ukrainian labels of recipients, priorities and statuses; price, date, variant and plural formatting;
                      purchase.ts (the «🛒 купить до 12.12 · дарит Виталий» line, Kyiv today);
                      recipient-tones.ts (the person → theme colour mapping) and RecipientAvatar
   url-state/         ?recipient=&category=&priority= (unknown values ignored), filtering and grouping (with the price sum) in memory;
@@ -323,10 +323,10 @@ The family's to-do list «Дела» ([ADR 0011](decisions/0011-todos-grouped-li
 
 ```
 todos/
-  data/          todos-api.ts (task list infinite query, one task), categories-api.ts, labels.ts (Russian enums,
+  data/          todos-api.ts (task list infinite query, one task), categories-api.ts, labels.ts (Ukrainian enums,
                  priority marks), due-date.ts (Kyiv today, due groups, «сегодня / завтра / пн 30.11»)
   writes/        task-writes-api.ts (create / edit / delete, Idempotency-Key), status-api.ts (optimistic move between
-                 lists, undo), steps-api.ts, category-writes-api.ts, failures-api.ts (Russian text of a failed write)
+                 lists, undo), steps-api.ts, category-writes-api.ts, failures-api.ts (Ukrainian text of a failed write)
   section/       TodosSection (title, tabs «Задачи» / «Архив», the gear), the list of pages
   url-state/     the filters (?who=&category=&q=) and their mapping to the API query, the debounced search
   task-filters/  «Кому» chips, the category select, the search field
@@ -395,4 +395,4 @@ chat id. Todos marks a task made from a gift with 🎁 and links it back with `t
 - `index.html` has `noindex` and `robots.txt` disallows everything.
 - `public/staticwebapp.config.json` sends unknown paths to `index.html` on Azure Static Web Apps; other static hosts
   ignore it.
-- UI text is Russian; screens are designed for a phone first. Look, theme and layout: [design rules](design.md).
+- UI text is Ukrainian (ADR 0014, one locale in `src/platform/locale.ts`); screens are designed for a phone first. Look, theme and layout: [design rules](design.md).

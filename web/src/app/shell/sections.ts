@@ -14,16 +14,16 @@ export interface Section {
 
 /** The main sections: the phone's bottom bar and the top group of the side menu. Keep it at five. */
 export const mainSections: Section[] = [
-  { path: '/', label: 'Главная', icon: DashboardOutlinedIcon },
+  { path: '/', label: 'Головна', icon: DashboardOutlinedIcon },
   { path: '/expenses', label: 'Бюджет', icon: ReceiptLongOutlinedIcon },
   { path: '/shopping', label: 'Покупки', icon: ShoppingCartOutlinedIcon },
-  { path: '/todos', label: 'Дела', icon: ChecklistOutlinedIcon },
-  { path: '/gifts', label: 'Подарки', icon: CardGiftcardOutlinedIcon },
+  { path: '/todos', label: 'Справи', icon: ChecklistOutlinedIcon },
+  { path: '/gifts', label: 'Подарунки', icon: CardGiftcardOutlinedIcon },
 ];
 
 /** Service pages: only in the side menu on a computer; on a phone they are linked from the home page. */
 export const serviceSections: Section[] = [
-  { path: '/status', label: 'Состояние', icon: MonitorHeartOutlinedIcon },
+  { path: '/status', label: 'Стан', icon: MonitorHeartOutlinedIcon },
   { path: '/notifications', label: 'Телеграм', icon: TelegramIcon },
 ];
 

@@ -37,7 +37,7 @@ export const nextPage = (last: Paged) =>
 export type ExpenseDays = Month | { from: string; to: string };
 
 /**
- * The expenses of a month or a period, loaded page by page («Показать ещё»). `enabled` false sends nothing (a
+ * The expenses of a month or a period, loaded page by page («Показати ще»). `enabled` false sends nothing (a
  * period the page found invalid).
  */
 export function useExpenses(

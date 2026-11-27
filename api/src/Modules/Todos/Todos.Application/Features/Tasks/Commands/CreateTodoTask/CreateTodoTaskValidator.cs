@@ -17,7 +17,7 @@ internal sealed class CreateTodoTaskValidator : AbstractValidator<CreateTodoTask
         RuleFor(c => c.Priority).IsInEnum();
         RuleFor(c => c.CategoryId).NotEqual(Guid.Empty);
         RuleFor(c => c.Steps).Must(s => s.Count <= TodoTask.MaxSteps)
-            .WithMessage($"A task has at most {TodoTask.MaxSteps} steps.");
+            .WithMessage($"У завданні не більше {TodoTask.MaxSteps} кроків.");
         RuleForEach(c => c.Steps).NotEmpty().MaximumLength(TodoTask.MaxTitleLength);
     }
 }

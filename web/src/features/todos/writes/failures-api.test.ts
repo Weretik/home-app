@@ -9,27 +9,27 @@ describe('describeWriteError', () => {
   it('names a task by default', () => {
     expect(
       describeWriteError(problem(409, 'todos.changed_meanwhile')).message,
-    ).toMatch(/^Задачу изменили/);
+    ).toMatch(/^Справу змінили/);
     expect(
       describeWriteError(problem(404, 'todos.task_not_found')).message,
-    ).toBe('Этой задачи уже нет: её удалили в другом месте.');
+    ).toBe('Цієї справи вже немає: її видалили в іншому місці.');
   });
 
   it('names a category in the settings', () => {
     expect(
       describeWriteError(
         problem(409, 'todos.changed_meanwhile'),
-        'сохранить',
+        'зберегти',
         'category',
       ).message,
-    ).toMatch(/^Категорию изменили/);
+    ).toMatch(/^Категорію змінили/);
     expect(
       describeWriteError(
         problem(404, 'todos.category_not_found'),
-        'удалить',
+        'видалити',
         'category',
       ).message,
-    ).toBe('Этой категории уже нет: её удалили в другом месте.');
+    ).toBe('Цієї категорії вже немає: її видалили в іншому місці.');
   });
 
   it('asks for a new Idempotency-Key only after a reused one', () => {

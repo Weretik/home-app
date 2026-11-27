@@ -44,7 +44,7 @@ export function useShoppingList() {
   });
 }
 
-/** ⭐ Частые: names often bought lately that are not in the list now. */
+/** ⭐ Часті: names often bought lately that are not in the list now. */
 export function useFrequentItems() {
   return useQuery({
     queryKey: [...shoppingKey, 'frequent'],

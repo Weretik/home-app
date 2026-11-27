@@ -3,8 +3,8 @@ import type { Recipient } from './summary-api';
 /** Own copy of the Gifts labels: features never import each other (web ADR 0008). */
 export const recipientLabels: Record<Recipient, string> = {
   Maria: 'Маша',
-  Vitaliy: 'Виталий',
-  Together: 'Вместе',
+  Vitaliy: 'Віталій',
+  Together: 'Разом',
 };
 
 export const recipientOrder: readonly Recipient[] = [

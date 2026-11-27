@@ -48,7 +48,7 @@ public static class DigestPlanner
         slot.Kind switch
         {
             DigestKind.TodosMorning when inputs.Todos is { } todos =>
-                TodoTexts.Morning(Assignee(audience), TextFormat.Person(audience.ToString()), todos, today),
+                TodoTexts.Morning(Assignee(audience), TextFormat.Address(audience.ToString()), todos, today),
             DigestKind.TodosCommon when inputs.Todos is { } todos =>
                 Plain(TodoTexts.Common(todos, today, site.Page("todos"))),
             DigestKind.ShoppingEvening when inputs.Shopping is { } items =>

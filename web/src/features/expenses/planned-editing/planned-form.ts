@@ -50,11 +50,11 @@ export function validatePlanned(values: PlannedFormValues): FieldErrors {
   const name = values.name.trim();
   return {
     name: !name
-      ? 'Введите название'
+      ? 'Введіть назву'
       : name.length > MAX_PLAN_NAME
-        ? `Не длиннее ${MAX_PLAN_NAME} символов`
+        ? `Не довше ${MAX_PLAN_NAME} символів`
         : undefined,
-    categoryId: values.categoryId ? undefined : 'Выберите категорию',
+    categoryId: values.categoryId ? undefined : 'Виберіть категорію',
     amount: amountError(values.amount),
   };
 }

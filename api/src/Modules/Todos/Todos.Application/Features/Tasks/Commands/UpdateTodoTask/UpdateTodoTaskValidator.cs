@@ -8,7 +8,7 @@ internal sealed class UpdateTodoTaskValidator : AbstractValidator<UpdateTodoTask
     public UpdateTodoTaskValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the task you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого завдання у заголовку If-Match.");
         RuleFor(c => c.Title).NotEmpty().MaximumLength(TodoTask.MaxTitleLength);
         RuleFor(c => c.Notes).MaximumLength(TodoTask.MaxNotesLength);
         RuleFor(c => c.Assignee).IsInEnum();

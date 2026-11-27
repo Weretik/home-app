@@ -16,7 +16,7 @@ export function SearchField({
     <TextField
       size="small"
       type="search"
-      label="Поиск"
+      label="Пошук"
       value={text}
       onChange={(event) => setText(event.target.value)}
       sx={{ minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 240px' } }}

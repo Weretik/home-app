@@ -5,7 +5,7 @@ export type FieldErrors = Record<string, string | undefined>;
 export const MAX_PRICE = 10_000_000;
 export const MAX_LINK = 2000;
 
-const priceMessage = 'Цена больше нуля, до двух знаков после запятой';
+const priceMessage = 'Ціна більша за нуль, до двох знаків після коми';
 
 /**
  * Reads a price the way people type it («1 234,5», «99.99»): null for an empty field (the price is unknown),
@@ -39,14 +39,14 @@ export function checkLink(
 ): string | undefined {
   const link = text.trim();
   if (!link) return options.required;
-  if (link.length > MAX_LINK) return `Ссылка не длиннее ${MAX_LINK} символов`;
+  if (link.length > MAX_LINK) return `Посилання не довше ${MAX_LINK} символів`;
   try {
     const { protocol } = new URL(link);
     if (protocol === 'http:' || protocol === 'https:') return undefined;
   } catch {
     // Not a URL at all; the same message as a wrong scheme.
   }
-  return 'Ссылка должна начинаться с http:// или https://';
+  return 'Посилання має починатися з http:// або https://';
 }
 
 /** Text that is trimmed first: `required` gives the message of an empty one; then at most `max` characters. */
@@ -57,7 +57,7 @@ export function checkLength(
 ): string | undefined {
   const value = text.trim();
   if (!value) return required;
-  return value.length > max ? `Не длиннее ${max} символов` : undefined;
+  return value.length > max ? `Не довше ${max} символів` : undefined;
 }
 
 /** An optional date (`YYYY-MM-DD`) must fall in the years 2000–2100. */
@@ -66,7 +66,7 @@ export function checkYear(isoDate: string): string | undefined {
   const year = Number(isoDate.slice(0, 4));
   return year >= 2000 && year <= 2100
     ? undefined
-    : 'Дата между 2000 и 2100 годом';
+    : 'Дата між 2000 і 2100 роком';
 }
 
 /** True when no field has a message. */

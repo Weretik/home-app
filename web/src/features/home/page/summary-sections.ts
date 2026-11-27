@@ -13,7 +13,7 @@ export interface SummarySection {
   key: string;
   label: string;
   icon: typeof ReceiptLongOutlinedIcon;
-  /** The summary itself; null while the section has none, and the switcher shows it as «скоро». */
+  /** The summary itself; null while the section has none, and the switcher shows it as «згодом». */
   Summary: ComponentType | null;
 }
 
@@ -30,7 +30,7 @@ export const summarySections: SummarySection[] = [
   },
   {
     key: 'todos',
-    label: 'Дела',
+    label: 'Справи',
     icon: ChecklistOutlinedIcon,
     Summary: TodosSummary,
   },
@@ -42,7 +42,7 @@ export const summarySections: SummarySection[] = [
   },
   {
     key: 'gifts',
-    label: 'Подарки',
+    label: 'Подарунки',
     icon: CardGiftcardOutlinedIcon,
     Summary: GiftsSummary,
   },

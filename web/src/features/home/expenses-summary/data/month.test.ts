@@ -28,5 +28,5 @@ test('reads the month from the URL, or falls back', () => {
 });
 
 test('names the month in Russian with a capital letter', () => {
-  expect(formatMonth({ year: 2026, month: 10 })).toBe('Октябрь 2026');
+  expect(formatMonth({ year: 2026, month: 10 })).toBe('Жовтень 2026');
 });

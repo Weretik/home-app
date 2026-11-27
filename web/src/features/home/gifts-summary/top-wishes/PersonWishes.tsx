@@ -49,7 +49,7 @@ export function PersonWishes({ group }: { group: RecipientSummary }) {
         </Box>
       </Box>
       {topWanted.length === 0 ? (
-        <Typography color="text.secondary">Пока нет желаний с 🔥</Typography>
+        <Typography color="text.secondary">Поки немає бажань з 🔥</Typography>
       ) : (
         <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
           {topWanted.map((gift) => (
@@ -88,13 +88,13 @@ export function PersonWishes({ group }: { group: RecipientSummary }) {
                 {formatPrice(gift.price)}
               </Typography>
               {gift.link && (
-                <Tooltip title="Открыть ссылку">
+                <Tooltip title="Відкрити посилання">
                   <IconButton
                     size="small"
                     href={gift.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Открыть ссылку: ${gift.name}`}
+                    aria-label={`Відкрити посилання: ${gift.name}`}
                   >
                     <OpenInNewOutlinedIcon fontSize="small" />
                   </IconButton>
@@ -106,7 +106,7 @@ export function PersonWishes({ group }: { group: RecipientSummary }) {
       )}
       {more > 0 && (
         <Typography variant="body2" color="text.secondary">
-          И ещё {more} в разделе «Подарки»
+          І ще {more} у розділі «Подарунки»
         </Typography>
       )}
     </Box>

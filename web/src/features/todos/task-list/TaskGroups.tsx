@@ -11,7 +11,7 @@ interface TaskGroupsProps {
   onOpen: (task: TodoTaskItem) => void;
 }
 
-/** The active tasks by due day (FR-001): Просрочено, Сегодня, Завтра, one group per later day, Без срока. */
+/** The active tasks by due day (FR-001): Прострочено, Сьогодні, Завтра, one group per later day, Без терміну. */
 export function TaskGroups({ items, today, onDone, onOpen }: TaskGroupsProps) {
   return groupByDueDay(items, today).map((group) => (
     <TaskGroup

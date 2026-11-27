@@ -10,7 +10,7 @@ interface TaskGroupProps {
   children: ReactNode;
 }
 
-/** One day group of a list: its heading («Просрочено · 2» in red, «Сегодня · 3», «Пн, 30 ноября · 1») and its rows. */
+/** One day group of a list: its heading («Прострочено · 2» in red, «Сьогодні · 3», «Пн, 30 листопада · 1») and its rows. */
 export function TaskGroup({ label, count, overdue, children }: TaskGroupProps) {
   const headingId = useId();
   return (

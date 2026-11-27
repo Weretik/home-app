@@ -7,7 +7,7 @@ internal sealed class UpdateSettingsValidator : AbstractValidator<UpdateSettings
 {
     public UpdateSettingsValidator()
     {
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the settings in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію налаштувань у заголовку If-Match.");
         RuleFor(c => c.CartKeepHours).InclusiveBetween(ShoppingSettings.MinCartKeepHours, ShoppingSettings.MaxCartKeepHours);
         RuleFor(c => c.FrequentDays).InclusiveBetween(ShoppingSettings.MinFrequentDays, ShoppingSettings.MaxFrequentDays);
     }

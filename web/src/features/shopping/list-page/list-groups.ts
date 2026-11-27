@@ -1,3 +1,4 @@
+import { locale } from '../../../platform/locale';
 import type { ShoppingItem } from '../data/shopping-api';
 
 /** One department of the list with its needed items in the order they are picked up. */
@@ -33,7 +34,7 @@ export function groupNeeded(items: ShoppingItem[]): DepartmentGroup[] {
     group.items.push(item);
   }
   const sorted = [...groups.values()].sort(
-    (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'),
+    (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, locale),
   );
   for (const group of sorted)
     group.items.sort(

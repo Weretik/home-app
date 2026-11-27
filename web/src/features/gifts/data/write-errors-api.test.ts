@@ -11,13 +11,13 @@ const problem = (
 describe('describeWriteError', () => {
   it('says there is no connection when the request never got an answer', () => {
     expect(describeWriteError(new TypeError('Failed to fetch')).message).toBe(
-      'Нет связи с сервером. Проверьте интернет и попробуйте снова.',
+      'Немає зв’язку із сервером. Перевірте інтернет і спробуйте знову.',
     );
   });
 
   it('explains a change made elsewhere, also for 412', () => {
     const text =
-      'Подарок или запись изменили в другом месте — список обновлён, откройте снова.';
+      'Подарунок або запис змінили в іншому місці — список оновлено, відкрийте знову.';
     expect(
       describeWriteError(problem(409, 'gifts.changed_meanwhile')).message,
     ).toBe(text);
@@ -27,7 +27,7 @@ describe('describeWriteError', () => {
   it('says the item is gone after a 404', () => {
     expect(
       describeWriteError(problem(404, 'gifts.gift_not_found')).message,
-    ).toBe('Этого уже нет: его удалили в другом месте.');
+    ).toBe('Цього вже немає: його видалили в іншому місці.');
   });
 
   it('renews the key after it was used for other data', () => {
@@ -39,21 +39,21 @@ describe('describeWriteError', () => {
 
   it('explains a category that gifts still use', () => {
     expect(
-      describeWriteError(problem(409, 'gifts.category_in_use'), 'удалить')
+      describeWriteError(problem(409, 'gifts.category_in_use'), 'видалити')
         .message,
-    ).toBe('Эта категория есть у подарков — сначала перенесите их в другую.');
+    ).toBe('Ця категорія є в подарунків — спершу перенесіть їх в іншу.');
   });
 
   it('puts a taken category name under the name field', () => {
     const failure = describeWriteError(
       problem(409, 'gifts.category_name_taken'),
     );
-    expect(failure.fieldErrors).toEqual({ name: ['Такая категория уже есть'] });
+    expect(failure.fieldErrors).toEqual({ name: ['Така категорія вже є'] });
   });
 
   it('asks to wait after too many writes', () => {
     expect(describeWriteError(problem(429)).message).toBe(
-      'Слишком много изменений подряд. Подождите минуту и повторите.',
+      'Забагато змін поспіль. Зачекайте хвилину й повторіть.',
     );
   });
 
@@ -61,13 +61,13 @@ describe('describeWriteError', () => {
     const failure = describeWriteError(
       problem(400, 'validation', { link: ['Bad link'] }),
     );
-    expect(failure.message).toBe('Проверьте поля: Server says no.');
+    expect(failure.message).toBe('Перевірте поля: Server says no.');
     expect(failure.fieldErrors).toEqual({ link: ['Bad link'] });
   });
 
   it('names the failed action otherwise', () => {
-    expect(describeWriteError(problem(500), 'удалить').message).toBe(
-      'Не удалось удалить: Server says no.',
+    expect(describeWriteError(problem(500), 'видалити').message).toBe(
+      'Не вдалося видалити: Server says no.',
     );
   });
 });

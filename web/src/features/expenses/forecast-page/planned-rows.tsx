@@ -11,13 +11,13 @@ export interface PlannedRowsProps extends RowHandlers<PlannedExpenseItem> {
   onRecord: (item: PlannedExpenseItem) => void;
 }
 
-/** «Записать как расход» in a plan's «⋮» menu. */
+/** «Записати як витрату» in a plan's «⋮» menu. */
 export const recordAction = (onClick: () => void): RowAction => ({
-  label: 'Записать как расход',
+  label: 'Записати як витрату',
   icon: <ReceiptLongOutlinedIcon fontSize="small" />,
   onClick,
 });
 
-/** A plan in one line: «Страховка · Машина · Виталий · 4 200,00 ₴». */
+/** A plan in one line: «Страховка · Машина · Віталій · 4 200,00 ₴». */
 export const planLine = (item: PlannedExpenseItem) =>
   `${item.name} · ${item.categoryName} · ${payerLabels[item.payer]} · ${formatAmount(item.amount)}`;

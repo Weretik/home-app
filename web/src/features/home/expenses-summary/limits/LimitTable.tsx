@@ -15,20 +15,20 @@ import {
   type LimitRow,
 } from './limit-rows';
 
-/** The limits on a computer: one table row per limit, «ИТОГО» last. */
+/** The limits on a computer: one table row per limit, «РАЗОМ» last. */
 export function LimitTable({ rows }: { rows: LimitRow[] }) {
   return (
     <TableContainer sx={{ pb: 1 }}>
       <Table size="small" aria-label={limitsLabel}>
         <TableHead>
           <TableRow>
-            <TableCell>Название</TableCell>
-            <TableCell align="right">Потрачено</TableCell>
-            <TableCell align="right">Лимит</TableCell>
-            <TableCell align="right">Остаток</TableCell>
+            <TableCell>Назва</TableCell>
+            <TableCell align="right">Витрачено</TableCell>
+            <TableCell align="right">Ліміт</TableCell>
+            <TableCell align="right">Залишок</TableCell>
             <TableCell align="right">%</TableCell>
-            <TableCell aria-label="Заполнение" sx={{ width: '16%' }} />
-            <TableCell align="right">Можно в день</TableCell>
+            <TableCell aria-label="Заповнення" sx={{ width: '16%' }} />
+            <TableCell align="right">Можна на день</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

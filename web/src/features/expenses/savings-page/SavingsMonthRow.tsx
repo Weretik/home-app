@@ -14,7 +14,7 @@ interface SavingsMonthRowProps {
   onOpen: (month: Month) => void;
 }
 
-/** One month of «По месяцам»: its name, put in and taken out, and the balance at its end; a tap opens it. */
+/** One month of «По місяцях»: its name, put in and taken out, and the balance at its end; a tap opens it. */
 export function SavingsMonthRow({
   month,
   isOpen,
@@ -50,7 +50,7 @@ export function SavingsMonthRow({
       />
       <Box sx={{ textAlign: 'right' }}>
         <Typography variant="caption" color="text.secondary">
-          на конец
+          на кінець
         </Typography>
         <Typography
           sx={{

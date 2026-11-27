@@ -6,17 +6,17 @@ import { AddStepField } from './AddStepField';
 import { StepItem } from './StepItem';
 import { MAX_STEPS, type StepsState } from './use-steps';
 
-/** «Шаги»: the checklist of the task with tick, rename in place, delete and «Добавить шаг» (FR-005). */
+/** «Кроки»: the checklist of the task with tick, rename in place, delete and «Додати крок» (FR-005). */
 export function StepsEditor({ state }: { state: StepsState }) {
   const done = state.steps.filter((step) => step.isDone).length;
   return (
     <Box
       component="section"
-      aria-label="Шаги"
+      aria-label="Кроки"
       sx={{ display: 'grid', gap: 0.5 }}
     >
       <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 600 }}>
-        Шаги
+        Кроки
         {state.steps.length > 0 && (
           <Box
             component="span"
@@ -32,7 +32,7 @@ export function StepsEditor({ state }: { state: StepsState }) {
       </Typography>
       {state.message && <Alert severity="error">{state.message}</Alert>}
       {state.steps.length > 0 && (
-        <List dense disablePadding aria-label="Список шагов">
+        <List dense disablePadding aria-label="Список кроків">
           {state.steps.map((step) => (
             <StepItem
               key={step.id}
@@ -47,7 +47,7 @@ export function StepsEditor({ state }: { state: StepsState }) {
       )}
       {state.isFull ? (
         <Typography variant="body2" color="text.secondary">
-          В задаче не больше {MAX_STEPS} шагов.
+          У справі не більше {MAX_STEPS} кроків.
         </Typography>
       ) : (
         <AddStepField disabled={state.isAdding} onAdd={state.add} />

@@ -21,7 +21,7 @@ Written from the backend SDD template, condensed to one page.
 | R-001 | A gift gets two optional fields: `giver` («Кто дарит»: `Vitaliy`, `Maria`, `Together`) and `buyBy` («Купить до», a day in 2000–2100, `gifts.buy_by_out_of_range`). «Кому» is the existing `recipient`. |
 | R-002 | A gift is *planned* when it is `Wanted` and has both a giver and a buy-by date. |
 | R-003 | When a save makes a gift planned, or changes the name, recipient, giver or buy-by date of a planned gift, Gifts publishes `GiftPurchasePlanned` in the same transaction (outbox). When a planned gift stops being planned (gifted, dropped, giver or date cleared, deleted), Gifts publishes `GiftPurchaseClosed` with the reason. |
-| R-004 | Todos keeps one task per gift (`source_kind = 'gift'`, `source_id` = gift id, unique together). On `GiftPurchasePlanned` it creates or updates it: title «🎁 Купить подарок: <name>» plus « (для Маши)» / « (для Виталия)» when the recipient is one person, assignee = giver (`Together` → `Shared`), due = buy-by, priority `High`, notes with the gift link `<site>/gifts?gift=<id>`; an archived task is reopened as `Todo`. |
+| R-004 | Todos keeps one task per gift (`source_kind = 'gift'`, `source_id` = gift id, unique together). On `GiftPurchasePlanned` it creates or updates it: title «🎁 Купити подарунок: <name>» plus « (для Маші)» / « (для Віталія)» when the recipient is one person, assignee = giver (`Together` → `Shared`), due = buy-by, priority `High`, notes with the gift link `<site>/gifts?gift=<id>`; an archived task is reopened as `Todo`. |
 | R-005 | On `GiftPurchaseClosed`: reason `Gifted` → the task becomes `Done`; any other reason → `Cancelled`. A task already archived stays as it is. These changes publish nothing back. |
 | R-006 | When a person moves a task with a source into `Done` (site or bot), Todos publishes `TodoTaskCompleted { taskId, sourceKind, sourceId }`. Gifts moves a `Wanted` gift to `Gifted` with today's Kyiv date; any other status is left alone. |
 | R-007 | Every handler is safe to run twice (upsert by source, status checks); a lost race on a row version or the unique source index fails the attempt and the outbox retries it. |
@@ -32,7 +32,7 @@ Written from the backend SDD template, condensed to one page.
 
 | ID | Scenario |
 | --- | --- |
-| SC-001 | Masha's ring: giver Vitaliy, buy-by 20.12 → within a tick Vitaliy has «🎁 Купить подарок: Кольцо (для Маши)» due 20.12. |
+| SC-001 | Masha's ring: giver Vitaliy, buy-by 20.12 → within a tick Vitaliy has «🎁 Купити подарунок: Кольцо (для Маші)» due 20.12. |
 | SC-002 | The buy-by date moves to 18.12 → the same task's due date is 18.12 (no second task). |
 | SC-003 | Vitaliy ticks the task done → the ring is in «Подаренные», gifted today. |
 | SC-004 | The gift is dropped instead → the task is cancelled. |

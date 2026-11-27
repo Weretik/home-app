@@ -21,7 +21,7 @@ export interface GiftRowsProps extends GiftHandlers {
   isChanging: (gift: GiftItem) => boolean;
 }
 
-/** Gifts as a table, for a computer (the Expenses pattern): «Список» and «Подаренные» differ in two columns. */
+/** Gifts as a table, for a computer (the Expenses pattern): «Список» and «Подаровані» differ in two columns. */
 export function GiftTable({
   items,
   variant,
@@ -32,12 +32,12 @@ export function GiftTable({
 }: GiftRowsProps) {
   const isActive = variant === 'active';
   const headers = [
-    'Подарок',
-    'Варианты',
-    'Категория',
-    ...(isActive ? ['Приоритет'] : []),
-    'Цена',
-    isActive ? 'Повод' : 'Итог',
+    'Подарунок',
+    'Варіанти',
+    'Категорія',
+    ...(isActive ? ['Пріоритет'] : []),
+    'Ціна',
+    isActive ? 'Привід' : 'Підсумок',
   ];
   const columns = headers.length + 1;
   const rows = (gifts: GiftItem[]) =>
@@ -60,12 +60,12 @@ export function GiftTable({
             {headers.map((header) => (
               <TableCell
                 key={header}
-                align={header === 'Цена' ? 'right' : undefined}
+                align={header === 'Ціна' ? 'right' : undefined}
               >
                 {header}
               </TableCell>
             ))}
-            <TableCell padding="checkbox" aria-label="Действия" />
+            <TableCell padding="checkbox" aria-label="Дії" />
           </TableRow>
         </TableHead>
         {!grouped && <TableBody>{rows(items)}</TableBody>}

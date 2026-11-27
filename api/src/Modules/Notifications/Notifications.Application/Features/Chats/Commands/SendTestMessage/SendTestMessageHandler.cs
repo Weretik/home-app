@@ -22,7 +22,7 @@ public sealed class SendTestMessageHandler(INotificationsDbContext db, ITelegram
         if (chatId is null)
             return ChatErrors.NotLinked(c.Audience);
 
-        var text = $"✅ Бот на связи. Этот чат подключён: {TextFormat.Person(c.Audience.ToString())}.";
+        var text = $"✅ Бот на зв’язку. Цей чат підключено: {TextFormat.Person(c.Audience.ToString())}.";
         return await bot.TrySendAsync(chatId.Value, text, [], cancellationToken) ? Result.Success() : ChatErrors.TelegramFailed;
     }
 }

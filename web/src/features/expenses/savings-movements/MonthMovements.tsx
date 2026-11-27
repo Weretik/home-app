@@ -12,7 +12,7 @@ import { SavingsEditor } from '../savings-editing/SavingsEditor';
 import { MovementList } from './MovementList';
 import { MovementTable } from './MovementTable';
 
-/** «Движения за месяц»: the open month's movements of the jar, page by page, with add, edit and delete. */
+/** «Операції за місяць»: the open month's movements of the jar, page by page, with add, edit and delete. */
 export function MonthMovements({ month }: { month: Month }) {
   const movements = useSavingsMovements(month);
   const editor = useEntryEditor<SavingsMovementItem>();
@@ -20,12 +20,12 @@ export function MonthMovements({ month }: { month: Month }) {
 
   return (
     <Box sx={{ display: 'grid', gap: 2, minWidth: 0 }}>
-      <PageToolbar addLabel="Добавить" onAdd={editor.add}>
+      <PageToolbar addLabel="Додати" onAdd={editor.add}>
         <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
-          Движения за месяц
+          Операції за місяць
         </Typography>
       </PageToolbar>
-      <PagedListCard query={movements} loadingLabel="Загружаю копилку">
+      <PagedListCard query={movements} loadingLabel="Завантажую скарбничку">
         {(items, isComputer) =>
           isComputer ? (
             <MovementTable items={items} {...rows} />

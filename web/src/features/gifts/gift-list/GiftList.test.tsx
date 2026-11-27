@@ -35,7 +35,7 @@ function renderList(props: Partial<Parameters<typeof GiftList>[0]> = {}) {
       <GiftList
         items={[gift()]}
         variant="active"
-        label="Подарки"
+        label="Подарунки"
         grouped={false}
         isChanging={() => false}
         {...handlers}
@@ -50,13 +50,13 @@ describe('GiftList', () => {
   it('shows a compact row: name and price, then the category and small chips', () => {
     renderList();
     const row = within(
-      screen.getByRole('list', { name: 'Подарки' }),
+      screen.getByRole('list', { name: 'Подарунки' }),
     ).getAllByRole('listitem')[0]!;
     expect(within(row).getByText('Наушники')).toBeInTheDocument();
     expect(within(row).getByText(/^4\s500\s₴$/)).toBeInTheDocument();
     expect(within(row).getByText('Техника')).toBeInTheDocument();
-    expect(within(row).getByText('🔥 Очень хочу')).toBeInTheDocument();
-    expect(within(row).getByText('12 марта 2027')).toBeInTheDocument();
+    expect(within(row).getByText('🔥 Дуже хочу')).toBeInTheDocument();
+    expect(within(row).getByText('12 березня 2027')).toBeInTheDocument();
   });
 
   it('puts each person in a block with their header, the count and the sum', () => {
@@ -71,26 +71,26 @@ describe('GiftList', () => {
     const masha = screen.getByRole('region', { name: 'Маша' });
     expect(within(masha).getByText('Духи')).toBeInTheDocument();
     expect(masha.textContent?.replace(/\s/g, ' ')).toContain(
-      '1 подарок · ≈ 3 200 ₴',
+      '1 подарунок · ≈ 3 200 ₴',
     );
-    const together = screen.getByRole('region', { name: 'Вместе' });
-    expect(within(together).getByText('1 подарок')).toBeInTheDocument();
+    const together = screen.getByRole('region', { name: 'Разом' });
+    expect(within(together).getByText('1 подарунок')).toBeInTheDocument();
     expect(
       screen
         .getAllByRole('heading', { level: 2 })
         .map((title) => title.textContent),
-    ).toEqual(['Маша', 'Виталий', 'Вместе']);
+    ).toEqual(['Маша', 'Віталій', 'Разом']);
     expect(
-      within(screen.getByRole('region', { name: 'Виталий' })).getByRole(
+      within(screen.getByRole('region', { name: 'Віталій' })).getByRole(
         'list',
-        { name: 'Подарки: Виталий' },
+        { name: 'Подарунки: Віталій' },
       ),
     ).toBeInTheDocument();
   });
 
   it('opens the variants under the row', async () => {
     renderList();
-    await userEvent.click(screen.getByRole('button', { name: '1 вариант' }));
+    await userEvent.click(screen.getByRole('button', { name: '1 варіант' }));
     expect(screen.getByRole('link', { name: /Белые/ })).toHaveAttribute(
       'href',
       'https://a.ua/1',
@@ -100,13 +100,13 @@ describe('GiftList', () => {
   it('offers every action in the row menu', async () => {
     const { onStatus } = renderList();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Действия: Наушники' }),
+      screen.getByRole('button', { name: 'Дії: Наушники' }),
     );
     const items = screen
       .getAllByRole('menuitem')
       .map((item) => item.textContent);
-    expect(items).toEqual(['Подарено', 'Не актуально', 'Изменить', 'Удалить']);
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Подарено' }));
+    expect(items).toEqual(['Подаровано', 'Неактуально', 'Змінити', 'Видалити']);
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Подаровано' }));
     expect(onStatus).toHaveBeenCalledWith(gift(), 'Gifted');
   });
 
@@ -115,13 +115,15 @@ describe('GiftList', () => {
       items: [gift({ status: 'Gifted', giftedOn: '2026-11-26' })],
       variant: 'archive',
     });
-    expect(screen.getByText('Подарено 26 ноября 2026')).toBeInTheDocument();
+    expect(
+      screen.getByText('Подаровано 26 листопада 2026'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Техника')).toBeInTheDocument();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Действия: Наушники' }),
+      screen.getByRole('button', { name: 'Дії: Наушники' }),
     );
     await userEvent.click(
-      screen.getByRole('menuitem', { name: 'Вернуть в список' }),
+      screen.getByRole('menuitem', { name: 'Повернути до списку' }),
     );
     expect(onStatus).toHaveBeenCalledWith(
       gift({ status: 'Gifted', giftedOn: '2026-11-26' }),

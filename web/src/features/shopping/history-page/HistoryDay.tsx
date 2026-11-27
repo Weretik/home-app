@@ -1,3 +1,4 @@
+import { locale } from '../../../platform/locale';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import Card from '@mui/material/Card';
@@ -20,12 +21,12 @@ interface HistoryDayProps {
   onDelete: (item: ShoppingItem) => void;
 }
 
-const time = new Intl.DateTimeFormat('ru-RU', {
+const time = new Intl.DateTimeFormat(locale, {
   hour: '2-digit',
   minute: '2-digit',
 });
 
-/** One day of the history: what was bought, by whom and when, with «Вернуть в список» and delete (R-10). */
+/** One day of the history: what was bought, by whom and when, with «Повернути до списку» and delete (R-10). */
 export function HistoryDay({
   day,
   returning,
@@ -67,10 +68,10 @@ export function HistoryDay({
                 primary: { sx: { fontWeight: 600, overflowWrap: 'anywhere' } },
               }}
             />
-            <Tooltip title="Вернуть в список">
+            <Tooltip title="Повернути до списку">
               <span>
                 <IconButton
-                  aria-label={`Вернуть в список: ${item.name}`}
+                  aria-label={`Повернути до списку: ${item.name}`}
                   disabled={returning === item.id}
                   onClick={() => onReturn(item)}
                 >
@@ -78,9 +79,9 @@ export function HistoryDay({
                 </IconButton>
               </span>
             </Tooltip>
-            <Tooltip title="Удалить">
+            <Tooltip title="Видалити">
               <IconButton
-                aria-label={`Удалить: ${item.name}`}
+                aria-label={`Видалити: ${item.name}`}
                 onClick={() => onDelete(item)}
               >
                 <DeleteOutlineOutlinedIcon fontSize="small" />

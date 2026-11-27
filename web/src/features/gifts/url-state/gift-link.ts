@@ -9,7 +9,7 @@ export type GiftLinkStep<T> =
 
 /**
  * What a tab does with `?gift=<id>` (gifts 002 FR-005): wait for its list, open the gift it holds, move from «Список»
- * to «Подаренные» when the gift is not wanted any more, or give up when neither tab has it.
+ * to «Подаровані» when the gift is not wanted any more, or give up when neither tab has it.
  */
 export function resolveGiftLink<T extends { id: string }>(
   id: string,

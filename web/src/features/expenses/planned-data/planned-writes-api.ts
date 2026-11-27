@@ -35,7 +35,7 @@ export const useSavePlannedExpense = () => useSave(plannedWriter);
 export const useDeletePlannedExpense = () => useRemove(plannedWriter.remove);
 
 /**
- * «Записать как расход»: turns `plan` into an expense and deletes the plan in one step, with the plan's version in
+ * «Записати як витрату»: turns `plan` into an expense and deletes the plan in one step, with the plan's version in
  * If-Match. It changes the plans, the expenses and the summary; like every write it refreshes the module's queries.
  */
 export const useRecordPlannedExpense = (plan: EditedEntry) =>

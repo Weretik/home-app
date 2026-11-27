@@ -15,7 +15,7 @@ interface KeywordDialogProps {
   onClose: () => void;
 }
 
-/** «Новое слово» / «Изменить слово»: the start of a word («зубн паст») and its department. */
+/** «Нове слово» / «Змінити слово»: the start of a word («зубн паст») and its department. */
 export function KeywordDialog({
   keyword,
   departmentId,
@@ -46,7 +46,7 @@ export function KeywordDialog({
 
   return (
     <FormDialog
-      title={keyword ? 'Изменить слово' : 'Новое слово'}
+      title={keyword ? 'Змінити слово' : 'Нове слово'}
       error={form.message}
       isPending={save.isPending}
       onSubmit={submit}
@@ -60,12 +60,12 @@ export function KeywordDialog({
         error={!!errorOf('keyword')}
         helperText={
           errorOf('keyword') ??
-          'Начало слова: «молок» найдёт «молоко» и «молочный»'
+          'Початок слова: «молок» знайде «молоко» і «молочний»'
         }
       />
       <TextField
         select
-        label="Отдел"
+        label="Відділ"
         required
         value={values.departmentId}
         onChange={(e) => setValues({ ...values, departmentId: e.target.value })}

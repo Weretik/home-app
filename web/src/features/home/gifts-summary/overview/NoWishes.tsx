@@ -18,13 +18,13 @@ export function NoWishes() {
     >
       <CardGiftcardOutlinedIcon color="primary" />
       <Typography variant="h6" component="p">
-        Желаний пока нет
+        Бажань поки немає
       </Typography>
       <Typography color="text.secondary">
-        Добавьте подарки в разделе «Подарки».
+        Додайте подарунки в розділі «Подарунки».
       </Typography>
       <Button component={Link} to="/gifts">
-        Открыть подарки
+        Відкрити подарунки
       </Button>
     </Card>
   );

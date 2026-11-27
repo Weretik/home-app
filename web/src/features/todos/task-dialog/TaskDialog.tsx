@@ -29,7 +29,7 @@ interface TaskDialogProps {
 
 /**
  * A task in a dialog (FR-005), full screen on a phone and 600 px wide on a computer: the fields, the steps, and
- * «Удалить» (asks first), «Отмена», «Сохранить». Closing waits for a pending save.
+ * «Видалити» (asks first), «Скасувати», «Зберегти». Closing waits for a pending save.
  */
 export function TaskDialog({
   item,
@@ -75,7 +75,7 @@ export function TaskDialog({
         sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}
       >
         <DialogTitle id={titleId}>
-          {item ? 'Задача' : 'Новая задача'}
+          {item ? 'Справа' : 'Нова справа'}
         </DialogTitle>
         <DialogContent
           sx={{
@@ -102,25 +102,25 @@ export function TaskDialog({
               disabled={busy}
               sx={{ mr: 'auto' }}
             >
-              Удалить
+              Видалити
             </Button>
           )}
           <Button onClick={onClose} disabled={form.isPending}>
-            Отмена
+            Скасувати
           </Button>
           <Button type="submit" variant="contained" disabled={busy}>
-            {form.isPending ? 'Сохраняю…' : 'Сохранить'}
+            {form.isPending ? 'Зберігаю…' : 'Зберегти'}
           </Button>
         </DialogActions>
       </Box>
       {confirming && item && (
         <ConfirmDeleteDialog
-          title="Удалить задачу?"
+          title="Видалити справу?"
           summary={item.title}
-          warning="Задача и её шаги удалятся насовсем. Если она просто не нужна, поставьте статус «Не актуально»."
+          warning="Справа та її кроки видаляться назавжди. Якщо вона просто не потрібна, поставте статус «Неактуально»."
           error={
             remove.error
-              ? describeWriteError(remove.error, 'удалить').message
+              ? describeWriteError(remove.error, 'видалити').message
               : undefined
           }
           isPending={remove.isPending}

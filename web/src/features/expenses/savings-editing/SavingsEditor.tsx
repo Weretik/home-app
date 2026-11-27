@@ -21,7 +21,7 @@ export function SavingsEditor({
   if (state.mode === 'delete')
     return (
       <DeleteEntryDialog
-        title="Удалить движение?"
+        title="Видалити операцію?"
         summary={`${formatSignedAmount(state.item.amount)} · ${personLabels[state.item.person]} · ${formatDay(state.item.date)}`}
         id={state.item.id}
         remove={remove}

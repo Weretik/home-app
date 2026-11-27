@@ -8,7 +8,7 @@ internal sealed class UpdatePlannedExpenseValidator : AbstractValidator<UpdatePl
     public UpdatePlannedExpenseValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the plan you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого плану у заголовку If-Match.");
         RuleFor(c => c.Year).InclusiveBetween(2000, 2100);
         RuleFor(c => c.Month).InclusiveBetween(1, 12);
         RuleFor(c => c.Name).NotEmpty().MaximumLength(PlannedExpense.MaxNameLength);

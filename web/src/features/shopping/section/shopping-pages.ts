@@ -1,4 +1,4 @@
-/** The pages of the Shopping section, shown as tabs; «Настройки» is reached from the gear, not a tab (design.md). */
+/** The pages of the Shopping section, shown as tabs; «Налаштування» is reached from the gear, not a tab (design.md). */
 export interface ShoppingPage {
   /** Path under /shopping; '' is the index page. */
   path: string;
@@ -7,7 +7,7 @@ export interface ShoppingPage {
 
 export const shoppingPages: ShoppingPage[] = [
   { path: '', label: 'Список' },
-  { path: 'history', label: 'История' },
+  { path: 'history', label: 'Історія' },
 ];
 
 export const sectionPath = '/shopping';

@@ -27,9 +27,9 @@ export function GoalProgressView({
     inset: 0,
   } as const;
   const rows = [
-    { label: 'Сейчас', value: formatAmount(balance) },
+    { label: 'Зараз', value: formatAmount(balance) },
     { label: 'План', value: formatAmount(goal) },
-    ...(done ? [] : [{ label: 'Осталось', value: formatAmount(remaining) }]),
+    ...(done ? [] : [{ label: 'Залишилось', value: formatAmount(remaining) }]),
   ];
 
   return (
@@ -38,7 +38,7 @@ export function GoalProgressView({
     >
       <Box
         role="img"
-        aria-label={`Выполнено ${percent}%`}
+        aria-label={`Виконано ${percent}%`}
         sx={{ position: 'relative', width: size, height: size, flexShrink: 0 }}
       >
         <CircularProgress
@@ -81,7 +81,7 @@ export function GoalProgressView({
             {percent}%
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            выполнено
+            виконано
           </Typography>
         </Box>
       </Box>
@@ -103,7 +103,7 @@ export function GoalProgressView({
           ))}
         </Box>
         <Typography variant="body2" color="text.secondary">
-          Выполнено {percent}%
+          Виконано {percent}%
         </Typography>
         {done && (
           <Typography
@@ -116,7 +116,7 @@ export function GoalProgressView({
             }}
           >
             <CheckCircleOutlineOutlinedIcon fontSize="small" />
-            План выполнен!
+            План виконано!
           </Typography>
         )}
       </Box>

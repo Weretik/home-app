@@ -22,7 +22,7 @@ public sealed partial class GlobalExceptionHandler(
         var problem = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError,
-            Title = "An unexpected error occurred.",
+            Title = "Сталася неочікувана помилка.",
         };
         problem.Extensions["traceId"] = httpContext.TraceIdentifier;
 

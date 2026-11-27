@@ -41,7 +41,7 @@ added to the file. No speed verdict is given beyond that.
 | --- | --- | --- |
 | Notifications tick | one save: deliveries + outbox messages | unique `deliveries.key`; keys already present are filtered, a racing tick hits the unique index → caught, plans 0 |
 | Outbox `TelegramMessage` | send, then one `ExecuteUpdate` of `sent_at_utc` | a crash between the two resends once (AF-002) |
-| Webhook link / unlink | one insert or one `ExecuteDelete` | unique audience and chat id; a repeat answers «уже подключён» |
+| Webhook link / unlink | one insert or one `ExecuteDelete` | unique audience and chat id; a repeat answers «уже підключено» |
 | Webhook «✅» | `ITodoCompletion`: one save, 3 attempts on a version race | an already closed task answers `AlreadyClosed` |
 | Gift create / update / status / delete | one save with the purchase event | Gifts create keeps its `Idempotency-Key` |
 | `GiftPurchasePlanned` / `Closed` in Todos | one save | upsert by `(source_kind, source_id)` unique; status checks |

@@ -8,7 +8,7 @@ internal sealed class UpdateGiftValidator : AbstractValidator<UpdateGiftCommand>
     public UpdateGiftValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the gift you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого подарунка у заголовку If-Match.");
         RuleFor(c => c.Recipient).IsInEnum();
         RuleFor(c => c.Name).NotEmpty().MaximumLength(Gift.MaxNameLength);
         RuleFor(c => c.CategoryId).NotEmpty();
@@ -19,7 +19,7 @@ internal sealed class UpdateGiftValidator : AbstractValidator<UpdateGiftCommand>
         RuleFor(c => c.Notes).MaximumLength(Gift.MaxNotesLength);
         RuleFor(c => c.Giver).IsInEnum().When(c => c.Giver is not null);
         RuleFor(c => c.Variants).NotNull().Must(v => v.Count <= Gift.MaxVariants)
-            .WithMessage($"A gift has at most {Gift.MaxVariants} variants.");
+            .WithMessage($"У подарунка не більше {Gift.MaxVariants} варіантів.");
         RuleForEach(c => c.Variants).NotNull().SetValidator(new VariantDraftValidator());
     }
 }

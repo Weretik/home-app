@@ -15,7 +15,7 @@ import {
 } from './list-settings-form';
 import { useSaveShoppingSettings, type ShoppingSettings } from './settings-api';
 
-/** «Список»: hours a bought item stays in the cart and the ⭐ Частые window in days (R-13). */
+/** «Список»: hours a bought item stays in the cart and the ⭐ Часті window in days (R-13). */
 export function ListSettingsCard({ settings }: { settings: ShoppingSettings }) {
   const form = useCheckedForm(
     () => listSettingsValues(settings),
@@ -60,7 +60,7 @@ export function ListSettingsCard({ settings }: { settings: ShoppingSettings }) {
         </Typography>
         {form.message && <Alert severity="error">{form.message}</Alert>}
         <TextField
-          label="Сколько часов купленное лежит в корзине"
+          label="Скільки годин куплене лежить у кошику"
           value={values.cartKeepHours}
           onChange={(e) =>
             setValues({ ...values, cartKeepHours: e.target.value })
@@ -68,29 +68,29 @@ export function ListSettingsCard({ settings }: { settings: ShoppingSettings }) {
           error={!!hoursError}
           helperText={
             hoursError ??
-            `Потом уходит в историю. От ${HOURS.min} до ${HOURS.max}`
+            `Потім іде в історію. Від ${HOURS.min} до ${HOURS.max}`
           }
           slotProps={{ htmlInput: { inputMode: 'numeric' } }}
         />
         <TextField
-          label="За сколько дней искать частые"
+          label="За скільки днів шукати часті"
           value={values.frequentDays}
           onChange={(e) =>
             setValues({ ...values, frequentDays: e.target.value })
           }
           error={!!daysError}
           helperText={
-            daysError ?? `Для ⭐ Частые. От ${DAYS.min} до ${DAYS.max}`
+            daysError ?? `Для ⭐ Часті. Від ${DAYS.min} до ${DAYS.max}`
           }
           slotProps={{ htmlInput: { inputMode: 'numeric' } }}
         />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Button type="submit" variant="contained" disabled={save.isPending}>
-            {save.isPending ? 'Сохраняю…' : 'Сохранить'}
+            {save.isPending ? 'Зберігаю…' : 'Зберегти'}
           </Button>
           {saved && (
             <Typography role="status" sx={{ color: 'text.secondary' }}>
-              Сохранено
+              Збережено
             </Typography>
           )}
         </Box>

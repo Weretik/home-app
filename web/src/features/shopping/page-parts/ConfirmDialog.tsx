@@ -19,11 +19,11 @@ interface ConfirmDialogProps {
   onClose: () => void;
 }
 
-/** Asks before something is deleted (design.md: delete always asks, with a red «Удалить»). */
+/** Asks before something is deleted (design.md: delete always asks, with a red «Видалити»). */
 export function ConfirmDialog({
   title,
   summary,
-  consequence = 'Удалится насовсем.',
+  consequence = 'Видалиться назавжди.',
   error,
   isPending,
   onConfirm,
@@ -48,7 +48,7 @@ export function ConfirmDialog({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} disabled={isPending}>
-          Отмена
+          Скасувати
         </Button>
         <Button
           color="error"
@@ -56,7 +56,7 @@ export function ConfirmDialog({
           onClick={onConfirm}
           disabled={isPending}
         >
-          {isPending ? 'Удаляю…' : 'Удалить'}
+          {isPending ? 'Видаляю…' : 'Видалити'}
         </Button>
       </DialogActions>
     </Dialog>

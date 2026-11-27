@@ -13,7 +13,7 @@ interface HistoryMonthProps {
   onDelete: (item: ShoppingItem) => void;
 }
 
-/** One month of the history: «Ноябрь 2026 · 38 покупок», then its day cards, newest first (FR-301, FR-302). */
+/** One month of the history: «Листопад 2026 · 38 покупок», then its day cards, newest first (FR-301, FR-302). */
 export function HistoryMonth({ month, ...actions }: HistoryMonthProps) {
   const titleId = useId();
   return (

@@ -109,21 +109,21 @@ function renderSettings() {
 test('lists departments in order with counts; the fallback cannot be deleted', async () => {
   renderSettings();
 
-  const list = await screen.findByRole('list', { name: 'Отделы' });
+  const list = await screen.findByRole('list', { name: 'Відділи' });
   const rows = await within(list).findAllByRole('listitem');
   expect(rows).toHaveLength(3);
   expect(rows[0]).toHaveTextContent('🥛 Молочка');
-  expect(rows[0]).toHaveTextContent('12 слов · 2 в списке');
+  expect(rows[0]).toHaveTextContent('12 слів · 2 у списку');
   expect(rows[1]).toHaveTextContent('1 слово');
   expect(
-    within(rows[0]!).getByRole('button', { name: 'Выше: Молочка' }),
+    within(rows[0]!).getByRole('button', { name: 'Вище: Молочка' }),
   ).toBeDisabled();
 
   await userEvent.click(
-    within(rows[2]!).getByRole('button', { name: 'Действия: Другое' }),
+    within(rows[2]!).getByRole('button', { name: 'Дії: Другое' }),
   );
   expect(
-    screen.queryByRole('menuitem', { name: 'Удалить' }),
+    screen.queryByRole('menuitem', { name: 'Видалити' }),
   ).not.toBeInTheDocument();
 });
 
@@ -131,23 +131,23 @@ test('moves a department up and adds a new one', async () => {
   const { writes } = renderSettings();
   await screen.findByText('🍞 Хлеб');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Выше: Хлеб' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Вище: Хлеб' }));
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.url.pathname).toBe('/api/shopping/departments/order');
   expect(writes()[0]!.body).toEqual({
     departmentIds: ['d-bread', 'd-dairy', 'd-other'],
   });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить отдел' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Новый отдел' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати відділ' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Новий відділ' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Введите название')).toBeInTheDocument();
-  await userEvent.type(within(dialog).getByLabelText(/Название/), 'Зоотовары');
+  expect(within(dialog).getByText('Введіть назву')).toBeInTheDocument();
+  await userEvent.type(within(dialog).getByLabelText(/Назва/), 'Зоотовары');
   await userEvent.type(within(dialog).getByLabelText('Значок'), '🐱');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -160,11 +160,13 @@ test('deletes a department after asking, with its version', async () => {
   const { writes } = renderSettings();
   await screen.findByText('🍞 Хлеб');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Действия: Хлеб' }));
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Удалить отдел?' });
+  await userEvent.click(screen.getByRole('button', { name: 'Дії: Хлеб' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Видалити відділ?',
+  });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.method).toBe('DELETE');
@@ -174,12 +176,12 @@ test('deletes a department after asking, with its version', async () => {
 
 test('searches keywords, marks learned ones and edits one with its version', async () => {
   const { writes, sent } = renderSettings();
-  const list = await screen.findByRole('list', { name: 'Слова для отделов' });
+  const list = await screen.findByRole('list', { name: 'Слова для відділів' });
   expect((await within(list).findAllByRole('listitem'))[1]).toHaveTextContent(
-    'выучено',
+    'вивчено',
   );
 
-  await userEvent.type(screen.getByLabelText('Поиск'), 'сыр');
+  await userEvent.type(screen.getByLabelText('Пошук'), 'сыр');
   await waitFor(() =>
     expect(sent.some((s) => s.url.searchParams.get('search') === 'сыр')).toBe(
       true,
@@ -187,15 +189,15 @@ test('searches keywords, marks learned ones and edits one with its version', asy
   );
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Действия: сырок глазир' }),
+    screen.getByRole('button', { name: 'Дії: сырок глазир' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Изменить слово' });
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Змінити слово' });
   const word = within(dialog).getByLabelText(/Слово/);
   await userEvent.clear(word);
   await userEvent.type(word, 'Сырок  Глазированный');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.url.pathname).toBe('/api/shopping/keywords/k2');
@@ -209,20 +211,20 @@ test('searches keywords, marks learned ones and edits one with its version', asy
 test('checks and saves the list settings with the version', async () => {
   const { writes } = renderSettings();
   const hours = await screen.findByLabelText(
-    'Сколько часов купленное лежит в корзине',
+    'Скільки годин куплене лежить у кошику',
   );
   expect(hours).toHaveValue('3');
 
   await userEvent.clear(hours);
   await userEvent.type(hours, '100');
-  await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
-  expect(screen.getByText('От 1 до 72')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+  expect(screen.getByText('Від 1 до 72')).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 
   await userEvent.clear(hours);
   await userEvent.type(hours, '6');
-  await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
-  expect(await screen.findByText('Сохранено')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+  expect(await screen.findByText('Збережено')).toBeInTheDocument();
   expect(writes()[0]!.headers.get('If-Match')).toBe('7');
   expect(writes()[0]!.body).toEqual({ cartKeepHours: 6, frequentDays: 183 });
 });
@@ -231,22 +233,22 @@ test('adds a keyword with an Idempotency-Key and the filtered department', async
   const { writes } = renderSettings();
   await screen.findByText('🍞 Хлеб');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить слово' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Новое слово' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати слово' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Нове слово' });
   await userEvent.type(within(dialog).getByLabelText(/Слово/), 'Ё');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Не короче 2 букв')).toBeInTheDocument();
-  expect(within(dialog).getByText('Выберите отдел')).toBeInTheDocument();
+  expect(within(dialog).getByText('Не коротше 2 літер')).toBeInTheDocument();
+  expect(within(dialog).getByText('Виберіть відділ')).toBeInTheDocument();
 
   await userEvent.type(within(dialog).getByLabelText(/Слово/), 'жик');
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: /Отдел/ }),
+    within(dialog).getByRole('combobox', { name: /Відділ/ }),
   );
   await userEvent.click(await screen.findByRole('option', { name: /Хлеб/ }));
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.url.pathname).toBe('/api/shopping/keywords');

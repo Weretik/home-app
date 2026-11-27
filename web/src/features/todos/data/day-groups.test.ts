@@ -5,8 +5,8 @@ const today = '2026-11-26'; // a Thursday
 
 describe('dayHeading', () => {
   it('names the weekday and the month, and the year outside this one', () => {
-    expect(dayHeading('2026-11-30', today)).toBe('Пн, 30 ноября');
-    expect(dayHeading('2027-01-04', today)).toBe('Пн, 4 января 2027');
+    expect(dayHeading('2026-11-30', today)).toBe('Пн, 30 листопада');
+    expect(dayHeading('2027-01-04', today)).toBe('Пн, 4 січня 2027');
   });
 });
 
@@ -25,11 +25,11 @@ describe('groupByDueDay', () => {
     const groups = groupByDueDay(items, today);
 
     expect(groups.map((g) => g.label)).toEqual([
-      'Просрочено',
-      'Сегодня',
+      'Прострочено',
+      'Сьогодні',
       'Завтра',
-      'Пн, 30 ноября',
-      'Без срока',
+      'Пн, 30 листопада',
+      'Без терміну',
     ]);
     expect(groups[0]!.overdue).toBe(true);
     expect(groups[0]!.items.map((i) => i.id)).toEqual(['c', 'f']);
@@ -50,9 +50,9 @@ describe('groupByCompletionDay', () => {
     const groups = groupByCompletionDay(items, today);
 
     expect(groups.map((g) => g.label)).toEqual([
-      'Сегодня',
-      'Вчера',
-      'Пт, 20 ноября',
+      'Сьогодні',
+      'Вчора',
+      'Пт, 20 листопада',
     ]);
     expect(groups[0]!.items.map((i) => i.id)).toEqual(['a', 'b']);
   });

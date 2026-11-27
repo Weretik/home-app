@@ -10,8 +10,8 @@ internal sealed class ReorderDepartmentsValidator : AbstractValidator<ReorderDep
     {
         RuleFor(c => c.DepartmentIds)
             .NotEmpty()
-            .Must(ids => ids.Count <= MaxDepartments).WithMessage($"At most {MaxDepartments} departments.")
-            .Must(ids => ids.Distinct().Count() == ids.Count).WithMessage("Each department is sent once.")
-            .Must(ids => !ids.Contains(Guid.Empty)).WithMessage("A department id is empty.");
+            .Must(ids => ids.Count <= MaxDepartments).WithMessage($"Не більше {MaxDepartments} відділів.")
+            .Must(ids => ids.Distinct().Count() == ids.Count).WithMessage("Кожен відділ має бути в списку один раз.")
+            .Must(ids => !ids.Contains(Guid.Empty)).WithMessage("Ідентифікатор відділу порожній.");
     }
 }

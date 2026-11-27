@@ -19,7 +19,7 @@ export function AmountField({
   value,
   onChange,
   errors,
-  label = 'Сумма',
+  label = 'Сума',
   name = 'amount',
   required = true,
   hint,

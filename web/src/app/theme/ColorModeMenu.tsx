@@ -15,13 +15,13 @@ type Mode = 'light' | 'dark' | 'system';
 
 const systemMode = {
   value: 'system' as Mode,
-  label: 'Как в системе',
+  label: 'Як у системі',
   icon: ContrastIcon,
 };
 
 const modes: { value: Mode; label: string; icon: typeof ContrastIcon }[] = [
-  { value: 'light', label: 'Светлая', icon: LightModeOutlinedIcon },
-  { value: 'dark', label: 'Тёмная', icon: DarkModeOutlinedIcon },
+  { value: 'light', label: 'Світла', icon: LightModeOutlinedIcon },
+  { value: 'dark', label: 'Темна', icon: DarkModeOutlinedIcon },
   systemMode,
 ];
 
@@ -38,7 +38,7 @@ export function ColorModeMenu() {
       <Tooltip title={`Тема: ${current.label.toLowerCase()}`}>
         <IconButton
           color="inherit"
-          aria-label="Тема оформления"
+          aria-label="Тема оформлення"
           aria-haspopup="menu"
           aria-expanded={anchor ? 'true' : undefined}
           onClick={(event) => setAnchor(event.currentTarget)}

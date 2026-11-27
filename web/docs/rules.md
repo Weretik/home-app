@@ -58,7 +58,7 @@ the same change.
 - Server state in React Query, not in component state copies.
 - The app is never indexed: `noindex` in `index.html`, `Disallow: /` in `public/robots.txt`.
 - Mark only problems in lists, with the reason; no "OK" badges.
-- UI text in Russian; layouts work on a phone first.
+- UI text in Ukrainian, words from the [glossary](specs/platform/001-ukrainian-interface/glossary.md); layouts work on a phone first.
 - Every screen follows the [design rules](design.md): theme tokens only, no literal colours outside `app/theme/`,
   both colour schemes, the shell's menus, the card patterns.
 - Nothing secret in `web/`: every `VITE_*` value ends up in the build.
@@ -105,9 +105,9 @@ files, imports, app); `tools/architecture/rules.test.mjs` (part of `npm test`) p
 | Server state in React Query                                                      | review only: copies of server data in component state are not mechanically distinguishable from form state                    |
 | Never indexed                                                                    | structure: `neverIndexed` (`index.html`, `public/robots.txt`)                                                                 |
 | Only problems marked in lists                                                    | review only: wording and design judgement                                                                                     |
-| Russian UI text, phone first                                                     | review only: language and layout judgement; page tests query Russian names                                                    |
+| Ukrainian UI text, phone first                                                   | review only: language and layout judgement; page tests query Ukrainian names                                                  |
 | Theme tokens, no literal colours outside `app/theme/`                            | structure: `noLiteralColours`; the rest of [design.md](design.md) is review only                                              |
-| One interface language: locale only from `src/platform/locale.ts` (`uk-UA`)            | structure: `oneLocale`                                                                                                        |
+| One interface language: locale only from `src/platform/locale.ts` (`uk-UA`)      | structure: `oneLocale`                                                                                                        |
 | Nothing secret in `web/`                                                         | review only: secrets are not recognisable by shape; `.env` and `.env.local` are git-ignored                                   |
 | Pure logic has a test next to it                                                 | structure: `logicHasTests`                                                                                                    |
 | Type check, lint, format, tests, build                                           | CI: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build`                                  |

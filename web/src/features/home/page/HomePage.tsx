@@ -2,19 +2,20 @@ import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { locale } from '../../../platform/locale';
 import { SectionCard } from './SectionCard';
 import { SummarySwitcher } from './SummarySwitcher';
 import { useSummaryParam } from './use-summary-param';
 
-const today = new Intl.DateTimeFormat('ru-RU', {
+const today = new Intl.DateTimeFormat(locale, {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
 });
 
 /**
- * Главная: one section's summary at a time, picked with the switcher (`?s=`). Today «Бюджет» and «Подарки» have one; the
- * others join through `summary-sections.ts`. The service pages «Состояние» and «Телеграм» are linked below for phones,
+ * Головна: one section's summary at a time, picked with the switcher (`?s=`). Today «Бюджет» and «Подарунки» have one; the
+ * others join through `summary-sections.ts`. The service pages «Стан» and «Телеграм» are linked below for phones,
  * which have no side menu.
  */
 export function HomePage() {
@@ -25,7 +26,7 @@ export function HomePage() {
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
       <Box>
         <Typography variant="h4" component="h1">
-          Главная
+          Головна
         </Typography>
         <Typography
           color="text.secondary"
@@ -53,15 +54,15 @@ export function HomePage() {
           to="/status"
           color="primary"
           icon={MonitorHeartOutlinedIcon}
-          title="Состояние"
-          caption="Работают ли сервер и база"
+          title="Стан"
+          caption="Чи працюють сервер і база"
         />
         <SectionCard
           to="/notifications"
           color="secondary"
           icon={TelegramIcon}
           title="Телеграм"
-          caption="Бот: чаты, расписание, отправки"
+          caption="Бот: чати, розклад, надсилання"
         />
       </Box>
     </Box>

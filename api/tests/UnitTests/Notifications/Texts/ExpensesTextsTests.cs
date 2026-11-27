@@ -21,10 +21,10 @@ public sealed class ExpensesTextsTests
 
         var text = ExpensesTexts.Week(week, November, "https://web.example/expenses/forecast");
 
-        Assert.StartsWith("📊 <b>Расходы за неделю</b> 23.11–29.11\nВсего: <b>9 870 ₴</b> (14 зап.)\nМаша — 9 870 ₴\n", text);
+        Assert.StartsWith("📊 <b>Витрати за тиждень</b> 23.11–29.11\nУсього: <b>9 870 ₴</b> (14 зап.)\nМаша — 9 870 ₴\n", text);
         Assert.Contains("• Продукты — 6 000 ₴", text);
-        Assert.Contains("из 50 000 ₴ (90%)", text);
-        Assert.Contains("⚠️ Лимиты: Продукты — 90%", text);
+        Assert.Contains("з 50 000 ₴ (90%)", text);
+        Assert.Contains("⚠️ Ліміти: Продукты — 90%", text);
         Assert.DoesNotContain("Одежда", text);
     }
 
@@ -33,10 +33,10 @@ public sealed class ExpensesTextsTests
     {
         var text = ExpensesTexts.Month(November, "https://web.example/expenses/forecast");
 
-        Assert.StartsWith("🗓 <b>Итоги за ", text);
-        Assert.Contains("➡️ Итог месяца: <b>+37 499,50 ₴</b>", text);
-        Assert.Contains("🐷 Копилка: +5 000 ₴ за месяц, всего 25 000 ₴ из 100 000 ₴", text);
-        Assert.Contains("⚠️ Продукты: 13 500 ₴ из 15 000 ₴ (90%)", text);
-        Assert.Contains("✅ Одежда (кв.): 2 000 ₴ из 10 000 ₴ (20%)", text);
+        Assert.StartsWith("🗓 <b>Підсумки за ", text);
+        Assert.Contains("➡️ Підсумок місяця: <b>+37 499,50 ₴</b>", text);
+        Assert.Contains("🐷 Скарбничка: +5 000 ₴ за місяць, усього 25 000 ₴ з 100 000 ₴", text);
+        Assert.Contains("⚠️ Продукты: 13 500 ₴ з 15 000 ₴ (90%)", text);
+        Assert.Contains("✅ Одежда (кв.): 2 000 ₴ з 10 000 ₴ (20%)", text);
     }
 }

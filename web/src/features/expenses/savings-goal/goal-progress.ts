@@ -9,7 +9,7 @@ export interface GoalProgress {
 
 /**
  * How much of the savings goal the jar holds, in whole percent rounded down (100 only once the goal is reached), never
- * below 0, 0 without a goal. The home summary's «Копилка» card uses the same rule (`goalPercentOf` in
+ * below 0, 0 without a goal. The home summary's «Скарбничка» card uses the same rule (`goalPercentOf` in
  * `home/expenses-summary/data/money.ts`); features never import each other, so both sides test the same cases.
  */
 export const goalPercent = (balance: number, goal: number) =>

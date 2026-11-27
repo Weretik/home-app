@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { titleError } from '../task-dialog/task-form';
 
 /**
- * «Добавить шаг»: Enter or the plus adds it, the field clears and keeps focus. It is not a form of its own (the dialog
+ * «Додати крок»: Enter or the plus adds it, the field clears and keeps focus. It is not a form of its own (the dialog
  * is one), so Enter is caught here instead of saving the task.
  */
 export function AddStepField({
@@ -32,7 +32,7 @@ export function AddStepField({
       <TextField
         size="small"
         fullWidth
-        placeholder="Добавить шаг"
+        placeholder="Додати крок"
         value={title}
         error={Boolean(error)}
         helperText={error}
@@ -47,13 +47,13 @@ export function AddStepField({
           }
         }}
         slotProps={{
-          htmlInput: { 'aria-label': 'Новый шаг', enterKeyHint: 'done' },
+          htmlInput: { 'aria-label': 'Новий крок', enterKeyHint: 'done' },
         }}
       />
-      <Tooltip title="Добавить шаг">
+      <Tooltip title="Додати крок">
         <span>
           <IconButton
-            aria-label="Добавить шаг"
+            aria-label="Додати крок"
             onClick={add}
             disabled={disabled}
           >

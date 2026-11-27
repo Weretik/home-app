@@ -36,13 +36,13 @@ export function ForecastCard({ summary }: { summary: MonthSummary }) {
           component={Link}
           to={`/expenses/forecast?year=${summary.year}&month=${summary.month}`}
         >
-          Открыть план
+          Відкрити план
         </Button>
       </Box>
       {summary.forecast.planned === 0 && (
         <Typography variant="body2" color="text.secondary">
-          На месяц ничего не запланировано: прогноз равен тому, что уже
-          потрачено.
+          На місяць нічого не заплановано: прогноз дорівнює тому, що вже
+          витрачено.
         </Typography>
       )}
       <List dense aria-label={title}>
