@@ -19,7 +19,7 @@ export function SearchField({
       label="Пошук"
       value={text}
       onChange={(event) => setText(event.target.value)}
-      sx={{ minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 240px' } }}
+      sx={{ minWidth: 0, flex: { xs: '1 1 40%', sm: '0 1 240px' } }}
       slotProps={{
         input: {
           startAdornment: (

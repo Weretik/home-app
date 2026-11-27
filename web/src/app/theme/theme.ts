@@ -1,6 +1,7 @@
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import { createTheme } from '@mui/material/styles';
 import { darkScheme, fonts, lightScheme } from './palette';
+import { phoneOverrides } from './phone-overrides';
 
 const heading = { fontFamily: fonts.heading, fontWeight: 700 };
 
@@ -24,7 +25,11 @@ export const theme = createTheme({
     button: { fontWeight: 600, textTransform: 'none' },
   },
   components: {
-    MuiButton: { defaultProps: { disableElevation: true } },
+    ...phoneOverrides,
+    MuiButton: {
+      ...phoneOverrides.MuiButton,
+      defaultProps: { disableElevation: true },
+    },
     MuiTextField: { defaultProps: { fullWidth: true, size: 'small' } },
     MuiCard: {
       defaultProps: { elevation: 0 },

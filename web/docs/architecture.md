@@ -20,7 +20,8 @@ src/
   main.tsx        entry: router and providers
   app/
     root/         routes and providers (theme, React Query)
-    theme/        palette, theme, light/dark/system switch (docs/design.md)
+    theme/        palette, theme, phone and touch overrides (web ADR 0020), light/dark/system switch
+                  (docs/design.md)
     shell/        frame/ the layout and header; navigation/ side menu, bottom bar with the «Ще» sheet, the list of
                   sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey

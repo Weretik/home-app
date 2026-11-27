@@ -1,12 +1,10 @@
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ExpenseItem } from '../data/expenses-api';
 import { formatAmount, formatDay } from '../data/formatting';
 import { payerLabels, paymentMethodLabels } from '../data/labels';
 import { RowActions } from '../entry-dialogs/RowActions';
+import { CompactRow } from '../month-view/CompactRow';
 import { OutsideLimitsChip } from './OutsideLimitsChip';
 import type { RowHandlers } from '../entry-editing/use-entry-editor';
 
@@ -24,52 +22,40 @@ export function ExpenseList({
   return (
     <List disablePadding aria-label={label}>
       {items.map((item, index) => (
-        <ListItem
+        <CompactRow
           key={item.id}
           divider={index < items.length - 1}
-          sx={{ alignItems: 'flex-start', gap: 2, py: 1.25 }}
-        >
-          <ListItemText
-            sx={{ my: 0, minWidth: 0 }}
-            primary={
-              <>
-                {item.categoryName}
-                {item.outsideLimits && <OutsideLimitsChip />}
-              </>
-            }
-            secondary={
-              <>
-                {formatDay(item.date)} · {payerLabels[item.payer]} ·{' '}
-                {paymentMethodLabels[item.paymentMethod]}
-                {item.comment && (
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{ display: 'block', overflowWrap: 'anywhere' }}
-                  >
-                    {item.comment}
-                  </Typography>
-                )}
-              </>
-            }
-          />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography
-              sx={{
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {formatAmount(item.amount)}
-            </Typography>
+          title={
+            <>
+              {item.categoryName}
+              {item.outsideLimits && <OutsideLimitsChip />}
+            </>
+          }
+          amount={formatAmount(item.amount)}
+          actions={
             <RowActions
               label={`${item.categoryName}, ${formatAmount(item.amount)}`}
               onEdit={() => onEdit(item)}
               onDelete={() => onDelete(item)}
             />
-          </Box>
-        </ListItem>
+          }
+          details={
+            <>
+              {formatDay(item.date)} · {payerLabels[item.payer]} ·{' '}
+              {paymentMethodLabels[item.paymentMethod]}
+              {item.comment && (
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="text.primary"
+                  sx={{ display: 'block' }}
+                >
+                  {item.comment}
+                </Typography>
+              )}
+            </>
+          }
+        />
       ))}
     </List>
   );

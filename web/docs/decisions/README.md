@@ -25,6 +25,7 @@ Next.js storefront.
 | 0017 | [«Про нас»: a section of its own with person tabs, «about me» first](0017-notes-section-person-tabs-me-first.md)                              |
 | 0018 | [A limit change says from which month it applies](0018-limit-change-applies-from-a-month.md)                                                  |
 | 0019 | [The phone's bottom bar ends with «Ще»: a sheet with every other page](0019-phone-more-sheet-in-the-bottom-bar.md)                            |
+| 0020 | [Phone: 44px tap targets in the theme, rows that never squeeze, room for the keyboard](0020-phone-touch-targets-and-keyboard.md)              |
 
 ## Decisions that must have a record
 
