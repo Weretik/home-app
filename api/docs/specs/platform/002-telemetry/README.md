@@ -18,7 +18,7 @@ SDD template (Weretik/obsidian `Templates/backend-sdd`), condensed: no contract,
 | FR-002 | When it is not set (local runs, tests, CI), nothing is registered and nothing is sent. |
 | FR-003 | `/health` requests are not traced. |
 | FR-004 | No request or response bodies and no family data are added to telemetry; only what the instrumentation and the existing log messages record. |
-| FR-005 | Free alerts: an uptime job on `/health` every 5 minutes with e-mail on failure; smart detection e-mails; a 0.1 GB daily cap ([deploy guide](../../../../../docs/deploy.md#telemetry-and-alerts)). |
+| FR-005 | Free alerts: an uptime job on `/health` every 15 minutes with e-mail after two failures; a 0.1 GB daily cap (smart detection e-mails optional, not set up) ([deploy guide](../../../../../docs/deploy.md#telemetry-and-alerts)). |
 | FR-006 | The deploy guide has the queries that read PERF1 and PERF2; the measured values go into the quality targets with a date. |
 
 ## Design
