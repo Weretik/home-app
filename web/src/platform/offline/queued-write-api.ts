@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { ApiError, apiCall } from '../../api-client';
+import { markOffline } from '../client/connectivity';
 import { api } from '../client/api';
 import { moduleKeys } from '../client/query-client';
 import { recordRefused } from './network-status';
@@ -67,9 +68,15 @@ export async function sendQueuedRequest(
   }
 }
 
-/** Retries a network failure until it passes, a server error three times; a refusal (4xx) never. */
+/**
+ * Retries a network failure until it passes (counting the app offline, so the write pauses until the network is
+ * back), a server error three times; a refusal (4xx) never.
+ */
 export function retryQueuedWrite(failureCount: number, error: Error): boolean {
-  if (!(error instanceof ApiError)) return true;
+  if (!(error instanceof ApiError)) {
+    markOffline();
+    return true;
+  }
   return error.status >= 500 && failureCount < 3;
 }
 

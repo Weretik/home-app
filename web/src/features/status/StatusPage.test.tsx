@@ -42,5 +42,7 @@ test('shows the API status and each check', async () => {
 test('says when the API cannot be reached', async () => {
   renderPage(() => Promise.reject(new TypeError('Failed to fetch')));
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('Failed to fetch');
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Немає звʼязку з сервером',
+  );
 });

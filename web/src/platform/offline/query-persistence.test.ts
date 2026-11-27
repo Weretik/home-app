@@ -42,15 +42,18 @@ test('keeps data for 7 days, versioned by the API contract', () => {
   expect(persistence?.buster).toBe('hash-1');
 });
 
-test('keeps only successful queries and paused queued writes', () => {
-  const query = (status: string) => ({ state: { status } }) as unknown as Query;
+test('keeps every query with data, also after a failed refresh, and paused queued writes', () => {
+  const query = (status: string, data?: unknown) =>
+    ({ state: { status, data } }) as unknown as Query;
   const mutation = (key: string[], isPaused: boolean) =>
     ({
       options: { mutationKey: key },
       state: { isPaused },
     }) as unknown as Mutation;
 
-  expect(shouldKeepQuery(query('success'))).toBe(true);
+  expect(shouldKeepQuery(query('success', { items: [] }))).toBe(true);
+  // A polled list whose last refresh failed offline still has its data.
+  expect(shouldKeepQuery(query('error', { items: [] }))).toBe(true);
   expect(shouldKeepQuery(query('error'))).toBe(false);
   expect(shouldKeepQuery(query('pending'))).toBe(false);
   expect(shouldKeepMutation(mutation(['queued-write', 'shopping'], true))).toBe(

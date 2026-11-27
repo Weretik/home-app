@@ -32,9 +32,11 @@ export function indexedDbStorage(): CacheStorage | undefined {
   };
 }
 
-/** Only data that loaded: a failed or pending query is not worth showing offline. */
-export const shouldKeepQuery = (query: Query) =>
-  query.state.status === 'success';
+/**
+ * Every query that has data, also one whose last refresh failed (a list that polls keeps its data after a failed
+ * poll); a query that never loaded has nothing to show offline.
+ */
+export const shouldKeepQuery = (query: Query) => query.state.data !== undefined;
 
 /** Only queued writes that wait for the network; other mutations are never replayed. */
 export const shouldKeepMutation = (mutation: Mutation) =>

@@ -1,24 +1,40 @@
-import { ApiError } from '../../api-client';
-import { QueryClient } from '@tanstack/react-query';
+import { ApiError, NetworkError } from '../../api-client';
+import { MutationCache, QueryClient } from '@tanstack/react-query';
+import { markOffline } from './connectivity';
 
 /** How long unused data stays in memory: as long as it is kept for offline use (web ADR 0022). */
 export const QUERY_GC_TIME = 7 * 24 * 60 * 60 * 1000;
 
 /**
- * Retries only failures that may pass on their own; a 4xx answer will not change on retry. Data stays a week, so the
+ * A read that got no answer counts the app offline and waits for the network, keeping the data it has (no error is
+ * shown); otherwise only failures that may pass on their own are retried, as a 4xx answer will not change on retry.
+ */
+export function retryRead(failureCount: number, error: Error): boolean {
+  if (error instanceof NetworkError) {
+    markOffline();
+    return true;
+  }
+  return !(error instanceof ApiError && error.status < 500) && failureCount < 2;
+}
+
+/**
+ * Reads retry by {@link retryRead}; a write that got no answer also counts the app offline. Data stays a week, so the
  * offline cache can show it. Writes fail at once offline (`networkMode: 'always'`) unless they are queued writes
  * (src/platform/offline), which pause until the network is back.
  */
 export function createQueryClient(): QueryClient {
   return new QueryClient({
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        if (error instanceof NetworkError) markOffline();
+      },
+    }),
     defaultOptions: {
       mutations: { networkMode: 'always' },
       queries: {
         staleTime: 30_000,
         gcTime: QUERY_GC_TIME,
-        retry: (failureCount, error) =>
-          !(error instanceof ApiError && error.status < 500) &&
-          failureCount < 2,
+        retry: retryRead,
       },
     },
   });
