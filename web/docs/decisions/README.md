@@ -19,6 +19,7 @@ Next.js storefront.
 | 0011 | [Todos: a grouped list with quick add, an optimistic done tick, steps saved at once](0011-todos-grouped-list-quick-add-optimistic-done.md)    |
 | 0012 | [A live shared list: optimistic ticks, polling and «кто я» per device](0012-live-shared-list-with-optimistic-ticks-and-polling.md)            |
 | 0013 | [A deep link opens one record: `?gift=<id>`](0013-deep-link-opens-a-record.md)                                                                |
+| 0014 | [The interface is Ukrainian, strings in place, one locale constant](0014-ukrainian-interface.md) |
 
 ## Decisions that must have a record
 

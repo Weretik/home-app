@@ -8,6 +8,7 @@ import {
   logicHasTests,
   noLiteralColours,
   oneComponentPerFile,
+  oneLocale,
 } from './file-rules.mjs';
 import {
   folderShape,
@@ -37,6 +38,7 @@ export const treeRules = [
   clientInstanceOnlyFromDataAccess,
   apiClientThroughItsIndex,
   noLiteralColours,
+  oneLocale,
   logicHasTests,
 ];
 

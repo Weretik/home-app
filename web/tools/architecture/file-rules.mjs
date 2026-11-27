@@ -94,6 +94,21 @@ export function noLiteralColours(tree) {
 }
 
 /**
+ * One interface language (docs/decisions/0014-ukrainian-interface.md): no locale literal such as `'ru-RU'` or `'uk'`
+ * outside `src/platform/locale.ts`; `Intl` and `localeCompare` take `locale` from there.
+ */
+export function oneLocale(tree) {
+  const literal = /['"`](?:ru|uk|en)(?:-[A-Z]{2})?['"`]/;
+  return production(tree)
+    .filter((file) => file.path !== 'src/platform/locale.ts')
+    .filter((file) => literal.test(file.text))
+    .map(
+      (file) =>
+        `${file.path}: a locale literal; import \`locale\` from src/platform/locale.ts`,
+    );
+}
+
+/**
  * Logic is tested first (docs/rules.md, "Tests and checks"): a feature module with pure logic — a `.ts` file that is
  * not a hook (`use-*.ts`), not data access (`*-api.ts`) and exports a function — has a test next to it.
  */

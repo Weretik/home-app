@@ -9,6 +9,7 @@ import {
   logicHasTests,
   noLiteralColours,
   oneComponentPerFile,
+  oneLocale,
 } from './file-rules.mjs';
 import {
   folderShape,
@@ -191,6 +192,19 @@ describe('files', () => {
           'src/features/a/Card.tsx': "const c = 'rgba(0, 0, 0, 0.1)';",
         }),
       ),
+    ).toHaveLength(1);
+  });
+
+  test('the locale only in platform/locale.ts', () => {
+    const uk = "export const locale = 'uk-UA';\n";
+    expect(oneLocale(treeOf({ 'src/platform/locale.ts': uk }))).toEqual([]);
+    expect(
+      oneLocale(
+        treeOf({ 'src/features/a/format.ts': "new Intl.NumberFormat('ru-RU');" }),
+      ),
+    ).toHaveLength(1);
+    expect(
+      oneLocale(treeOf({ 'src/features/a/sort.ts': "a.localeCompare(b, 'ru');" })),
     ).toHaveLength(1);
   });
 
