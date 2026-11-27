@@ -96,7 +96,8 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 - Sign-in with Google for the family, in the Identity module ([ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md),
   [module page](../modules/identity.md)): every endpoint needs a session (`Authorization: Bearer`) through the
   authorization fallback policy; the few anonymous endpoints say `AllowAnonymous` in their own file and are listed in
-  `AuthorizationRulesTests`. A `GET` with the scheduler key reads as the read-only service `scheduler` (deploy checks).
+  `AuthorizationRulesTests`. A `GET` with the deploy check key (`X-Deploy-Check-Key`) reads as the read-only service `deploy-check`;
+  the scheduler key reads nothing ([ADR 0045](../decisions/0045-separate-deploy-check-key.md)).
   The open period of [ADR 0015](../decisions/0015-expenses-open-until-identity.md) is over.
 - Edits of shared rows are guarded by a row version (`xmin`, `If-Match`)
   ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).
@@ -104,6 +105,7 @@ For example `POST /api/shopping/items` once the Shopping module exists:
   OpenAPI document ([ADR 0014](../decisions/0014-one-time-sheet-import.md)).
 - CORS allows only the origins in `Cors:Origins` (the web app). The session travels in a header, not a cookie.
 - The outbox tick and the notifications tick need the shared scheduler key (`X-Scheduler-Key`), compared in constant time,
-  and are hidden from the OpenAPI document. They are called by the GitHub Actions cron ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md)).
+  and are hidden from the OpenAPI document. They are called by cron-job.org, with the GitHub Actions cron as a backup
+  ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md), [ADR 0043](../decisions/0043-external-cron-and-scheduler-heartbeat.md)). The key only runs the ticks.
 - The Telegram webhook checks `X-Telegram-Bot-Api-Secret-Token`, derived from the bot token and compared in constant
   time; without a token it answers `404` ([ADR 0033](../decisions/0033-notifications-module-and-telegram-webhook.md)).

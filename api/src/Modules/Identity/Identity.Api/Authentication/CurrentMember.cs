@@ -7,7 +7,7 @@ namespace Identity.Api.Authentication;
 
 /// <summary>
 /// <see cref="ICurrentMember"/> over the principal the session handler set for this request (ADR 0040). The person
-/// comes from the allowlist order (ADR 0038); the scheduler key and a request-less scope have no member.
+/// comes from the allowlist order (ADR 0038); the deploy check key and a request-less scope have no member.
 /// </summary>
 internal sealed class CurrentMember(IHttpContextAccessor http, IdentitySettings settings) : ICurrentMember
 {

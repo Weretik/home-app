@@ -59,7 +59,7 @@ at most one write an hour per session; a note with these numbers was added to th
 
 | ID | Severity | Finding | Evidence | Status |
 | --- | --- | --- | --- | --- |
-| AF-001 | Medium | The scheduler key now also reads every section; a leaked `SCHEDULER_KEY` exposes the data read-only. | `SchedulerKeyAuthenticationHandler` | accepted: needed for the deploy smoke checks (root ADR 0005); the key was already a production secret in two places only; recorded in ADR 0037 "Consequences". |
+| AF-001 | Medium | The scheduler key now also reads every section; a leaked `SCHEDULER_KEY` exposes the data read-only. | `SchedulerKeyAuthenticationHandler` | accepted: needed for the deploy smoke checks (root ADR 0005); the key was already a production secret in two places only; recorded in ADR 0037 "Consequences". Resolved 2026-11-27 by ADR 0045: the deploy reads with its own `DEPLOY_CHECK_KEY`, the scheduler key reads nothing. |
 | AF-002 | Medium | The web app keeps the session token in `localStorage`, readable by any script on the site. | web ADR 0015 | accepted: cross-site cookies are blocked between the two Azure hosts; the site runs only its bundle and Google's script; sign-out and the allowlist end a stolen session. |
 | AF-003 | Low | Personal data: e-mail, name and picture URL of the two members are stored per session. | `identity.sessions` | accepted: needed to show who is signed in; ended sessions are deleted 30 days later at the next sign-in (R-012); nothing else is kept. |
 | AF-004 | Low | Sessions of a member who never signs in again are not cleaned up. | `SignInHandler` | accepted: at most a few rows per device of two people; no background work on the free tier (ADR 0006). |

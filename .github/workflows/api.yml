@@ -163,14 +163,16 @@ jobs:
       # /health only proves the app and the database are up. Every section page reads one of these endpoints, so a 500
       # in any module (a bad setting, a missing migration, an outside call that throws) fails the deploy instead of
       # showing «Не удалось загрузить» on the site (docs/decisions/0005-post-deploy-smoke-reads-every-section.md).
-      # Every section needs a signed-in member since ADR 0037 (api/docs); the deploy reads them with the scheduler key,
-      # which a GET accepts as the read-only service «scheduler».
+      # Every section needs a signed-in member since ADR 0037 (api/docs); the deploy reads them with its own deploy check
+      # key, which a GET accepts as the read-only service «deploy-check». The scheduler key only runs the ticks and
+      # must read nothing (api/docs/decisions/0045).
       - name: Smoke test the read endpoint of every section
         env:
+          DEPLOY_CHECK_KEY: ${{ secrets.DEPLOY_CHECK_KEY }}
           SCHEDULER_KEY: ${{ secrets.SCHEDULER_KEY }}
         run: |
-          if [ -z "$SCHEDULER_KEY" ]; then
-            echo "::error::Secret SCHEDULER_KEY is not set (see docs/deploy.md); the sections cannot be read without it."
+          if [ -z "$DEPLOY_CHECK_KEY" ]; then
+            echo "::error::Secret DEPLOY_CHECK_KEY is not set (see docs/deploy.md); the sections cannot be read without it."
             exit 1
           fi
           year=$(date -u +%Y); month=$(date -u +%-m)
@@ -187,10 +189,16 @@ jobs:
             /api/notifications/status \
             /api/notifications/push; do
             code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 \
-              -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL$path" || echo 000)
+              -H "X-Deploy-Check-Key: $DEPLOY_CHECK_KEY" "$APP_URL$path" || echo 000)
             echo "$code $path"
             if [ "$code" != "200" ]; then failed=1; fi
           done
+          if [ -n "$SCHEDULER_KEY" ]; then
+            code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 \
+              -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL/api/todos/summary" || echo 000)
+            echo "$code /api/todos/summary with the scheduler key (must be 401)"
+            if [ "$code" != "401" ]; then failed=1; fi
+          fi
           exit $failed
 
       # Digests only go out when an outside scheduler calls the tick (cron-job.org, GitHub cron as a backup). GitHub
@@ -198,9 +206,9 @@ jobs:
       # A warning, not a failure: right after a first deploy no tick has come yet (api/docs/decisions/0043).
       - name: Scheduler heartbeat
         env:
-          SCHEDULER_KEY: ${{ secrets.SCHEDULER_KEY }}
+          DEPLOY_CHECK_KEY: ${{ secrets.DEPLOY_CHECK_KEY }}
         run: |
-          body=$(curl --silent --max-time 60 -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL/api/notifications/status" || true)
+          body=$(curl --silent --max-time 60 -H "X-Deploy-Check-Key: $DEPLOY_CHECK_KEY" "$APP_URL/api/notifications/status" || true)
           echo "$body" | grep -o '"lastTickAtUtc":[^,]*' || true
           if echo "$body" | grep -q '"schedulerSilent":true'; then
             echo "::warning::No scheduler tick for over an hour: digests are not going out. Check the cron-job.org jobs (docs/deploy.md)."

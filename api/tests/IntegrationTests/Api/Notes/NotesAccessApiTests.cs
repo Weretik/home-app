@@ -6,7 +6,7 @@ using static IntegrationTests.Api.Notes.NoteRequests;
 namespace IntegrationTests.Api.Notes;
 
 /// <summary>
-/// Notes are family data: nothing without a session, the scheduler key only reads (R-014, SC-007). The identity
+/// Notes are family data: nothing without a session, the deploy check key only reads (R-014, SC-007). The identity
 /// sweeps (<c>IdentityProtectionApiTests</c>) also cover both reads, since they enumerate every GET of the contract.
 /// </summary>
 [Collection(ApiCollection.Name)]
@@ -40,11 +40,11 @@ public sealed class NotesAccessApiTests(ApiFactory api)
     }
 
     [SkippableFact]
-    public async Task The_SchedulerKey_ReadsTheNotes_ButCannotCreateOne()
+    public async Task The_DeployCheckKey_ReadsTheNotes_ButCannotCreateOne()
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);
         using var deploy = api.CreateAnonymousClient();
-        deploy.DefaultRequestHeaders.Add("X-Scheduler-Key", ApiFactory.TickKey);
+        deploy.DefaultRequestHeaders.Add("X-Deploy-Check-Key", ApiFactory.DeployCheckKey);
 
         Assert.Equal(HttpStatusCode.OK, (await deploy.GetAsync("/api/notes/items")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await deploy.GetAsync("/api/notes/categories")).StatusCode);

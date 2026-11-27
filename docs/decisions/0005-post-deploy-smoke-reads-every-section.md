@@ -1,6 +1,6 @@
 # 0005. Tests use real-format secrets, outside clients run for real, and the deploy reads every section
 
-**Status:** accepted, 2026-11-27; amended 2026-11-27 by [API ADR 0037](../../api/docs/decisions/0037-google-sign-in-with-server-sessions.md) (reads with the scheduler key)
+**Status:** accepted, 2026-11-27; amended 2026-11-27 by [API ADR 0037](../../api/docs/decisions/0037-google-sign-in-with-server-sessions.md) (reads with the scheduler key) and 2026-11-27 by [API ADR 0045](../../api/docs/decisions/0045-separate-deploy-check-key.md) (its own deploy check key)
 
 ## Context
 
@@ -42,3 +42,10 @@ Since sign-in ([API ADR 0037](../../api/docs/decisions/0037-google-sign-in-with-
 answers `401` without a session. The smoke test sends `X-Scheduler-Key` with the GitHub secret `SCHEDULER_KEY`; a
 `GET` with that key reads as the read-only service `scheduler`. A last step checks that the API answers `401` without
 a session and that sign-in is configured (a made-up Google token gets `401`, not `409`).
+
+## Amendment, 2026-11-27: its own key
+
+The scheduler key is also stored in cron-job.org, so it no longer reads anything ([API ADR
+0045](../../api/docs/decisions/0045-separate-deploy-check-key.md)). The smoke test sends `X-Deploy-Check-Key` with the
+GitHub secret `DEPLOY_CHECK_KEY` (= App Service `DeployCheck__Key`); a `GET` with it reads as the read-only service
+`deploy-check`. It also checks that the scheduler key gets `401` on a read.

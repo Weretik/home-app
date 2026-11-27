@@ -22,7 +22,8 @@ Settings → Secrets and variables → Actions:
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | portal: Static Web App `home-web` → Overview → Manage deployment token |
 | `VITE_API_URL` | variable, optional | the API address; when not set, the address above is used |
 | `DATABASE_CONNECTION_STRING` | secret of the `production` environment | the same string as the App Service's `ConnectionStrings__Database`; the deploy job applies migrations with it |
-| `SCHEDULER_KEY` | secret | a long random value, the same as the App Service's `OutboxTick__Key`; the `scheduler.yml` cron sends it every 15 minutes. Until it is set the cron only prints a notice ([ADR 0034](../api/docs/decisions/0034-scheduler-github-actions-cron.md)). The deploy also reads every section with it ([ADR 0037](../api/docs/decisions/0037-google-sign-in-with-server-sessions.md)), so the deploy fails without it |
+| `SCHEDULER_KEY` | secret | a long random value, the same as the App Service's `OutboxTick__Key`; the `scheduler.yml` cron sends it every 15 minutes. Until it is set the cron only prints a notice ([ADR 0034](../api/docs/decisions/0034-scheduler-github-actions-cron.md)). It runs the ticks only and reads nothing ([ADR 0045](../api/docs/decisions/0045-separate-deploy-check-key.md)) |
+| `DEPLOY_CHECK_KEY` | secret | another long random value (`openssl rand -hex 32`), the same as the App Service's `DeployCheck__Key`, never given to cron-job.org; the deploy reads every section with it, so the deploy fails without it ([ADR 0045](../api/docs/decisions/0045-separate-deploy-check-key.md)) |
 | `VITE_GOOGLE_CLIENT_ID` | variable | the Google OAuth client id ([below](#sign-in-with-google)); public, it ends up in the JS |
 
 The API deploys through OIDC: GitHub gets a short-lived Azure token, with no passwords or publish profile (basic auth on
@@ -61,6 +62,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `ConnectionStrings__Database` | PostgreSQL connection string | once the database is chosen |
 | `Expenses__Import__Key` | long random value | normally never: the sheet is imported on a local API and the rows reach production as a SQL script; set it only for a direct import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
 | `OutboxTick__Key` | long random value, equal to the GitHub secret `SCHEDULER_KEY` | for the outbox and the Telegram bot; without it both ticks answer `404` |
+| `DeployCheck__Key` | long random value, equal to the GitHub secret `DEPLOY_CHECK_KEY`, different from `OutboxTick__Key` | always; the deploy's read checks use it, and without it the deploy fails |
 | `Telegram__BotToken` | the token from @BotFather | for the Telegram bot; empty means the bot is off and the webhook answers `404` |
 | `WebPush__PublicKey`, `WebPush__PrivateKey` | the VAPID key pair ([below](#push-notifications)) | for push notifications; without them push is off and the «Сповіщення» page says so |
 | `Identity__Google__ClientId` | the Google OAuth client id ([below](#sign-in-with-google)) | always; without it nobody can sign in and the site stays closed |
