@@ -5,6 +5,7 @@ using Shopping.Api;
 using Gifts.Api;
 using Host.Api.Composition;
 using Identity.Api;
+using Notes.Api;
 using Notifications.Api;
 using Todos.Api;
 
@@ -25,6 +26,7 @@ builder.Services.AddExpensesModule(builder.Configuration);
 builder.Services.AddShoppingModule(builder.Configuration);
 builder.Services.AddGiftsModule(builder.Configuration);
 builder.Services.AddTodosModule(builder.Configuration);
+builder.Services.AddNotesModule(builder.Configuration);
 builder.Services.AddNotificationsModule(builder.Configuration);
 
 var app = builder.Build();
@@ -46,6 +48,7 @@ app.MapExpensesModule();
 app.MapShoppingModule();
 app.MapGiftsModule();
 app.MapTodosModule();
+app.MapNotesModule();
 app.MapNotificationsModule();
 
 await app.RunAsync();

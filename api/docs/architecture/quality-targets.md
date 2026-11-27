@@ -31,3 +31,7 @@ against these targets in its SDD.
 - Sign-in (ADR 0037) adds one indexed lookup of `identity.sessions` by token hash to every protected request, and at
   most one update an hour per session; at two users this stays far inside the read target. `identity.sessions` holds
   a few rows per device; ended ones are deleted 30 days later at the member's next sign-in.
+- Notes (ADR 0039): hundreds of notes and about ten categories in total. The list is one query (a left join to the
+  category, filters, word search by `LIKE` without an index, `Take(1000)`) and the category list one query with a
+  per-category count; at these volumes a sequential scan stays far inside the read target. Measure before adding a
+  trigram index or paging.

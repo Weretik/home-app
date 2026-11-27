@@ -1,3 +1,4 @@
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -6,6 +7,7 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import { Link as RouterLink } from 'react-router-dom';
 import type { FamilyPerson } from '../../../platform/member-api';
 import { useCurrentMember, useSignOut } from '../data/identity-api';
 import { MemberAvatar } from '../member/MemberAvatar';
@@ -18,7 +20,7 @@ const personLabels: Record<FamilyPerson, string> = {
 
 /**
  * «Профіль» (identity 002 FR-004): the Google picture and name, the e-mail, who the member is in the home, the
- * Telegram chat and «Вийти». Links to other sections (such as the notes about each other) go after Telegram.
+ * Telegram chat, the link to «Про нас» (notes 001 FR-008) and «Вийти». Links to other sections go after Telegram.
  */
 export function ProfilePage() {
   const { data: member } = useCurrentMember();
@@ -69,6 +71,30 @@ export function ProfilePage() {
           </Box>
           <Divider />
           <TelegramRow person={person} />
+          <Divider />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'wrap',
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography>Про нас</Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Що ми любимо, не любимо й варто знати одне про одного
+              </Typography>
+            </Box>
+            <Button
+              component={RouterLink}
+              to="/notes"
+              variant="outlined"
+              startIcon={<FavoriteBorderIcon />}
+            >
+              Відкрити
+            </Button>
+          </Box>
         </CardContent>
       </Card>
       <Box>

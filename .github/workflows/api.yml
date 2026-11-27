@@ -78,6 +78,9 @@ jobs:
             --project src/Modules/Todos/Todos.Infrastructure --startup-project src/Host/Host.Api \
             --context TodosDbContext --output ${{ runner.temp }}/migrations/todos
           dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
+            --project src/Modules/Notes/Notes.Infrastructure --startup-project src/Host/Host.Api \
+            --context NotesDbContext --output ${{ runner.temp }}/migrations/notes
+          dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
             --project src/Modules/Notifications/Notifications.Infrastructure --startup-project src/Host/Host.Api \
             --context NotificationsDbContext --output ${{ runner.temp }}/migrations/notifications
 
@@ -179,6 +182,8 @@ jobs:
             /api/shopping/summary \
             /api/gifts/summary \
             /api/todos/summary \
+            /api/notes/items \
+            /api/notes/categories \
             /api/notifications/status; do
             code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 \
               -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL$path" || echo 000)

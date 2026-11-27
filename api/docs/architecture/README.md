@@ -22,6 +22,7 @@ The modules follow the areas of the old Google Sheets and Telegram bots. Each mo
 | Gifts | Gift wishlist with variants, the archive of given gifts, gift categories, personal details and the home summary | `gifts` | in place, see [gifts.md](../modules/gifts.md); specification [001](../specs/gifts/001-gifts-module/README.md), [002](../specs/gifts/002-gift-purchase-todo/README.md) |
 | Notifications | The family Telegram bot: linked chats, morning to-dos, gift reminders, evening shopping list, expenses summaries, the webhook and the scheduler tick | `notifications` | in place, see [notifications.md](../modules/notifications.md); specification [001](../specs/notifications/001-telegram-bot/README.md) |
 | Identity | The two user accounts and the session | `identity` | planned, see [ADR 0009](../decisions/README.md) |
+| Notes | What Masha and Vitaliy like, dislike and should know about each other, with note categories; the author comes from the session through `Identity.Contracts` | `notes` | in place, see [notes.md](../modules/notes.md); specification [001](../specs/notes/001-notes-module/README.md) |
 
 Add a module as [the README](../../README.md#add-a-module) describes, then add it to this table, to
 [c4.md](c4.md), and to `Program.cs` and `MediatorSetup.cs`. The architecture tests find modules by folder, so a new

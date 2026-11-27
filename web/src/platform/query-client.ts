@@ -27,4 +27,5 @@ export const moduleKeys = {
   todos: ['todos'],
   notifications: ['notifications'],
   identity: ['identity'],
+  notes: ['notes'],
 } as const;

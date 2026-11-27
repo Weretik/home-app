@@ -1,5 +1,6 @@
 import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
 import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
@@ -21,6 +22,14 @@ export const mainSections: Section[] = [
   { path: '/gifts', label: 'Подарунки', icon: CardGiftcardOutlinedIcon },
 ];
 
+/**
+ * More sections under the main five: only in the side menu on a computer; on a phone the home page links to them
+ * (web ADR 0017).
+ */
+export const moreSections: Section[] = [
+  { path: '/notes', label: 'Про нас', icon: FavoriteBorderOutlinedIcon },
+];
+
 /** Service pages: only in the side menu on a computer; on a phone they are linked from the home page. */
 export const serviceSections: Section[] = [
   { path: '/status', label: 'Стан', icon: MonitorHeartOutlinedIcon },
@@ -29,7 +38,7 @@ export const serviceSections: Section[] = [
 
 /** The section a path belongs to, for the bottom bar and the page title. */
 export function sectionOf(pathname: string): Section | undefined {
-  return [...mainSections, ...serviceSections].find((s) =>
+  return [...mainSections, ...moreSections, ...serviceSections].find((s) =>
     s.path === '/' ? pathname === '/' : pathname.startsWith(s.path),
   );
 }

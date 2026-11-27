@@ -105,7 +105,8 @@ The hosting plan allows several PostgreSQL databases, so this project gets its o
 Each module's first migration creates its schema itself, since the owner has all rights; nothing to run by hand.
 
 **Migrations.** Production never migrates on start (`Database:InitializeOnStartup` is off). The API workflow builds
-one EF migrations bundle per module (today `expenses` and `gifts`, listed in `.github/workflows/api.yml`) and, in the
+one EF migrations bundle per module (today `identity`, `expenses`, `shopping`, `gifts`, `todos`, `notes` and `notifications`, listed in
+`.github/workflows/api.yml`) and, in the
 deploy job, runs them against the `DATABASE_CONNECTION_STRING` secret
 before the new version is deployed. Without that secret the deploy stops with an error, and the running version stays.
 Add it once: Settings → Environments → `production` → Environment secrets → `DATABASE_CONNECTION_STRING` (the GitHub
@@ -178,7 +179,7 @@ A new token changes the webhook secret; the next tick sets the webhook again.
 - No Always On: after idle time the first request wakes the app up in 10–30 seconds. The workflow's smoke test allows
   for that.
 - After `/health` shows the new commit, the smoke test also reads the first endpoint of every section (system status,
-  expenses summary and budget, shopping, gifts and todos summaries, Telegram status) and fails the deploy on anything
+  expenses summary and budget, shopping, gifts and todos summaries, the notes and their categories, Telegram status) and fails the deploy on anything
   but 200 ([ADR 0005](decisions/0005-post-deploy-smoke-reads-every-section.md)). A new section adds its endpoint there.
 - 60 CPU minutes per day. Plenty for two people, including the scheduler's 96 short calls a day (it also keeps the
   app warm).

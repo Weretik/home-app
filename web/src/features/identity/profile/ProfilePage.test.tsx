@@ -110,3 +110,13 @@ test('«Вийти» ends the session', async () => {
     expect(session.current()).toEqual({ token: null, ended: 'signed-out' }),
   );
 });
+
+test('links to the notes about each other «Про нас»', async () => {
+  renderProfile(masha);
+
+  await screen.findByText('Марія Ціупіна');
+  expect(screen.getByRole('link', { name: 'Відкрити' })).toHaveAttribute(
+    'href',
+    '/notes',
+  );
+});

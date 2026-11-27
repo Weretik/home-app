@@ -1,3 +1,4 @@
+using NetArchTest.Rules;
 
 namespace ArchitectureTests.Boundaries;
 
@@ -33,6 +34,33 @@ public sealed class ModuleBoundaryTests
             select $"{Path.GetFileNameWithoutExtension(projectFile)} -> {reference}";
 
         Assert.Empty(violations);
+    }
+
+    /// <summary>
+    /// Who is signed in is an Identity detail: other modules ask <c>Identity.Contracts.ICurrentMember</c> and never
+    /// read claims or <c>HttpContext.User</c> themselves (ADR 0040).
+    /// </summary>
+    [Fact]
+    public void Only_TheIdentityModule_ReadsClaims()
+    {
+        var violations =
+            from module in Repository.Modules
+            where module != "Identity"
+            from layer in Repository.Layers
+            let result = Types.InAssembly(Repository.Assembly($"{module}.{layer}"))
+                .ShouldNot()
+                .HaveDependencyOn("System.Security.Claims")
+                .GetResult()
+            from type in result.FailingTypeNames ?? []
+            select type;
+        var userReads =
+            from module in Repository.Modules
+            where module != "Identity"
+            from file in SourceFiles.Under($"src/Modules/{module}")
+            where File.ReadAllText(file).Contains(".User", StringComparison.Ordinal)
+            select SourceFiles.Relative(file);
+
+        Assert.Empty(violations.Concat(userReads));
     }
 
     [Fact]
