@@ -51,6 +51,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0041 | [Limit amounts are kept by the period they start in](0041-limit-amounts-kept-by-month.md) (supersedes the past-amount part of 0027) |
 | 0042 | [Web Push with VAPID next to Telegram, sent by the API itself](0042-web-push-next-to-telegram.md) |
 | 0043 | [cron-job.org calls the ticks, GitHub cron is the backup, and the API keeps a heartbeat](0043-external-cron-and-scheduler-heartbeat.md) |
+| 0044 | [Telemetry goes to Application Insights through OpenTelemetry, alerts stay free](0044-telemetry-in-application-insights.md) |
 
 ## Decisions that must have a record
 
