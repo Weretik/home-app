@@ -47,7 +47,7 @@ the same change.
 - Every mutation disables its submit while pending.
 - A write the backend protects with `Idempotency-Key` makes one key per attempt, reuses it on retry, and renews it
   after success or a change of the data.
-- Every read of a backend module starts its query key with the module's prefix (`src/platform/query-keys.ts`); every
+- Every read of a backend module starts its query key with the module's prefix (`src/platform/query-client.ts`); every
   write to the module invalidates that prefix, so every page and summary showing the module refreshes
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
 - A write's type allows only what the API offers: a record that is only changed has no create or delete

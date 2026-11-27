@@ -1,6 +1,6 @@
 # 0012. A live shared list: optimistic ticks, polling and «кто я» per device
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26. The «кто я» part is superseded by [0016](0016-pages-start-on-the-signed-in-person.md).
 
 ## Context
 

@@ -2,13 +2,19 @@ import { ThemeProvider } from '@mui/material/styles';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
 import { createQueryClient } from '../../../platform/query-client';
 import { session } from '../../../platform/session';
 import { MemberMenu } from './MemberMenu';
 
-const member = { email: 'v@example.com', name: 'Віталій', pictureUrl: null };
+const member = {
+  email: 'v@example.com',
+  name: 'Віталій',
+  pictureUrl: null,
+  person: 'Vitaliy',
+};
 
 function renderMenu(signOutStatus = 204) {
   const requests: Request[] = [];
@@ -31,7 +37,9 @@ function renderMenu(signOutStatus = 204) {
   render(
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={client}>
-        <MemberMenu />
+        <MemoryRouter>
+          <MemberMenu />
+        </MemoryRouter>
       </QueryClientProvider>
     </ThemeProvider>,
   );
@@ -55,6 +63,10 @@ test('shows the first letter, then the name and e-mail in the menu', async () =>
 
   expect(screen.getByText('Віталій')).toBeInTheDocument();
   expect(screen.getByText('v@example.com')).toBeInTheDocument();
+  expect(screen.getByRole('menuitem', { name: 'Профіль' })).toHaveAttribute(
+    'href',
+    '/profile',
+  );
 });
 
 test('«Вийти» ends the session on the server, forgets the token and clears the cache', async () => {

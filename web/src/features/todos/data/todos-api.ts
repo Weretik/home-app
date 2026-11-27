@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { moduleKeys } from '../../../platform/query-keys';
+import { moduleKeys } from '../../../platform/query-client';
 
 export type TodoTaskItem = Schema<'TodoTaskItem'>;
 export type TodoTaskList = Schema<'TodoTaskList'>;

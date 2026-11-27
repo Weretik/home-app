@@ -44,6 +44,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0035 | [Modules talk through integration events in the outbox](0035-integration-events-through-the-outbox.md) |
 | 0036 | [Telegram chats are linked from Telegram, not configured](0036-telegram-chats-linked-from-telegram.md) |
 | 0037 | [Texts the API and the bot write are Ukrainian, in place](0037-ukrainian-user-facing-texts.md) |
+| 0038 | [The allowlist position says who the member is](0038-allowlist-position-says-who-the-member-is.md) |
 
 ## Decisions that must have a record
 

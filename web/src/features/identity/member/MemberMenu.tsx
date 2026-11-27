@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -9,10 +10,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useCurrentMember, useSignOut } from '../data/identity-api';
 import { MemberAvatar } from './MemberAvatar';
 
-/** The member's avatar in the header; its menu shows the name, the e-mail and «Вийти» (FR-006, FR-007). */
+/** The member's avatar in the header; its menu shows the name, the e-mail, «Профіль» (identity 002) and «Вийти» (FR-006, FR-007). */
 export function MemberMenu() {
   const { data: member } = useCurrentMember();
   const signOut = useSignOut();
@@ -50,6 +52,16 @@ export function MemberMenu() {
           </Box>
         )}
         {member && <Divider />}
+        <MenuItem
+          component={RouterLink}
+          to="/profile"
+          onClick={() => setAnchor(null)}
+        >
+          <ListItemIcon>
+            <AccountCircleOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Профіль</ListItemText>
+        </MenuItem>
         <MenuItem
           disabled={signOut.isPending}
           onClick={() => {

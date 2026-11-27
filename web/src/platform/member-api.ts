@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../api-client';
 import { api } from './api';
-import { moduleKeys } from './query-keys';
+import { moduleKeys } from './query-client';
 
 export type FamilyMember = Schema<'FamilyMember'>;
 /** Who the signed-in member is in the home; the same values as the people of the other modules. */
