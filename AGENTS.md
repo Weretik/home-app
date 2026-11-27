@@ -91,6 +91,8 @@ lowercase letters, digits and hyphens, 3 to 6 words in the description.
 
 **Authorship:** Commits, merge and squash commits, and pull request descriptions carry no AI attribution: no `Co-Authored-By`, no `Claude-Session`, and no "Generated with Claude Code" line. The author and committer is the repository owner only (Weretik).
 
+**Commit and PR titles:** every commit, pull request title and squash commit follows Conventional Commits `<type>(<scope>): <description>`: English, an optional lowercase scope (module or app), the description starting with a lowercase letter, no trailing period, at most 72 characters; types `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`, `ci`, `build`; for example `fix(catalog): keep the category filter after reload`. The squash merge takes the PR title as the commit message, and the `PR title` workflow checks it on every pull request.
+
 ## Task routing
 
 | Task | Skill or process | Project rules |
