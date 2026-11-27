@@ -8,7 +8,7 @@ import {
 describe('category form', () => {
   it('asks for a name and limits name and emoji', () => {
     expect(validateCategory({ name: ' ', emoji: '' }).name).toBe(
-      'Введите название',
+      'Введіть назву',
     );
     expect(validateCategory({ name: 'x'.repeat(51), emoji: '' }).name).toMatch(
       /50/,
@@ -25,10 +25,10 @@ describe('category form', () => {
     });
   });
 
-  it('counts active tasks in Russian', () => {
-    expect(formatActiveCount(0)).toBe('нет активных задач');
-    expect(formatActiveCount(1)).toBe('1 активная задача');
-    expect(formatActiveCount(3)).toBe('3 активные задачи');
-    expect(formatActiveCount(5)).toBe('5 активных задач');
+  it('counts active tasks in Ukrainian', () => {
+    expect(formatActiveCount(0)).toBe('немає активних справ');
+    expect(formatActiveCount(1)).toBe('1 активна справа');
+    expect(formatActiveCount(3)).toBe('3 активні справи');
+    expect(formatActiveCount(5)).toBe('5 активних справ');
   });
 });

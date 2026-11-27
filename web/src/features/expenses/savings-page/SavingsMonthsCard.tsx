@@ -10,7 +10,7 @@ import type { Month } from '../data/month';
 import type { SavingsMonthSummary } from '../data/savings-api';
 import { SavingsMonthRow } from './SavingsMonthRow';
 
-/** Months shown before «Показать все». */
+/** Months shown before «Показати всі». */
 const FIRST_MONTHS = 12;
 
 interface SavingsMonthsCardProps {
@@ -22,7 +22,7 @@ interface SavingsMonthsCardProps {
   onRetry: () => void;
 }
 
-/** «По месяцам»: each month's put in, taken out and closing balance; a month opens its movements. */
+/** «По місяцях»: each month's put in, taken out and closing balance; a month opens its movements. */
 export function SavingsMonthsCard({
   months,
   error,
@@ -42,7 +42,7 @@ export function SavingsMonthsCard({
         component="h2"
         sx={{ fontWeight: 600, px: 2, pt: 2, pb: 1 }}
       >
-        По месяцам
+        По місяцях
       </Typography>
       {error ? (
         <Box sx={{ p: 2 }}>
@@ -50,11 +50,11 @@ export function SavingsMonthsCard({
             severity="error"
             action={
               <Button color="inherit" size="small" onClick={onRetry}>
-                Повторить
+                Повторити
               </Button>
             }
           >
-            Не удалось загрузить: {error.message}
+            Не вдалося завантажити: {error.message}
           </Alert>
         </Box>
       ) : !shown ? (
@@ -64,10 +64,10 @@ export function SavingsMonthsCard({
         </Box>
       ) : shown.length === 0 ? (
         <Typography color="text.secondary" sx={{ px: 2, pb: 2 }}>
-          Движений по копилке ещё нет. Добавьте первое — оно появится здесь.
+          Операцій зі скарбничкою ще немає. Додайте першу — вона з’явиться тут.
         </Typography>
       ) : (
-        <List disablePadding aria-label="Копилка по месяцам">
+        <List disablePadding aria-label="Скарбничка по місяцях">
           {shown.map((month) => (
             <SavingsMonthRow
               key={`${month.year}-${month.month}`}
@@ -81,7 +81,7 @@ export function SavingsMonthsCard({
       {!showAll && months && months.length > FIRST_MONTHS && (
         <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
           <Button variant="outlined" onClick={() => setShowAll(true)}>
-            Показать все месяцы
+            Показати всі місяці
           </Button>
         </Box>
       )}

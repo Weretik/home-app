@@ -3,15 +3,16 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { assigneeEmoji, assigneeLabels } from '../data/labels';
 import type { AssigneeCounts } from '../data/todos-summary-api';
+import { locale } from '../../../../platform/locale';
 
-/** «задача», «задачи», «задач» after a count. */
+/** «завдання», «завдання», «завдань» after a count. */
 const tasksWord = (count: number) => {
-  const forms = { one: 'задача', few: 'задачи', many: 'задач' } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const forms = { one: 'завдання', few: 'завдання', many: 'завдань' } as const;
+  const rule = new Intl.PluralRules(locale).select(count);
   return forms[rule as keyof typeof forms] ?? forms.many;
 };
 
-/** Маша, Виталий, Общее: active tasks, «просрочено N» in red and «сегодня N» when not zero (FR-008). */
+/** Маша, Віталій, Спільне: active tasks, «прострочено N» in red and «сьогодні N» when not zero (FR-008). */
 export function AssigneeCards({ counts }: { counts: AssigneeCounts[] }) {
   return (
     <Box
@@ -65,13 +66,13 @@ export function AssigneeCards({ counts }: { counts: AssigneeCounts[] }) {
                   component="span"
                   sx={{ color: 'error.main', fontWeight: 600, mr: 1.5 }}
                 >
-                  просрочено {count.overdue}
+                  прострочено {count.overdue}
                 </Box>
               )}
-              {count.dueToday > 0 && <span>сегодня {count.dueToday}</span>}
+              {count.dueToday > 0 && <span>сьогодні {count.dueToday}</span>}
               {count.overdue === 0 &&
                 count.dueToday === 0 &&
-                'на сегодня всё спокойно'}
+                'на сьогодні все спокійно'}
             </Typography>
           </Card>
         );

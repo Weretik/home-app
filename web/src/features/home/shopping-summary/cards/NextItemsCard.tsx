@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import type { ShoppingSummary } from '../data/shopping-summary-api';
 import { itemLine, personName } from '../data/summary-labels';
 
-/** «Купить в первую очередь»: up to eight needed items, urgent first. */
+/** «Купити насамперед»: up to eight needed items, urgent first. */
 export function NextItemsCard({ summary }: { summary: ShoppingSummary }) {
   return (
     <Card component="section" aria-labelledby="shopping-next-title">
@@ -17,7 +17,7 @@ export function NextItemsCard({ summary }: { summary: ShoppingSummary }) {
         component="h2"
         sx={{ fontWeight: 600, px: 2, pt: 2 }}
       >
-        Купить в первую очередь
+        Купити насамперед
       </Typography>
       <List aria-labelledby="shopping-next-title" dense>
         {summary.nextItems.map((item) => (
@@ -25,7 +25,7 @@ export function NextItemsCard({ summary }: { summary: ShoppingSummary }) {
             key={item.id}
             secondaryAction={
               item.urgent ? (
-                <Chip size="small" color="secondary" label="Срочно" />
+                <Chip size="small" color="secondary" label="Терміново" />
               ) : undefined
             }
           >

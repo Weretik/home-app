@@ -59,7 +59,7 @@ describe('validateTask', () => {
 
   it('asks for a title and limits its length', () => {
     expect(validateTask({ ...values, title: '   ' }).title).toBe(
-      'Введите название',
+      'Введіть назву',
     );
     expect(validateTask({ ...values, title: 'x'.repeat(201) }).title).toMatch(
       /200/,
@@ -77,7 +77,7 @@ describe('validateTask', () => {
       dueDate: '1999-12-31',
     });
     expect(errors.notes).toMatch(/4000/);
-    expect(errors.dueDate).toBe('Дата между 2000 и 2100 годом');
+    expect(errors.dueDate).toBe('Дата між 2000 і 2100 роком');
   });
 });
 
@@ -113,7 +113,7 @@ describe('requests', () => {
     });
   });
 
-  it('makes a quick task Обычно, without a date', () => {
+  it('makes a quick task Звичайна, without a date', () => {
     expect(quickTask(' Купить хлеб ', 'Shared')).toMatchObject({
       title: 'Купить хлеб',
       assignee: 'Shared',

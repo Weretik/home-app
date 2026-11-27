@@ -18,7 +18,7 @@ export function ExpenseList({
   onDelete,
 }: {
   items: ExpenseItem[];
-  /** The list's accessible name: «Расходы за месяц» or «Расходы за период». */
+  /** The list's accessible name: «Витрати за місяць» or «Витрати за період». */
   label: string;
 } & RowHandlers<ExpenseItem>) {
   return (

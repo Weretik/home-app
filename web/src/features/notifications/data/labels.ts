@@ -3,23 +3,24 @@ import type {
   NotificationDeliveryItem,
   NotificationScheduleItem,
 } from './notifications-api';
+import { locale } from '../../../platform/locale';
 
 /** The chats in the order the page lists them. */
 export const audiences: readonly Audience[] = ['Vitaliy', 'Maria', 'Family'];
 
 export const audienceLabels: Record<Audience, string> = {
-  Vitaliy: 'Виталий',
+  Vitaliy: 'Віталій',
   Maria: 'Маша',
-  Family: 'Семейная группа',
+  Family: 'Сімейна група',
 };
 
-/** A delivery's kind as the schedule names it («Утренние дела»), else the kind itself. */
+/** A delivery's kind as the schedule names it («Ранкові справи»), else the kind itself. */
 export const deliveryTitle = (
   kind: NotificationDeliveryItem['kind'],
   schedule: readonly NotificationScheduleItem[],
 ) => schedule.find((item) => item.kind === kind)?.title ?? kind;
 
-const kyivTime = new Intl.DateTimeFormat('ru-RU', {
+const kyivTime = new Intl.DateTimeFormat(locale, {
   timeZone: 'Europe/Kyiv',
   day: '2-digit',
   month: '2-digit',

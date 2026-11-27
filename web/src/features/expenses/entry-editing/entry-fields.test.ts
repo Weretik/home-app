@@ -34,12 +34,12 @@ test('reads amounts the way people type them', () => {
 });
 
 test('checks amount, date and comment', () => {
-  expect(amountError('')).toBe('Введите сумму');
-  expect(amountError('0')).toBe('Сумма больше нуля');
+  expect(amountError('')).toBe('Введіть суму');
+  expect(amountError('0')).toBe('Сума має бути більшою за нуль');
   expect(amountError('1,234')).toBeDefined();
-  expect(amountError('20000000')).toBe('Слишком большая сумма');
+  expect(amountError('20000000')).toBe('Завелика сума');
   expect(amountError('15,50')).toBeUndefined();
-  expect(dateError('')).toBe('Выберите дату');
+  expect(dateError('')).toBe('Виберіть дату');
   expect(dateError('1999-12-31')).toBeDefined();
   expect(dateError('2026-11-26')).toBeUndefined();
   expect(commentError('x'.repeat(501))).toBeDefined();

@@ -5,35 +5,35 @@ namespace Shopping.Domain.Departments;
 public static class DepartmentErrors
 {
     public static readonly Error NameRequired =
-        Error.Validation("shopping.department_name_required", "The department needs a name.", "name");
+        Error.Validation("shopping.department_name_required", "Відділу потрібна назва.", "name");
 
     public static readonly Error NameTooLong =
-        Error.Validation("shopping.department_name_too_long", $"The department name is longer than {Department.MaxNameLength} characters.", "name");
+        Error.Validation("shopping.department_name_too_long", $"Назва відділу задовга: не більше {Department.MaxNameLength} символів.", "name");
 
     public static readonly Error IconTooLong =
-        Error.Validation("shopping.department_icon_too_long", $"The icon is longer than {Department.MaxIconLength} characters.", "icon");
+        Error.Validation("shopping.department_icon_too_long", $"Іконка задовга: не більше {Department.MaxIconLength} символів.", "icon");
 
     public static readonly Error NameTaken =
-        Error.Conflict("shopping.department_name_taken", "There already is a department with this name.");
+        Error.Conflict("shopping.department_name_taken", "Відділ із такою назвою вже є.");
 
     public static readonly Error FallbackCannotBeDeleted = Error.Conflict(
-        "shopping.fallback_department", "The fallback department («Другое») cannot be deleted; items without a department go there.");
+        "shopping.fallback_department", "Відділ за замовчуванням («Другое») видалити не можна: туди потрапляють товари без відділу.");
 
     public static readonly Error OrderIncomplete = Error.Validation(
-        "shopping.department_order_incomplete", "Send every department exactly once.", "departmentIds");
+        "shopping.department_order_incomplete", "Надішліть кожен відділ рівно один раз.", "departmentIds");
 
     public static readonly Error KeywordTooShort =
-        Error.Validation("shopping.keyword_too_short", $"A keyword has at least {DepartmentKeyword.MinKeywordLength} characters.", "keyword");
+        Error.Validation("shopping.keyword_too_short", $"Ключове слово закоротке: щонайменше {DepartmentKeyword.MinKeywordLength} символи.", "keyword");
 
     public static readonly Error KeywordTooLong =
-        Error.Validation("shopping.keyword_too_long", $"A keyword is at most {DepartmentKeyword.MaxKeywordLength} characters.", "keyword");
+        Error.Validation("shopping.keyword_too_long", $"Ключове слово задовге: не більше {DepartmentKeyword.MaxKeywordLength} символів.", "keyword");
 
     public static readonly Error KeywordTaken =
-        Error.Conflict("shopping.keyword_taken", "This keyword already exists.");
+        Error.Conflict("shopping.keyword_taken", "Таке ключове слово вже є.");
 
     public static Error NotFound(Guid id) =>
-        Error.NotFound("shopping.department_not_found", $"There is no department {id}.");
+        Error.NotFound("shopping.department_not_found", $"Відділу {id} немає.");
 
     public static Error KeywordNotFound(Guid id) =>
-        Error.NotFound("shopping.keyword_not_found", $"There is no keyword {id}.");
+        Error.NotFound("shopping.keyword_not_found", $"Ключового слова {id} немає.");
 }

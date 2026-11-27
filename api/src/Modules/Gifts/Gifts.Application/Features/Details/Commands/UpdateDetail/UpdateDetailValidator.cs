@@ -8,7 +8,7 @@ internal sealed class UpdateDetailValidator : AbstractValidator<UpdateDetailComm
     public UpdateDetailValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the detail you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого нюансу у заголовку If-Match.");
         RuleFor(c => c.Recipient).IsInEnum();
         RuleFor(c => c.Label).NotEmpty().MaximumLength(Detail.MaxLabelLength);
         RuleFor(c => c.Value).NotEmpty().MaximumLength(Detail.MaxValueLength);

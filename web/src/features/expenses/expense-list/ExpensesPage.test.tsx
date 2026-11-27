@@ -130,22 +130,22 @@ test('shows each expense with Russian labels and no month total card', async () 
     ),
   );
 
-  const list = await screen.findByRole('list', { name: 'Расходы за месяц' });
-  expect(screen.getByText('Октябрь 2026')).toBeInTheDocument();
+  const list = await screen.findByRole('list', { name: 'Витрати за місяць' });
+  expect(screen.getByText('Жовтень 2026')).toBeInTheDocument();
   // The total card is gone; an overall summary will be its own page.
   expect(screen.queryByText(normalized('95 024,00 ₴'))).not.toBeInTheDocument();
   expect(screen.queryByText('2 записи')).not.toBeInTheDocument();
   expect(
-    screen.queryByRole('region', { name: 'Расходы за месяц' }),
+    screen.queryByRole('region', { name: 'Витрати за місяць' }),
   ).not.toBeInTheDocument();
 
   const rows = within(list).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
-  expect(rows[0]).toHaveTextContent('Общее');
-  expect(rows[0]).toHaveTextContent('Карта');
+  expect(rows[0]).toHaveTextContent('Спільне');
+  expect(rows[0]).toHaveTextContent('Картка');
   expect(rows[0]).toHaveTextContent('Сильпо');
   expect(rows[1]).toHaveTextContent('Маша');
-  expect(rows[1]).toHaveTextContent('Наличные');
+  expect(rows[1]).toHaveTextContent('Готівка');
   expect(
     within(rows[0]!).getByText(normalized('1 234,50 ₴')),
   ).toBeInTheDocument();
@@ -167,15 +167,15 @@ test('opens the current month when the URL has none', async () => {
 
 test('moves to the previous month and keeps it for the incomes tab', async () => {
   const { expenseUrls } = renderSection(() => json(page([expense()])));
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Предыдущий месяц' }),
+    screen.getByRole('button', { name: 'Попередній місяць' }),
   );
 
-  expect(await screen.findByText('Сентябрь 2026')).toBeInTheDocument();
+  expect(await screen.findByText('Вересень 2026')).toBeInTheDocument();
   expect(expenseUrls().at(-1)!.searchParams.get('month')).toBe('9');
-  expect(screen.getByRole('tab', { name: 'Доходы' })).toHaveAttribute(
+  expect(screen.getByRole('tab', { name: 'Доходи' })).toHaveAttribute(
     'href',
     '/expenses/incomes?year=2026&month=9',
   );
@@ -183,11 +183,11 @@ test('moves to the previous month and keeps it for the incomes tab', async () =>
 
 test('filters by who paid and by category', async () => {
   const { expenseUrls } = renderSection(() => json(page([expense()])));
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(screen.getByRole('combobox', { name: 'Кто' }));
-  await userEvent.click(screen.getByRole('option', { name: 'Общее' }));
-  await userEvent.click(screen.getByRole('combobox', { name: 'Категория' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Хто' }));
+  await userEvent.click(screen.getByRole('option', { name: 'Спільне' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Категорія' }));
   await userEvent.click(await screen.findByRole('option', { name: 'Дом' }));
 
   const query = expenseUrls().at(-1)!.searchParams;
@@ -199,7 +199,7 @@ test('says when the month has no expenses', async () => {
   renderSection(() => json(page([], { totalAmount: 0 })));
 
   expect(
-    await screen.findByText('За этот месяц записей нет'),
+    await screen.findByText('За цей місяць записів немає'),
   ).toBeInTheDocument();
 });
 
@@ -210,13 +210,11 @@ test('offers to reset a filter that leaves nothing', async () => {
   );
 
   expect(
-    await screen.findByText('С этим фильтром записей нет'),
+    await screen.findByText('З цим фільтром записів немає'),
   ).toBeInTheDocument();
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Сбросить фильтр' }),
-  );
+  await userEvent.click(screen.getByRole('button', { name: 'Скинути фільтр' }));
 
-  await screen.findByText('За этот месяц записей нет');
+  await screen.findByText('За цей місяць записів немає');
   expect(expenseUrls().at(-1)!.searchParams.has('payer')).toBe(false);
 });
 
@@ -227,17 +225,17 @@ test('shows the error and retries', async () => {
   );
 
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Не удалось загрузить',
+    'Не вдалося завантажити',
   );
   fail = false;
-  await userEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Повторити' }));
 
   expect(
-    await screen.findByRole('list', { name: 'Расходы за месяц' }),
+    await screen.findByRole('list', { name: 'Витрати за місяць' }),
   ).toBeInTheDocument();
 });
 
-test('loads the next page on «Показать ещё»', async () => {
+test('loads the next page on «Показати ще»', async () => {
   const { expenseUrls } = renderSection((url) =>
     url.searchParams.get('page') === '1'
       ? json(page([expense()], { pageSize: 1, totalCount: 2 }))
@@ -251,13 +249,13 @@ test('loads the next page on «Показать ещё»', async () => {
   );
 
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Показать ещё' }),
+    await screen.findByRole('button', { name: 'Показати ще' }),
   );
 
   expect(await screen.findByText('Дом')).toBeInTheDocument();
   expect(expenseUrls().at(-1)!.searchParams.get('page')).toBe('2');
   expect(
-    screen.queryByRole('button', { name: 'Показать ещё' }),
+    screen.queryByRole('button', { name: 'Показати ще' }),
   ).not.toBeInTheDocument();
 });
 
@@ -274,19 +272,19 @@ test('shows a table on a computer', async () => {
   }));
   renderSection(() => json(page([expense()])));
 
-  const table = await screen.findByRole('table', { name: 'Расходы за месяц' });
+  const table = await screen.findByRole('table', { name: 'Витрати за місяць' });
   for (const column of [
     'Дата',
-    'Категория',
-    'Кто',
-    'Сумма',
+    'Категорія',
+    'Хто',
+    'Сума',
     'Оплата',
-    'Комментарий',
+    'Коментар',
   ])
     expect(
       within(table).getByRole('columnheader', { name: column }),
     ).toBeInTheDocument();
-  expect(within(table).getByText('Общее')).toBeInTheDocument();
+  expect(within(table).getByText('Спільне')).toBeInTheDocument();
 });
 
 const dialogClosed = () =>
@@ -307,36 +305,34 @@ test('adds an expense with an Idempotency-Key and keeps the key on a retry', asy
     }
     return json(page([expense()]));
   });
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Добавить расход' }),
-  );
-  const dialog = await screen.findByRole('dialog', { name: 'Новый расход' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати витрату' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Нова витрата' });
   expect(within(dialog).getByLabelText(/Дата/)).toHaveValue('2026-10-01');
 
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Выберите категорию')).toBeInTheDocument();
-  expect(within(dialog).getByText('Введите сумму')).toBeInTheDocument();
+  expect(within(dialog).getByText('Виберіть категорію')).toBeInTheDocument();
+  expect(within(dialog).getByText('Введіть суму')).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: /Категория/ }),
+    within(dialog).getByRole('combobox', { name: /Категорія/ }),
   );
   await userEvent.click(await screen.findByRole('option', { name: 'Дом' }));
-  await userEvent.type(within(dialog).getByLabelText(/Сумма/), '250,5');
+  await userEvent.type(within(dialog).getByLabelText(/Сума/), '250,5');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-    'Не удалось сохранить',
+    'Не вдалося зберегти',
   );
   const listLoads = expenseUrls().length;
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -362,21 +358,19 @@ test('edits an expense with its version in If-Match', async () => {
   const { writes } = renderSection((_, sent) =>
     sent.method === 'PUT' ? noContent() : json(page([item])),
   );
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Продукты/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Продукты/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить расход',
+    name: 'Змінити витрату',
   });
-  const amount = within(dialog).getByLabelText(/Сумма/);
+  const amount = within(dialog).getByLabelText(/Сума/);
   expect(amount).toHaveValue('1234,50');
   await userEvent.clear(amount);
   await userEvent.type(amount, '99');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -401,22 +395,20 @@ test('says when the expense was changed elsewhere and reloads the list', async (
         )
       : json(page([expense()])),
   );
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Продукты/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Продукты/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить расход',
+    name: 'Змінити витрату',
   });
   const loads = expenseUrls().length;
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-    'Запись изменили в другом месте',
+    'Запис змінили в іншому місці',
   );
   await waitFor(() => expect(expenseUrls().length).toBeGreaterThan(loads));
 });
@@ -428,27 +420,25 @@ test('marks expenses outside the limits and changes the mark in the dialog', asy
       ? noContent()
       : json(page([item, expense({ categoryName: 'Дом' })])),
   );
-  const list = await screen.findByRole('list', { name: 'Расходы за месяц' });
+  const list = await screen.findByRole('list', { name: 'Витрати за місяць' });
 
   const [marked, plain] = within(list).getAllByRole('listitem');
-  expect(marked).toHaveTextContent('вне лимитов');
-  expect(plain).not.toHaveTextContent('вне лимитов');
+  expect(marked).toHaveTextContent('поза лімітами');
+  expect(plain).not.toHaveTextContent('поза лімітами');
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Продукты/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Продукты/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить расход',
+    name: 'Змінити витрату',
   });
-  const box = within(dialog).getByRole('checkbox', { name: 'Не в лимиты' });
+  const box = within(dialog).getByRole('checkbox', { name: 'Не в ліміти' });
   expect(box).toBeChecked();
   expect(box).toHaveAccessibleDescription(
-    'Считается в итогах, но не в лимитах и не переносится',
+    'Враховується в підсумках, але не в лімітах і не переноситься',
   );
   await userEvent.click(box);
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -460,18 +450,16 @@ test('deletes an expense only after the confirmation', async () => {
   const { writes } = renderSection((_, sent) =>
     sent.method === 'DELETE' ? noContent() : json(page([item])),
   );
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Продукты/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Продукты/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Удалить расход?',
+    name: 'Видалити витрату?',
   });
   expect(writes()).toHaveLength(0);
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await dialogClosed();
 
@@ -482,18 +470,18 @@ test('deletes an expense only after the confirmation', async () => {
 
 test('switches to a period of days and back to the month', async () => {
   const { expenseUrls } = renderSection(() => json(page([expense()])));
-  await screen.findByRole('list', { name: 'Расходы за месяц' });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Период' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Період' }));
 
-  const period = screen.getByRole('group', { name: 'Период' });
-  expect(within(period).getByLabelText('с')).toHaveValue('2026-10-01');
+  const period = screen.getByRole('group', { name: 'Період' });
+  expect(within(period).getByLabelText('з')).toHaveValue('2026-10-01');
   expect(within(period).getByLabelText('по')).toHaveValue('2026-10-31');
   expect(
-    await screen.findByRole('list', { name: 'Расходы за период' }),
+    await screen.findByRole('list', { name: 'Витрати за період' }),
   ).toBeInTheDocument();
   expect(
-    screen.queryByRole('button', { name: 'Предыдущий месяц' }),
+    screen.queryByRole('button', { name: 'Попередній місяць' }),
   ).not.toBeInTheDocument();
   const query = expenseUrls().at(-1)!.searchParams;
   expect(query.get('from')).toBe('2026-10-01');
@@ -511,12 +499,12 @@ test('switches to a period of days and back to the month', async () => {
   );
   expect(urlParams().get('to')).toBe('2026-10-10');
 
-  await userEvent.click(screen.getByRole('button', { name: 'К месяцу' }));
+  await userEvent.click(screen.getByRole('button', { name: 'До місяця' }));
 
   expect(
-    await screen.findByRole('list', { name: 'Расходы за месяц' }),
+    await screen.findByRole('list', { name: 'Витрати за місяць' }),
   ).toBeInTheDocument();
-  expect(screen.getByText('Октябрь 2026')).toBeInTheDocument();
+  expect(screen.getByText('Жовтень 2026')).toBeInTheDocument();
   const back = expenseUrls().at(-1)!.searchParams;
   expect(back.get('month')).toBe('10');
   expect(back.has('from')).toBe(false);
@@ -529,9 +517,9 @@ test('opens the period from the URL together with the filters', async () => {
     '/expenses?year=2026&month=10&from=2026-09-20&to=2026-10-05&payer=Maria',
   );
 
-  await screen.findByRole('list', { name: 'Расходы за период' });
-  const period = screen.getByRole('group', { name: 'Период' });
-  expect(within(period).getByLabelText('с')).toHaveValue('2026-09-20');
+  await screen.findByRole('list', { name: 'Витрати за період' });
+  const period = screen.getByRole('group', { name: 'Період' });
+  expect(within(period).getByLabelText('з')).toHaveValue('2026-09-20');
   expect(within(period).getByLabelText('по')).toHaveValue('2026-10-05');
   const query = expenseUrls()[0]!.searchParams;
   expect(query.get('from')).toBe('2026-09-20');
@@ -539,7 +527,7 @@ test('opens the period from the URL together with the filters', async () => {
   expect(query.get('payer')).toBe('Maria');
   expect(query.has('year')).toBe(false);
 
-  await userEvent.click(screen.getByRole('combobox', { name: 'Категория' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Категорія' }));
   await userEvent.click(await screen.findByRole('option', { name: 'Дом' }));
   await waitFor(() =>
     expect(expenseUrls().at(-1)!.searchParams.get('categoryId')).toBe('c-home'),
@@ -555,20 +543,20 @@ test('says why a period is wrong and loads nothing', async () => {
   );
 
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Дата «с» позже даты «по»',
+    'Дата «з» пізніше за дату «по»',
   );
-  const period = screen.getByRole('group', { name: 'Период' });
-  fireEvent.change(within(period).getByLabelText('с'), {
+  const period = screen.getByRole('group', { name: 'Період' });
+  fireEvent.change(within(period).getByLabelText('з'), {
     target: { value: '2025-01-01' },
   });
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Период не длиннее 366 дней',
+    'Період не довше 366 днів',
   );
-  fireEvent.change(within(period).getByLabelText('с'), {
+  fireEvent.change(within(period).getByLabelText('з'), {
     target: { value: '' },
   });
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Выберите обе даты',
+    'Виберіть обидві дати',
   );
   expect(expenseUrls()).toHaveLength(0);
   expect(screen.queryByRole('list')).not.toBeInTheDocument();
@@ -579,11 +567,9 @@ test("starts a new expense on the period's first day when today is outside it", 
     () => json(page([expense()])),
     '/expenses?from=2020-03-10&to=2020-03-20',
   );
-  await screen.findByRole('list', { name: 'Расходы за период' });
+  await screen.findByRole('list', { name: 'Витрати за період' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Добавить расход' }),
-  );
-  const dialog = await screen.findByRole('dialog', { name: 'Новый расход' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати витрату' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Нова витрата' });
   expect(within(dialog).getByLabelText(/Дата/)).toHaveValue('2020-03-10');
 });

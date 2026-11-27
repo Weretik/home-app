@@ -34,14 +34,14 @@ export function validateLimit(values: LimitFormValues): FieldErrors {
   const name = values.name.trim();
   return {
     name: !name
-      ? 'Введите название'
+      ? 'Введіть назву'
       : name.length > MAX_LIMIT_NAME
-        ? `Не длиннее ${MAX_LIMIT_NAME} символов`
+        ? `Не довше ${MAX_LIMIT_NAME} символів`
         : undefined,
     amount: amountError(values.amount),
     categoryIds:
       values.categoryIds.length === 0
-        ? 'Выберите хотя бы одну категорию'
+        ? 'Виберіть хоча б одну категорію'
         : undefined,
   };
 }

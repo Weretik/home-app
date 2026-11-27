@@ -43,7 +43,7 @@ function renderTable(props: Partial<Parameters<typeof GiftTable>[0]> = {}) {
       <GiftTable
         items={[gift()]}
         variant="active"
-        label="Подарки"
+        label="Подарунки"
         grouped={false}
         isChanging={() => false}
         {...handlers}
@@ -61,25 +61,25 @@ describe('GiftTable', () => {
   it('shows a wanted gift in one row with the columns of «Список»', () => {
     renderTable();
     expect(headers()).toEqual([
-      'Подарок',
-      'Варианты',
-      'Категория',
-      'Приоритет',
-      'Цена',
-      'Повод',
+      'Подарунок',
+      'Варіанти',
+      'Категорія',
+      'Пріоритет',
+      'Ціна',
+      'Привід',
       '',
     ]);
     const row = screen.getByRole('row', { name: /Серьги с топазом/ });
     for (const text of [
       'Украшения',
-      '🔥 Очень хочу',
-      'цена не указана',
-      'День рождения · 12 марта 2027',
+      '🔥 Дуже хочу',
+      'ціну не вказано',
+      'День рождения · 12 березня 2027',
       'Белое золото',
     ])
       expect(within(row).getByText(text)).toBeInTheDocument();
     const link = within(row).getByRole('link', {
-      name: 'Открыть ссылку: Серьги с топазом',
+      name: 'Відкрити посилання: Серьги с топазом',
     });
     expect(link).toHaveAttribute('href', 'https://shop.ua/earrings');
     expect(link).toHaveAttribute('target', '_blank');
@@ -98,22 +98,22 @@ describe('GiftTable', () => {
     const titles = screen.getAllByRole('heading', { level: 2 });
     expect(titles.map((title) => title.textContent)).toEqual([
       'Маша',
-      'Виталий',
+      'Віталій',
     ]);
     const masha = screen.getByRole('rowheader', { name: /Маша/ });
     expect(masha.textContent?.replace(/\s/g, ' ')).toContain(
-      '2 подарка · ≈ 3 200 ₴',
+      '2 подарунки · ≈ 3 200 ₴',
     );
-    const vitaliy = screen.getByRole('rowheader', { name: /Виталий/ });
+    const vitaliy = screen.getByRole('rowheader', { name: /Віталій/ });
     expect(vitaliy.textContent?.replace(/\s/g, ' ')).toContain(
-      '1 подарок · ≈ 1 625 ₴',
+      '1 подарунок · ≈ 1 625 ₴',
     );
     expect(headers()).not.toContain('Для кого');
   });
 
   it('opens the variants in a row under the gift', async () => {
     renderTable();
-    const toggle = screen.getByRole('button', { name: 'Варианты: 2' });
+    const toggle = screen.getByRole('button', { name: 'Варіанти: 2' });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -131,36 +131,36 @@ describe('GiftTable', () => {
   it('marks a gift gifted from the row, and not relevant or edited from its menu', async () => {
     const { onStatus, onEdit, onDelete } = renderTable();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Подарено: Серьги с топазом' }),
+      screen.getByRole('button', { name: 'Подаровано: Серьги с топазом' }),
     );
     expect(onStatus).toHaveBeenLastCalledWith(gift(), 'Gifted');
     const menu = () =>
       userEvent.click(
-        screen.getByRole('button', { name: 'Действия: Серьги с топазом' }),
+        screen.getByRole('button', { name: 'Дії: Серьги с топазом' }),
       );
     await menu();
     await userEvent.click(
-      screen.getByRole('menuitem', { name: 'Не актуально' }),
+      screen.getByRole('menuitem', { name: 'Неактуально' }),
     );
     expect(onStatus).toHaveBeenLastCalledWith(gift(), 'Dropped');
     await menu();
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
     expect(onEdit).toHaveBeenCalledWith(gift());
     await menu();
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
     expect(onDelete).toHaveBeenCalledWith(gift());
   });
 
   it('locks the status actions while the change is sent', async () => {
     renderTable({ isChanging: () => true });
     expect(
-      screen.getByRole('button', { name: 'Подарено: Серьги с топазом' }),
+      screen.getByRole('button', { name: 'Подаровано: Серьги с топазом' }),
     ).toBeDisabled();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Действия: Серьги с топазом' }),
+      screen.getByRole('button', { name: 'Дії: Серьги с топазом' }),
     );
     expect(
-      screen.getByRole('menuitem', { name: 'Не актуально' }),
+      screen.getByRole('menuitem', { name: 'Неактуально' }),
     ).toHaveAttribute('aria-disabled', 'true');
   });
 
@@ -181,23 +181,23 @@ describe('GiftTable', () => {
       variant: 'archive',
     });
     expect(headers()).toEqual([
-      'Подарок',
-      'Варианты',
-      'Категория',
-      'Цена',
-      'Итог',
+      'Подарунок',
+      'Варіанти',
+      'Категорія',
+      'Ціна',
+      'Підсумок',
       '',
     ]);
-    expect(screen.getByText('Подарено 26 ноября 2026')).toBeInTheDocument();
-    expect(screen.getByText('Не актуально')).toBeInTheDocument();
+    expect(
+      screen.getByText('Подаровано 26 листопада 2026'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Неактуально')).toBeInTheDocument();
     expect(screen.getByText(/1\s234,50\s₴/)).toBeInTheDocument();
     await userEvent.click(
-      screen.getByRole('button', { name: 'Вернуть в список: Плед' }),
+      screen.getByRole('button', { name: 'Повернути до списку: Плед' }),
     );
     expect(onStatus).toHaveBeenCalledWith(dropped, 'Wanted');
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Действия: Плед' }),
-    );
-    expect(screen.queryByRole('menuitem', { name: 'Не актуально' })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Дії: Плед' }));
+    expect(screen.queryByRole('menuitem', { name: 'Неактуально' })).toBeNull();
   });
 });

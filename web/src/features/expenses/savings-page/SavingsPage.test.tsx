@@ -126,15 +126,15 @@ test('shows the balance in the jar and signed, coloured movements', async () => 
   ]);
 
   const rows = within(
-    await screen.findByRole('list', { name: 'Движения копилки за месяц' }),
+    await screen.findByRole('list', { name: 'Операції скарбнички за місяць' }),
   ).getAllByRole('listitem');
-  expect(screen.getByRole('tab', { name: 'Копилка' })).toHaveAttribute(
+  expect(screen.getByRole('tab', { name: 'Скарбничка' })).toHaveAttribute(
     'aria-current',
     'page',
   );
-  const balance = screen.getByRole('region', { name: 'Копилка' });
+  const balance = screen.getByRole('region', { name: 'Скарбничка' });
   await waitFor(() =>
-    expect(plain(balance)).toContain('В копилке сейчас12 345,67 ₴'),
+    expect(plain(balance)).toContain('У скарбничці зараз12 345,67 ₴'),
   );
 
   const deposit = within(rows[0]!).getByText(/^\+1\s500,00/);
@@ -145,27 +145,27 @@ test('shows the balance in the jar and signed, coloured movements', async () => 
   expect(rows[1]).toHaveTextContent('Маша');
 
   const months = within(
-    screen.getByRole('list', { name: 'Копилка по месяцам' }),
+    screen.getByRole('list', { name: 'Скарбничка по місяцях' }),
   ).getAllByRole('button');
-  expect(months[0]).toHaveTextContent('Октябрь 2026');
+  expect(months[0]).toHaveTextContent('Жовтень 2026');
   expect(plain(months[0]!)).toContain('+1 500,00 ₴');
   expect(plain(months[0]!)).toContain('−700,00 ₴');
   expect(plain(months[0]!)).toContain('10 800,00 ₴');
   expect(months[0]).toHaveAttribute('aria-current', 'true');
 });
 
-test('takes money out with a minus sign and Виталий by default', async () => {
+test('takes money out with a minus sign and Віталій by default', async () => {
   const { sent } = renderPage([]);
-  await screen.findByText('За этот месяц записей нет');
+  await screen.findByText('За цей місяць записів немає');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Додати' }));
   const dialog = await screen.findByRole('dialog');
   await userEvent.click(
-    within(dialog).getByRole('radio', { name: 'Взяли из копилки' }),
+    within(dialog).getByRole('radio', { name: 'Взяли зі скарбнички' }),
   );
-  await userEvent.type(within(dialog).getByLabelText(/Сумма/), '700');
+  await userEvent.type(within(dialog).getByLabelText(/Сума/), '700');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -185,18 +185,18 @@ test('takes money out with a minus sign and Виталий by default', async ()
 test('edits a movement with If-Match and deletes after the confirmation', async () => {
   const item = movement({ version: 7 });
   const { sent } = renderPage([item]);
-  await screen.findByRole('list', { name: 'Движения копилки за месяц' });
+  await screen.findByRole('list', { name: 'Операції скарбнички за місяць' });
 
-  await userEvent.click(screen.getByRole('button', { name: /Действия:/ }));
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії:/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить движение',
+    name: 'Змінити операцію',
   });
   expect(
-    within(dialog).getByRole('radio', { name: 'Положили в копилку' }),
+    within(dialog).getByRole('radio', { name: 'Поклали в скарбничку' }),
   ).toBeChecked();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -206,13 +206,13 @@ test('edits a movement with If-Match and deletes after the confirmation', async 
   expect(put.headers.get('If-Match')).toBe('7');
   expect(put.body).toMatchObject({ amount: 1500 });
 
-  await userEvent.click(screen.getByRole('button', { name: /Действия:/ }));
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
+  await userEvent.click(screen.getByRole('button', { name: /Дії:/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
   const confirm = await screen.findByRole('dialog', {
-    name: 'Удалить движение?',
+    name: 'Видалити операцію?',
   });
   await userEvent.click(
-    within(confirm).getByRole('button', { name: 'Удалить' }),
+    within(confirm).getByRole('button', { name: 'Видалити' }),
   );
   await waitFor(() =>
     expect(sent.some((s) => s.method === 'DELETE')).toBe(true),
@@ -222,34 +222,36 @@ test('edits a movement with If-Match and deletes after the confirmation', async 
 test('shows how far the jar is towards its goal', async () => {
   renderPage([movement()]);
 
-  const card = await screen.findByRole('region', { name: 'План копилки' });
+  const card = await screen.findByRole('region', { name: 'План скарбнички' });
   expect(
-    await within(card).findByRole('img', { name: 'Выполнено 12%' }),
+    await within(card).findByRole('img', { name: 'Виконано 12%' }),
   ).toBeInTheDocument();
-  expect(within(card).getByText('Выполнено 12%')).toBeInTheDocument();
+  expect(within(card).getByText('Виконано 12%')).toBeInTheDocument();
   const figures = plain(card);
-  expect(figures).toContain('Сейчас12 345,67 ₴');
+  expect(figures).toContain('Зараз12 345,67 ₴');
   expect(figures).toContain('План100 000,00 ₴');
-  expect(figures).toContain('Осталось87 654,33 ₴');
-  expect(within(card).queryByText('План выполнен!')).not.toBeInTheDocument();
+  expect(figures).toContain('Залишилось87 654,33 ₴');
+  expect(within(card).queryByText('План виконано!')).not.toBeInTheDocument();
 });
 
 test('says the goal is reached', async () => {
   renderPage([movement()], 10_000);
 
-  const card = await screen.findByRole('region', { name: 'План копилки' });
-  expect(await within(card).findByText('План выполнен!')).toBeInTheDocument();
+  const card = await screen.findByRole('region', { name: 'План скарбнички' });
+  expect(await within(card).findByText('План виконано!')).toBeInTheDocument();
   expect(
-    within(card).getByRole('img', { name: 'Выполнено 123%' }),
+    within(card).getByRole('img', { name: 'Виконано 123%' }),
   ).toBeInTheDocument();
-  expect(within(card).queryByText('Осталось')).not.toBeInTheDocument();
+  expect(within(card).queryByText('Залишилось')).not.toBeInTheDocument();
 });
 
 test('offers to set a goal when there is none', async () => {
   renderPage([movement()], 0);
 
-  const card = await screen.findByRole('region', { name: 'План копилки' });
+  const card = await screen.findByRole('region', { name: 'План скарбнички' });
   expect(
-    await within(card).findByRole('link', { name: 'Задать план в настройках' }),
+    await within(card).findByRole('link', {
+      name: 'Задати план у налаштуваннях',
+    }),
   ).toHaveAttribute('href', '/expenses/settings');
 });

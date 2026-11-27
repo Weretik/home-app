@@ -65,10 +65,10 @@ export function EditDialog({
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose} disabled={isPending}>
-            Отмена
+            Скасувати
           </Button>
           <Button type="submit" variant="contained" disabled={isPending}>
-            {isPending ? 'Сохраняю…' : 'Сохранить'}
+            {isPending ? 'Зберігаю…' : 'Зберегти'}
           </Button>
         </DialogActions>
       </Box>

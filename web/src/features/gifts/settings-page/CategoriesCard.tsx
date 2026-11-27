@@ -7,7 +7,7 @@ import { RowActions } from '../editing/RowActions';
 import { useEditorState } from '../editing/use-editor-state';
 import { SettingsCard } from './SettingsCard';
 
-/** «Категории»: add, rename, delete; a category that gifts use is refused by the server and the dialog says why. */
+/** «Категорії»: add, rename, delete; a category that gifts use is refused by the server and the dialog says why. */
 export function CategoriesCard() {
   const categories = useGiftCategories();
   const editor = useEditorState<GiftCategoryItem>();
@@ -15,9 +15,9 @@ export function CategoriesCard() {
 
   return (
     <SettingsCard
-      title="Категории"
-      caption="По ним фильтруется список подарков."
-      addLabel="Добавить категорию"
+      title="Категорії"
+      caption="За ними фільтрується список подарунків."
+      addLabel="Додати категорію"
       onAdd={() => editor.add()}
       isPending={categories.isPending}
       error={categories.error}
@@ -25,10 +25,10 @@ export function CategoriesCard() {
     >
       {all.length === 0 ? (
         <Typography color="text.secondary" sx={{ py: 1 }}>
-          Категорий пока нет. Добавьте первую, например «Украшения».
+          Категорій поки немає. Додайте першу, наприклад «Прикраси».
         </Typography>
       ) : (
-        <List aria-label="Категории" dense disablePadding>
+        <List aria-label="Категорії" dense disablePadding>
           {all.map((category, index) => (
             <ListItem
               key={category.id}

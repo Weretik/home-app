@@ -42,27 +42,27 @@ const summary = (overrides: Partial<MonthSummary> = {}): MonthSummary => ({
 });
 
 test('names what each of the two earned, 0 for nothing', () => {
-  expect(plain(incomesCaption(summary()))).toBe('Виталий 0 ₴ · Маша 20 000 ₴');
+  expect(plain(incomesCaption(summary()))).toBe('Віталій 0 ₴ · Маша 20 000 ₴');
 });
 
 test('says when there is no monthly limit', () => {
-  expect(expensesCaption(summary())).toBe('лимит не задан');
+  expect(expensesCaption(summary())).toBe('ліміт не задано');
 });
 
-test('the jar card rounds the goal percent down, like «План копилки»', () => {
+test('the jar card rounds the goal percent down, like «План скарбнички»', () => {
   expect(savingsGoalPercent(summary())).toBe(99);
-  expect(plain(savingsCaption(summary()))).toBe('99% от цели 100 000 ₴');
+  expect(plain(savingsCaption(summary()))).toBe('99% від цілі 100 000 ₴');
   expect(savingsGoalPercent(summary({ savingsGoal: 0 }))).toBeNull();
-  expect(savingsCaption(summary({ savingsGoal: 0 }))).toBe('цель не задана');
+  expect(savingsCaption(summary({ savingsGoal: 0 }))).toBe('ціль не задано');
 });
 
 test('who spent what lists every payer with a share, and nothing without expenses', () => {
   expect(
     whoSpentLines(summary()).map((line) => [line.name, line.caption]),
   ).toEqual([
-    ['Виталий', '33% расходов'],
-    ['Маша', '0% расходов'],
-    ['Общее', '67% расходов'],
+    ['Віталій', '33% витрат'],
+    ['Маша', '0% витрат'],
+    ['Спільне', '67% витрат'],
   ]);
   expect(whoSpentLines(summary({ expenses: 0 }))).toEqual([]);
 });

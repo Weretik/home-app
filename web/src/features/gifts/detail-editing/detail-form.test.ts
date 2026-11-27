@@ -18,9 +18,9 @@ describe('detail form', () => {
 
   it('asks for every field and limits their length', () => {
     expect(validateDetail(emptyDetail())).toEqual({
-      recipient: 'Выберите, для кого',
-      label: 'Введите, что это',
-      value: 'Введите значение',
+      recipient: 'Виберіть, для кого',
+      label: 'Введіть, що це',
+      value: 'Введіть значення',
     });
     expect(
       validateDetail({
@@ -30,8 +30,8 @@ describe('detail form', () => {
       }),
     ).toEqual({
       recipient: undefined,
-      label: 'Не длиннее 100 символов',
-      value: 'Не длиннее 200 символов',
+      label: 'Не довше 100 символів',
+      value: 'Не довше 200 символів',
     });
   });
 

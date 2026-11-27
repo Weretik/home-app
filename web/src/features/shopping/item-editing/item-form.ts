@@ -28,14 +28,14 @@ export const itemValues = (item: ShoppingItem): ItemValues => ({
 export function checkItem(values: ItemValues): ItemErrors {
   const errors: ItemErrors = {};
   const name = values.name.trim();
-  if (!name) errors.name = 'Введите название';
+  if (!name) errors.name = 'Введіть назву';
   else if (name.length > NAME_MAX)
-    errors.name = `Не длиннее ${NAME_MAX} символов`;
+    errors.name = `Не довше ${NAME_MAX} символів`;
   if (values.quantity.trim().length > QUANTITY_MAX)
-    errors.quantity = `Не длиннее ${QUANTITY_MAX} символов`;
+    errors.quantity = `Не довше ${QUANTITY_MAX} символів`;
   if (values.note.trim().length > NOTE_MAX)
-    errors.note = `Не длиннее ${NOTE_MAX} символов`;
-  if (!values.departmentId) errors.departmentId = 'Выберите отдел';
+    errors.note = `Не довше ${NOTE_MAX} символів`;
+  if (!values.departmentId) errors.departmentId = 'Виберіть відділ';
   return errors;
 }
 

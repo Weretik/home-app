@@ -12,8 +12,8 @@ import { usePeriodParam } from '../url-state/use-period-param';
 import { sectionPath, settingsPath } from './expenses-pages';
 
 /**
- * Previous / next month arrows around the month name; «К текущему» when another month is open. Hidden while the
- * «Расходы» page shows a period of days instead of a month, and on «Настройки», which has no month.
+ * Previous / next month arrows around the month name; «До поточного» when another month is open. Hidden while the
+ * «Витрати» page shows a period of days instead of a month, and on «Налаштування», which has no month.
  */
 export function MonthPicker() {
   const [month, setMonth] = useMonthParam();
@@ -30,12 +30,12 @@ export function MonthPicker() {
   return (
     <Box
       role="group"
-      aria-label="Месяц"
+      aria-label="Місяць"
       sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}
     >
-      <Tooltip title="Предыдущий месяц">
+      <Tooltip title="Попередній місяць">
         <IconButton
-          aria-label="Предыдущий месяц"
+          aria-label="Попередній місяць"
           onClick={() => setMonth(shiftMonth(month, -1))}
         >
           <ChevronLeftOutlinedIcon />
@@ -52,9 +52,9 @@ export function MonthPicker() {
       >
         {formatMonth(month)}
       </Typography>
-      <Tooltip title="Следующий месяц">
+      <Tooltip title="Наступний місяць">
         <IconButton
-          aria-label="Следующий месяц"
+          aria-label="Наступний місяць"
           onClick={() => setMonth(shiftMonth(month, 1))}
         >
           <ChevronRightOutlinedIcon />
@@ -62,7 +62,7 @@ export function MonthPicker() {
       </Tooltip>
       {!isCurrent && (
         <Button size="small" onClick={() => setMonth(today)}>
-          К текущему
+          До поточного
         </Button>
       )}
     </Box>

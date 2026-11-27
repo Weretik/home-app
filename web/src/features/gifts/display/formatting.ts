@@ -1,17 +1,19 @@
-const money = new Intl.NumberFormat('ru-RU', {
+import { locale } from '../../../platform/locale';
+
+const money = new Intl.NumberFormat(locale, {
   style: 'currency',
   currency: 'UAH',
   currencyDisplay: 'narrowSymbol',
 });
 
-const whole = new Intl.NumberFormat('ru-RU', {
+const whole = new Intl.NumberFormat(locale, {
   style: 'currency',
   currency: 'UAH',
   currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
-const longDay = new Intl.DateTimeFormat('ru-RU', {
+const longDay = new Intl.DateTimeFormat(locale, {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -19,27 +21,31 @@ const longDay = new Intl.DateTimeFormat('ru-RU', {
 
 /** A gift price: «1 625 ₴» when whole, «1 234,50 ₴» with real kopecks; an unknown price is never shown as zero. */
 export function formatPrice(value: number | null | undefined): string {
-  if (value == null) return 'цена не указана';
+  if (value == null) return 'ціну не вказано';
   return Number.isInteger(value) ? whole.format(value) : money.format(value);
 }
 
 /** A rounded sum for a person's group header: «4 500 ₴». */
 export const formatWhole = (value: number) => whole.format(value);
 
-/** «1 подарок», «3 подарка», «12 подарков». */
+/** «1 подарунок», «3 подарунки», «12 подарунків». */
 export function formatGiftsCount(count: number): string {
-  const forms = { one: 'подарок', few: 'подарка', many: 'подарков' } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const forms = {
+    one: 'подарунок',
+    few: 'подарунки',
+    many: 'подарунків',
+  } as const;
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }
 
-/** A contract date (`2027-03-12`) as «12 марта 2027». Read as a calendar day, so no time zone shifts it. */
+/** A contract date (`2027-03-12`) as «12 березня 2027». Read as a calendar day, so no time zone shifts it. */
 export function formatLongDay(isoDate: string): string {
   const [year = 0, month = 1, date = 1] = isoDate.split('-').map(Number);
-  return longDay.format(new Date(year, month - 1, date)).replace(/\s?г\.$/, '');
+  return longDay.format(new Date(year, month - 1, date)).replace(/\s?р\.$/, '');
 }
 
-/** «День рождения · 12 марта 2027», or whichever part is set; undefined when neither is. */
+/** «День народження · 12 березня 2027», or whichever part is set; undefined when neither is. */
 export function formatOccasion(
   occasion: string | null | undefined,
   date: string | null | undefined,
@@ -63,22 +69,22 @@ export function variantLabel(variant: {
   }
 }
 
-/** «1 вариант», «2 варианта», «5 вариантов». */
+/** «1 варіант», «2 варіанти», «5 варіантів». */
 export function formatVariantsCount(count: number): string {
-  const forms = { one: 'вариант', few: 'варианта', many: 'вариантов' } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const forms = { one: 'варіант', few: 'варіанти', many: 'варіантів' } as const;
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }
 
-/** How an archived gift ended: «Подарено 26 ноября 2026», «Подарено», «Не актуально»; undefined while wanted. */
+/** How an archived gift ended: «Подаровано 26 листопада 2026», «Подаровано», «Неактуально»; undefined while wanted. */
 export function formatOutcome(gift: {
   status: string;
   giftedOn?: string | null;
 }): string | undefined {
   if (gift.status === 'Gifted')
     return gift.giftedOn
-      ? `Подарено ${formatLongDay(gift.giftedOn)}`
-      : 'Подарено';
-  if (gift.status === 'Dropped') return 'Не актуально';
+      ? `Подаровано ${formatLongDay(gift.giftedOn)}`
+      : 'Подаровано';
+  if (gift.status === 'Dropped') return 'Неактуально';
   return undefined;
 }

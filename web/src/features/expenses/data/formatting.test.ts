@@ -15,14 +15,14 @@ test('formats hryvnias with two decimals', () => {
 });
 
 test('formats a contract date as a short local day', () => {
-  expect(formatDay('2026-10-01')).toBe('чт, 1 окт.');
+  expect(formatDay('2026-10-01')).toBe('чт, 1 жовт.');
 });
 
-test('counts records with Russian plural forms', () => {
-  expect(formatRecordCount(1)).toBe('1 запись');
+test('counts records with Ukrainian plural forms', () => {
+  expect(formatRecordCount(1)).toBe('1 запис');
   expect(formatRecordCount(3)).toBe('3 записи');
-  expect(formatRecordCount(12)).toBe('12 записей');
-  expect(formatRecordCount(21)).toBe('21 запись');
+  expect(formatRecordCount(12)).toBe('12 записів');
+  expect(formatRecordCount(21)).toBe('21 запис');
 });
 
 test('writes the sign of a signed amount', () => {

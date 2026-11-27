@@ -22,7 +22,7 @@ const item = {
 
 /**
  * The wrapping line under a task's title (FR-004): a 🎁 for a gift's to-do (gifts 002), priority mark, due date (red when overdue), category, steps,
- * a notes icon, the assignee, and «В работе» / «Отложено». `extra` goes first (the archive's status and date, so an
+ * a notes icon, the assignee, and «В роботі» / «Відкладено». `extra` goes first (the archive's status and date, so an
  * archived row shows no status chip again).
  */
 export function TaskMeta({
@@ -57,8 +57,8 @@ export function TaskMeta({
         <Box
           component="span"
           role="img"
-          aria-label="Задача из подарков"
-          title="Задача из подарков"
+          aria-label="Справа з подарунків"
+          title="Справа з подарунків"
         >
           🎁
         </Box>
@@ -93,7 +93,7 @@ export function TaskMeta({
                 clip: 'rect(0 0 0 0)',
               }}
             >
-              просрочено:
+              прострочено:
             </Box>
           )}
           {formatDue(task.dueDate, today)}
@@ -114,14 +114,14 @@ export function TaskMeta({
         <Box
           component="span"
           sx={item}
-          aria-label={`Шаги: ${task.stepsDone} из ${task.stepsTotal}`}
+          aria-label={`Кроки: ${task.stepsDone} з ${task.stepsTotal}`}
         >
           <ChecklistOutlinedIcon sx={{ fontSize: 16 }} aria-hidden />
           {task.stepsDone}/{task.stepsTotal}
         </Box>
       )}
       {task.notes && (
-        <NotesOutlinedIcon sx={{ fontSize: 16 }} titleAccess="Есть заметка" />
+        <NotesOutlinedIcon sx={{ fontSize: 16 }} titleAccess="Є нотатка" />
       )}
       <AssigneeAvatar assignee={task.assignee} />
       {task.status !== 'Todo' && activeStatuses.includes(task.status) && (

@@ -1,6 +1,6 @@
 /**
- * The day headings of the lists (FR-001, FR-006): the active tasks by due day («Просрочено», «Сегодня», «Завтра»,
- * «Пн, 30 ноября» …, «Без срока») and the archive by the Kyiv day of completion («Сегодня», «Вчера», «Пт, 20 ноября»).
+ * The day headings of the lists (FR-001, FR-006): the active tasks by due day («Прострочено», «Сьогодні», «Завтра»,
+ * «Пн, 30 листопада» …, «Без терміну») and the archive by the Kyiv day of completion («Сьогодні», «Вчора», «Пт, 20 листопада»).
  * Items keep the API's order inside a group.
  */
 import { addDays, kyivDayOf } from './due-date';
@@ -14,23 +14,23 @@ export interface DayGroup<T> {
   items: T[];
 }
 
-const weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'] as const;
+const weekdays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'] as const;
 const months = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
+  'січня',
+  'лютого',
+  'березня',
+  'квітня',
+  'травня',
+  'червня',
+  'липня',
+  'серпня',
+  'вересня',
+  'жовтня',
+  'листопада',
+  'грудня',
 ] as const;
 
-/** «Пн, 30 ноября», with the year outside the year of `today`: «Пн, 4 января 2027». */
+/** «Пн, 30 листопада», with the year outside the year of `today`: «Пн, 4 січня 2027». */
 export function dayHeading(day: string, today: string): string {
   const [year = 2000, month = 1, date = 1] = day.split('-').map(Number);
   const weekday =
@@ -71,11 +71,11 @@ export function groupByDueDay<T extends { dueDate?: string | null }>(
       key,
       label:
         key === 'overdue'
-          ? 'Просрочено'
+          ? 'Прострочено'
           : key === 'none'
-            ? 'Без срока'
+            ? 'Без терміну'
             : key === today
-              ? 'Сегодня'
+              ? 'Сьогодні'
               : key === tomorrow
                 ? 'Завтра'
                 : dayHeading(key, today),
@@ -100,11 +100,11 @@ export function groupByCompletionDay<
       key,
       label:
         key === 'none'
-          ? 'Без даты'
+          ? 'Без дати'
           : key === today
-            ? 'Сегодня'
+            ? 'Сьогодні'
             : key === yesterday
-              ? 'Вчера'
+              ? 'Вчора'
               : dayHeading(key, today),
       overdue: false,
       items: group,

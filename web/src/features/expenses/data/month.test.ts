@@ -41,8 +41,8 @@ test('reads a month from URL values and falls back on bad ones', () => {
 });
 
 test('names the month in Russian with the year', () => {
-  expect(formatMonth({ year: 2026, month: 10 })).toBe('Октябрь 2026');
-  expect(formatMonth({ year: 2027, month: 1 })).toBe('Январь 2027');
+  expect(formatMonth({ year: 2026, month: 10 })).toBe('Жовтень 2026');
+  expect(formatMonth({ year: 2027, month: 1 })).toBe('Січень 2027');
 });
 
 test('gives the first and last day of a month', () => {

@@ -19,14 +19,14 @@ export function addedMessage(result: AddItemsResult): string {
   const names = [...result.added, ...result.restored, ...result.updated].map(
     (item) => item.name,
   );
-  if (names.length === 0) return 'Ничего не добавлено';
+  if (names.length === 0) return 'Нічого не додано';
   return result.added.length + result.restored.length === 0
-    ? `Уже в списке: ${names.join(', ')}`
-    : `Добавлено: ${names.join(', ')}`;
+    ? `Вже в списку: ${names.join(', ')}`
+    : `Додано: ${names.join(', ')}`;
 }
 
 /**
- * The quick add and its «Отменить» (R-1, R-2, R-8): one add at a time with an Idempotency-Key per attempt, «Я» as
+ * The quick add and its «Скасувати» (R-1, R-2, R-8): one add at a time with an Idempotency-Key per attempt, «Я» as
  * the author; the last result stays for the snackbar until it closes or is undone.
  */
 export function useQuickAdd() {
@@ -58,7 +58,7 @@ export function useQuickAdd() {
           onDone?.();
         },
         onError: (failure) => {
-          const described = describeWriteError(failure, 'добавить');
+          const described = describeWriteError(failure, 'додати');
           if (described.renewKey) idempotency.renew();
           setError(
             Object.values(described.fieldErrors)[0]?.[0] ?? described.message,
@@ -74,7 +74,7 @@ export function useQuickAdd() {
     setLast(null);
     undo.mutate(added, {
       onError: (failure) =>
-        setError(describeWriteError(failure, 'отменить').message),
+        setError(describeWriteError(failure, 'скасувати').message),
     });
   };
 

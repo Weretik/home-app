@@ -16,7 +16,7 @@ interface ExpenseFiltersProps {
   onPayerChange: (value: Payer | undefined) => void;
 }
 
-/** Category and «Кто» filters of the expense list. */
+/** Category and «Хто» filters of the expense list. */
 export function ExpenseFilters({
   categoryId,
   payer,
@@ -35,7 +35,7 @@ export function ExpenseFilters({
   return (
     <Box
       role="group"
-      aria-label="Фильтры"
+      aria-label="Фільтри"
       sx={{
         display: 'grid',
         gap: 2,
@@ -44,14 +44,14 @@ export function ExpenseFilters({
       }}
     >
       <FilterSelect
-        label="Категория"
+        label="Категорія"
         value={knownCategory ? categoryId : undefined}
         options={categoryOptions}
         onChange={onCategoryChange}
         disabled={categories.isPending}
       />
       <FilterSelect
-        label="Кто"
+        label="Хто"
         value={payer}
         options={payerOptions}
         onChange={onPayerChange}

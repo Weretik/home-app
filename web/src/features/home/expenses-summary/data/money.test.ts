@@ -14,7 +14,7 @@ test('a share rounds to the nearest whole percent, 0 without a total', () => {
   expect(percentOf(5, 0)).toBe(0);
 });
 
-// The same cases as goal-progress.test.ts on «Копилка»: one rule for the goal percent on both pages.
+// The same cases as goal-progress.test.ts on «Скарбничка»: one rule for the goal percent on both pages.
 test('the goal percent rounds down, so 100 % means the goal is reached', () => {
   expect(goalPercentOf(42_500, 100_000)).toBe(42);
   expect(goalPercentOf(99_600, 100_000)).toBe(99);

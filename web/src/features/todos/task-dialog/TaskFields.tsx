@@ -27,7 +27,7 @@ const options = <T extends string>(labels: Record<T, string>) =>
 const assignees = options<Assignee>(assigneeLabels);
 const authors = [
   ...options<Author>(authorLabels),
-  { value: '' as const, label: 'не указано' },
+  { value: '' as const, label: 'не вказано' },
 ];
 const priorities = (['Urgent', 'High', 'Normal', 'Low'] as TodoPriority[]).map(
   (value) => ({
@@ -61,7 +61,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
   return (
     <>
       <TextField
-        label="Название"
+        label="Назва"
         required
         multiline
         value={values.title}
@@ -75,7 +75,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
         onChange={(value) => set('assignee', value)}
       />
       <SegmentedField
-        label="Поставил(а)"
+        label="Поставив(-ла)"
         value={values.author}
         options={authors}
         onChange={(value) => set('author', value)}
@@ -94,7 +94,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
         ))}
       </TextField>
       <SegmentedField
-        label="Приоритет"
+        label="Пріоритет"
         value={values.priority}
         options={priorities}
         onChange={(value) => set('priority', value)}
@@ -106,7 +106,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
       />
       <TextField
         select
-        label="Категория"
+        label="Категорія"
         value={known ? values.categoryId : ''}
         disabled={categories.isPending}
         onChange={(event) => set('categoryId', event.target.value)}
@@ -116,7 +116,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
           inputLabel: { shrink: true },
         }}
       >
-        <MenuItem value="">Без категории</MenuItem>
+        <MenuItem value="">Без категорії</MenuItem>
         {(categories.data ?? []).map((category) => (
           <MenuItem key={category.id} value={category.id}>
             {categoryLabel(category)}
@@ -124,7 +124,7 @@ export function TaskFields({ values, errors, set }: TaskFieldsProps) {
         ))}
       </TextField>
       <TextField
-        label="Заметка"
+        label="Нотатка"
         multiline
         minRows={2}
         value={values.notes}

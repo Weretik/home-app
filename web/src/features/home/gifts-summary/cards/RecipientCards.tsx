@@ -4,7 +4,7 @@ import type { GiftsSummaryView } from '../data/summary-api';
 import { PersonAvatar } from '../persons/PersonAvatar';
 import { FigureCard } from './FigureCard';
 
-/** The top row: one figure card per person in their colour and «Всего» (docs/design.md, «Figure card»). */
+/** The top row: one figure card per person in their colour and «Усього» (docs/design.md, «Figure card»). */
 export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
   return (
     <Box
@@ -29,7 +29,7 @@ export function RecipientCards({ summary }: { summary: GiftsSummaryView }) {
             🎁
           </Box>
         }
-        title="Всего"
+        title="Усього"
         counts={summary.total}
       />
     </Box>

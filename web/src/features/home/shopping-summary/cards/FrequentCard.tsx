@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import type { ShoppingSummary } from '../data/shopping-summary-api';
 import { times } from '../data/summary-labels';
 
-/** «Покупаем чаще всего»: the top five names of the frequent window. */
+/** «Купуємо найчастіше»: the top five names of the frequent window. */
 export function FrequentCard({ summary }: { summary: ShoppingSummary }) {
   if (summary.topFrequent.length === 0) return null;
   return (
@@ -17,7 +17,7 @@ export function FrequentCard({ summary }: { summary: ShoppingSummary }) {
         component="h2"
         sx={{ fontWeight: 600, px: 2, pt: 2 }}
       >
-        Покупаем чаще всего
+        Купуємо найчастіше
       </Typography>
       <List aria-labelledby="shopping-frequent-title" dense>
         {summary.topFrequent.map((item) => (

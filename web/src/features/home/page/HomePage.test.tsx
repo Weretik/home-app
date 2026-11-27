@@ -101,7 +101,7 @@ function renderHome(
           ...overrides,
           month: Number(url.searchParams.get('month')),
         })
-      : json({ title: 'Сервер недоступен', status }, status);
+      : json({ title: 'Сервер недоступний', status }, status);
   });
   const client = createQueryClient();
   client.setDefaultOptions({ queries: { retry: false } });
@@ -123,77 +123,79 @@ const plain = (element: HTMLElement) =>
 test('opens the budget summary first, every section has its summary', async () => {
   renderHome('/');
 
-  const switcher = screen.getByRole('group', { name: 'Сводка' });
+  const switcher = screen.getByRole('group', { name: 'Зведення' });
   expect(
     within(switcher).getByRole('button', { name: /Бюджет/ }),
   ).toHaveAttribute('aria-pressed', 'true');
   expect(
-    within(switcher).getByRole('button', { name: /Подарки/ }),
+    within(switcher).getByRole('button', { name: /Подарунки/ }),
   ).toBeEnabled();
-  expect(within(switcher).getByRole('button', { name: /Дела/ })).toBeEnabled();
+  expect(
+    within(switcher).getByRole('button', { name: /Справи/ }),
+  ).toBeEnabled();
   expect(
     within(switcher).getByRole('button', { name: /Покупки/ }),
   ).toBeEnabled();
-  expect(screen.getByRole('link', { name: /Состояние/ })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /Стан/ })).toHaveAttribute(
     'href',
     '/status',
   );
-  await screen.findByRole('region', { name: 'Доходы' });
+  await screen.findByRole('region', { name: 'Доходи' });
 });
 
 test('shows the month figures, the limits and who spent what', async () => {
   renderHome();
 
-  const incomes = await screen.findByRole('region', { name: 'Доходы' });
+  const incomes = await screen.findByRole('region', { name: 'Доходи' });
   expect(plain(incomes)).toContain('50 000 ₴');
-  expect(plain(incomes)).toContain('Виталий 30 000 ₴ · Маша 20 000 ₴');
-  expect(plain(screen.getByRole('region', { name: 'Расходы' }))).toContain(
-    'лимит 40 000 ₴ · 90%',
+  expect(plain(incomes)).toContain('Віталій 30 000 ₴ · Маша 20 000 ₴');
+  expect(plain(screen.getByRole('region', { name: 'Витрати' }))).toContain(
+    'ліміт 40 000 ₴ · 90%',
   );
-  const result = screen.getByRole('region', { name: 'Итог месяца' });
+  const result = screen.getByRole('region', { name: 'Підсумок місяця' });
   expect(within(result).getByText(/^−1\s500/)).toHaveStyle({
     color: theme.colorSchemes.light!.palette.error.main,
   });
-  expect(plain(result)).toContain('отложено 15 500 ₴');
-  expect(plain(screen.getByRole('region', { name: 'Копилка' }))).toContain(
-    '60% от цели 100 000 ₴',
+  expect(plain(result)).toContain('відкладено 15 500 ₴');
+  expect(plain(screen.getByRole('region', { name: 'Скарбничка' }))).toContain(
+    '60% від цілі 100 000 ₴',
   );
 
   const rows = within(
-    screen.getByRole('list', { name: 'Лимиты месяца' }),
+    screen.getByRole('list', { name: 'Ліміти місяця' }),
   ).getAllByRole('listitem');
   expect(rows).toHaveLength(3);
   expect(plain(rows[0]!)).toContain('Продукты110%');
-  expect(within(rows[0]!).getByText(/остаток −1\s500,00/)).toHaveStyle({
+  expect(within(rows[0]!).getByText(/залишок −1\s500,00/)).toHaveStyle({
     color: theme.colorSchemes.light!.palette.error.main,
   });
-  expect(plain(rows[0]!)).toContain('→ след. мес. 1 500,00 ₴');
-  expect(rows[0]).not.toHaveTextContent('перенос');
+  expect(plain(rows[0]!)).toContain('→ наст. міс. 1 500,00 ₴');
+  expect(rows[0]).not.toHaveTextContent('перенесення');
   expect(rows[1]).toHaveTextContent('Одежда (квартал)');
-  expect(rows[1]).not.toHaveTextContent('след. мес.');
-  expect(rows[1]).not.toHaveTextContent('в день');
-  expect(plain(rows[2]!)).toContain('ИТОГО90%');
-  expect(plain(rows[2]!)).toContain('остаток 4 000,00 ₴ · в день 1 000,00 ₴');
+  expect(rows[1]).not.toHaveTextContent('наст. міс.');
+  expect(rows[1]).not.toHaveTextContent('на день');
+  expect(plain(rows[2]!)).toContain('РАЗОМ90%');
+  expect(plain(rows[2]!)).toContain('залишок 4 000,00 ₴ · на день 1 000,00 ₴');
 
-  expect(screen.getByRole('region', { name: 'Расходы' })).not.toHaveTextContent(
-    'Вне лимитов',
+  expect(screen.getByRole('region', { name: 'Витрати' })).not.toHaveTextContent(
+    'Поза лімітами',
   );
   const forecast = screen.getByRole('region', { name: 'Прогноз' });
-  expect(plain(forecast)).toContain('Ожидаемые расходы38 000,00 ₴');
-  expect(plain(forecast)).toContain('Запланировано2 000,00 ₴');
-  expect(plain(forecast)).toContain('Ожидаемый итог месяца−3 500,00 ₴');
-  expect(plain(forecast)).toContain('Останется от лимита2 000,00 ₴');
+  expect(plain(forecast)).toContain('Очікувані витрати38 000,00 ₴');
+  expect(plain(forecast)).toContain('Заплановано2 000,00 ₴');
+  expect(plain(forecast)).toContain('Очікуваний підсумок місяця−3 500,00 ₴');
+  expect(plain(forecast)).toContain('Залишиться від ліміту2 000,00 ₴');
   expect(
-    within(forecast).getByRole('link', { name: 'Открыть план' }),
+    within(forecast).getByRole('link', { name: 'Відкрити план' }),
   ).toHaveAttribute('href', '/expenses/forecast?year=2026&month=10');
 
-  const who = screen.getByRole('list', { name: 'Кто сколько потратил' });
-  expect(plain(who)).toContain('Общее50% расходов18 000,00 ₴');
-  const top = screen.getByRole('list', { name: 'Топ-5 категорий' });
+  const who = screen.getByRole('list', { name: 'Хто скільки витратив' });
+  expect(plain(who)).toContain('Спільне50% витрат18 000,00 ₴');
+  const top = screen.getByRole('list', { name: 'Топ-5 категорій' });
   expect(within(top).getAllByRole('listitem')).toHaveLength(2);
 });
 
-test('counts the carry-over and the expenses outside the limits in ИТОГО', async () => {
+test('counts the carry-over and the expenses outside the limits in РАЗОМ', async () => {
   renderHome('/?year=2026&month=10', 200, {
     outsideLimitsCount: 2,
     outsideLimitsAmount: 4000,
@@ -201,41 +203,41 @@ test('counts the carry-over and the expenses outside the limits in ИТОГО', 
     carriesOut: 0,
   });
 
-  const expenses = await screen.findByRole('region', { name: 'Расходы' });
-  expect(plain(expenses)).toContain('Вне лимитов: 2 траты на 4 000 ₴');
+  const expenses = await screen.findByRole('region', { name: 'Витрати' });
+  expect(plain(expenses)).toContain('Поза лімітами: 2 витрати на 4 000 ₴');
   // (36 000 − 4 000 outside the limits + 3 000 carried in) of 40 000.
-  expect(plain(expenses)).toContain('лимит 40 000 ₴ · 88%');
+  expect(plain(expenses)).toContain('ліміт 40 000 ₴ · 88%');
   const total = within(
-    screen.getByRole('list', { name: 'Лимиты месяца' }),
+    screen.getByRole('list', { name: 'Ліміти місяця' }),
   ).getAllByRole('listitem')[2]!;
-  expect(plain(total)).toContain('ИТОГО88%');
-  expect(plain(total)).toContain('32 000,00 ₴ из 40 000,00 ₴');
-  expect(plain(total)).toContain('остаток 5 000,00 ₴');
-  expect(plain(total)).toContain('перенос 3 000,00 ₴ · план 2 000,00 ₴');
+  expect(plain(total)).toContain('РАЗОМ88%');
+  expect(plain(total)).toContain('32 000,00 ₴ з 40 000,00 ₴');
+  expect(plain(total)).toContain('залишок 5 000,00 ₴');
+  expect(plain(total)).toContain('перенесення 3 000,00 ₴ · план 2 000,00 ₴');
 });
 
 test('loads the next month from the arrows', async () => {
   const { urls } = renderHome();
-  await screen.findByRole('region', { name: 'Доходы' });
+  await screen.findByRole('region', { name: 'Доходи' });
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Следующий месяц' }),
+    screen.getByRole('button', { name: 'Наступний місяць' }),
   );
 
   await waitFor(() => expect(urls).toHaveLength(2));
   expect(urls[1]!.pathname).toBe('/api/expenses/summary');
   expect(urls[1]!.searchParams.get('year')).toBe('2026');
   expect(urls[1]!.searchParams.get('month')).toBe('11');
-  expect(screen.getByText('Ноябрь 2026')).toBeInTheDocument();
+  expect(screen.getByText('Листопад 2026')).toBeInTheDocument();
 });
 
 test('says why the summary did not load and offers to retry', async () => {
   renderHome('/', 500);
 
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Не удалось загрузить сводку',
+    'Не вдалося завантажити зведення',
   );
-  expect(screen.getByRole('button', { name: 'Повторить' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Повторити' })).toBeInTheDocument();
 });
 
 test('opens the gifts summary from ?s=gifts', async () => {
@@ -272,10 +274,10 @@ test('opens the gifts summary from ?s=gifts', async () => {
     </ThemeProvider>,
   );
 
-  const switcher = screen.getByRole('group', { name: 'Сводка' });
+  const switcher = screen.getByRole('group', { name: 'Зведення' });
   expect(
-    within(switcher).getByRole('button', { name: /Подарки/ }),
+    within(switcher).getByRole('button', { name: /Подарунки/ }),
   ).toHaveAttribute('aria-pressed', 'true');
-  expect(await screen.findByText('Желаний пока нет')).toBeInTheDocument();
+  expect(await screen.findByText('Бажань поки немає')).toBeInTheDocument();
   expect(urls.map((url) => url.pathname)).toEqual(['/api/gifts/summary']);
 });

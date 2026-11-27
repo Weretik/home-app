@@ -17,8 +17,8 @@ import {
 } from '../entry-editing/entry-fields';
 
 export const directionLabels: Record<SavingsDirection, string> = {
-  Deposit: 'Положили в копилку',
-  Withdrawal: 'Взяли из копилки',
+  Deposit: 'Поклали в скарбничку',
+  Withdrawal: 'Взяли зі скарбнички',
 };
 
 /** The savings form as typed: the amount is positive, the direction gives its sign. */
@@ -30,7 +30,7 @@ export interface SavingsFormValues {
   comment: string;
 }
 
-/** The form of an existing movement, or a new deposit by Виталий on the default date. */
+/** The form of an existing movement, or a new deposit by Віталій on the default date. */
 export function savingsFormValues(
   item: SavingsMovementItem | undefined,
   month: Month,

@@ -3,11 +3,11 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import { useState } from 'react';
 
-/** What a list says after a tick: «Готово» with «Отменить», or why the write failed. */
+/** What a list says after a tick: «Готово» with «Скасувати», or why the write failed. */
 export interface ResultMessage {
   text: string;
   severity: 'success' | 'error';
-  /** «Отменить» and what it does; none for an error. */
+  /** «Скасувати» and what it does; none for an error. */
   undo?: () => void;
 }
 
@@ -47,7 +47,7 @@ export function ResultSnackbar({
                   onClose();
                 }}
               >
-                Отменить
+                Скасувати
               </Button>
             )
           }

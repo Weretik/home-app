@@ -24,7 +24,7 @@ export function ExpenseTable({
   onDelete,
 }: {
   items: ExpenseItem[];
-  /** The list's accessible name: «Расходы за месяц» or «Расходы за период». */
+  /** The list's accessible name: «Витрати за місяць» or «Витрати за період». */
   label: string;
 } & RowHandlers<ExpenseItem>) {
   return (
@@ -33,12 +33,12 @@ export function ExpenseTable({
         <TableHead>
           <TableRow>
             <TableCell>Дата</TableCell>
-            <TableCell>Категория</TableCell>
-            <TableCell>Кто</TableCell>
-            <TableCell align="right">Сумма</TableCell>
+            <TableCell>Категорія</TableCell>
+            <TableCell>Хто</TableCell>
+            <TableCell align="right">Сума</TableCell>
             <TableCell>Оплата</TableCell>
-            <TableCell>Комментарий</TableCell>
-            <TableCell padding="checkbox" aria-label="Действия" />
+            <TableCell>Коментар</TableCell>
+            <TableCell padding="checkbox" aria-label="Дії" />
           </TableRow>
         </TableHead>
         <TableBody>

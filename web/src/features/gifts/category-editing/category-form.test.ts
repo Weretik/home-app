@@ -4,10 +4,10 @@ import { toCategoryRequest, validateCategory } from './category-form';
 describe('category form', () => {
   it('asks for a name up to 100 characters', () => {
     expect(validateCategory({ name: '  ' })).toEqual({
-      name: 'Введите название',
+      name: 'Введіть назву',
     });
     expect(validateCategory({ name: 'x'.repeat(101) })).toEqual({
-      name: 'Не длиннее 100 символов',
+      name: 'Не довше 100 символів',
     });
     expect(validateCategory({ name: 'Книги' })).toEqual({ name: undefined });
   });

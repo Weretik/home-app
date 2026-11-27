@@ -83,7 +83,7 @@ describe('applyFilters', () => {
 });
 
 describe('groupByRecipient', () => {
-  it('groups in the order Маша, Виталий, Вместе and leaves out empty groups', () => {
+  it('groups in the order Маша, Віталій, Вместе and leaves out empty groups', () => {
     const groups = groupByRecipient([
       gift('1', 'Together'),
       gift('2', 'Maria'),

@@ -16,7 +16,7 @@ interface FormDialogProps {
   isPending: boolean;
   onSubmit: () => void;
   onClose: () => void;
-  /** Extra buttons on the left of the actions («Удалить»). */
+  /** Extra buttons on the left of the actions («Видалити»). */
   extraAction?: ReactNode;
   children: ReactNode;
 }
@@ -68,10 +68,10 @@ export function FormDialog({
         <DialogActions sx={{ px: 3, pb: 2 }}>
           {extraAction && <Box sx={{ mr: 'auto' }}>{extraAction}</Box>}
           <Button onClick={onClose} disabled={isPending}>
-            Отмена
+            Скасувати
           </Button>
           <Button type="submit" variant="contained" disabled={isPending}>
-            {isPending ? 'Сохраняю…' : 'Сохранить'}
+            {isPending ? 'Зберігаю…' : 'Зберегти'}
           </Button>
         </DialogActions>
       </Box>

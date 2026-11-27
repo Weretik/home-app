@@ -4,45 +4,45 @@ using Notifications.Domain.Chats;
 
 namespace Notifications.Application.Features.Telegram.Commands.HandleTelegramUpdate;
 
-/// <summary>What the bot answers to commands and buttons (Russian).</summary>
+/// <summary>What the bot answers to commands and buttons (Ukrainian).</summary>
 public static class BotTexts
 {
     public const string ChoosePrefix = "me:";
 
-    public const string Ask = "👋 Привет! Я бот нашего дома: утром пришлю дела, вечером — покупки, по воскресеньям и в конце месяца — расходы.\n\nКто вы?";
+    public const string Ask = "👋 Привіт! Я бот нашого дому: зранку надішлю справи, увечері — покупки, щонеділі й наприкінці місяця — витрати.\n\nХто ви?";
 
-    public const string NotLinked = "Сначала напишите /start, чтобы подключить этот чат.";
+    public const string NotLinked = "Спершу напишіть /start, щоб підключити цей чат.";
 
-    public const string NothingToday = "На сегодня дел нет 🎉";
+    public const string NothingToday = "На сьогодні справ немає 🎉";
 
     public const string FamilyLinked =
-        "✅ Группа подключена как семейная: сюда будут приходить общие дела, покупки и сводки по расходам.";
+        "✅ Групу підключено як сімейну: сюди надходитимуть спільні справи, покупки й підсумки витрат.";
 
     public static IReadOnlyList<TelegramButton> AskButtons { get; } =
     [
-        new("Я Виталий", ChoosePrefix + nameof(Audience.Vitaliy)),
+        new("Я Віталій", ChoosePrefix + nameof(Audience.Vitaliy)),
         new("Я Маша", ChoosePrefix + nameof(Audience.Maria)),
     ];
 
     public static string Help(string settingsUrl) =>
-        "Команды:\n/today — дела на сегодня\n/help — эта подсказка\n\n"
-        + $"Расписание и отвязка чатов — на сайте: {TextFormat.Link(settingsUrl, "Телеграм")}";
+        "Команди:\n/today — справи на сьогодні\n/help — ця підказка\n\n"
+        + $"Розклад і відв’язування чатів — на сайті: {TextFormat.Link(settingsUrl, "Телеграм")}";
 
     public static string Linked(Audience audience, string settingsUrl) =>
-        $"✅ Готово, {TextFormat.Person(audience.ToString())}! Чат подключён.\n\n{Help(settingsUrl)}";
+        $"✅ Готово, {TextFormat.Address(audience.ToString())}! Чат підключено.\n\n{Help(settingsUrl)}";
 
     public static string AlreadyLinked(Audience audience) =>
-        $"Этот чат уже подключён: {Who(audience)}.";
+        $"Цей чат уже підключено: {Who(audience)}.";
 
     public static string Taken(Audience audience, string settingsUrl) =>
-        $"{Who(audience)} — уже подключён другой чат. Отвязать его можно на сайте: {TextFormat.Link(settingsUrl, "Телеграм")}";
+        $"{Who(audience)} — уже підключено інший чат. Відв’язати його можна на сайті: {TextFormat.Link(settingsUrl, "Телеграм")}";
 
     public static string Done(Todos.Contracts.TodoCompletionOutcome outcome) => outcome switch
     {
         Todos.Contracts.TodoCompletionOutcome.Completed => "✅ Готово!",
-        Todos.Contracts.TodoCompletionOutcome.AlreadyClosed => "Это дело уже закрыто.",
-        _ => "Этого дела уже нет.",
+        Todos.Contracts.TodoCompletionOutcome.AlreadyClosed => "Цю справу вже закрито.",
+        _ => "Цієї справи вже немає.",
     };
 
-    private static string Who(Audience audience) => audience == Audience.Family ? "семейная группа" : TextFormat.Person(audience.ToString());
+    private static string Who(Audience audience) => audience == Audience.Family ? "сімейна група" : TextFormat.Person(audience.ToString());
 }

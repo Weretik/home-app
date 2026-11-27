@@ -8,7 +8,7 @@ import { ListStatus } from '../month-view/ListStatus';
 import { BudgetSettingsCard } from './BudgetSettingsCard';
 import { LimitsCard } from './LimitsCard';
 
-/** «Настройки» of the Expenses section: the monthly limit, the savings goal and the spending limits. */
+/** «Налаштування» of the Expenses section: the monthly limit, the savings goal and the spending limits. */
 export function SettingsPage() {
   const budget = useBudget();
   const editor = useEntryEditor<SpendingLimitItem>();
@@ -16,7 +16,7 @@ export function SettingsPage() {
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
       <Typography variant="h5" component="h2">
-        Настройки
+        Налаштування
       </Typography>
       {budget.data ? (
         <>
@@ -34,7 +34,7 @@ export function SettingsPage() {
             isPending={budget.isPending}
             error={budget.error}
             isEmpty={false}
-            loadingLabel="Загружаю настройки"
+            loadingLabel="Завантажую налаштування"
             onRetry={() => void budget.refetch()}
           >
             {null}

@@ -134,10 +134,10 @@ test('shows the wanted gifts in a block per person, in the server order', async 
   expect(
     within(masha).getByRole('heading', { name: 'Маша' }),
   ).toBeInTheDocument();
-  expect(within(masha).getByText(/^2 подарка/)).toBeInTheDocument();
+  expect(within(masha).getByText(/^2 подарунки/)).toBeInTheDocument();
   expect(rowNames(masha)).toEqual(['Серьги', 'Кольцо']);
-  expect(screen.getByRole('region', { name: 'Виталий' })).toBeInTheDocument();
-  expect(screen.getByRole('region', { name: 'Вместе' })).toBeInTheDocument();
+  expect(screen.getByRole('region', { name: 'Віталій' })).toBeInTheDocument();
+  expect(screen.getByRole('region', { name: 'Разом' })).toBeInTheDocument();
   expect(lists()[0]!.url.searchParams.get('archived')).toBe('false');
 });
 
@@ -149,20 +149,20 @@ test('filters by person and category in the URL without a new request', async ()
   expect(new URLSearchParams(search()).get('recipient')).toBe('Maria');
   expect(screen.queryByRole('region', { name: 'Маша' })).toBeNull();
   expect(
-    within(screen.getByRole('list', { name: 'Список подарков' })).getAllByRole(
-      'listitem',
-    ),
+    within(
+      screen.getByRole('list', { name: 'Список подарунків' }),
+    ).getAllByRole('listitem'),
   ).toHaveLength(2);
 
-  await userEvent.click(screen.getByRole('combobox', { name: 'Категория' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Категорія' }));
   await userEvent.click(screen.getByRole('option', { name: 'Техника' }));
   expect(
-    await screen.findByText('С этими фильтрами подарков нет'),
+    await screen.findByText('З цими фільтрами подарунків немає'),
   ).toBeInTheDocument();
   expect(lists()).toHaveLength(1);
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Сбросить фильтры' }),
+    screen.getByRole('button', { name: 'Скинути фільтри' }),
   );
   expect(rows()).toHaveLength(4);
   expect(search()).toBe('');
@@ -178,9 +178,9 @@ test('ignores a person or category in the link that does not exist', async () =>
 
 test('says when the wishlist is empty', async () => {
   renderPage([]);
-  expect(await screen.findByText('Список желаний пуст')).toBeInTheDocument();
+  expect(await screen.findByText('Список бажань порожній')).toBeInTheDocument();
   expect(
-    screen.getByRole('button', { name: 'Добавить подарок' }),
+    screen.getByRole('button', { name: 'Додати подарунок' }),
   ).toBeInTheDocument();
 });
 
@@ -192,10 +192,10 @@ test('shows a failed load and retries', async () => {
       : undefined,
   );
   expect(
-    await screen.findByText(/Не удалось загрузить: База недоступна/),
+    await screen.findByText(/Не вдалося завантажити: База недоступна/),
   ).toBeInTheDocument();
   fail = false;
-  await userEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Повторити' }));
   expect(
     await screen.findByRole('region', { name: 'Маша' }),
   ).toBeInTheDocument();
@@ -209,51 +209,51 @@ test('adds a gift with variants, preset from the filter, with one key per data',
       sent.method === 'POST' && fail ? json({ detail: 'Ой' }, 500) : undefined,
     '/gifts?recipient=Maria',
   );
-  await screen.findByText('Список желаний пуст');
+  await screen.findByText('Список бажань порожній');
   await userEvent.click(
-    screen.getByRole('button', { name: 'Добавить подарок' }),
+    screen.getByRole('button', { name: 'Додати подарунок' }),
   );
-  const dialog = screen.getByRole('dialog', { name: 'Новый подарок' });
+  const dialog = screen.getByRole('dialog', { name: 'Новий подарунок' });
   expect(
     within(dialog).getByRole('combobox', { name: 'Для кого' }),
   ).toHaveTextContent('Маша');
   expect(
-    within(dialog).getByRole('combobox', { name: 'Приоритет' }),
+    within(dialog).getByRole('combobox', { name: 'Пріоритет' }),
   ).toHaveTextContent('⭐ Хочу');
 
-  await userEvent.type(within(dialog).getByLabelText('Название'), 'Серьги');
+  await userEvent.type(within(dialog).getByLabelText('Назва'), 'Серьги');
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: 'Категория' }),
+    within(dialog).getByRole('combobox', { name: 'Категорія' }),
   );
   await userEvent.click(screen.getByRole('option', { name: 'Украшения' }));
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Добавить вариант' }),
+    within(dialog).getByRole('button', { name: 'Додати варіант' }),
   );
-  expect(within(dialog).getByLabelText('Ссылка варианта 1')).toHaveFocus();
+  expect(within(dialog).getByLabelText('Посилання варіанта 1')).toHaveFocus();
   await userEvent.type(
-    within(dialog).getByLabelText('Ссылка варианта 1'),
+    within(dialog).getByLabelText('Посилання варіанта 1'),
     'https://a.ua/1',
   );
   await userEvent.type(
-    within(dialog).getByLabelText('Название варианта'),
+    within(dialog).getByLabelText('Назва варіанта'),
     'Голубой',
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Добавить вариант' }),
+    within(dialog).getByRole('button', { name: 'Додати варіант' }),
   );
   await userEvent.type(
-    within(dialog).getByLabelText('Ссылка варианта 2'),
+    within(dialog).getByLabelText('Посилання варіанта 2'),
     'https://a.ua/2',
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   expect(
-    await within(dialog).findByText('Не удалось сохранить: Ой'),
+    await within(dialog).findByText('Не вдалося зберегти: Ой'),
   ).toBeInTheDocument();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(2));
   const [first, second] = writes();
@@ -263,11 +263,11 @@ test('adds a gift with variants, preset from the filter, with one key per data',
 
   fail = false;
   await userEvent.type(
-    within(dialog).getByLabelText('Заметки'),
+    within(dialog).getByLabelText('Нотатки'),
     'Белое золото',
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   const third = writes()[2]!;
@@ -291,20 +291,20 @@ test('adds a gift with variants, preset from the filter, with one key per data',
 
 test('checks the fields before sending', async () => {
   const { writes } = renderPage([]);
-  await screen.findByText('Список желаний пуст');
+  await screen.findByText('Список бажань порожній');
   await userEvent.click(
-    screen.getByRole('button', { name: 'Добавить подарок' }),
+    screen.getByRole('button', { name: 'Додати подарунок' }),
   );
   const dialog = screen.getByRole('dialog');
-  await userEvent.type(within(dialog).getByLabelText('Ссылка'), 'shop.ua');
+  await userEvent.type(within(dialog).getByLabelText('Посилання'), 'shop.ua');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   for (const text of [
-    'Выберите, для кого',
-    'Введите название',
-    'Выберите категорию',
-    'Ссылка должна начинаться с http:// или https://',
+    'Виберіть, для кого',
+    'Введіть назву',
+    'Виберіть категорію',
+    'Посилання має починатися з http:// або https://',
   ])
     expect(within(dialog).getByText(text)).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
@@ -320,19 +320,19 @@ test('edits a gift with its version and replaces its variants', async () => {
   });
   const { writes } = renderPage([item]);
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Наушники' }),
+    await screen.findByRole('button', { name: 'Дії: Наушники' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  const dialog = screen.getByRole('dialog', { name: 'Изменить подарок' });
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  const dialog = screen.getByRole('dialog', { name: 'Змінити подарунок' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить вариант 1' }),
+    within(dialog).getByRole('button', { name: 'Видалити варіант 1' }),
   );
   await userEvent.type(
-    within(dialog).getByLabelText('Цена (если известна)'),
+    within(dialog).getByLabelText('Ціна (якщо відома)'),
     '1 500',
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   await waitFor(() => expect(writes()).toHaveLength(1));
@@ -353,13 +353,11 @@ test('says when a gift was changed elsewhere and reloads the list', async () => 
       : undefined,
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Плед' }),
+    await screen.findByRole('button', { name: 'Дії: Плед' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
-  expect(
-    await screen.findByText(/изменили в другом месте/),
-  ).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+  expect(await screen.findByText(/змінили в іншому місці/)).toBeInTheDocument();
   await waitFor(() => expect(lists().length).toBeGreaterThan(1));
 });
 
@@ -367,13 +365,13 @@ test('deletes a gift after asking', async () => {
   const item = gift({ name: 'Плед' });
   const { writes } = renderPage([item]);
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Плед' }),
+    await screen.findByRole('button', { name: 'Дії: Плед' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const dialog = screen.getByRole('dialog', { name: 'Удалить подарок?' });
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const dialog = screen.getByRole('dialog', { name: 'Видалити подарунок?' });
   expect(within(dialog).getByText('Плед · Маша')).toBeInTheDocument();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   expect(writes()[0]).toMatchObject({ method: 'DELETE' });
@@ -392,10 +390,10 @@ test('marks a gift gifted and it leaves the list', async () => {
     },
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Плед' }),
+    await screen.findByRole('button', { name: 'Дії: Плед' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Подарено' }));
-  expect(await screen.findByText('Список желаний пуст')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Подаровано' }));
+  expect(await screen.findByText('Список бажань порожній')).toBeInTheDocument();
   const put = writes()[0]!;
   expect(put.url.pathname).toBe(`/api/gifts/items/${item.id}/status`);
   expect(put.headers.get('If-Match')).toBe('7');
@@ -407,12 +405,12 @@ test('marks a gift not relevant, and says when writes are too frequent', async (
     sent.method === 'PUT' ? json({ detail: 'x' }, 429) : undefined,
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Плед' }),
+    await screen.findByRole('button', { name: 'Дії: Плед' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Не актуально' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Неактуально' }));
   expect(
     await screen.findByText(
-      'Слишком много изменений подряд. Подождите минуту и повторите.',
+      'Забагато змін поспіль. Зачекайте хвилину й повторіть.',
     ),
   ).toBeInTheDocument();
   expect(writes()[0]!.body).toEqual({ status: 'Dropped', giftedOn: null });

@@ -8,7 +8,7 @@ import { LimitTable } from './LimitTable';
 import { limitRows } from './limit-rows';
 
 /**
- * «Лимиты»: every spending limit of the month, then «ИТОГО» against the monthly limit; each row notes the overspend
+ * «Ліміти»: every spending limit of the month, then «РАЗОМ» against the monthly limit; each row notes the overspend
  * carried in, what moves on to the next period and what is planned, when there is any.
  */
 export function LimitsCard({ summary }: { summary: MonthSummary }) {
@@ -25,7 +25,7 @@ export function LimitsCard({ summary }: { summary: MonthSummary }) {
         component="h2"
         sx={{ fontWeight: 600, px: { xs: 2, md: 3 }, pt: { xs: 2, md: 2.5 } }}
       >
-        Лимиты
+        Ліміти
       </Typography>
       {summary.limits.length === 0 && (
         <Typography
@@ -33,7 +33,7 @@ export function LimitsCard({ summary }: { summary: MonthSummary }) {
           color="text.secondary"
           sx={{ px: { xs: 2, md: 3 }, pt: 0.5 }}
         >
-          Лимитов по категориям пока нет; ниже весь месяц целиком.
+          Лімітів за категоріями поки немає; нижче весь місяць цілком.
         </Typography>
       )}
       {isComputer ? <LimitTable rows={rows} /> : <LimitList rows={rows} />}

@@ -27,7 +27,7 @@ export const giftKeys = {
   details: [...moduleKeys.gifts, 'details'] as const,
 };
 
-/** The wanted gifts («Список», archived=false) or the gifted and dropped ones («Подаренные»), in the server's order. */
+/** The wanted gifts («Список», archived=false) or the gifted and dropped ones («Подаровані»), in the server's order. */
 export function useGifts(archived: boolean) {
   return useQuery({
     queryKey: giftKeys.list(archived),
@@ -50,7 +50,7 @@ export function useGiftCategories() {
   });
 }
 
-/** The «нюансы» of every recipient, in the server's order. */
+/** The «нюанси» of every recipient, in the server's order. */
 export function useGiftDetails() {
   return useQuery({
     queryKey: giftKeys.details,

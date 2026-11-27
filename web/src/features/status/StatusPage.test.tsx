@@ -36,7 +36,7 @@ test('shows the API status and each check', async () => {
   );
 
   expect(await screen.findByRole('alert')).toHaveTextContent('API: Healthy');
-  expect(screen.getByText('База данных')).toBeInTheDocument();
+  expect(screen.getByText('База даних')).toBeInTheDocument();
 });
 
 test('says when the API cannot be reached', async () => {

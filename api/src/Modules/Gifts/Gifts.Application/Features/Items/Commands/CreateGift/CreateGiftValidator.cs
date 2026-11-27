@@ -19,7 +19,7 @@ internal sealed class CreateGiftValidator : AbstractValidator<CreateGiftCommand>
         RuleFor(c => c.Notes).MaximumLength(Gift.MaxNotesLength);
         RuleFor(c => c.Giver).IsInEnum().When(c => c.Giver is not null);
         RuleFor(c => c.Variants).NotNull().Must(v => v.Count <= Gift.MaxVariants)
-            .WithMessage($"A gift has at most {Gift.MaxVariants} variants.");
+            .WithMessage($"У подарунка не більше {Gift.MaxVariants} варіантів.");
         RuleForEach(c => c.Variants).NotNull().SetValidator(new VariantDraftValidator());
     }
 }

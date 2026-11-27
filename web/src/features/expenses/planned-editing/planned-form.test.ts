@@ -42,9 +42,9 @@ test('starts a new plan shared and empty in the open month, an existing one from
 
 test('checks name, category and amount', () => {
   const errors = validatePlanned(plannedFormValues(undefined, november));
-  expect(errors.name).toBe('Введите название');
-  expect(errors.categoryId).toBe('Выберите категорию');
-  expect(errors.amount).toBe('Введите сумму');
+  expect(errors.name).toBe('Введіть назву');
+  expect(errors.categoryId).toBe('Виберіть категорію');
+  expect(errors.amount).toBe('Введіть суму');
   const filled = {
     year: 2026,
     month: 11,
@@ -53,10 +53,10 @@ test('checks name, category and amount', () => {
     payer: 'Shared' as const,
     amount: '0',
   };
-  expect(validatePlanned(filled).name).toBe('Введите название');
-  expect(validatePlanned(filled).amount).toBe('Сумма больше нуля');
+  expect(validatePlanned(filled).name).toBe('Введіть назву');
+  expect(validatePlanned(filled).amount).toBe('Сума має бути більшою за нуль');
   expect(validatePlanned({ ...filled, name: 'x'.repeat(101) }).name).toBe(
-    'Не длиннее 100 символов',
+    'Не довше 100 символів',
   );
   expect(
     Object.values(

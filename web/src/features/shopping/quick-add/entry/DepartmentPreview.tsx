@@ -15,7 +15,7 @@ export function DepartmentPreview({ text }: { text: string }) {
       aria-live="polite"
       sx={{ color: 'text.secondary', px: 0.5 }}
     >
-      Отдел: {data.departmentIcon} {data.departmentName}
+      Відділ: {data.departmentIcon} {data.departmentName}
     </Typography>
   );
 }

@@ -16,7 +16,7 @@ import { RowActions } from '../editing/RowActions';
 import { useEditorState } from '../editing/use-editor-state';
 import { SettingsCard } from './SettingsCard';
 
-/** «Нюансы»: sizes and other details per person, edited only here; the home summary shows them read-only. */
+/** «Нюанси»: sizes and other details per person, edited only here; the home summary shows them read-only. */
 export function DetailsCard() {
   const details = useGiftDetails();
   const editor = useEditorState<GiftDetailItem, Recipient>();
@@ -30,9 +30,9 @@ export function DetailsCard() {
 
   return (
     <SettingsCard
-      title="Нюансы"
-      caption="Размеры и детали, которые важно помнить: кольцо, одежда, обувь."
-      addLabel="Добавить нюанс"
+      title="Нюанси"
+      caption="Розміри та деталі, які важливо пам’ятати: каблучка, одяг, взуття."
+      addLabel="Додати нюанс"
       onAdd={() => editor.add()}
       isPending={details.isPending}
       error={details.error}
@@ -40,7 +40,8 @@ export function DetailsCard() {
     >
       {groups.length === 0 && (
         <Typography color="text.secondary" sx={{ py: 1 }}>
-          Нюансов пока нет. Добавьте, например, «Кольцо — 18,5–19,0» для Маши.
+          Нюансів поки немає. Додайте, наприклад, «Каблучка — 18,5–19,0» для
+          Маші.
         </Typography>
       )}
       {groups.map((group) => {
@@ -57,10 +58,10 @@ export function DetailsCard() {
               <Typography variant="subtitle2" component="h3">
                 {name}
               </Typography>
-              <Tooltip title={`Добавить нюанс для ${name}`}>
+              <Tooltip title={`Додати нюанс для ${name}`}>
                 <IconButton
                   size="small"
-                  aria-label={`Добавить нюанс для ${name}`}
+                  aria-label={`Додати нюанс для ${name}`}
                   onClick={() => editor.add(group.recipient)}
                 >
                   <AddOutlinedIcon fontSize="small" />

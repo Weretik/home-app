@@ -7,6 +7,6 @@ internal sealed class DeleteTodoTaskValidator : AbstractValidator<DeleteTodoTask
     public DeleteTodoTaskValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the task you delete in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію завдання, яке видаляєте, у заголовку If-Match.");
     }
 }

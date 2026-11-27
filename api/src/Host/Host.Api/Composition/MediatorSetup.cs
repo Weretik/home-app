@@ -1,4 +1,6 @@
+using System.Globalization;
 using BuildingBlocks.Application.Pipeline;
+using FluentValidation;
 
 namespace Host.Api.Composition;
 
@@ -10,6 +12,8 @@ internal static class MediatorSetup
     /// </summary>
     public static IServiceCollection AddMediatorPipeline(this IServiceCollection services)
     {
+        // Validation messages people read are Ukrainian (ADR 0037): FluentValidation's built-in messages too.
+        ValidatorOptions.Global.LanguageManager.Culture = CultureInfo.GetCultureInfo("uk");
         services.AddMediator(options =>
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;

@@ -21,10 +21,10 @@ interface DepartmentRowProps {
 const words = (n: number) => {
   const tens = n % 100;
   const ones = n % 10;
-  if (tens >= 11 && tens <= 14) return `${n} слов`;
+  if (tens >= 11 && tens <= 14) return `${n} слів`;
   if (ones === 1) return `${n} слово`;
   if (ones >= 2 && ones <= 4) return `${n} слова`;
-  return `${n} слов`;
+  return `${n} слів`;
 };
 
 /** A department in store order: icon and name, its counts, up / down arrows and «⋮» (the fallback cannot be deleted). */
@@ -32,8 +32,8 @@ export function DepartmentRow(props: DepartmentRowProps) {
   const { department: d, isFirst, isLast, isMoving, onMove } = props;
   const caption = [
     words(d.keywordCount),
-    d.neededCount > 0 ? `${d.neededCount} в списке` : null,
-    d.isFallback ? 'сюда идёт всё без отдела' : null,
+    d.neededCount > 0 ? `${d.neededCount} у списку` : null,
+    d.isFallback ? 'сюди йде все без відділу' : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -45,10 +45,10 @@ export function DepartmentRow(props: DepartmentRowProps) {
         secondary={caption}
         slotProps={{ primary: { sx: { fontWeight: 600 } } }}
       />
-      <Tooltip title="Выше">
+      <Tooltip title="Вище">
         <span>
           <IconButton
-            aria-label={`Выше: ${d.name}`}
+            aria-label={`Вище: ${d.name}`}
             disabled={isFirst || isMoving}
             onClick={() => onMove(-1)}
           >
@@ -56,10 +56,10 @@ export function DepartmentRow(props: DepartmentRowProps) {
           </IconButton>
         </span>
       </Tooltip>
-      <Tooltip title="Ниже">
+      <Tooltip title="Нижче">
         <span>
           <IconButton
-            aria-label={`Ниже: ${d.name}`}
+            aria-label={`Нижче: ${d.name}`}
             disabled={isLast || isMoving}
             onClick={() => onMove(1)}
           >

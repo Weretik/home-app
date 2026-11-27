@@ -6,7 +6,7 @@ import type { Month } from '../data/month';
 
 export type PlannedExpenseItem = Schema<'PlannedExpenseItem'>;
 
-/** «Прогноз»: the expenses planned for a month, ordered by name, and their total («Запланировано»). */
+/** «Прогноз»: the expenses planned for a month, ordered by name, and their total («Заплановано»). */
 export function usePlannedExpenses(month: Month) {
   return useQuery({
     queryKey: [...moduleKeys.expenses, 'planned', month],

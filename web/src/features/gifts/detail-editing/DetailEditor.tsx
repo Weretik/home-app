@@ -11,7 +11,7 @@ interface DetailEditorProps {
   onClose: () => void;
 }
 
-/** The open dialog of the «Нюансы» card: add, edit or delete one. */
+/** The open dialog of the «Нюанси» card: add, edit or delete one. */
 export function DetailEditor({ state, onClose }: DetailEditorProps) {
   const remove = useDeleteDetail();
   if (!state) return null;
@@ -27,11 +27,11 @@ export function DetailEditor({ state, onClose }: DetailEditorProps) {
   };
   return (
     <DeleteDialog
-      title="Удалить нюанс?"
+      title="Видалити нюанс?"
       summary={`${recipientLabels[detail.recipient]} · ${detail.label} — ${detail.value}`}
       error={
         remove.error
-          ? describeWriteError(remove.error, 'удалить').message
+          ? describeWriteError(remove.error, 'видалити').message
           : undefined
       }
       isPending={remove.isPending}

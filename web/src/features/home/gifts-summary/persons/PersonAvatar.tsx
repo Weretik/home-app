@@ -9,7 +9,7 @@ const initials: Record<Recipient, string | undefined> = {
   Together: undefined,
 };
 
-/** The person's circle in their colour: an initial, or two people for «Вместе». Decorative; the name is next to it. */
+/** The person's circle in their colour: an initial, or two people for «Разом». Decorative; the name is next to it. */
 export function PersonAvatar({
   recipient,
   size = 32,

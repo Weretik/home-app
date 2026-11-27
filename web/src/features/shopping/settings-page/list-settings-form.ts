@@ -23,9 +23,9 @@ function checkRange(
   range: { min: number; max: number },
 ): string | undefined {
   const value = whole(text);
-  if (Number.isNaN(value)) return 'Введите целое число';
+  if (Number.isNaN(value)) return 'Введіть ціле число';
   if (value < range.min || value > range.max)
-    return `От ${range.min} до ${range.max}`;
+    return `Від ${range.min} до ${range.max}`;
   return undefined;
 }
 

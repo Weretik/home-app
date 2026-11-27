@@ -6,7 +6,7 @@ import { KeywordsCard } from '../keyword-settings/KeywordsCard';
 import { ListSettingsCard } from './ListSettingsCard';
 import { useShoppingSettings } from './settings-api';
 
-/** «Настройки» of Покупки (the gear): departments, their keywords, the list's settings (R-11…R-13). */
+/** «Налаштування» of Покупки (the gear): departments, their keywords, the list's settings (R-11…R-13). */
 export function SettingsPage() {
   const settings = useShoppingSettings();
   return (
@@ -22,11 +22,11 @@ export function SettingsPage() {
       <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
         <DepartmentsCard />
         {settings.isPending && (
-          <CircularProgress aria-label="Загружаю настройки" />
+          <CircularProgress aria-label="Завантажую налаштування" />
         )}
         {settings.error && (
           <Alert severity="error">
-            Не удалось загрузить настройки: {settings.error.message}
+            Не вдалося завантажити налаштування: {settings.error.message}
           </Alert>
         )}
         {settings.data && <ListSettingsCard settings={settings.data} />}

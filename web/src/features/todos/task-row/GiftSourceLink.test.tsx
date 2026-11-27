@@ -43,7 +43,7 @@ test('a gift to-do links to its gift inside the app', () => {
   themed(<GiftSourceLink task={task(gift)} />);
 
   expect(
-    screen.getByRole('link', { name: '🎁 Открыть подарок' }),
+    screen.getByRole('link', { name: '🎁 Відкрити подарунок' }),
   ).toHaveAttribute('href', '/gifts?gift=g%201');
 });
 
@@ -56,13 +56,13 @@ test('other tasks have no gift link and no gift mark', () => {
   );
 
   expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  expect(screen.queryByRole('img', { name: 'Задача из подарков' })).toBeNull();
+  expect(screen.queryByRole('img', { name: 'Справа з подарунків' })).toBeNull();
 });
 
 test('the meta line marks a gift to-do', () => {
   themed(<TaskMeta task={task(gift)} today="2026-11-27" />);
 
   expect(
-    screen.getByRole('img', { name: 'Задача из подарков' }),
+    screen.getByRole('img', { name: 'Справа з подарунків' }),
   ).toBeInTheDocument();
 });

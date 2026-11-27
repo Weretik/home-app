@@ -9,7 +9,7 @@ const payers: Payer[] = ['Vitaliy', 'Maria', 'Shared'];
 export const earnedBy = (summary: MonthSummary, person: Person) =>
   summary.incomesByPerson.find((i) => i.person === person)?.amount ?? 0;
 
-/** «Виталий 30 000 ₴ · Маша 20 000 ₴» under «Доходы». */
+/** «Віталій 30 000 ₴ · Маша 20 000 ₴» under «Доходи». */
 export const incomesCaption = (summary: MonthSummary) =>
   (['Vitaliy', 'Maria'] as const)
     .map(
@@ -18,24 +18,24 @@ export const incomesCaption = (summary: MonthSummary) =>
     )
     .join(' · ');
 
-/** «лимит 40 000 ₴ · 90%» under «Расходы» (the «ИТОГО» percent), or that there is no limit. */
+/** «ліміт 40 000 ₴ · 90%» under «Витрати» (the «РАЗОМ» percent), or that there is no limit. */
 export const expensesCaption = (summary: MonthSummary) =>
   summary.monthlyLimit > 0
-    ? `лимит ${formatWhole(summary.monthlyLimit)} · ${totalPercent(summary)}%`
-    : 'лимит не задан';
+    ? `ліміт ${formatWhole(summary.monthlyLimit)} · ${totalPercent(summary)}%`
+    : 'ліміт не задано';
 
-/** The share of the savings goal for the «Копилка» card; null without a goal (no bar). */
+/** The share of the savings goal for the «Скарбничка» card; null without a goal (no bar). */
 export const savingsGoalPercent = (summary: MonthSummary) =>
   summary.savingsGoal > 0
     ? goalPercentOf(summary.savingsBalance, summary.savingsGoal)
     : null;
 
-/** «60% от цели 100 000 ₴» under «Копилка», or that there is no goal. */
+/** «60% від цілі 100 000 ₴» under «Скарбничка», or that there is no goal. */
 export const savingsCaption = (summary: MonthSummary) => {
   const percent = savingsGoalPercent(summary);
   return percent === null
-    ? 'цель не задана'
-    : `${percent}% от цели ${formatWhole(summary.savingsGoal)}`;
+    ? 'ціль не задано'
+    : `${percent}% від цілі ${formatWhole(summary.savingsGoal)}`;
 };
 
 /** One name / amount line of a small card. */
@@ -46,7 +46,7 @@ export interface AmountLine {
   caption?: string;
 }
 
-/** «Кто сколько потратил»: each payer with the share of the month's expenses; none in a month without expenses. */
+/** «Хто скільки витратив»: each payer with the share of the month's expenses; none in a month without expenses. */
 export function whoSpentLines(summary: MonthSummary): AmountLine[] {
   if (summary.expenses <= 0) return [];
   const spentBy = (payer: Payer) =>
@@ -55,11 +55,11 @@ export function whoSpentLines(summary: MonthSummary): AmountLine[] {
     key: payer,
     name: payerLabels[payer],
     amount: spentBy(payer),
-    caption: `${percentOf(spentBy(payer), summary.expenses)}% расходов`,
+    caption: `${percentOf(spentBy(payer), summary.expenses)}% витрат`,
   }));
 }
 
-/** «Топ-5 категорий»: the five biggest categories of the month. */
+/** «Топ-5 категорій»: the five biggest categories of the month. */
 export const topCategoryLines = (summary: MonthSummary): AmountLine[] =>
   summary.topCategories.slice(0, 5).map((category) => ({
     key: category.categoryId,

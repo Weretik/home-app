@@ -20,7 +20,7 @@ export function ExpenseEditor({
   if (state.mode === 'delete')
     return (
       <DeleteEntryDialog
-        title="Удалить расход?"
+        title="Видалити витрату?"
         summary={`${state.item.categoryName} · ${formatAmount(state.item.amount)} · ${formatDay(state.item.date)}`}
         id={state.item.id}
         remove={remove}

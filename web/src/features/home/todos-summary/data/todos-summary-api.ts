@@ -20,7 +20,7 @@ export function useTodoSummary() {
   });
 }
 
-/** Ticks a task of «На сегодня» done in place (FR-008), with its version; then everything under the module prefix reloads. */
+/** Ticks a task of «На сьогодні» done in place (FR-008), with its version; then everything under the module prefix reloads. */
 export function useCompleteFocusTask() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -39,13 +39,13 @@ export function useCompleteFocusTask() {
   });
 }
 
-/** Why a tick in «На сегодня» failed, in Russian (the API's own messages are English). The summary reloads after it. */
+/** Why a tick in «На сьогодні» failed, in Ukrainian (the API's own messages are English). The summary reloads after it. */
 export function describeTickError(error: Error): string {
   if (!(error instanceof ApiError))
-    return 'Нет связи с сервером. Проверьте интернет и попробуйте снова.';
+    return 'Немає зв’язку із сервером. Перевірте інтернет і спробуйте знову.';
   if (error.status === 404 || error.code === 'todos.changed_meanwhile')
-    return 'Задачу изменили в другом месте — сводка обновлена.';
+    return 'Завдання змінили в іншому місці — зведення оновлено.';
   if (error.status === 429)
-    return 'Слишком много изменений подряд. Подождите минуту и повторите.';
-  return `Не удалось отметить задачу: ${error.message}`;
+    return 'Забагато змін поспіль. Зачекайте хвилину й повторіть.';
+  return `Не вдалося позначити завдання: ${error.message}`;
 }

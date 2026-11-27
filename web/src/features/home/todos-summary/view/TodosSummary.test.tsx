@@ -104,28 +104,28 @@ test('shows the counts per assignee, the week and the focus list', async () => {
   );
 
   const maria = await screen.findByRole('region', { name: 'Маша' });
-  expect(plain(maria)).toContain('4 задачи');
-  expect(within(maria).getByText('просрочено 1')).toHaveStyle({
+  expect(plain(maria)).toContain('4 завдання');
+  expect(within(maria).getByText('прострочено 1')).toHaveStyle({
     color: theme.colorSchemes.light!.palette.error.main,
   });
-  expect(maria).toHaveTextContent('сегодня 2');
-  expect(screen.getByRole('region', { name: 'Виталий' })).toHaveTextContent(
-    'на сегодня всё спокойно',
+  expect(maria).toHaveTextContent('сьогодні 2');
+  expect(screen.getByRole('region', { name: 'Віталій' })).toHaveTextContent(
+    'на сьогодні все спокійно',
   );
-  expect(screen.getByText('Сделано за неделю: 5')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Открыть дела' })).toHaveAttribute(
+  expect(screen.getByText('Зроблено за тиждень: 5')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Відкрити справи' })).toHaveAttribute(
     'href',
     '/todos',
   );
 
   const rows = within(
-    screen.getByRole('list', { name: 'На сегодня' }),
+    screen.getByRole('list', { name: 'На сьогодні' }),
   ).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
   expect(rows[0]).toHaveTextContent('вт 24.11');
-  expect(rows[1]).toHaveTextContent('сегодня');
-  expect(rows[1]).toHaveTextContent('Общее');
-  expect(screen.getByRole('link', { name: 'Все на сегодня' })).toHaveAttribute(
+  expect(rows[1]).toHaveTextContent('сьогодні');
+  expect(rows[1]).toHaveTextContent('Спільне');
+  expect(screen.getByRole('link', { name: 'Усі на сьогодні' })).toHaveAttribute(
     'href',
     '/todos?when=today',
   );
@@ -154,12 +154,12 @@ test('ticks a focus task done with its version and reloads the summary', async (
   expect(put.body).toEqual({ status: 'Done' });
 });
 
-test('hides «На сегодня» when nothing needs attention', async () => {
+test('hides «На сьогодні» when nothing needs attention', async () => {
   renderHome(() => json(summary([])));
 
-  expect(await screen.findByText('Сделано за неделю: 5')).toBeInTheDocument();
+  expect(await screen.findByText('Зроблено за тиждень: 5')).toBeInTheDocument();
   expect(
-    screen.queryByRole('heading', { name: 'На сегодня' }),
+    screen.queryByRole('heading', { name: 'На сьогодні' }),
   ).not.toBeInTheDocument();
 });
 
@@ -185,7 +185,7 @@ test('says in Russian when a focus task changed elsewhere', async () => {
 
   expect(
     await screen.findByText(
-      'Задачу изменили в другом месте — сводка обновлена.',
+      'Завдання змінили в іншому місці — зведення оновлено.',
     ),
   ).toBeInTheDocument();
 });

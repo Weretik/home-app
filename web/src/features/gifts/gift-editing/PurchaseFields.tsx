@@ -16,7 +16,7 @@ interface PurchaseFieldsProps {
   ) => void;
 }
 
-/** «Кто дарит» and «Купить до» (gifts 002 FR-001): with both set the server makes a to-do and a Telegram reminder. */
+/** «Хто дарує» and «Купити до» (gifts 002 FR-001): with both set the server makes a to-do and a Telegram reminder. */
 export function PurchaseFields({ values, errors, set }: PurchaseFieldsProps) {
   const both = Boolean(values.giver && values.buyBy);
   return (
@@ -30,12 +30,12 @@ export function PurchaseFields({ values, errors, set }: PurchaseFieldsProps) {
       >
         <TextField
           select
-          label="Кто дарит"
+          label="Хто дарує"
           value={values.giver}
           onChange={(event) => set('giver', event.target.value as Giver | '')}
         >
           <MenuItem value="">
-            <em>не указано</em>
+            <em>не вказано</em>
           </MenuItem>
           {recipients.map((giver) => (
             <MenuItem key={giver} value={giver}>
@@ -44,7 +44,7 @@ export function PurchaseFields({ values, errors, set }: PurchaseFieldsProps) {
           ))}
         </TextField>
         <TextField
-          label="Купить до"
+          label="Купити до"
           type="date"
           value={values.buyBy}
           onChange={(event) => set('buyBy', event.target.value)}
@@ -55,8 +55,8 @@ export function PurchaseFields({ values, errors, set }: PurchaseFieldsProps) {
       </Box>
       <Typography variant="body2" color="text.secondary">
         {both
-          ? 'Задача появится в «Делах», напоминание придёт в Телеграм за 2 недели.'
-          : 'Укажите, кто дарит, и дату — появится задача в «Делах» и напоминание в Телеграме за 2 недели.'}
+          ? 'Завдання з’явиться у «Справах», нагадування прийде в Телеграм за 2 тижні.'
+          : 'Вкажіть, хто дарує, і дату — з’явиться завдання у «Справах» і нагадування в Телеграмі за 2 тижні.'}
       </Typography>
     </Box>
   );

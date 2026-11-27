@@ -7,7 +7,7 @@ import type { GiftsSummaryView } from '../data/summary-api';
 import { PersonAvatar } from '../persons/PersonAvatar';
 import { SummaryCard } from './SummaryCard';
 
-/** «Нюансы» read-only: sizes and details per person; they are edited only in the Gifts settings. */
+/** «Нюанси» read-only: sizes and details per person; they are edited only in the Gifts settings. */
 export function DetailsCard({ summary }: { summary: GiftsSummaryView }) {
   const groups = recipientOrder
     .map((recipient) => ({
@@ -18,17 +18,17 @@ export function DetailsCard({ summary }: { summary: GiftsSummaryView }) {
 
   return (
     <SummaryCard
-      title="Нюансы"
+      title="Нюанси"
       action={
         <Button component={Link} to="/gifts/settings" size="small">
-          Изменить
+          Змінити
         </Button>
       }
     >
       {groups.length === 0 && (
         <Typography color="text.secondary">
-          Нюансов пока нет. Размеры и другие детали добавляются в настройках
-          подарков.
+          Нюансів поки немає. Розміри та інші деталі додаються в налаштуваннях
+          подарунків.
         </Typography>
       )}
       {groups.map((group) => (

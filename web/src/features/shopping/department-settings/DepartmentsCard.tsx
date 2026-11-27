@@ -22,7 +22,7 @@ import {
 type Open =
   { kind: 'add' } | { kind: 'edit' | 'delete'; department: Department };
 
-/** «Отделы»: the store-walk order (up / down), add, rename, delete with a confirmation (R-11). */
+/** «Відділи»: the store-walk order (up / down), add, rename, delete with a confirmation (R-11). */
 export function DepartmentsCard() {
   const departments = useDepartments();
   const reorder = useReorderDepartments();
@@ -53,29 +53,29 @@ export function DepartmentsCard() {
           component="h2"
           sx={{ fontWeight: 600 }}
         >
-          Отделы
+          Відділи
         </Typography>
         <Button
           startIcon={<AddOutlinedIcon />}
           onClick={() => setOpen({ kind: 'add' })}
         >
-          Добавить отдел
+          Додати відділ
         </Button>
       </Box>
       <Typography variant="body2" sx={{ color: 'text.secondary', px: 2 }}>
-        В этом порядке идут отделы в списке — как вы обходите магазин.
+        У такому порядку йдуть відділи в списку — як ви обходите магазин.
       </Typography>
       {departments.isPending && (
-        <CircularProgress aria-label="Загружаю отделы" sx={{ m: 2 }} />
+        <CircularProgress aria-label="Завантажую відділи" sx={{ m: 2 }} />
       )}
       {departments.error && (
         <Alert severity="error" sx={{ m: 2 }}>
-          Не удалось загрузить отделы: {departments.error.message}
+          Не вдалося завантажити відділи: {departments.error.message}
         </Alert>
       )}
       {reorder.error && (
         <Alert severity="error" sx={{ m: 2 }} onClose={() => reorder.reset()}>
-          {describeWriteError(reorder.error, 'изменить порядок').message}
+          {describeWriteError(reorder.error, 'змінити порядок').message}
         </Alert>
       )}
       <List aria-labelledby="departments-title">
@@ -103,12 +103,12 @@ export function DepartmentsCard() {
       )}
       {open?.kind === 'delete' && (
         <ConfirmDialog
-          title="Удалить отдел?"
+          title="Видалити відділ?"
           summary={`${open.department.icon ?? ''} ${open.department.name}`.trim()}
-          consequence="Его товары и слова перейдут в отдел по умолчанию."
+          consequence="Його товари й слова перейдуть до відділу за замовчуванням."
           error={
             remove.error
-              ? describeWriteError(remove.error, 'удалить').message
+              ? describeWriteError(remove.error, 'видалити').message
               : undefined
           }
           isPending={remove.isPending}

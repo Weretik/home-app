@@ -30,13 +30,13 @@ const plain = { fontWeight: 600, fontVariantNumeric: 'tabular-nums' } as const;
 export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
   const figures: { label: string; value?: ReactNode }[] = [
     {
-      label: 'На начало месяца',
+      label: 'На початок місяця',
       value: month && (
         <Typography sx={plain}>{formatAmount(month.balanceAtStart)}</Typography>
       ),
     },
     {
-      label: 'Положили',
+      label: 'Поклали',
       value: month && <SignedAmount value={month.deposits} sx={plain} />,
     },
     {
@@ -44,7 +44,7 @@ export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
       value: month && <SignedAmount value={-month.withdrawals} sx={plain} />,
     },
     {
-      label: 'На конец месяца',
+      label: 'На кінець місяця',
       value: month && (
         <Typography sx={plain}>{formatAmount(month.balanceAtEnd)}</Typography>
       ),
@@ -54,7 +54,7 @@ export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
   return (
     <Card
       component="section"
-      aria-label="Копилка"
+      aria-label="Скарбничка"
       sx={{
         p: { xs: 2, md: 3 },
         display: 'grid',
@@ -83,7 +83,7 @@ export function BalanceCard({ currentBalance, month }: BalanceCardProps) {
         </Box>
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="body2" color="text.secondary">
-            В копилке сейчас
+            У скарбничці зараз
           </Typography>
           {currentBalance === undefined ? (
             <Skeleton width={200} height={48} />

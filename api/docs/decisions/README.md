@@ -43,6 +43,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0034 | [The scheduler is a GitHub Actions cron](0034-scheduler-github-actions-cron.md) |
 | 0035 | [Modules talk through integration events in the outbox](0035-integration-events-through-the-outbox.md) |
 | 0036 | [Telegram chats are linked from Telegram, not configured](0036-telegram-chats-linked-from-telegram.md) |
+| 0037 | [Texts the API and the bot write are Ukrainian, in place](0037-ukrainian-user-facing-texts.md) |
 
 ## Decisions that must have a record
 

@@ -22,19 +22,19 @@ export interface ListStatusProps {
 
 const emptyTexts = {
   month: {
-    title: 'За этот месяц записей нет',
-    hint: 'Записи месяца появятся здесь. Стрелками выше можно открыть другой месяц.',
-    filteredHint: 'Сбросьте фильтр или выберите другой месяц.',
+    title: 'За цей місяць записів немає',
+    hint: 'Записи місяця з’являться тут. Стрілками вище можна відкрити інший місяць.',
+    filteredHint: 'Скиньте фільтр або виберіть інший місяць.',
   },
   period: {
-    title: 'За этот период записей нет',
-    hint: 'Записи за выбранные дни появятся здесь. Даты можно изменить выше.',
-    filteredHint: 'Сбросьте фильтр или выберите другие даты.',
+    title: 'За цей період записів немає',
+    hint: 'Записи за вибрані дні з’являться тут. Дати можна змінити вище.',
+    filteredHint: 'Скиньте фільтр або виберіть інші дати.',
   },
   plan: {
-    title: 'На этот месяц ничего не запланировано',
-    hint: 'Добавьте траты, которые ждёте в этом месяце: они войдут в прогноз и в лимиты.',
-    filteredHint: 'Сбросьте фильтр или выберите другой месяц.',
+    title: 'На цей місяць нічого не заплановано',
+    hint: 'Додайте витрати, на які чекаєте цього місяця: вони ввійдуть у прогноз і в ліміти.',
+    filteredHint: 'Скиньте фільтр або виберіть інший місяць.',
   },
 } as const;
 
@@ -64,11 +64,11 @@ export function ListStatus({
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={onRetry}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить: {error.message}
+          Не вдалося завантажити: {error.message}
         </Alert>
       </Box>
     );
@@ -98,14 +98,16 @@ export function ListStatus({
           <EventNoteOutlinedIcon />
         </Box>
         <Typography variant="h6" component="p">
-          {isFiltered ? 'С этим фильтром записей нет' : emptyTexts[scope].title}
+          {isFiltered
+            ? 'З цим фільтром записів немає'
+            : emptyTexts[scope].title}
         </Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
           {isFiltered ? emptyTexts[scope].filteredHint : emptyTexts[scope].hint}
         </Typography>
         {isFiltered && (
           <Button onClick={onResetFilters} sx={{ mt: 1 }}>
-            Сбросить фильтр
+            Скинути фільтр
           </Button>
         )}
       </Box>

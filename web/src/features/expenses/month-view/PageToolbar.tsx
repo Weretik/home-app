@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 interface PageToolbarProps {
   /** What stands on the left: filters, a heading or a total. */
   children: ReactNode;
-  /** The add button's text: «Добавить расход», «Добавить план». */
+  /** The add button's text: «Додати витрату», «Додати план». */
   addLabel: string;
   onAdd: () => void;
 }

@@ -3,7 +3,7 @@ import type { MonthSummary } from '../data/summary-api';
 import { AmountsCard } from './AmountsCard';
 import { topCategoryLines, whoSpentLines } from './card-lines';
 
-/** «Кто сколько потратил» and «Топ-5 категорий» side by side from `sm`. */
+/** «Хто скільки витратив» and «Топ-5 категорій» side by side from `sm`. */
 export function SpendingCards({ summary }: { summary: MonthSummary }) {
   return (
     <Box
@@ -14,14 +14,14 @@ export function SpendingCards({ summary }: { summary: MonthSummary }) {
       }}
     >
       <AmountsCard
-        title="Кто сколько потратил"
+        title="Хто скільки витратив"
         lines={whoSpentLines(summary)}
-        empty="Расходов за месяц нет."
+        empty="Витрат за місяць немає."
       />
       <AmountsCard
-        title="Топ-5 категорий"
+        title="Топ-5 категорій"
         lines={topCategoryLines(summary)}
-        empty="Расходов за месяц нет."
+        empty="Витрат за місяць немає."
       />
     </Box>
   );

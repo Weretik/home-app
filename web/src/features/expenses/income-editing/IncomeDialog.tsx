@@ -34,7 +34,7 @@ export function IncomeDialog({ item, month, onClose }: IncomeDialogProps) {
 
   return (
     <EntryDialog
-      title={item ? 'Изменить доход' : 'Новый доход'}
+      title={item ? 'Змінити дохід' : 'Новий дохід'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
@@ -60,7 +60,7 @@ export function IncomeDialog({ item, month, onClose }: IncomeDialogProps) {
         errors={errors}
       />
       <TextField
-        label="Комментарий"
+        label="Коментар"
         multiline
         minRows={2}
         value={values.comment}

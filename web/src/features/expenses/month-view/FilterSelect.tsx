@@ -9,7 +9,7 @@ interface FilterSelectProps<T extends string> {
   disabled?: boolean;
 }
 
-/** A list filter: a select whose first option «Все» turns it off. */
+/** A list filter: a select whose first option «Усі» turns it off. */
 export function FilterSelect<T extends string>({
   label,
   value,
@@ -33,7 +33,7 @@ export function FilterSelect<T extends string>({
         inputLabel: { shrink: true },
       }}
     >
-      <MenuItem value="">Все</MenuItem>
+      <MenuItem value="">Усі</MenuItem>
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
           {option.label}

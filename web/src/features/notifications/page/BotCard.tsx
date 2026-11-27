@@ -7,9 +7,9 @@ import type { NotificationsStatus } from '../data/notifications-api';
 import { InfoCard } from './InfoCard';
 
 const steps = [
-  'Откройте бота и отправьте /start.',
-  'Нажмите «Я Виталий» или «Я Маша» — этот чат будет вашим.',
-  'Группа не обязательна: без неё общие сводки приходят каждому в личку.',
+  'Відкрийте бота й надішліть /start.',
+  'Натисніть «Я Віталій» або «Я Маша» — цей чат стане вашим.',
+  'Група не обов’язкова: без неї спільні зведення приходять кожному в особисті.',
 ];
 
 /** «Бот» (FR-002, FR-003): whether the bot is set up and reachable, its link, and how to connect a chat. */
@@ -18,7 +18,7 @@ export function BotCard({ status }: { status: NotificationsStatus }) {
     <InfoCard title="Бот">
       {!status.configured ? (
         <Alert severity="warning">
-          Бот ещё не настроен: добавьте токен от @BotFather в настройку{' '}
+          Бот ще не налаштовано: додайте токен від @BotFather у налаштування{' '}
           <code>Telegram__BotToken</code> сервера (App Service).
         </Alert>
       ) : status.botUsername ? (
@@ -32,7 +32,7 @@ export function BotCard({ status }: { status: NotificationsStatus }) {
           }}
         >
           <Typography>
-            Бот работает: <strong>@{status.botUsername}</strong>
+            Бот працює: <strong>@{status.botUsername}</strong>
           </Typography>
           {status.botLink && (
             <Button
@@ -42,14 +42,14 @@ export function BotCard({ status }: { status: NotificationsStatus }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Открыть бота
+              Відкрити бота
             </Button>
           )}
         </Box>
       ) : (
         <Alert severity="info">
-          Токен есть, но Телеграм сейчас не ответил. Сообщения уйдут, когда он
-          будет доступен.
+          Токен є, але Телеграм зараз не відповів. Повідомлення підуть, коли він
+          буде доступний.
         </Alert>
       )}
       {status.configured && (

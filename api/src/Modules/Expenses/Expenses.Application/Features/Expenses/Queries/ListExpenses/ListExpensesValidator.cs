@@ -12,7 +12,7 @@ internal sealed class ListExpensesValidator : AbstractValidator<ListExpensesQuer
         RuleFor(q => q)
             .Must(q => (q.Year, q.Month, q.From, q.To) is (not null, not null, null, null) or (null, null, not null, not null))
             .WithName("period")
-            .WithMessage("Send either year and month, or from and to.");
+            .WithMessage("Надішліть або рік і місяць, або from і to.");
 
         When(q => q.Year is not null || q.Month is not null, () =>
         {
@@ -22,11 +22,11 @@ internal sealed class ListExpensesValidator : AbstractValidator<ListExpensesQuer
 
         When(q => q.From is not null && q.To is not null, () =>
         {
-            RuleFor(q => q.From).Must(d => d!.Value.Year is >= 2000 and <= 2100).WithMessage("The date must be in 2000–2100.");
+            RuleFor(q => q.From).Must(d => d!.Value.Year is >= 2000 and <= 2100).WithMessage("Дата має бути в межах 2000–2100 років.");
             RuleFor(q => q.To)
-                .Must((q, to) => to >= q.From).WithMessage("The period ends before it starts.")
+                .Must((q, to) => to >= q.From).WithMessage("Період закінчується раніше, ніж починається.")
                 .Must((q, to) => to!.Value.DayNumber - q.From!.Value.DayNumber < MaxPeriodDays)
-                .WithMessage($"A period is at most {MaxPeriodDays} days.");
+                .WithMessage($"Період — не більше {MaxPeriodDays} днів.");
         });
 
         RuleFor(q => q.Payer).IsInEnum();

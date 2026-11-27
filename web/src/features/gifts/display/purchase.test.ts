@@ -12,16 +12,16 @@ describe('formatPurchase', () => {
   it('shows the day and the giver', () => {
     expect(
       formatPurchase({ giver: 'Vitaliy', buyBy: '2026-12-12' }, '2026-11-27'),
-    ).toEqual({ text: '🛒 купить до 12.12 · дарит Виталий', overdue: false });
+    ).toEqual({ text: '🛒 купити до 12.12 · дарує Віталій', overdue: false });
     expect(
       formatPurchase({ giver: 'Together', buyBy: '2026-12-12' }, '2026-11-27')
         ?.text,
-    ).toBe('🛒 купить до 12.12 · дарит вместе');
+    ).toBe('🛒 купити до 12.12 · дарує разом');
   });
 
   it('leaves the giver out when nobody is set', () => {
     expect(formatPurchase({ buyBy: '2027-01-05' }, '2026-11-27')?.text).toBe(
-      '🛒 купить до 05.01',
+      '🛒 купити до 05.01',
     );
   });
 

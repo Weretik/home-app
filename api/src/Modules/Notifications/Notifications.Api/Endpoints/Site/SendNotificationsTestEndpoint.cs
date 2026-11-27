@@ -14,7 +14,7 @@ internal static class SendNotificationsTestEndpoint
     {
         group.MapPost("/test", HandleAsync)
             .WithName("sendNotificationsTest")
-            .WithSummary("Sends «✅ Бот на связи» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused.")
+            .WithSummary("Sends «✅ Бот на зв’язку» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)

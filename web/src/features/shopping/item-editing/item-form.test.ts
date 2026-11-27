@@ -36,8 +36,8 @@ test('checks the name, the lengths and the department', () => {
 
   expect(checkItem(values)).toEqual({});
   expect(checkItem({ ...values, name: '  ', departmentId: '' })).toEqual({
-    name: 'Введите название',
-    departmentId: 'Выберите отдел',
+    name: 'Введіть назву',
+    departmentId: 'Виберіть відділ',
   });
   expect(
     checkItem({
@@ -47,9 +47,9 @@ test('checks the name, the lengths and the department', () => {
       note: 'н'.repeat(201),
     }),
   ).toEqual({
-    name: 'Не длиннее 80 символов',
-    quantity: 'Не длиннее 30 символов',
-    note: 'Не длиннее 200 символов',
+    name: 'Не довше 80 символів',
+    quantity: 'Не довше 30 символів',
+    note: 'Не довше 200 символів',
   });
 });
 

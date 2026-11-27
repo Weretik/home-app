@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { keptParams, pageUrl, settingsPath, todosPages } from './todos-pages';
 
-/** «Задачи» and «Архив» tabs and the «Настройки» gear at their end. Switching keeps the filters. */
+/** «Справи» and «Архів» tabs and the «Налаштування» gear at their end. Switching keeps the filters. */
 export function SectionTabs() {
   const { pathname } = useLocation();
   const [params] = useSearchParams();
@@ -35,7 +35,7 @@ export function SectionTabs() {
     >
       <Tabs
         component="nav"
-        aria-label="Страницы раздела"
+        aria-label="Сторінки розділу"
         value={active ? pageUrl(active) : false}
         variant="scrollable"
         scrollButtons="auto"
@@ -54,11 +54,11 @@ export function SectionTabs() {
           />
         ))}
       </Tabs>
-      <Tooltip title="Настройки">
+      <Tooltip title="Налаштування">
         <IconButton
           component={Link}
           to={settingsPath}
-          aria-label="Настройки"
+          aria-label="Налаштування"
           aria-current={onSettings ? 'page' : undefined}
           color={onSettings ? 'primary' : 'default'}
           sx={(theme) => ({

@@ -6,7 +6,7 @@ export interface CategoryFormValues {
 }
 
 export const validateCategory = (values: CategoryFormValues): FieldErrors => ({
-  name: checkLength(values.name, 100, 'Введите название'),
+  name: checkLength(values.name, 100, 'Введіть назву'),
 });
 
 export const toCategoryRequest = (

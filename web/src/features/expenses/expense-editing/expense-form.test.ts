@@ -1,6 +1,6 @@
 import { expenseFormValues, toExpenseRequest } from './expense-form';
 
-test('a new expense counts in the limits; «Не в лимиты» is kept and sent', () => {
+test('a new expense counts in the limits; «Не в ліміти» is kept and sent', () => {
   const values = expenseFormValues(undefined, '2026-11-26');
   expect(values.outsideLimits).toBe(false);
   expect(

@@ -7,7 +7,7 @@ internal sealed class ChangeTodoTaskStatusValidator : AbstractValidator<ChangeTo
     public ChangeTodoTaskStatusValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the task you changed in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого завдання у заголовку If-Match.");
         RuleFor(c => c.Status).IsInEnum();
     }
 }

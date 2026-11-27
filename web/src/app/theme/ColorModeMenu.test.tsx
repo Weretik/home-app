@@ -18,10 +18,10 @@ test('starts with the system theme', async () => {
   renderMenu();
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Тема оформления' }),
+    screen.getByRole('button', { name: 'Тема оформлення' }),
   );
 
-  expect(screen.getByRole('menuitem', { name: 'Как в системе' })).toHaveClass(
+  expect(screen.getByRole('menuitem', { name: 'Як у системі' })).toHaveClass(
     'Mui-selected',
   );
 });
@@ -30,9 +30,9 @@ test('switches to the dark theme and remembers it', async () => {
   renderMenu();
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Тема оформления' }),
+    screen.getByRole('button', { name: 'Тема оформлення' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Тёмная' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Темна' }));
 
   expect(document.documentElement).toHaveAttribute('data-color-scheme', 'dark');
   expect(localStorage.getItem('mui-mode')).toBe('dark');

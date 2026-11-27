@@ -7,7 +7,7 @@ internal sealed class ChangeGiftStatusValidator : AbstractValidator<ChangeGiftSt
     public ChangeGiftStatusValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the gift you changed in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого подарунка у заголовку If-Match.");
         RuleFor(c => c.Status).IsInEnum();
     }
 }

@@ -18,14 +18,14 @@ export function IncomeTable({
 }: { items: IncomeItem[] } & RowHandlers<IncomeItem>) {
   return (
     <TableContainer>
-      <Table size="small" aria-label="Доходы за месяц">
+      <Table size="small" aria-label="Доходи за місяць">
         <TableHead>
           <TableRow>
             <TableCell>Дата</TableCell>
-            <TableCell>Кто</TableCell>
-            <TableCell align="right">Сумма</TableCell>
-            <TableCell>Комментарий</TableCell>
-            <TableCell padding="checkbox" aria-label="Действия" />
+            <TableCell>Хто</TableCell>
+            <TableCell align="right">Сума</TableCell>
+            <TableCell>Коментар</TableCell>
+            <TableCell padding="checkbox" aria-label="Дії" />
           </TableRow>
         </TableHead>
         <TableBody>

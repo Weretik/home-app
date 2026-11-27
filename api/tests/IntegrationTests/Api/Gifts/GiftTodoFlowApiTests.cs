@@ -34,7 +34,7 @@ public sealed class GiftTodoFlowApiTests(ApiFactory api)
 
         await OutboxTickAsync(client);
         var task = await GiftTaskAsync(client, giftId, name);
-        Assert.Equal($"🎁 Купить подарок: {name} (для Маши)", task.GetProperty("title").GetString());
+        Assert.Equal($"🎁 Купити подарунок: {name} (для Маші)", task.GetProperty("title").GetString());
         Assert.Equal("Vitaliy", task.GetProperty("assignee").GetString());
         Assert.Equal("2040-12-20", task.GetProperty("dueDate").GetString());
 

@@ -26,9 +26,9 @@ test('starts a new limit monthly and empty, an existing one from its values', ()
 
 test('checks name, amount and categories', () => {
   const errors = validateLimit(limitFormValues());
-  expect(errors.name).toBe('Введите название');
-  expect(errors.amount).toBe('Введите сумму');
-  expect(errors.categoryIds).toBe('Выберите хотя бы одну категорию');
+  expect(errors.name).toBe('Введіть назву');
+  expect(errors.amount).toBe('Введіть суму');
+  expect(errors.categoryIds).toBe('Виберіть хоча б одну категорію');
   expect(
     validateLimit({
       name: 'x'.repeat(101),
@@ -36,7 +36,7 @@ test('checks name, amount and categories', () => {
       amount: '1',
       categoryIds: ['a'],
     }).name,
-  ).toBe('Не длиннее 100 символов');
+  ).toBe('Не довше 100 символів');
 });
 
 test('sends a trimmed name, the amount as a number and distinct categories', () => {

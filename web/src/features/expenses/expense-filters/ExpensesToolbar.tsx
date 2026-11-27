@@ -10,14 +10,14 @@ interface ExpensesToolbarProps {
   onAdd: () => void;
 }
 
-/** The row above the expenses: the category and «Кто» filters, «Период», and «Добавить расход». */
+/** The row above the expenses: the category and «Хто» filters, «Період», and «Додати витрату». */
 export function ExpensesToolbar({
   filters,
   period,
   onAdd,
 }: ExpensesToolbarProps) {
   return (
-    <PageToolbar addLabel="Добавить расход" onAdd={onAdd}>
+    <PageToolbar addLabel="Додати витрату" onAdd={onAdd}>
       <Box
         sx={{
           display: 'flex',

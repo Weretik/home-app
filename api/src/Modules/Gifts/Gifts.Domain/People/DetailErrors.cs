@@ -5,20 +5,20 @@ namespace Gifts.Domain.People;
 public static class DetailErrors
 {
     public static readonly Error LabelRequired =
-        Error.Validation("gifts.detail_label_required", "The detail needs a label, such as «Кольцо».", "label");
+        Error.Validation("gifts.detail_label_required", "Нюансу потрібна назва, наприклад «Каблучка».", "label");
 
     public static readonly Error LabelTooLong =
-        Error.Validation("gifts.detail_label_too_long", $"The label is longer than {Detail.MaxLabelLength} characters.", "label");
+        Error.Validation("gifts.detail_label_too_long", $"Назва задовга: не більше {Detail.MaxLabelLength} символів.", "label");
 
     public static readonly Error ValueRequired =
-        Error.Validation("gifts.detail_value_required", "The detail needs a value, such as «18,5».", "value");
+        Error.Validation("gifts.detail_value_required", "Нюансу потрібне значення, наприклад «18,5».", "value");
 
     public static readonly Error ValueTooLong =
-        Error.Validation("gifts.detail_value_too_long", $"The value is longer than {Detail.MaxValueLength} characters.", "value");
+        Error.Validation("gifts.detail_value_too_long", $"Значення задовге: не більше {Detail.MaxValueLength} символів.", "value");
 
     public static readonly Error ChangedMeanwhile = Error.Conflict(
-        "gifts.changed_meanwhile", "Someone changed or deleted this detail in the meantime; reload and try again.");
+        "gifts.changed_meanwhile", "Тим часом цей нюанс хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
     public static Error NotFound(Guid id) =>
-        Error.NotFound("gifts.detail_not_found", $"There is no detail {id}.");
+        Error.NotFound("gifts.detail_not_found", $"Нюансу {id} немає.");
 }

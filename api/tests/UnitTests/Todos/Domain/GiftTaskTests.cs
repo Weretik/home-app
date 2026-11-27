@@ -12,13 +12,13 @@ public sealed class GiftTaskTests
     [Fact]
     public void A_Gift_Task_NamesTheGift_AndForWhom_AndFitsTheTitle()
     {
-        Assert.Equal("🎁 Купить подарок: Кольцо (для Маши)", GiftTask.Title(" Кольцо ", GiftParty.Maria));
-        Assert.Equal("🎁 Купить подарок: Часы (для Виталия)", GiftTask.Title("Часы", GiftParty.Vitaliy));
-        Assert.Equal("🎁 Купить подарок: Кофемашина", GiftTask.Title("Кофемашина", GiftParty.Together));
+        Assert.Equal("🎁 Купити подарунок: Кольцо (для Маші)", GiftTask.Title(" Кольцо ", GiftParty.Maria));
+        Assert.Equal("🎁 Купити подарунок: Часы (для Віталія)", GiftTask.Title("Часы", GiftParty.Vitaliy));
+        Assert.Equal("🎁 Купити подарунок: Кофемашина", GiftTask.Title("Кофемашина", GiftParty.Together));
 
         var longTitle = GiftTask.Title(new string('a', 300), GiftParty.Maria);
         Assert.Equal(TodoTask.MaxTitleLength, longTitle.Length);
-        Assert.EndsWith("… (для Маши)", longTitle);
+        Assert.EndsWith("… (для Маші)", longTitle);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public sealed class GiftTaskTests
         Assert.Equal(Assignee.Maria, GiftTask.AssigneeOf(GiftParty.Maria));
         Assert.Equal(Assignee.Vitaliy, GiftTask.AssigneeOf(GiftParty.Vitaliy));
         Assert.Equal(Assignee.Shared, GiftTask.AssigneeOf(GiftParty.Together));
-        Assert.Equal("Подарок на сайте: https://web.example/gifts?gift=1", GiftTask.Notes("https://web.example/gifts?gift=1"));
+        Assert.Equal("Подарунок на сайті: https://web.example/gifts?gift=1", GiftTask.Notes("https://web.example/gifts?gift=1"));
     }
 
     [Fact]

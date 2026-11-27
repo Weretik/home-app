@@ -7,6 +7,6 @@ internal sealed class DeleteTodoCategoryValidator : AbstractValidator<DeleteTodo
     public DeleteTodoCategoryValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the category you delete in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію категорії, яку видаляєте, у заголовку If-Match.");
     }
 }

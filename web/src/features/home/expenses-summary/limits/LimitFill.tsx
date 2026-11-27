@@ -14,7 +14,7 @@ export function LimitFill({
       variant="determinate"
       color={fillOf(percent)}
       value={Math.min(percent, 100)}
-      aria-label={`${name}: потрачено ${percent}%`}
+      aria-label={`${name}: витрачено ${percent}%`}
       sx={{ height: 6, borderRadius: 3, minWidth: 64 }}
     />
   );

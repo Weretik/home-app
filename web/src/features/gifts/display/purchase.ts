@@ -13,11 +13,11 @@ export function kyivToday(now: Date = new Date()): string {
   return kyivDay.format(now);
 }
 
-/** How the giver reads after «дарит»: «Маша», «Виталий», «вместе». */
+/** How the giver reads after «дарує»: «Маша», «Віталій», «разом». */
 const giverAfterVerb: Record<Giver, string> = {
   Maria: recipientLabels.Maria,
   Vitaliy: recipientLabels.Vitaliy,
-  Together: 'вместе',
+  Together: 'разом',
 };
 
 export interface PurchaseLine {
@@ -27,7 +27,7 @@ export interface PurchaseLine {
 }
 
 /**
- * The line under a wanted gift's name (gifts 002 FR-004): «🛒 купить до 12.12 · дарит Виталий», or null without a
+ * The line under a wanted gift's name (gifts 002 FR-004): «🛒 купити до 12.12 · дарує Віталій», or null without a
  * buy-by day. Contract days compare as strings.
  */
 export function formatPurchase(
@@ -36,9 +36,9 @@ export function formatPurchase(
 ): PurchaseLine | null {
   if (!gift.buyBy) return null;
   const [, month = '', day = ''] = gift.buyBy.split('-');
-  const giver = gift.giver ? ` · дарит ${giverAfterVerb[gift.giver]}` : '';
+  const giver = gift.giver ? ` · дарує ${giverAfterVerb[gift.giver]}` : '';
   return {
-    text: `🛒 купить до ${day}.${month}${giver}`,
+    text: `🛒 купити до ${day}.${month}${giver}`,
     overdue: gift.buyBy < today,
   };
 }

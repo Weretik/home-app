@@ -6,14 +6,14 @@ public static class ShoppingSettingsErrors
 {
     public static readonly Error CartKeepHoursOutOfRange = Error.Validation(
         "shopping.cart_keep_hours_out_of_range",
-        $"A bought item stays in the cart {ShoppingSettings.MinCartKeepHours}–{ShoppingSettings.MaxCartKeepHours} hours.",
+        $"Куплений товар лишається в кошику від {ShoppingSettings.MinCartKeepHours} до {ShoppingSettings.MaxCartKeepHours} годин.",
         "cartKeepHours");
 
     public static readonly Error FrequentDaysOutOfRange = Error.Validation(
         "shopping.frequent_days_out_of_range",
-        $"Frequent items count the last {ShoppingSettings.MinFrequentDays}–{ShoppingSettings.MaxFrequentDays} days.",
+        $"Часті товари рахуються за період від {ShoppingSettings.MinFrequentDays} до {ShoppingSettings.MaxFrequentDays} днів.",
         "frequentDays");
 
     public static readonly Error Missing = Error.NotFound(
-        "shopping.settings_not_found", "The shopping settings row is missing; apply the migrations.");
+        "shopping.settings_not_found", "Немає рядка налаштувань покупок; застосуйте міграції.");
 }

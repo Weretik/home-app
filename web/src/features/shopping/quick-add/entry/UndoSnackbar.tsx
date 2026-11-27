@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import { addedMessage, type QuickAddController } from './use-quick-add';
 
-/** «Добавлено: … · Отменить» after an add (R-2); «Отменить» only when the add created new rows. */
+/** «Додано: … · Скасувати» after an add (R-2); «Скасувати» only when the add created new rows. */
 export function UndoSnackbar({ quickAdd }: { quickAdd: QuickAddController }) {
   const { last } = quickAdd;
   return (
@@ -18,7 +18,7 @@ export function UndoSnackbar({ quickAdd }: { quickAdd: QuickAddController }) {
       action={
         last && last.added.length > 0 ? (
           <Button color="inherit" size="small" onClick={quickAdd.undoLast}>
-            Отменить
+            Скасувати
           </Button>
         ) : undefined
       }

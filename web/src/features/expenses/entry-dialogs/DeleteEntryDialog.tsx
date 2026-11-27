@@ -11,7 +11,7 @@ import { describeWriteError } from '../write-data/write-errors-api';
 
 interface DeleteEntryDialogProps {
   title: string;
-  /** The entry in one line: «Продукты · 1 234,50 ₴ · чт, 1 окт.». */
+  /** The entry in one line: «Продукты · 1 234,50 ₴ · чт, 1 жовт.». */
   summary: string;
   id: string;
   /** The delete mutation of the entry's kind. */
@@ -34,7 +34,7 @@ export function DeleteEntryDialog({
     onClose();
   };
   const error = remove.error
-    ? describeWriteError(remove.error, 'удалить').message
+    ? describeWriteError(remove.error, 'видалити').message
     : undefined;
 
   return (
@@ -50,12 +50,12 @@ export function DeleteEntryDialog({
         <DialogContentText sx={{ color: 'text.primary', fontWeight: 600 }}>
           {summary}
         </DialogContentText>
-        <DialogContentText>Запись удалится насовсем.</DialogContentText>
+        <DialogContentText>Запис буде видалено назавжди.</DialogContentText>
         {error && <Alert severity="error">{error}</Alert>}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={close} disabled={remove.isPending}>
-          Отмена
+          Скасувати
         </Button>
         <Button
           color="error"
@@ -63,7 +63,7 @@ export function DeleteEntryDialog({
           onClick={() => remove.mutate(id, { onSuccess: close })}
           disabled={remove.isPending}
         >
-          {remove.isPending ? 'Удаляю…' : 'Удалить'}
+          {remove.isPending ? 'Видаляю…' : 'Видалити'}
         </Button>
       </DialogActions>
     </Dialog>

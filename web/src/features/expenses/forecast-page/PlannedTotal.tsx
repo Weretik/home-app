@@ -7,12 +7,12 @@ interface PlannedTotalProps {
   plans?: { totalAmount: number; count: number };
 }
 
-/** «Запланировано 12 000,00 ₴» and how many plans the month has; announced when it changes. */
+/** «Заплановано 12 000,00 ₴» and how many plans the month has; announced when it changes. */
 export function PlannedTotal({ plans }: PlannedTotalProps) {
   return (
     <Box role="status" aria-live="polite" sx={{ minWidth: 0 }}>
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
-        Запланировано{' '}
+        Заплановано{' '}
         <Box
           component="span"
           sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}
@@ -22,7 +22,8 @@ export function PlannedTotal({ plans }: PlannedTotalProps) {
       </Typography>
       {plans && (
         <Typography variant="body2" color="text.secondary">
-          {formatRecordCount(plans.count)} на месяц · входят в прогноз и лимиты
+          {formatRecordCount(plans.count)} на місяць · входять у прогноз і
+          ліміти
         </Typography>
       )}
     </Box>

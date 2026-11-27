@@ -7,7 +7,7 @@ afterEach(() => {
   localStorage.clear();
 });
 
-test('defaults to Виталий and remembers the choice on the device', () => {
+test('defaults to Віталій and remembers the choice on the device', () => {
   const { result } = renderHook(() => useMe());
   expect(result.current[0]).toBe('Vitaliy');
 

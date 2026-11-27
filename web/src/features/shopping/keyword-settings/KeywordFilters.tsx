@@ -13,7 +13,7 @@ interface KeywordFiltersProps {
   onDepartment: (departmentId: string) => void;
 }
 
-/** Search by the start of a word and the department filter of «Слова для отделов». */
+/** Search by the start of a word and the department filter of «Слова для відділів». */
 export function KeywordFilters(props: KeywordFiltersProps) {
   return (
     <Box
@@ -25,7 +25,7 @@ export function KeywordFilters(props: KeywordFiltersProps) {
       }}
     >
       <TextField
-        label="Поиск"
+        label="Пошук"
         size="small"
         value={props.search}
         onChange={(e) => props.onSearch(e.target.value)}
@@ -41,12 +41,12 @@ export function KeywordFilters(props: KeywordFiltersProps) {
       />
       <TextField
         select
-        label="Отдел"
+        label="Відділ"
         size="small"
         value={props.departmentId}
         onChange={(e) => props.onDepartment(e.target.value)}
       >
-        <MenuItem value="">Все отделы</MenuItem>
+        <MenuItem value="">Усі відділи</MenuItem>
         {props.departments.map((d) => (
           <MenuItem key={d.id} value={d.id}>
             {d.icon} {d.name}

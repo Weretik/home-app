@@ -106,32 +106,32 @@ test('lists the categories with their active counts and adds one', async () => {
     return json(list);
   });
 
-  const rows = await screen.findByRole('list', { name: 'Категории задач' });
+  const rows = await screen.findByRole('list', { name: 'Категорії справ' });
   expect(rows).toHaveTextContent('Дом');
-  expect(rows).toHaveTextContent('2 активные задачи');
-  expect(screen.getByRole('link', { name: 'Настройки' })).toHaveAttribute(
+  expect(rows).toHaveTextContent('2 активні справи');
+  expect(screen.getByRole('link', { name: 'Налаштування' })).toHaveAttribute(
     'aria-current',
     'page',
   );
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Добавить категорию' }),
+    screen.getByRole('button', { name: 'Додати категорію' }),
   );
-  const dialog = await screen.findByRole('dialog', { name: 'Новая категория' });
+  const dialog = await screen.findByRole('dialog', { name: 'Нова категорія' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Введите название')).toBeInTheDocument();
+  expect(within(dialog).getByText('Введіть назву')).toBeInTheDocument();
   await userEvent.type(
-    within(dialog).getByRole('textbox', { name: /Название/ }),
+    within(dialog).getByRole('textbox', { name: /Назва/ }),
     ' Сад ',
   );
   await userEvent.type(
-    within(dialog).getByRole('textbox', { name: 'Эмодзи' }),
+    within(dialog).getByRole('textbox', { name: 'Емодзі' }),
     '🌱',
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -140,7 +140,7 @@ test('lists the categories with their active counts and adds one', async () => {
   expect(writes()[0]!.body).toEqual({ name: 'Сад', emoji: '🌱' });
   expect(writes()[0]!.headers.has('Idempotency-Key')).toBe(false);
   expect(
-    await screen.findByText('нет активных задач', {}, { timeout: 4000 }),
+    await screen.findByText('немає активних справ', {}, { timeout: 4000 }),
   ).toBeInTheDocument();
 });
 
@@ -156,24 +156,24 @@ test('renames a category with its version and shows a taken name under the field
     }
     return json(categories);
   });
-  await screen.findByRole('list', { name: 'Категории задач' });
+  await screen.findByRole('list', { name: 'Категорії справ' });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Изменить: Дом' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Змінити: Дом' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить категорию',
+    name: 'Змінити категорію',
   });
-  const name = within(dialog).getByRole('textbox', { name: /Название/ });
+  const name = within(dialog).getByRole('textbox', { name: /Назва/ });
   await userEvent.clear(name);
   await userEvent.type(name, 'Ремонт');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   expect(
-    await within(dialog).findByText('Такое название уже есть'),
+    await within(dialog).findByText('Така назва вже є'),
   ).toBeInTheDocument();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -188,15 +188,15 @@ test('warns how many tasks lose a deleted category', async () => {
   const { writes } = renderPage((s) =>
     s.method === 'DELETE' ? noContent() : json(categories),
   );
-  await screen.findByRole('list', { name: 'Категории задач' });
+  await screen.findByRole('list', { name: 'Категорії справ' });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Удалить: Дом' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Видалити: Дом' }));
   const dialog = await screen.findByRole('dialog', {
-    name: 'Удалить категорию?',
+    name: 'Видалити категорію?',
   });
-  expect(dialog).toHaveTextContent('2 задачи останутся без категории');
+  expect(dialog).toHaveTextContent('2 справи залишаться без категорії');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),

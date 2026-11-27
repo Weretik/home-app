@@ -13,7 +13,7 @@ interface GroupTitleProps {
   priceSum: number;
 }
 
-/** A person's group header: their circle, the name, «3 подарка · ≈ 4 500 ₴». */
+/** A person's group header: their circle, the name, «3 подарунки · ≈ 4 500 ₴». */
 export function GroupTitle({
   id,
   recipient,

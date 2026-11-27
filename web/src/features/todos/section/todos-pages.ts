@@ -1,4 +1,4 @@
-/** The pages of the Todos section, shown as tabs (ADR 0006); «Настройки» is reached from the gear, not a tab. */
+/** The pages of the Todos section, shown as tabs (ADR 0006); «Налаштування» is reached from the gear, not a tab. */
 export interface TodosPage {
   /** Path under /todos; '' is the index page. */
   path: string;
@@ -6,8 +6,8 @@ export interface TodosPage {
 }
 
 export const todosPages: TodosPage[] = [
-  { path: '', label: 'Задачи' },
-  { path: 'archive', label: 'Архив' },
+  { path: '', label: 'Справи' },
+  { path: 'archive', label: 'Архів' },
 ];
 
 export const sectionPath = '/todos';

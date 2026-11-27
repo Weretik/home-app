@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
-/** Why a quick «Подарено» / «Не актуально» / «Вернуть в список» failed; the list has already been refreshed if stale. */
+/** Why a quick «Подаровано» / «Неактуально» / «Повернути до списку» failed; the list has already been refreshed if stale. */
 export function StatusSnackbar({
   message,
   onClose,

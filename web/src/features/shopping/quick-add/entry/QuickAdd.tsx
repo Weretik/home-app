@@ -32,7 +32,7 @@ export function QuickAdd({ quickAdd }: { quickAdd: QuickAddController }) {
   return (
     <Card
       component="section"
-      aria-label="Добавить в список"
+      aria-label="Додати до списку"
       sx={{
         position: 'sticky',
         top: 'calc(var(--top-bar-height, 64px) + 8px)',
@@ -50,9 +50,9 @@ export function QuickAdd({ quickAdd }: { quickAdd: QuickAddController }) {
             quickAdd.clearError();
           }}
         />
-        <Tooltip title={urgent ? 'Срочно: да' : 'Срочно'}>
+        <Tooltip title={urgent ? 'Терміново: так' : 'Терміново'}>
           <IconButton
-            aria-label="Срочно"
+            aria-label="Терміново"
             aria-pressed={urgent}
             color={urgent ? 'secondary' : 'default'}
             onClick={() => setUrgent(!urgent)}
@@ -60,11 +60,11 @@ export function QuickAdd({ quickAdd }: { quickAdd: QuickAddController }) {
             <PriorityHighOutlinedIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Добавить">
+        <Tooltip title="Додати">
           <span>
             <IconButton
               type="submit"
-              aria-label="Добавить"
+              aria-label="Додати"
               color="primary"
               disabled={!text.trim() || quickAdd.isPending}
             >

@@ -6,12 +6,12 @@ import type { GiftsSummaryView } from '../data/summary-api';
 import { PersonAvatar } from '../persons/PersonAvatar';
 import { SummaryCard } from './SummaryCard';
 
-/** «Ближайшие поводы»: wanted gifts with an occasion from today, the nearest first. */
+/** «Найближчі нагоди»: wanted gifts with an occasion from today, the nearest first. */
 export function OccasionsCard({ summary }: { summary: GiftsSummaryView }) {
   if (summary.upcoming.length === 0) return null;
 
   return (
-    <SummaryCard title="Ближайшие поводы">
+    <SummaryCard title="Найближчі нагоди">
       <Box
         component="ul"
         sx={{ m: 0, p: 0, listStyle: 'none', display: 'grid', gap: 1.5 }}

@@ -38,10 +38,10 @@ const summary = (overrides: Partial<MonthSummary> = {}): MonthSummary => ({
 
 test('counts spendings in Russian', () => {
   expect([1, 3, 5, 21].map(formatSpendingCount)).toEqual([
-    '1 трата',
-    '3 траты',
-    '5 трат',
-    '21 трата',
+    '1 витрата',
+    '3 витрати',
+    '5 витрат',
+    '21 витрата',
   ]);
 });
 
@@ -53,16 +53,16 @@ test('shows the outside-limits line only when there are such expenses', () => {
         summary({ outsideLimitsCount: 2, outsideLimitsAmount: 3500.4 }),
       ),
     ),
-  ).toBe('Вне лимитов: 2 траты на 3 500 ₴');
+  ).toBe('Поза лімітами: 2 витрати на 3 500 ₴');
 });
 
 test('forecasts the month, with what stays of the limit only when there is one', () => {
   const lines = forecastLines(summary());
   expect(lines.map((line) => [line.name, line.amount, line.tone])).toEqual([
-    ['Ожидаемые расходы', 35000, undefined],
-    ['Запланировано', 5000, undefined],
-    ['Ожидаемый итог месяца', 5000, 'success'],
-    ['Останется от лимита', 5000, undefined],
+    ['Очікувані витрати', 35000, undefined],
+    ['Заплановано', 5000, undefined],
+    ['Очікуваний підсумок місяця', 5000, 'success'],
+    ['Залишиться від ліміту', 5000, undefined],
   ]);
   const over = forecastLines(
     summary({

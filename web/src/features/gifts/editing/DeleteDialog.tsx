@@ -8,9 +8,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useId } from 'react';
 
 interface DeleteDialogProps {
-  /** «Удалить подарок?» */
+  /** «Видалити подарунок?» */
   title: string;
-  /** The item in one line: «Серьги · Маша». */
+  /** The item in one line: «Сережки · Маша». */
   summary: string;
   /** Why the delete failed, in Russian. */
   error?: string;
@@ -49,12 +49,12 @@ export function DeleteDialog({
         >
           {summary}
         </DialogContentText>
-        <DialogContentText>Удалится насовсем.</DialogContentText>
+        <DialogContentText>Видалиться назавжди.</DialogContentText>
         {error && <Alert severity="error">{error}</Alert>}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} disabled={isPending}>
-          Отмена
+          Скасувати
         </Button>
         <Button
           color="error"
@@ -62,7 +62,7 @@ export function DeleteDialog({
           onClick={onConfirm}
           disabled={isPending}
         >
-          {isPending ? 'Удаляю…' : 'Удалить'}
+          {isPending ? 'Видаляю…' : 'Видалити'}
         </Button>
       </DialogActions>
     </Dialog>

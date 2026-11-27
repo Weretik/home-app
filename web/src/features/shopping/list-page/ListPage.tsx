@@ -37,7 +37,7 @@ export function ListPage() {
       <QuickAdd quickAdd={quickAdd} />
       {setStatus.error && (
         <Alert severity="error" onClose={() => setStatus.reset()}>
-          {describeWriteError(setStatus.error, 'отметить').message}
+          {describeWriteError(setStatus.error, 'позначити').message}
         </Alert>
       )}
       <PageStatus
@@ -45,11 +45,11 @@ export function ListPage() {
         error={list.error}
         hasData={list.data !== undefined}
         isEmpty={items.length === 0}
-        loadingLabel="Загружаю список"
+        loadingLabel="Завантажую список"
         empty={{
           emoji: '🛒',
-          title: 'Список пуст 🎉',
-          hint: 'Напишите в поле выше, что купить: можно сразу несколько через запятую, или нажмите на ⭐ частое.',
+          title: 'Список порожній 🎉',
+          hint: 'Напишіть у полі вище, що купити: можна одразу кілька через кому, або натисніть на ⭐ часте.',
         }}
         onRetry={() => void list.refetch()}
       >

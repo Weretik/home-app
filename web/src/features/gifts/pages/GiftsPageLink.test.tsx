@@ -100,13 +100,13 @@ test('a link to a wanted gift opens its dialog and leaves the link', async () =>
   renderAt(`/gifts?gift=${ring.id}`, [gift(), ring]);
 
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить подарок',
+    name: 'Змінити подарунок',
   });
-  expect(within(dialog).getByLabelText('Название')).toHaveValue('Кольцо');
+  expect(within(dialog).getByLabelText('Назва')).toHaveValue('Кольцо');
   await waitFor(() => expect(where()).toBe('/gifts'));
 });
 
-test('a link to a given gift moves to «Подаренные» and opens it there', async () => {
+test('a link to a given gift moves to «Подаровані» and opens it there', async () => {
   const given = gift({
     name: 'Плед',
     status: 'Gifted',
@@ -115,16 +115,16 @@ test('a link to a given gift moves to «Подаренные» and opens it ther
   renderAt(`/gifts?gift=${given.id}`, [gift()], [given]);
 
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить подарок',
+    name: 'Змінити подарунок',
   });
-  expect(within(dialog).getByLabelText('Название')).toHaveValue('Плед');
+  expect(within(dialog).getByLabelText('Назва')).toHaveValue('Плед');
   await waitFor(() => expect(where()).toBe('/gifts/archive'));
 });
 
 test('a link to a gift nobody has says so', async () => {
   renderAt('/gifts?gift=missing', [gift()], []);
 
-  expect(await screen.findByText(/Подарок не найден/)).toBeInTheDocument();
+  expect(await screen.findByText(/Подарунок не знайдено/)).toBeInTheDocument();
   expect(where()).toBe('/gifts/archive?gift=missing');
 });
 
@@ -134,7 +134,7 @@ test('a wanted gift shows when to buy it and who gives it', async () => {
   ]);
 
   expect(
-    await screen.findAllByText('🛒 купить до 12.12 · дарит Виталий'),
+    await screen.findAllByText('🛒 купити до 12.12 · дарує Віталій'),
   ).not.toHaveLength(0);
 });
 
@@ -144,15 +144,15 @@ test('the dialog sends who gives the gift and the buy-by day', async () => {
   const writes = renderAt(`/gifts?gift=${perfume.id}`, [perfume]);
 
   const dialog = await screen.findByRole('dialog', {
-    name: 'Изменить подарок',
+    name: 'Змінити подарунок',
   });
-  await user.click(within(dialog).getByLabelText('Кто дарит'));
-  await user.click(await screen.findByRole('option', { name: 'Виталий' }));
-  await user.type(within(dialog).getByLabelText('Купить до'), '2026-12-20');
+  await user.click(within(dialog).getByLabelText('Хто дарує'));
+  await user.click(await screen.findByRole('option', { name: 'Віталій' }));
+  await user.type(within(dialog).getByLabelText('Купити до'), '2026-12-20');
   expect(
-    within(dialog).getByText(/Задача появится в «Делах»/),
+    within(dialog).getByText(/Завдання з’явиться у «Справах»/),
   ).toBeInTheDocument();
-  await user.click(within(dialog).getByRole('button', { name: 'Сохранить' }));
+  await user.click(within(dialog).getByRole('button', { name: 'Зберегти' }));
 
   await waitFor(() => expect(writes).toHaveLength(1));
   expect(writes[0]?.body).toMatchObject({

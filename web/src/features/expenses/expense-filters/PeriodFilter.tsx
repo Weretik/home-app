@@ -15,8 +15,8 @@ interface PeriodFilterProps {
 }
 
 /**
- * «Период»: shows the expenses of any days from–to instead of the month. Off, it is one button; on, two date fields
- * («с», «по») with the reason under them when the period is wrong, and «К месяцу» to go back.
+ * «Період»: shows the expenses of any days from–to instead of the month. Off, it is one button; on, two date fields
+ * («з», «по») with the reason under them when the period is wrong, and «До місяця» to go back.
  */
 export function PeriodFilter({ param, month, error }: PeriodFilterProps) {
   if (!param.active)
@@ -26,7 +26,7 @@ export function PeriodFilter({ param, month, error }: PeriodFilterProps) {
         startIcon={<DateRangeOutlinedIcon />}
         onClick={() => param.start(month)}
       >
-        Период
+        Період
       </Button>
     );
 
@@ -49,7 +49,7 @@ export function PeriodFilter({ param, month, error }: PeriodFilterProps) {
   return (
     <Box
       role="group"
-      aria-label="Период"
+      aria-label="Період"
       sx={{
         display: 'grid',
         gap: 2,
@@ -58,14 +58,14 @@ export function PeriodFilter({ param, month, error }: PeriodFilterProps) {
         justifyContent: 'start',
       }}
     >
-      {dateField('from', 'с')}
+      {dateField('from', 'з')}
       {dateField('to', 'по')}
       <Button
         size="small"
         onClick={param.end}
         sx={{ gridColumn: { xs: '1 / -1', sm: 'auto' }, justifySelf: 'start' }}
       >
-        К месяцу
+        До місяця
       </Button>
       {error && (
         <FormHelperText

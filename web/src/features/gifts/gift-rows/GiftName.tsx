@@ -7,8 +7,8 @@ import type { GiftItem } from '../data/gifts-api';
 import { formatPurchase, kyivToday } from '../display/purchase';
 
 /**
- * A gift's name with its shop link as an icon, the purchase line of a wanted gift («🛒 купить до 12.12 · дарит
- * Виталий», red when late) and its notes in at most two lines under it.
+ * A gift's name with its shop link as an icon, the purchase line of a wanted gift («🛒 купити до 12.12 · дарує
+ * Віталій», red when late) and its notes in at most two lines under it.
  */
 export function GiftName({ gift }: { gift: GiftItem }) {
   const purchase =
@@ -20,13 +20,13 @@ export function GiftName({ gift }: { gift: GiftItem }) {
           {gift.name}
         </Typography>
         {gift.link && (
-          <Tooltip title="Открыть ссылку">
+          <Tooltip title="Відкрити посилання">
             <IconButton
               size="small"
               href={gift.link}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Открыть ссылку: ${gift.name}`}
+              aria-label={`Відкрити посилання: ${gift.name}`}
               sx={{ my: -0.5 }}
             >
               <OpenInNewOutlinedIcon sx={{ fontSize: 16 }} />

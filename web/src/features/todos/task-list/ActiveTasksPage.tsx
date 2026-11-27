@@ -22,8 +22,8 @@ import { useDoneTick } from './use-done-tick';
 type Open = { item: TodoTaskItem } | { title: string } | null;
 
 /**
- * «Задачи»: the filters, quick add, and the active tasks by due day (FR-001…FR-004). A tick marks a task done
- * at once with «Отменить»; a tap opens it.
+ * «Справи»: the filters, quick add, and the active tasks by due day (FR-001…FR-004). A tick marks a task done
+ * at once with «Скасувати»; a tap opens it.
  */
 export function ActiveTasksPage() {
   const filterState = useTodoFilters('active');
@@ -52,10 +52,10 @@ export function ActiveTasksPage() {
           isEmpty={items.length === 0}
           isFiltered={isFiltered(filters)}
           empty={{
-            title: 'Задач нет',
-            hint: 'Добавьте первую выше.',
+            title: 'Справ немає',
+            hint: 'Додайте першу вище.',
           }}
-          loadingLabel="Загружаю задачи"
+          loadingLabel="Завантажую справи"
           onRetry={() => void query.refetch()}
           onResetFilters={filterState.clear}
         >

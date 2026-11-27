@@ -11,7 +11,7 @@ interface ConfirmDeleteDialogProps {
   title: string;
   /** What is deleted, in one line. */
   summary: string;
-  /** What happens, for example «Задача удалится насовсем.». */
+  /** What happens, for example «Справа видалиться назавжди.». */
   warning: string;
   /** A failed delete's message. */
   error?: string;
@@ -20,7 +20,7 @@ interface ConfirmDeleteDialogProps {
   onClose: () => void;
 }
 
-/** Asks before something is deleted for good, with a red «Удалить» (docs/design.md, «Editing entries»). */
+/** Asks before something is deleted for good, with a red «Видалити» (docs/design.md, «Editing entries»). */
 export function ConfirmDeleteDialog({
   title,
   summary,
@@ -55,7 +55,7 @@ export function ConfirmDeleteDialog({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} disabled={isPending}>
-          Отмена
+          Скасувати
         </Button>
         <Button
           color="error"
@@ -63,7 +63,7 @@ export function ConfirmDeleteDialog({
           onClick={onConfirm}
           disabled={isPending}
         >
-          {isPending ? 'Удаляю…' : 'Удалить'}
+          {isPending ? 'Видаляю…' : 'Видалити'}
         </Button>
       </DialogActions>
     </Dialog>

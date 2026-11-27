@@ -12,7 +12,7 @@ interface OccasionFieldsProps {
   ) => void;
 }
 
-/** When the gift is for («повод к дате») and free notes. */
+/** When the gift is for («привід до дати») and free notes. */
 export function OccasionFields({ values, errors, set }: OccasionFieldsProps) {
   return (
     <>
@@ -24,15 +24,15 @@ export function OccasionFields({ values, errors, set }: OccasionFieldsProps) {
         }}
       >
         <TextField
-          label="Повод"
-          placeholder="День рождения"
+          label="Привід"
+          placeholder="День народження"
           value={values.occasion}
           onChange={(event) => set('occasion', event.target.value)}
           error={Boolean(errors.occasion)}
           helperText={errors.occasion}
         />
         <TextField
-          label="Дата повода"
+          label="Дата приводу"
           type="date"
           value={values.occasionDate}
           onChange={(event) => set('occasionDate', event.target.value)}
@@ -42,7 +42,7 @@ export function OccasionFields({ values, errors, set }: OccasionFieldsProps) {
         />
       </Box>
       <TextField
-        label="Заметки"
+        label="Нотатки"
         value={values.notes}
         multiline
         minRows={2}

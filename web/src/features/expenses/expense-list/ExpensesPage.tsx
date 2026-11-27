@@ -11,7 +11,7 @@ import { ExpenseTable } from './ExpenseTable';
 import { useShownExpenses } from './use-shown-expenses';
 
 /**
- * «Расходы»: filters, «Период», «Добавить», and the expenses of the month or of a period of days, newest first, each
+ * «Витрати»: filters, «Період», «Додати», and the expenses of the month or of a period of days, newest first, each
  * with edit and delete. A wrong period shows its reason and loads nothing.
  */
 export function ExpensesPage() {
@@ -37,7 +37,7 @@ export function ExpensesPage() {
       {shown.periodProblem ? (
         <Card>
           <Typography color="text.secondary" sx={{ p: { xs: 2, md: 3 } }}>
-            Исправьте даты периода, чтобы увидеть расходы.
+            Виправте дати періоду, щоб побачити витрати.
           </Typography>
         </Card>
       ) : (
@@ -45,7 +45,7 @@ export function ExpensesPage() {
           query={shown.query}
           isFiltered={shown.isFiltered}
           scope={shown.periodParam.active ? 'period' : 'month'}
-          loadingLabel="Загружаю расходы"
+          loadingLabel="Завантажую витрати"
           onResetFilters={shown.clearFilters}
         >
           {(items, isComputer) =>

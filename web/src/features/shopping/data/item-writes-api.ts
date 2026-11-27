@@ -55,7 +55,7 @@ export const useAddItems = () =>
     ),
   );
 
-/** Changes an item's name, quantity, note, department or «Срочно». */
+/** Changes an item's name, quantity, note, department or «Терміново». */
 export const useUpdateItem = () =>
   useShoppingWrite(
     ({ row, body }: { row: Versioned; body: UpdateItemRequest }) =>
@@ -70,13 +70,13 @@ const deleteItem = (row: Versioned) =>
 /** Deletes an item of the list or a history row. */
 export const useDeleteItem = () => useShoppingWrite(deleteItem);
 
-/** «Отменить» after an add: deletes the rows the add created (restored and updated ones stay). */
+/** «Скасувати» after an add: deletes the rows the add created (restored and updated ones stay). */
 export const useUndoAdd = () =>
   useShoppingWrite((added: ShoppingItem[]) =>
     Promise.all(added.map((item) => deleteItem(item))),
   );
 
-/** «Убрать купленные»: the whole cart goes to the history. */
+/** «Прибрати куплене»: the whole cart goes to the history. */
 export const useClearCart = () =>
   useShoppingWrite(() =>
     apiCall(api.POST('/api/shopping/items/clear-cart', {})),

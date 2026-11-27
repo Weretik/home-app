@@ -17,7 +17,7 @@ test('starts empty for a new department and from the row for an edit', () => {
 
 test('needs a name within the limit and a short icon', () => {
   expect(checkDepartment({ name: '  ', icon: '' })).toEqual({
-    name: 'Введите название',
+    name: 'Введіть назву',
   });
   expect(
     checkDepartment({
@@ -25,8 +25,8 @@ test('needs a name within the limit and a short icon', () => {
       icon: '🍝'.repeat(ICON_MAX),
     }),
   ).toEqual({
-    name: `Не длиннее ${DEPARTMENT_NAME_MAX} символов`,
-    icon: 'Один-два эмодзи',
+    name: `Не довше ${DEPARTMENT_NAME_MAX} символів`,
+    icon: 'Один-два емодзі',
   });
   expect(checkDepartment({ name: 'Бакалея', icon: '🍝' })).toEqual({});
 });

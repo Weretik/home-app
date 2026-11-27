@@ -10,13 +10,13 @@ public static class GiftReminderText
         var days = gift.BuyBy.DayNumber - today.DayNumber;
         var when = days switch
         {
-            0 => "сегодня",
+            0 => "сьогодні",
             1 => "завтра",
             _ => $"через {days} дн.",
         };
-        var forWhom = gift.Recipient == GiftParty.Together ? "для дома, вместе" : $"для: {TextFormat.Person(gift.Recipient.ToString())}";
-        return $"🎁 <b>Пора купить подарок</b>\n{TextFormat.Escape(gift.Name)} ({forWhom})\n"
-            + $"Купить до {TextFormat.Day(gift.BuyBy)} — {when}\n"
-            + TextFormat.Link(gift.Link, "Открыть подарок");
+        var forWhom = gift.Recipient == GiftParty.Together ? "для дому, разом" : $"для: {TextFormat.Person(gift.Recipient.ToString())}";
+        return $"🎁 <b>Час купити подарунок</b>\n{TextFormat.Escape(gift.Name)} ({forWhom})\n"
+            + $"Купити до {TextFormat.Day(gift.BuyBy)} — {when}\n"
+            + TextFormat.Link(gift.Link, "Відкрити подарунок");
     }
 }

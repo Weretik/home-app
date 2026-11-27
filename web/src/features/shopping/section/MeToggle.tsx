@@ -6,7 +6,7 @@ import { personLabels } from '../data/labels';
 import type { ShoppingPerson } from '../data/shopping-api';
 import { useMe } from './use-me';
 
-/** «Я: Виталий / Маша»: who this device adds and buys as; remembered on the device. */
+/** «Я: Віталій / Маша»: who this device adds and buys as; remembered on the device. */
 export function MeToggle() {
   const [me, setMe] = useMe();
 

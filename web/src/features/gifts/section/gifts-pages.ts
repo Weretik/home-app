@@ -1,5 +1,5 @@
 /**
- * The pages of the Gifts section, shown as tabs (web ADR 0006). «Настройки» is reached from the gear next to the
+ * The pages of the Gifts section, shown as tabs (web ADR 0006). «Налаштування» is reached from the gear next to the
  * tabs, not a tab itself (docs/design.md).
  */
 export interface GiftsPageEntry {
@@ -12,7 +12,7 @@ export const sectionPath = '/gifts';
 
 export const giftsPages: GiftsPageEntry[] = [
   { path: '', label: 'Список' },
-  { path: 'archive', label: 'Подаренные' },
+  { path: 'archive', label: 'Подаровані' },
 ];
 
 export const pageUrl = (page: GiftsPageEntry) =>

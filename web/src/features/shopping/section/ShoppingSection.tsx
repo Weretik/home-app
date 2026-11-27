@@ -31,8 +31,8 @@ export function ShoppingSection() {
               color="text.secondary"
               sx={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              Нужно {counts.needed}
-              {counts.urgent > 0 && ` · срочно ${counts.urgent}`} · в корзине{' '}
+              Потрібно {counts.needed}
+              {counts.urgent > 0 && ` · терміново ${counts.urgent}`} · у кошику{' '}
               {counts.inCart}
             </Typography>
           )}

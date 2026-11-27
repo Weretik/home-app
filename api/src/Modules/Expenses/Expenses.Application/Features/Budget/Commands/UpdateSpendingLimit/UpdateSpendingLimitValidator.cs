@@ -8,7 +8,7 @@ internal sealed class UpdateSpendingLimitValidator : AbstractValidator<UpdateSpe
     public UpdateSpendingLimitValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the limit you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого ліміту у заголовку If-Match.");
         RuleFor(c => c.Name).NotEmpty().MaximumLength(SpendingLimit.MaxNameLength);
         RuleFor(c => c.Period).IsInEnum();
         RuleFor(c => c.Amount).GreaterThan(0);

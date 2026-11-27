@@ -4,7 +4,7 @@ import { SummaryCard } from '../cards/SummaryCard';
 import { PersonWishes } from './PersonWishes';
 
 /**
- * «🔥 Очень хочу», full width: one tinted block per person (side by side from `md`, stacked on a phone), each with up
+ * «🔥 Дуже хочу», full width: one tinted block per person (side by side from `md`, stacked on a phone), each with up
  * to five most wanted gifts. Hidden while nobody has a 🔥 wish.
  */
 export function TopWishesCard({ summary }: { summary: GiftsSummaryView }) {
@@ -12,7 +12,7 @@ export function TopWishesCard({ summary }: { summary: GiftsSummaryView }) {
     return null;
 
   return (
-    <SummaryCard title="🔥 Очень хочу">
+    <SummaryCard title="🔥 Дуже хочу">
       <Box
         sx={{
           display: 'grid',

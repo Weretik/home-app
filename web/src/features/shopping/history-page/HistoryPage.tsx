@@ -14,7 +14,7 @@ import { groupByMonth } from './history-groups';
 import { useShoppingHistory } from './history-api';
 import { useReturnItem } from './use-return-item';
 
-/** «История»: bought items by month and day (SDD 003), «Вернуть в список», delete, «Показать ещё» (R-10, R-15). */
+/** «Історія»: bought items by month and day (SDD 003), «Повернути до списку», delete, «Показати ще» (R-10, R-15). */
 export function HistoryPage() {
   const history = useShoppingHistory();
   const remove = useDeleteItem();
@@ -34,11 +34,11 @@ export function HistoryPage() {
         error={history.error}
         hasData={history.data !== undefined}
         isEmpty={items.length === 0}
-        loadingLabel="Загружаю историю"
+        loadingLabel="Завантажую історію"
         empty={{
           emoji: '🧾',
-          title: 'Истории пока нет',
-          hint: 'Купленное попадает сюда после «Убрать купленные» или само через несколько часов.',
+          title: 'Історії поки немає',
+          hint: 'Куплене потрапляє сюди після «Прибрати куплене» або саме за кілька годин.',
         }}
         onRetry={() => void history.refetch()}
       >
@@ -57,22 +57,22 @@ export function HistoryPage() {
             disabled={history.isFetchingNextPage}
             sx={{ justifySelf: 'center' }}
           >
-            {history.isFetchingNextPage ? 'Загружаю…' : 'Показать ещё'}
+            {history.isFetchingNextPage ? 'Завантажую…' : 'Показати ще'}
           </Button>
         )}
       </PageStatus>
       {history.isFetchNextPageError && (
         <Alert severity="error">
-          Не удалось загрузить ещё. Попробуйте снова.
+          Не вдалося завантажити ще. Спробуйте знову.
         </Alert>
       )}
       {deleting && (
         <ConfirmDialog
-          title="Удалить из истории?"
+          title="Видалити з історії?"
           summary={itemTitle(deleting)}
           error={
             remove.error
-              ? describeWriteError(remove.error, 'удалить').message
+              ? describeWriteError(remove.error, 'видалити').message
               : undefined
           }
           isPending={remove.isPending}

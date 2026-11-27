@@ -15,7 +15,7 @@ import { DeleteCategoryDialog } from './DeleteCategoryDialog';
 type Open =
   { mode: 'add' } | { mode: 'edit' | 'delete'; item: TodoCategoryItem } | null;
 
-/** «Настройки» of the section: the categories with emoji, name and active count; add, change, delete (FR-007). */
+/** «Налаштування» of the section: the categories with emoji, name and active count; add, change, delete (FR-007). */
 export function CategoriesSettingsPage() {
   const categories = useCategories();
   const [open, setOpen] = useState<Open>(null);
@@ -46,20 +46,20 @@ export function CategoriesSettingsPage() {
           component="h2"
           sx={{ fontWeight: 600 }}
         >
-          Категории
+          Категорії
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddOutlinedIcon />}
           onClick={() => setOpen({ mode: 'add' })}
         >
-          Добавить категорию
+          Додати категорію
         </Button>
       </Box>
       {categories.isPending ? (
         <Box
           role="progressbar"
-          aria-label="Загружаю категории"
+          aria-label="Завантажую категорії"
           sx={{ px: 2, pb: 2 }}
         >
           {[0, 1, 2].map((row) => (
@@ -76,21 +76,21 @@ export function CategoriesSettingsPage() {
                 size="small"
                 onClick={() => void categories.refetch()}
               >
-                Повторить
+                Повторити
               </Button>
             }
           >
-            Не удалось загрузить: {categories.error.message}
+            Не вдалося завантажити: {categories.error.message}
           </Alert>
         </Box>
       ) : items.length === 0 ? (
         <Typography color="text.secondary" sx={{ px: 2, pb: 2 }}>
-          Категорий нет. Добавьте первую — например, «🏠 Дом».
+          Категорій немає. Додайте першу — наприклад, «🏠 Дім».
         </Typography>
       ) : (
         <List
           disablePadding
-          aria-label="Категории задач"
+          aria-label="Категорії справ"
           sx={{ borderTop: 1, borderColor: 'divider' }}
         >
           {items.map((item, index) => (

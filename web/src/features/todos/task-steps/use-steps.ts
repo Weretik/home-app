@@ -33,7 +33,7 @@ export function useSteps(task: TodoTaskItem | undefined) {
     isPending: add.isPending || update.isPending || remove.isPending,
     isAdding: add.isPending,
     message: failed
-      ? describeWriteError(failed, 'сохранить шаг').message
+      ? describeWriteError(failed, 'зберегти крок').message
       : undefined,
     add: (title: string, onDone: () => void) => {
       if (!task) {
