@@ -97,12 +97,15 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID || secrets.VITE_GOOGLE_CLIENT_ID }}
         run: |
           expected=$(ls dist/assets/index-*.js | xargs -n1 basename)
+          # The CDN takes a little while to serve a new deploy everywhere: the page and its JS may land apart.
           for attempt in $(seq 1 12); do
             html=$(curl -fsS "$SITE_URL/" || true)
-            if echo "$html" | grep -qF "$expected"; then break; fi
+            js=$(curl -fsS "$SITE_URL/assets/$expected" || true)
+            if echo "$html" | grep -qF "$expected" && [ -n "$js" ]; then break; fi
             echo "The site does not serve $expected yet (attempt $attempt)"; sleep 10
           done
-          echo "$html" | grep -qF "$expected" || { echo "::error::The site does not serve the new build $expected"; exit 1; }
-          curl -fsS "$SITE_URL/assets/$expected" | grep -qF "$VITE_GOOGLE_CLIENT_ID" \
+          echo "$html" | grep -qF "$expected" && [ -n "$js" ] \
+            || { echo "::error::The site does not serve the new build $expected"; exit 1; }
+          echo "$js" | grep -qF "$VITE_GOOGLE_CLIENT_ID" \
             || { echo "::error::The deployed JS has no Google client id: sign-in would say «Вхід ще не налаштовано»"; exit 1; }
           echo "The deployed site offers Google sign-in."
