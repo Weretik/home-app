@@ -212,11 +212,13 @@ Once ([API ADR 0044](../api/docs/decisions/0044-telemetry-in-application-insight
 2. **Daily cap.** The Application Insights resource → Configure → Usage and estimated costs → **Daily cap** →
    `0.1` GB, with the e-mail on reaching it. Two people send a few MB a day; the cap only guards against a bug that
    floods logs.
-3. **Smart detection e-mails.** The Application Insights resource → Alerts → Alert rules → *Failure Anomalies* is
-   there by default. Open its action group *Application Insights Smart Detection* and add your e-mail, so the
-   notice reaches you whatever your Azure role. Smart detection needs a few days of data before it starts.
-4. **Uptime.** In cron-job.org add a job: `GET <API url>/health`, every 5 minutes, *Notify me when the job fails*
-   (and when it recovers). The site is down for the family when this fails.
+3. **Uptime.** In cron-job.org add a job `home health`: `GET <API url>/health`, every 15 minutes, no headers;
+   notifications on *the job fails* (notify after 2 failures, so a restart during a deploy does not alarm) and on
+   *the job succeeds again*. An outage reaches you within about 30 minutes. Done on 2026-11-28.
+4. **Optional, not set up: smart detection e-mails.** The Application Insights resource → Alerts → *Failure
+   Anomalies* is there by default; to get its e-mails, add your e-mail to the action group *Application Insights
+   Smart Detection*. It reports a rise in errors while the site is still up. Skipped on 2026-11-28: the errors are in
+   Application Insights anyway, and the uptime job covers outages.
 
 **Reading the speed targets** (Application Insights → Logs), for the quality targets PERF1 and PERF2:
 
