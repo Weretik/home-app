@@ -17,7 +17,7 @@ internal static class TelegramWebhookEndpoint
 {
     public static IEndpointRouteBuilder MapTelegramWebhook(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost(TelegramOptions.WebhookPath, HandleAsync).ExcludeFromDescription();
+        endpoints.MapPost(TelegramOptions.WebhookPath, HandleAsync).ExcludeFromDescription().AllowAnonymous();
         return endpoints;
     }
 

@@ -11,7 +11,7 @@ internal static class PlatformRegistration
     public static IServiceCollection AddPlatform(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(TimeProvider.System);
-        // Schemes and policies come with an identity module; the middleware is already in place.
+        // The schemes and the fallback policy (every endpoint needs a member) come with the Identity module (ADR 0037).
         services.AddAuthentication();
         services.AddAuthorization();
         services.AddApiProblems();

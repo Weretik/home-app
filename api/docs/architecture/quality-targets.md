@@ -28,3 +28,6 @@ against these targets in its SDD.
   indexed reads and at most a handful of Telegram calls; the 15-minute tick is also the delivery delay of integration
   events ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md)). `notifications.deliveries` grows by about
   5 rows a day (under 2 000 a year).
+- Sign-in (ADR 0037) adds one indexed lookup of `identity.sessions` by token hash to every protected request, and at
+  most one update an hour per session; at two users this stays far inside the read target. `identity.sessions` holds
+  a few rows per device; ended ones are deleted 30 days later at the member's next sign-in.

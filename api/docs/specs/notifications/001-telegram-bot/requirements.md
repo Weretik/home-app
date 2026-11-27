@@ -52,7 +52,7 @@ to open the site to keep track.
 | R-016 | The webhook accepts only requests with the secret header derived from the bot token (constant-time compare; `401` otherwise, `404` when no token is configured) and always answers `200` for a valid request, so Telegram does not resend it. Replies to commands are sent at once and best effort. |
 | R-017 | The tick needs the scheduler key (`X-Scheduler-Key` = `OutboxTick:Key`); it also sets the webhook when Telegram reports another url. Without a bot token it plans nothing and reports `configured: false`. |
 | R-018 | A test message from the site goes at once to a linked chat (`404` when not linked, `409` `notifications.not_configured` without a token, `409` `notifications.telegram_failed` when Telegram refuses). |
-| R-019 | All site writes are anonymous and rate limited (`PublicWrite`). |
+| R-019 | All site writes are rate limited (`PublicWrite`). They were anonymous until 2026-11-27; since then they need a signed-in member ([ADR 0037](../../../decisions/0037-google-sign-in-with-server-sessions.md)). |
 
 ## Acceptance scenarios
 

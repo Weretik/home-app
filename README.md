@@ -95,8 +95,8 @@ More: [C4 diagrams](api/docs/architecture/c4.md), [backend architecture](api/doc
 
 - [ ] **MCP server**: manage the home from Claude (add an expense, read the month summary, update the shopping list).
 - [ ] **Telegram bot webhooks**: more commands to add and change records right from the chat.
-- [ ] **Google sign-in**: until then writes are open and rate limited
-  ([ADR 0015](api/docs/decisions/0015-expenses-open-until-identity.md)).
+- [x] **Google sign-in** for the family, everything closed by default
+  ([ADR 0037](api/docs/decisions/0037-google-sign-in-with-server-sessions.md)).
 
 ## Repository map
 

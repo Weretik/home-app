@@ -38,6 +38,13 @@
     <Project Path="src/Modules/Todos/Todos.Domain/Todos.Domain.csproj" />
     <Project Path="src/Modules/Todos/Todos.Infrastructure/Todos.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Identity.Api/Identity.Api.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Contracts/Identity.Contracts.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Notifications/">
     <Project Path="src/Modules/Notifications/Notifications.Api/Notifications.Api.csproj" />
     <Project Path="src/Modules/Notifications/Notifications.Application/Notifications.Application.csproj" />

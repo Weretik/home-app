@@ -61,6 +61,9 @@ jobs:
         env:
           # The API origin is public (it ends up in the JS), so it is a repository variable, not a secret.
           VITE_API_URL: ${{ vars.VITE_API_URL || 'https://vitaliy-home-api-ase3bfeab4e9gren.polandcentral-01.azurewebsites.net' }}
+          # The Google OAuth client id of the sign-in button is public too (it is in every page); without it the
+          # sign-in screen says sign-in is not set up.
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
         run: npm run build
 
       # Uploads the ready dist/ as is; the Static Web App does not build anything itself.

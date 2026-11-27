@@ -92,14 +92,16 @@ For example `POST /api/shopping/items` once the Shopping module exists:
 
 ## Security
 
-- Authentication is not in place yet; it arrives with the Identity module and its ADR. The authentication and
-  authorization middleware is already in the pipeline. Until then the Expenses, Shopping, Gifts and Todos reads and writes are
-  anonymous; writes are rate limited ([ADR 0015](../decisions/0015-expenses-open-until-identity.md)).
+- Sign-in with Google for the family, in the Identity module ([ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md),
+  [module page](../modules/identity.md)): every endpoint needs a session (`Authorization: Bearer`) through the
+  authorization fallback policy; the few anonymous endpoints say `AllowAnonymous` in their own file and are listed in
+  `AuthorizationRulesTests`. A `GET` with the scheduler key reads as the read-only service `scheduler` (deploy checks).
+  The open period of [ADR 0015](../decisions/0015-expenses-open-until-identity.md) is over.
 - Edits of shared rows are guarded by a row version (`xmin`, `If-Match`)
   ([ADR 0017](../decisions/0017-row-version-via-xmin-for-edits.md)).
 - The one-time sheet import needs the `X-Import-Key` header, compared in constant time, and is hidden from the
   OpenAPI document ([ADR 0014](../decisions/0014-one-time-sheet-import.md)).
-- CORS allows only the origins in `Cors:Origins` (the web app), with credentials, ready for a cookie session.
+- CORS allows only the origins in `Cors:Origins` (the web app). The session travels in a header, not a cookie.
 - The outbox tick and the notifications tick need the shared scheduler key (`X-Scheduler-Key`), compared in constant time,
   and are hidden from the OpenAPI document. They are called by the GitHub Actions cron ([ADR 0034](../decisions/0034-scheduler-github-actions-cron.md)).
 - The Telegram webhook checks `X-Telegram-Bot-Api-Secret-Token`, derived from the bot token and compared in constant

@@ -31,7 +31,8 @@ internal static class ApiDocumentation
 
     public static void MapApiDocumentation(this WebApplication app)
     {
-        app.MapOpenApi();
+        // The contract is public anyway (it is committed to the repository); the data behind it is not.
+        app.MapOpenApi().AllowAnonymous();
         if (app.Environment.IsDevelopment())
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Home API"));
     }

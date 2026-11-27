@@ -161,8 +161,8 @@ to them. The seed is the «Справочник» of 2026-11-26: departments in 
 
 ## HTTP API
 
-All under `/api/shopping`, tag `Shopping`, open without sign-in like Expenses
-([ADR 0015](../decisions/0015-expenses-open-until-identity.md)). Every write uses the `PublicWrite` rate limit and can
+All under `/api/shopping`, tag `Shopping`, behind sign-in like every module
+([ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md)). Every write uses the `PublicWrite` rate limit and can
 answer `429`. Errors are problem responses with `code`.
 
 | Operation | Route | Notes |

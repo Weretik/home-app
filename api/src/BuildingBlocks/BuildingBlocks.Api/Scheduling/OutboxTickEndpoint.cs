@@ -16,7 +16,7 @@ public static class OutboxTickEndpoint
 
     public static IEndpointRouteBuilder MapOutboxTick(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/internal/outbox/tick", RunAsync).ExcludeFromDescription();
+        endpoints.MapPost("/internal/outbox/tick", RunAsync).ExcludeFromDescription().AllowAnonymous();
         return endpoints;
     }
 

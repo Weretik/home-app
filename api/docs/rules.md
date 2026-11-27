@@ -56,8 +56,12 @@ names the test for each rule and the reason for each rule that is review only
 - Every endpoint has a unique camelCase `WithName`, a `WithSummary`, and `Produces...` for every response it can
   give. **(tested on the generated OpenAPI document)**
 - Errors are RFC 9457 problem responses with `code` and, for validation, `errors` by field. **(tested)**
-- An anonymous endpoint that writes, and every sign-in, opts into a rate limit policy
-  (`RequireRateLimiting(RateLimitPolicies.PublicWrite)`) and lists `429` in its `Produces...`. **(tested)**
+- Every endpoint needs a signed-in member through the Identity module's fallback policy; nothing adds its own
+  `RequireAuthorization`. Only the endpoints listed with a reason in `AuthorizationRulesTests` say `AllowAnonymous`
+  ([ADR 0037](decisions/0037-google-sign-in-with-server-sessions.md)). **(tested)**
+- Every endpoint that writes, and the sign-in, opts into a rate limit policy
+  (`RequireRateLimiting(RateLimitPolicies.PublicWrite)`, `SignIn` for the sign-in) and lists `429` in its
+  `Produces...`. **(tested)**
 - A create (`201`) takes an `Idempotency-Key` header and an edit (`PUT`) takes `If-Match` with the row version; an
   exception is named in the test with its ADR (`recordPlannedExpense`, [ADR 0028](decisions/0028-planned-expenses-for-the-forecast.md)).
   **(tested on the OpenAPI document)**
@@ -147,6 +151,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | Validators check shape, the domain checks rules | `UnitTests/<Module>/Input/*`, `UnitTests/<Module>/Domain/*` (per rule); the split itself is review only (meaning) |
 | Unique `WithName` (camelCase) and `WithSummary` | `Http/OpenApiDocumentTests.Every_Operation_HasAUniqueCamelCaseId_AndASummary` |
 | `Produces…` for every body; errors are problem responses; input lists `400` | `OpenApiDocumentTests.Every_SuccessWithABody_HasASchema`, `.Every_Error_IsAProblemResponse`, `.Every_Operation_WithInput_ListsTheValidationProblem` |
+| Closed by default, anonymous only from the list | `Http/AuthorizationRulesTests` (architecture), `Api/Identity/IdentityProtectionApiTests` (integration: every documented `GET` is `401` without a session) |
 | Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006; the keyed notifications tick, ADR 0034; the Telegram webhook, ADR 0033), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
 | `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024; `setShoppingItemStatus` and `reorderShoppingDepartments` without a version, target values, ADR 0031) |
 | Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |

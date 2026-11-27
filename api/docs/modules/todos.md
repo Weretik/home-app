@@ -137,7 +137,7 @@ version starts ([ADR 0016](../decisions/0016-migrations-as-bundles-in-deploy.md)
 
 ## HTTP API
 
-Group `/api/todos`, tag `Todos`. Every write is anonymous, uses the `PublicWrite` rate limit and lists `429`.
+Group `/api/todos`, tag `Todos`. Every endpoint needs a signed-in member (ADR 0037); every write uses the `PublicWrite` rate limit and lists `429`.
 
 | Operation | Method and path | Request | Response |
 | --- | --- | --- | --- |

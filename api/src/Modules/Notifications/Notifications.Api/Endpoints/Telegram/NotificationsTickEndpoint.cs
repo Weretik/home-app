@@ -17,7 +17,7 @@ internal static class NotificationsTickEndpoint
 {
     public static IEndpointRouteBuilder MapNotificationsTick(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/internal/notifications/tick", HandleAsync).ExcludeFromDescription();
+        endpoints.MapPost("/internal/notifications/tick", HandleAsync).ExcludeFromDescription().AllowAnonymous();
         return endpoints;
     }
 
