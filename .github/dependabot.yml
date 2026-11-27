@@ -1,8 +1,11 @@
 # Monthly dependency updates, minor and patch grouped into one pull request per ecosystem.
+# Titles start with a Conventional Commits prefix, so the `PR title` check passes (docs/decisions/0008).
 version: 2
 updates:
   - package-ecosystem: nuget
     directory: /api
+    commit-message:
+      prefix: "build(deps)"
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
@@ -12,6 +15,8 @@ updates:
 
   - package-ecosystem: npm
     directory: /web
+    commit-message:
+      prefix: "build(deps)"
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
@@ -21,6 +26,8 @@ updates:
 
   - package-ecosystem: github-actions
     directory: /
+    commit-message:
+      prefix: "ci(deps)"
     schedule:
       interval: monthly
     groups:

@@ -89,6 +89,21 @@ lowercase letters, digits and hyphens, 3 to 6 words in the description.
 - No `claude`, no random suffixes, hashes or dates; `dependabot/*` and `renovate/*` are allowed.
 - The workflow `Branch name` (check `branch name`) fails a pull request from a branch that breaks the rule.
 
+## Commits and pull requests
+
+Commit messages and pull request titles follow Conventional Commits
+([ADR 0008](docs/decisions/0008-conventional-commit-pr-titles.md)): `<type>(<optional scope>): <description>`, English.
+Pull requests are squash-merged, so the title becomes the commit on `main`.
+
+- Types: the branch types above plus `build`, `ci`, `style`, `revert`; the scope is optional, lowercase kebab-case
+  (a module or half: `expenses`, `web`, `api`, `ci`); `!` before the colon marks a breaking change.
+- The description states the result, starts lowercase, has no trailing period; at most 100 characters (aim for 72).
+- Examples: `fix(catalog): keep filter on reload`, `feat(todos): add due dates`, `ci: check pull request titles`.
+- No AI attribution in commits or pull requests: no `Co-Authored-By` for an assistant, no session links, no
+  "Generated with …" lines or attribution comments.
+- The workflow `PR title` (check `pr title`) fails a pull request whose title breaks the rule; editing the title
+  reruns it.
+
 ## Task routing
 
 | Task | Skill or process | Project rules |

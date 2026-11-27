@@ -1,0 +1,46 @@
+name: PR title
+
+# Every pull request title follows Conventional Commits: <type>(<optional scope>): <description>
+# (docs/decisions/0008-conventional-commit-pr-titles.md). Pull requests are squash-merged, so the title becomes the
+# commit on main.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-title:
+    name: pr title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the pull request title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -eu
+
+          fail() {
+            echo "::error title=Wrong pull request title::Title '$TITLE' $1"
+            echo
+            echo "Title format (Conventional Commits): <type>(<optional scope>): <description>"
+            echo "  types:  feat, fix, hotfix, refactor, perf, docs, test, chore, build, ci, style, revert"
+            echo "  rules:  English; lowercase type and scope (letters, digits, hyphens); '!' before ':' marks a"
+            echo "          breaking change; a space after ':'; the description starts with a lowercase letter or digit,"
+            echo "          has no trailing period; the whole title is at most 100 characters"
+            echo "  examples: fix(catalog): keep filter on reload, feat(todos): add due dates, ci: check pr titles"
+            echo "Edit the pull request title; the check runs again on its own."
+            exit 1
+          }
+
+          printf '%s' "$TITLE" | grep -Eq '^(feat|fix|hotfix|refactor|perf|docs|test|chore|build|ci|style|revert)(\([a-z0-9]+(-[a-z0-9]+)*\))?!?: [a-z0-9`].*$' \
+            || fail "does not match <type>(<optional scope>): <description> with an allowed type."
+
+          case "$TITLE" in *.) fail "ends with a period." ;; esac
+
+          length=$(printf '%s' "$TITLE" | wc -m)
+          [ "$length" -le 100 ] || fail "is $length characters long; use at most 100."
+
+          printf '%s' "$TITLE" | LC_ALL=C grep -q '[^ -~]' && fail "has non-ASCII characters; write it in English."
+          echo "Title '$TITLE' is OK."
