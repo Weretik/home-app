@@ -141,3 +141,8 @@ npm run dev
 
 Built by [Vitaliy Tsiupin](https://www.linkedin.com/in/vitaliythupin/), full-stack .NET + React developer. The same
 approach runs in the production systems I build for businesses.
+
+## License
+
+[MIT](LICENSE) © 2026 Vitaliy Tsiupin. You may use, copy and change this code, also commercially, as long as the
+copyright notice and the license text stay with every copy or substantial part of it.

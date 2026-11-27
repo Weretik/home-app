@@ -13,4 +13,5 @@ New file: `NNNN-short-name.md`, next number in order.
 | [0003](0003-postgres-at-hosting-provider.md) | PostgreSQL: a separate database at the existing hosting provider | Accepted |
 | [0004](0004-sdd-first-feature-delivery.md) | Every feature: SDD first, then implementation, then an architecture audit | Accepted |
 | [0005](0005-post-deploy-smoke-reads-every-section.md) | Tests use real-format secrets, outside clients run for real, the deploy reads every section | Accepted |
+| [0006](0006-mit-license.md) | The code is published under the MIT License | Accepted |
 | — | Authentication for two users | Open |
