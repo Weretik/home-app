@@ -2,7 +2,7 @@ name: PR title
 
 # Every pull request title follows Conventional Commits: <type>(<optional scope>): <description>
 # (docs/decisions/0008-conventional-commit-pr-titles.md). Pull requests are squash-merged, so the title becomes the
-# commit on main.
+# commit on main. Bot pull requests (dependabot/*, renovate/*) are allowed as they are.
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
@@ -17,9 +17,13 @@ jobs:
     steps:
       - name: Check the pull request title
         env:
+          BRANCH: ${{ github.head_ref }}
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           set -eu
+          case "$BRANCH" in
+            dependabot/*|renovate/*) echo "Bot pull request is allowed."; exit 0 ;;
+          esac
 
           fail() {
             echo "::error title=Wrong pull request title::Title '$TITLE' $1"
