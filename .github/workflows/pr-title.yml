@@ -1,7 +1,8 @@
 name: PR title
 
-# The pull request title becomes the squash commit message, so it follows Conventional Commits:
-# <type>(<scope>): <description>. Bot pull requests (dependabot/*, renovate/*) are allowed as they are.
+# Every pull request title follows Conventional Commits: <type>(<optional scope>): <description>
+# (docs/decisions/0008-conventional-commit-pr-titles.md). Pull requests are squash-merged, so the title becomes the
+# commit on main. Bot pull requests (dependabot/*, renovate/*) are allowed as they are.
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
@@ -27,17 +28,23 @@ jobs:
           fail() {
             echo "::error title=Wrong pull request title::Title '$TITLE' $1"
             echo
-            echo "Title format (Conventional Commits): <type>(<scope>): <description>"
-            echo "  types:  feat, fix, refactor, perf, docs, test, chore, ci, build"
-            echo "  rules:  English, the scope is optional (lowercase), the description starts with a lowercase"
-            echo "          letter or digit, no trailing period, at most 72 characters"
-            echo "  examples: feat(catalog): add product swatches, fix(admin): keep filters after reload, ci: check pr titles"
-            echo "Edit the pull request title; the check runs again by itself."
+            echo "Title format (Conventional Commits): <type>(<optional scope>): <description>"
+            echo "  types:  feat, fix, hotfix, refactor, perf, docs, test, chore, build, ci, style, revert"
+            echo "  rules:  English; lowercase type and scope (letters, digits, hyphens); '!' before ':' marks a"
+            echo "          breaking change; a space after ':'; the description starts with a lowercase letter or digit,"
+            echo "          has no trailing period; the whole title is at most 100 characters"
+            echo "  examples: fix(catalog): keep filter on reload, feat(todos): add due dates, ci: check pr titles"
+            echo "Edit the pull request title; the check runs again on its own."
             exit 1
           }
 
-          [ "${#TITLE}" -le 72 ] || fail "is ${#TITLE} characters long; use at most 72."
-          echo "$TITLE" | grep -Eq '^(feat|fix|refactor|perf|docs|test|chore|ci|build)(\([a-z0-9]+(-[a-z0-9]+)*\))?!?: [a-z0-9`]' \
-            || fail "does not match <type>(<scope>): <description> with an allowed type and a lowercase start."
+          printf '%s' "$TITLE" | grep -Eq '^(feat|fix|hotfix|refactor|perf|docs|test|chore|build|ci|style|revert)(\([a-z0-9]+(-[a-z0-9]+)*\))?!?: [a-z0-9`].*$' \
+            || fail "does not match <type>(<optional scope>): <description> with an allowed type."
+
           case "$TITLE" in *.) fail "ends with a period." ;; esac
+
+          length=$(printf '%s' "$TITLE" | wc -m)
+          [ "$length" -le 100 ] || fail "is $length characters long; use at most 100."
+
+          printf '%s' "$TITLE" | LC_ALL=C grep -q '[^ -~]' && fail "has non-ASCII characters; write it in English."
           echo "Title '$TITLE' is OK."

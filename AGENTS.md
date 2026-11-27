@@ -89,9 +89,20 @@ lowercase letters, digits and hyphens, 3 to 6 words in the description.
 - No `claude`, no random suffixes, hashes or dates; `dependabot/*` and `renovate/*` are allowed.
 - The workflow `Branch name` (check `branch name`) fails a pull request from a branch that breaks the rule.
 
-**Authorship:** Commits, merge and squash commits, and pull request descriptions carry no AI attribution: no `Co-Authored-By`, no `Claude-Session`, and no "Generated with Claude Code" line. The author and committer is the repository owner only (Weretik).
+## Commits and pull requests
 
-**Commit and PR titles:** every commit, pull request title and squash commit follows Conventional Commits `<type>(<scope>): <description>`: English, an optional lowercase scope (module or app), the description starting with a lowercase letter, no trailing period, at most 72 characters; types `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`, `ci`, `build`; for example `fix(catalog): keep the category filter after reload`. The squash merge takes the PR title as the commit message, and the `PR title` workflow checks it on every pull request.
+Commit messages and pull request titles follow Conventional Commits
+([ADR 0008](docs/decisions/0008-conventional-commit-pr-titles.md)): `<type>(<optional scope>): <description>`, English.
+Pull requests are squash-merged, so the title becomes the commit on `main`.
+
+- Types: the branch types above plus `build`, `ci`, `style`, `revert`; the scope is optional, lowercase kebab-case
+  (a module or half: `expenses`, `web`, `api`, `ci`); `!` before the colon marks a breaking change.
+- The description states the result, starts lowercase, has no trailing period; at most 100 characters (aim for 72).
+- Examples: `fix(catalog): keep filter on reload`, `feat(todos): add due dates`, `ci: check pull request titles`.
+- No AI attribution in commits or pull requests: no `Co-Authored-By` for an assistant, no session links, no
+  "Generated with …" lines or attribution comments.
+- The workflow `PR title` (check `pr title`) fails a pull request whose title breaks the rule; editing the title
+  reruns it.
 
 ## Task routing
 

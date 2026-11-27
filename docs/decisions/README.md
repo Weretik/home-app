@@ -15,4 +15,5 @@ New file: `NNNN-short-name.md`, next number in order.
 | [0005](0005-post-deploy-smoke-reads-every-section.md) | Tests use real-format secrets, outside clients run for real, the deploy reads every section | Accepted |
 | [0006](0006-mit-license.md) | The code is published under the MIT License | Accepted |
 | [0007](0007-conventional-branch-names.md) | Branch names follow Conventional Branch, checked in CI | Accepted |
+| [0008](0008-conventional-commit-pr-titles.md) | Commits and pull request titles follow Conventional Commits, checked in CI; no AI attribution | Accepted |
 | — | Authentication for two users | Open |
