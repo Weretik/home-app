@@ -14,4 +14,5 @@ New file: `NNNN-short-name.md`, next number in order.
 | [0004](0004-sdd-first-feature-delivery.md) | Every feature: SDD first, then implementation, then an architecture audit | Accepted |
 | [0005](0005-post-deploy-smoke-reads-every-section.md) | Tests use real-format secrets, outside clients run for real, the deploy reads every section | Accepted |
 | [0006](0006-mit-license.md) | The code is published under the MIT License | Accepted |
+| [0007](0007-conventional-branch-names.md) | Branch names follow Conventional Branch, checked in CI | Accepted |
 | — | Authentication for two users | Open |

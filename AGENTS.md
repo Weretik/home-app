@@ -76,6 +76,19 @@ Every feature, above all a new one, goes in this order ([ADR 0004](docs/decision
    layers, folders and files, component split and size, contract, data, idempotency. Fix or record every finding.
 4. **Merge** only after the audit and green CI, on the user's explicit approval.
 
+## Branch names
+
+Every feature or fix gets a new branch from `main` named by Conventional Branch
+([ADR 0007](docs/decisions/0007-conventional-branch-names.md)): `<type>/<short-kebab-case-description>`, English,
+lowercase letters, digits and hyphens, 3 to 6 words in the description.
+
+- Types: `feat` (new feature), `fix` (bug), `hotfix` (urgent production fix), `refactor`, `perf`, `docs`, `test`,
+  `chore` (infrastructure, dependencies, CI).
+- Examples: `feat/order-history-export`, `fix/login-redirect-loop`, `chore/update-ci-node`.
+- One feature across several repositories (for example home-app and obsidian) uses the same branch name in each.
+- No `claude`, no random suffixes, hashes or dates; `dependabot/*` and `renovate/*` are allowed.
+- The workflow `Branch name` (check `branch name`) fails a pull request from a branch that breaks the rule.
+
 ## Task routing
 
 | Task | Skill or process | Project rules |
