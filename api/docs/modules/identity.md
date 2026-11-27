@@ -30,6 +30,14 @@ Code: [`src/Modules/Identity`](../../src/Modules/Identity). Schema: `identity`.
 5. A `GET` with the right `X-Scheduler-Key` authenticates as the read-only service `scheduler` (scheme
    `SchedulerKey`), so the deploy can check that every section reads; the header does nothing on other methods.
 
+## Who is signed in, for other modules
+
+`Identity.Contracts` exposes `ICurrentMember.Get()`, which returns `SignedInMember(Email, Name, Person)` with
+`HouseholdPerson` `Vitaliy` or `Maria` (by the allowlist order), or `null` for the scheduler key and outside a request
+([ADR 0040](../decisions/0040-current-member-through-identity-contracts.md)). `Identity.Api` implements it
+(`Authentication/CurrentMember`, scoped, over `IHttpContextAccessor`). Notes uses it for the author of a note; no other
+module reads claims or `HttpContext.User`, which `ModuleBoundaryTests.Only_TheIdentityModule_ReadsClaims` checks.
+
 ## Anonymous endpoints
 
 | Endpoint | Why it is open |
@@ -73,7 +81,7 @@ bundle first.
 
 ## Tests
 
-- Unit: `Session` (start, touch, revoke, stale), `SessionTokens`, `FamilyAllowlist`, `SignInHandler` with a fake
+- Unit: `Session` (start, touch, revoke, stale), `SessionTokens`, `FamilyAllowlist`, `CurrentMember`, `SignInHandler` with a fake
   verifier, `SessionAuthenticator`.
 - Architecture: `AuthorizationRulesTests` (the anonymous list).
 - Integration: `IdentityApiTests` (sign-in, refusals, sign-out, `me`, allowlist on every request, expiry slide),

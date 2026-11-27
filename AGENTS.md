@@ -20,7 +20,9 @@ with steps, statuses, priorities, editable categories, an archive and a home pag
 дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); gifts with a giver and a buy-by date become
 to-dos and close themselves when the to-do is done; and the Notifications module, the family Telegram bot (morning
 to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
-see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); the Identity module: Google sign-in for Masha and Vitaliy only (an e-mail allowlist), server sessions, and every
+see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); the Notes module (what Masha and Vitaliy
+like, dislike and should know about each other, by category, with who wrote each note taken from the session, see
+[api/docs/modules/notes.md](api/docs/modules/notes.md)); the Identity module: Google sign-in for Masha and Vitaliy only (an e-mail allowlist), server sessions, and every
 endpoint closed by default ([ADR 0037](api/docs/decisions/0037-google-sign-in-with-server-sessions.md), see
 [api/docs/modules/identity.md](api/docs/modules/identity.md)). Not indexed, no SEO. UI text is Ukrainian ([web ADR 0014](web/docs/decisions/0014-ukrainian-interface.md)); everything else (docs, comments, commits)
 is English.
@@ -32,7 +34,7 @@ not simplify it because the project is small.
 
 - API: [README](api/README.md) (commands, adding a use case or a module), [architecture](api/docs/architecture/README.md),
   [C4](api/docs/architecture/c4.md), modules ([Identity](api/docs/modules/identity.md), [Expenses](api/docs/modules/expenses.md), [Shopping](api/docs/modules/shopping.md), [Gifts](api/docs/modules/gifts.md),
-  [Todos](api/docs/modules/todos.md), [Notifications](api/docs/modules/notifications.md)),
+  [Todos](api/docs/modules/todos.md), [Notes](api/docs/modules/notes.md), [Notifications](api/docs/modules/notifications.md)),
   [specs](api/docs/specs/README.md), [rules](api/docs/rules.md), [decisions](api/docs/decisions/README.md),
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),

@@ -3,7 +3,7 @@
 A .NET 10 modular monolith on PostgreSQL, built on
 [fullstack-modular-template](https://github.com/Weretik/fullstack-modular-template). One deployable API (`Host.Api`)
 hosts the modules; each module owns its own schema, its own use cases and its own public surface. Modules so far:
-[Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md).
+[Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md), [Notes](docs/modules/notes.md).
 
 - [Architecture](docs/architecture/README.md): modules, layers and what may reference what.
 - [C4 diagrams](docs/architecture/c4.md): the system, its containers and the inside of the API.
@@ -14,7 +14,7 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 - [Quality targets](docs/architecture/quality-targets.md): latency, load, data and recovery numbers every audit starts from.
 - [Audits](docs/audits/): architecture audits of finished features and what was fixed.
 - [Modules](docs/modules/expenses.md): one page per module (model, layers, schema, endpoints):
-  [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md).
+  [Expenses](docs/modules/expenses.md), [Shopping](docs/modules/shopping.md), [Gifts](docs/modules/gifts.md), [Todos](docs/modules/todos.md), [Notes](docs/modules/notes.md).
 - [API contract](docs/contracts/openapi.json): generated from the code on every build.
 
 ## Layout
@@ -22,7 +22,7 @@ hosts the modules; each module owns its own schema, its own use cases and its ow
 ```
 src/
   BuildingBlocks/   Result and Error, validation pipeline, outbox, persistence helpers, problem responses
-  Modules/          one folder per module, five projects each (Expenses, Shopping, Gifts, Todos)
+  Modules/          one folder per module, five projects each (Expenses, Shopping, Gifts, Todos, Notes)
     <Name>/         <Name>.Api, .Application, .Contracts, .Domain, .Infrastructure
   Host/Host.Api/    Composition only: registers modules, middleware, OpenAPI
 tests/
@@ -116,6 +116,10 @@ exposes an interface and `Shopping.Application` implements it; `Expenses.Applica
 
 To react to something that happened in another module without waiting for it, publish a message through the outbox
 (below) instead of calling the other module inside the request.
+
+To learn who sends the request (to record an author, as Notes does), take `Identity.Contracts.ICurrentMember`; it answers
+the signed-in member and their person in the home, or `null` for the scheduler key. No module but Identity reads claims
+or `HttpContext.User` ([ADR 0040](docs/decisions/0040-current-member-through-identity-contracts.md)).
 
 ## Outbox and the scheduled tick
 

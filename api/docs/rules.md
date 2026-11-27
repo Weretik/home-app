@@ -9,6 +9,8 @@ names the test for each rule and the reason for each rule that is review only
 
 - A module is five projects: `Api`, `Application`, `Contracts`, `Domain`, `Infrastructure`. **(tested)**
 - A module uses another module only through that module's `Contracts`. **(tested)**
+- Only the Identity module reads claims or `HttpContext.User`; other modules learn who is signed in through
+  `Identity.Contracts.ICurrentMember` ([ADR 0040](decisions/0040-current-member-through-identity-contracts.md)). **(tested)**
 - `Domain` references no EF Core and no ASP.NET Core; `Application` references no `Infrastructure` or `Api`.
   **(tested)**
 - `Host.Api` holds composition only and references only module `Api` projects and shared infrastructure. **(tested)**
@@ -76,8 +78,8 @@ names the test for each rule and the reason for each rule that is review only
 - Reads use projections or `AsNoTracking` and page in SQL (page size at most 100). **(tested)**
 - No query and no `SaveChanges` inside a loop.
 - Search splits the input into words; each word is an escaped `LIKE` on a lower-cased,
-  `pg_trgm`-indexed column (exception: Shopping keywords, about 400 rows, ADR 0031; the production server does not
-  allow `CREATE EXTENSION`).
+  `pg_trgm`-indexed column (exceptions: Shopping keywords, about 400 rows, ADR 0031; Notes, hundreds of rows,
+  ADR 0039; the production server does not allow `CREATE EXTENSION`).
 - Shared state gets a named race guard: unique index, row version, or conditional `UPDATE`. The guard is tested by
   letting a second request in between the read and the save (`TestHost/RacingExpensesDb`).
 - Migrations are a separate step before a deploy and must keep the previous release working (add first, remove
@@ -126,6 +128,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | --- | --- |
 | Five projects per module | `Boundaries/ModuleBoundaryTests.Every_Module_HasAllFiveLayers` |
 | Other modules only through `Contracts`; `Contracts` reference nothing | `ModuleBoundaryTests.A_Module_ReferencesOtherModules_OnlyThroughTheirContracts`, `.Contracts_AreLeaf_Projects…` |
+| Only Identity reads claims or `HttpContext.User` | `ModuleBoundaryTests.Only_TheIdentityModule_ReadsClaims` |
 | `Domain` without EF Core, ASP.NET Core, Mediator, FluentValidation | `Boundaries/LayerDependencyTests.Domain_DependsOnNoFrameworks` |
 | `Application` without the driver, the web, `Infrastructure`, `Api` | `LayerDependencyTests.Application_DoesNotKnowTheDatabaseDriverOrTheWeb` |
 | `Infrastructure` without `Api` | `LayerDependencyTests.Infrastructure_DoesNotDependOnApi` |

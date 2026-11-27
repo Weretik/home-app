@@ -1,6 +1,7 @@
 using Identity.Api.Authentication;
 using Identity.Api.Endpoints;
 using Identity.Application;
+using Identity.Contracts;
 using Identity.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,10 @@ public static class IdentityModule
     {
         services.AddIdentityApplication();
         services.AddIdentityInfrastructure(configuration);
+
+        // Who sends the request, for the modules that record the author (ADR 0040).
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentMember, CurrentMember>();
 
         services.AddAuthentication(IdentitySchemes.Session)
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(IdentitySchemes.Session, null)

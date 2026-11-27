@@ -42,6 +42,7 @@ public sealed partial class OpenApiDocumentTests
     {
         ["recordPlannedExpense"] = "guarded by the plan's version; a repeat finds the plan gone (ADR 0028)",
         ["createTodoCategory"] = "a repeat hits the unique name and answers 409 (ADR 0030)",
+        ["createNoteCategory"] = "a repeat hits the unique name and answers 409 (ADR 0039)",
         ["addTodoTaskStep"] = "a duplicated step is visible in the task and removed with one tap (ADR 0030)",
     };
 

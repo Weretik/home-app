@@ -22,7 +22,7 @@ Written from the backend SDD template (Weretik/obsidian `Templates/backend-sdd`)
 ## State
 
 - Specification: accepted
-- Implementation: in progress
+- Implementation: backend done (module, migration, endpoints, tests, deploy steps, docs); web in progress
 - Verification: see [tasks](tasks.md#delivery-readiness-filled-before-merge)
 - Blockers: none
 

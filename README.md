@@ -22,6 +22,7 @@ two halves. Next step: an MCP server, so the home can be managed from Claude.
 | **Shopping** | One live list for both phones: quick add from free text («milk, bread, eggs 10»), automatic store departments, a cart that empties itself, history and frequent items. |
 | **To-dos** | Tasks for each person or both, with steps, statuses, priorities, categories and an archive. |
 | **Gifts** | A wishlist with variants, an archive of what was given and personal details. A gift with a giver and a buy-by date becomes a to-do and closes itself when the to-do is done. |
+| **About us** | Notes on what each of us likes, dislikes or should know about the other («not the milk from that shop, the one from this one»), by categories, with who wrote each note. New, no sheet before it. |
 | **Telegram bot** | Morning to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, «✅» buttons to close a task from the chat. |
 
 ## Architecture
@@ -37,6 +38,7 @@ flowchart LR
         Shopping
         Todos
         Gifts
+        Notes
         Notifications
     end
     User(("Family<br/>browser / phone")) --> Web
@@ -48,7 +50,7 @@ flowchart LR
     Claude["Claude (planned)"] -. "MCP" .-> Api
 ```
 
-- **Modular monolith.** One deployable API; each module (Expenses, Shopping, Todos, Gifts, Notifications) has five
+- **Modular monolith.** One deployable API; each module (Expenses, Shopping, Todos, Gifts, Notes, Notifications) has five
   projects (`Api`, `Application`, `Contracts`, `Domain`, `Infrastructure`) and its own database schema. Modules talk
   only through their `Contracts`; there are no foreign keys across schemas.
 - **Reliable side effects.** Telegram messages and cross-module events go through a transactional outbox; creates

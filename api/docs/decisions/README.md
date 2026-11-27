@@ -44,6 +44,9 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0035 | [Modules talk through integration events in the outbox](0035-integration-events-through-the-outbox.md) |
 | 0036 | [Telegram chats are linked from Telegram, not configured](0036-telegram-chats-linked-from-telegram.md) |
 | 0037 | [Texts the API and the bot write are Ukrainian, in place](0037-ukrainian-user-facing-texts.md) |
+| 0037 | [Google sign-in for the family, server-side sessions, everything closed by default](0037-google-sign-in-with-server-sessions.md) |
+| 0039 | [The Notes module and its model](0039-notes-module-model.md) |
+| 0040 | [Other modules learn who is signed in through Identity.Contracts](0040-current-member-through-identity-contracts.md) |
 
 ## Decisions that must have a record
 
@@ -55,4 +58,3 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 
 New record: copy the newest file, take the next number, and keep the sections Context, Decision, Consequences. A record
 that is replaced stays, with its status changed to `superseded by NNNN`.
-| 0037 | [Google sign-in for the family, server-side sessions, everything closed by default](0037-google-sign-in-with-server-sessions.md) |

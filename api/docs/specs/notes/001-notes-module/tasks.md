@@ -27,6 +27,11 @@ refactor → affected regression run. Evidence is the CI run of the pull request
 
 ## Delivery readiness (filled before merge)
 
-- [ ] Unit, architecture, integration tests green.
-- [ ] `openapi.json` regenerated, web client regenerated.
+- [x] Unit, architecture, integration tests green (2026-11-27, local run on PostgreSQL 17 in Docker): unit 429 passed
+  (32 new: `UnitTests/Notes`, `UnitTests/Identity/CurrentMemberTests`), architecture 91 passed (new
+  `ModuleBoundaryTests.Only_TheIdentityModule_ReadsClaims`), integration 198 passed, 0 skipped (22 new in
+  `IntegrationTests/Api/Notes`; `IdentityProtectionApiTests` now also sweeps `GET /api/notes/items` and
+  `/api/notes/categories`). CI evidence: the pull request run.
+- [ ] `openapi.json` regenerated (done: `listNotes` … `deleteNoteCategory`, schemas `NoteItem`, `NoteRequest`,
+  `NoteCategoryItem`, `NoteCategoryRequest`, `NoteCreated`, `NoteKind`), web client regenerated (web half).
 - [ ] Backend code audit done, findings fixed or recorded.
