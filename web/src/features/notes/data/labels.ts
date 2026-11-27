@@ -12,6 +12,12 @@ export const kindLabels: Record<NoteKind, string> = {
 
 export const people: readonly NotePerson[] = ['Vitaliy', 'Maria'];
 
+/** The other person of the two. */
+export const partnerOf: Record<NotePerson, NotePerson> = {
+  Vitaliy: 'Maria',
+  Maria: 'Vitaliy',
+};
+
 /** «Віталій», «Маша». */
 export const personNames: Record<NotePerson, string> = {
   Vitaliy: 'Віталій',

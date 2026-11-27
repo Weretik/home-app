@@ -373,8 +373,8 @@ phones; the bottom bar keeps five.
 ```
 notes/
   data/          notes-api.ts (the list query), categories-api.ts, labels.ts (kinds, people, the quick-add prompt,
-                 the card footer), note-groups.ts (cards by category), use-me.ts (the signed-in person and the partner
-                 from platform/member-api)
+                 the card footer), note-groups.ts (cards by category), use-me.ts (the signed-in person from
+                 platform/member-api)
   writes/        note-writes-api.ts (create with Idempotency-Key, edit / delete with If-Match), category-writes-api.ts,
                  failures-api.ts (Ukrainian text of a failed write)
   section/       NotesSection (title, the person tabs, the gear), NoteTabs, notes-tabs.ts (tab ↔ person, labels)
@@ -398,8 +398,9 @@ notes/
   after typing stops.
 - Quick add creates a note about the tab's person (the person toggle in «Усі»), with the chosen kind and no category;
   one `Idempotency-Key` per text, renewed after success. The pencil opens the dialog with the typed text.
-- The dialog edits the note as the list holds it now: a 409 reloads the list and the form takes the new version; a
-  404 closes the dialog and says the note was deleted.
+- The dialog's save and delete send the version its values were loaded from, so a list refetched meanwhile never lets
+  a save overwrite the partner's change; a 409 (save or delete) reloads the list and the form takes the note and its
+  new version together; a 404 closes the dialog and says the note was deleted.
 
 ## Notifications (`src/features/notifications`)
 

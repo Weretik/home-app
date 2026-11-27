@@ -10,6 +10,7 @@ export function PersonAvatar({ person }: { person: NotePerson }) {
   const tone = tones[person];
   return (
     <Avatar
+      component="span"
       role="img"
       aria-label={`Про ${personAbout[person]}`}
       sx={{

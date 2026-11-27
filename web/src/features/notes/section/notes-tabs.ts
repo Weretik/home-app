@@ -1,4 +1,4 @@
-import { personAbout, personNames } from '../data/labels';
+import { partnerOf, personAbout, personNames } from '../data/labels';
 import type { NotePerson } from '../data/notes-api';
 
 export const sectionPath = '/notes';
@@ -32,7 +32,7 @@ export function tabOptions(person: NotePerson | undefined): TabOption[] {
       { value: 'maria', label: personNames.Maria, about: 'Maria' },
       all,
     ];
-  const partner: NotePerson = person === 'Vitaliy' ? 'Maria' : 'Vitaliy';
+  const partner = partnerOf[person];
   return [
     { value: 'me', label: 'Про мене', about: person },
     {

@@ -225,6 +225,48 @@ test('deletes a note after asking', async () => {
   expect(writes()[0]!.headers.get('If-Match')).toBe('4');
 });
 
+test('a delete answered 409 reloads the form, so a save then keeps the other change in view (ADR 0007)', async () => {
+  let current = juice;
+  const { writes } = renderPage((s) => {
+    if (s.method === 'DELETE') {
+      current = { ...juice, title: 'Сік змінила Маша', version: 5 };
+      return problem(409, 'notes.changed_meanwhile');
+    }
+    if (s.method === 'PUT') return noContent();
+    return json([current]);
+  });
+
+  const dialog = await openJuice();
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Видалити' }),
+  );
+  const confirm = await screen.findByRole('dialog', {
+    name: 'Видалити нотатку?',
+  });
+  await userEvent.click(
+    within(confirm).getByRole('button', { name: 'Видалити' }),
+  );
+  expect(
+    await within(confirm).findByText(/Нотатку змінили в іншому місці/),
+  ).toBeInTheDocument();
+  await userEvent.click(
+    within(confirm).getByRole('button', { name: 'Скасувати' }),
+  );
+  await waitFor(() =>
+    expect(
+      within(dialog).getByRole('textbox', { name: /Що саме/ }),
+    ).toHaveValue('Сік змінила Маша'),
+  );
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+  expect(writes()[1]!.headers.get('If-Match')).toBe('5');
+  expect(writes()[1]!.body).toMatchObject({ title: 'Сік змінила Маша' });
+});
+
 test('a note deleted elsewhere closes the dialog and says so', async () => {
   renderPage((s) =>
     s.method === 'PUT' ? problem(404, 'notes.note_not_found') : json([juice]),

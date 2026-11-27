@@ -60,7 +60,9 @@ export function NoteTabs() {
               label={option.label}
               component={Link}
               to={href(option.value)}
-              aria-current={!onSettings && option === tab ? 'page' : undefined}
+              aria-current={
+                !onSettings && option.value === tab.value ? 'page' : undefined
+              }
               sx={{ minHeight: 44, textTransform: 'none', fontWeight: 600 }}
             />
           ))}

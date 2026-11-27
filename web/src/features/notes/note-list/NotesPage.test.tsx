@@ -140,6 +140,10 @@ test('starts on «Про мене», groups the cards by category, and keeps the
       .getAllByRole('tab')
       .map((tab) => tab.textContent),
   ).toEqual(['Про мене', 'Про Машу', 'Усі']);
+  expect(within(tabs).getByRole('tab', { name: 'Про мене' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
   const food = await screen.findByRole('region', { name: '🍕 Їжа · 1' });
   const card = within(food).getByRole('listitem');
   expect(card).toHaveTextContent('Любить');
@@ -160,6 +164,13 @@ test('starts on «Про мене», groups the cards by category, and keeps the
   );
   expect(lists().at(-1)!.url.searchParams.getAll('kind')).toEqual(['Likes']);
   expect(location()).toContain('kind=likes');
+  expect(within(tabs).getByRole('tab', { name: 'Про Машу' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(
+    within(tabs).getByRole('tab', { name: 'Про мене' }),
+  ).not.toHaveAttribute('aria-current');
   expect(screen.getByRole('textbox', { name: 'Нова нотатка' })).toHaveAttribute(
     'placeholder',
     'Що любить Маша?',
@@ -222,6 +233,30 @@ test('quick add creates a note about the tab person with the chosen kind and an 
     categoryId: null,
     isImportant: false,
   });
+});
+
+test('quick add keeps its Idempotency-Key on a retry and takes a new one for the next note', async () => {
+  let fail = true;
+  const { writes } = renderPage((s) => {
+    if (s.method !== 'POST') return json([]);
+    if (fail) {
+      fail = false;
+      return json({ title: 'Error', detail: 'Сервер недоступний.' }, 500);
+    }
+    return json({ id: 'n1' }, 201);
+  });
+
+  const field = await screen.findByRole('textbox', { name: 'Нова нотатка' });
+  await userEvent.type(field, 'Каву{Enter}');
+  expect(await screen.findByText(/Сервер недоступний/)).toBeInTheDocument();
+  await userEvent.type(field, '{Enter}');
+  await waitFor(() => expect(field).toHaveValue(''));
+  await userEvent.type(field, 'Каву{Enter}');
+  await waitFor(() => expect(writes()).toHaveLength(3));
+
+  const keys = writes().map((w) => w.headers.get('Idempotency-Key'));
+  expect(keys[1]).toBe(keys[0]);
+  expect(keys[2]).not.toBe(keys[0]);
 });
 
 test('a filtered empty list resets the filters and keeps the tab', async () => {

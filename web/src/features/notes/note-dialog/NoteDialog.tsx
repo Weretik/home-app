@@ -10,7 +10,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useId, useState, type FormEvent } from 'react';
 import type { NoteItem } from '../data/notes-api';
 import { ConfirmDeleteDialog } from '../feedback/ConfirmDeleteDialog';
-import { describeWriteError, isNoteGone } from '../writes/failures-api';
+import {
+  describeWriteError,
+  isChangedMeanwhile,
+  isNoteGone,
+} from '../writes/failures-api';
 import { useDeleteNote } from '../writes/note-writes-api';
 import { NoteFields } from './NoteFields';
 import type { NoteDraft } from './note-form';
@@ -108,11 +112,12 @@ export function NoteDialog({ note, draft, onClose, onGone }: NoteDialogProps) {
           isPending={remove.isPending}
           onConfirm={() =>
             remove.mutate(
-              { id: note.id, version: note.version },
+              { id: note.id, version: form.version ?? note.version },
               {
                 onSuccess: onClose,
                 onError: (error) => {
                   if (isNoteGone(error)) onGone();
+                  else if (isChangedMeanwhile(error)) form.reloadWhenNewer();
                 },
               },
             )

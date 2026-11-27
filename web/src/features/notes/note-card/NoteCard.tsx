@@ -11,7 +11,8 @@ import { PersonAvatar } from './PersonAvatar';
 
 /**
  * One note (FR-004): the kind mark, the person in «Усі», a star when important, the title, the place, the description
- * clamped to three lines and «Маша · 27.11». A tap opens the dialog.
+ * clamped to three lines and «Маша · 27.11». A tap opens the dialog. The whole card is one button, so everything in it
+ * is a `span` (a button holds phrasing content only; the group's `h2` stays the heading).
  */
 export function NoteCard({
   note,
@@ -34,9 +35,12 @@ export function NoteCard({
           alignContent: 'start',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          component="span"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        >
           <KindMark kind={note.kind} />
-          <Box sx={{ flex: 1 }} />
+          <Box component="span" sx={{ flex: 1 }} />
           {note.isImportant && (
             <Box component="span" role="img" aria-label="Важливо">
               ⭐
@@ -46,13 +50,14 @@ export function NoteCard({
         </Box>
         <Typography
           variant="subtitle1"
-          component="h3"
-          sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}
+          component="span"
+          sx={{ display: 'block', fontWeight: 600, overflowWrap: 'anywhere' }}
         >
           {note.title}
         </Typography>
         {note.place && (
           <Chip
+            component="span"
             size="small"
             variant="outlined"
             icon={<StorefrontOutlinedIcon />}
@@ -63,6 +68,7 @@ export function NoteCard({
         {note.details && (
           <Typography
             variant="body2"
+            component="span"
             color="text.secondary"
             sx={{
               display: '-webkit-box',
@@ -76,7 +82,7 @@ export function NoteCard({
             {note.details}
           </Typography>
         )}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" component="span" color="text.secondary">
           {noteFooter(note)}
         </Typography>
       </CardActionArea>

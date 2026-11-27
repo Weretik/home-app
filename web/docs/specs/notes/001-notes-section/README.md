@@ -46,14 +46,16 @@ The product rules are the backend SDD's (R-001…R-014). The screens add these:
 
 ```
 notes/
-  data/          notes-api.ts (list query), categories-api.ts, labels.ts (kinds, persons), use-me.ts (the
-                 signed-in person and the partner from platform/member-api)
+  data/          notes-api.ts (list query), categories-api.ts, labels.ts (kinds, persons, partnerOf),
+                 note-groups.ts, use-me.ts (the signed-in person from platform/member-api)
   writes/        note-writes-api.ts (create / update / delete), category-writes-api.ts, failures-api.ts
-  section/       NotesSection (title, tabs, gear), notes-tabs.ts (tab ↔ person, labels)
-  url-state/     filters.ts (URL ↔ API query), use-note-filters.ts
+  section/       NotesSection (title, tabs, gear), NoteTabs, notes-tabs.ts (tab ↔ person, labels)
+  url-state/     filters.ts (URL ↔ API query), use-note-filters.ts (also the search debounce)
   note-filters/  NoteFilters, KindChips, CategorySelect, SearchField
-  note-list/     NotesPage, NoteGroups, NoteCard, QuickAdd, ListStatus
-  note-dialog/   NoteDialog, NoteFields, note-form.ts (values ↔ request, checks), use-note-form.ts
+  note-list/     NotesPage, NoteGroups, QuickAdd, use-quick-add.ts
+  note-card/     NoteCard, KindMark, PersonAvatar, card-grid.ts
+  feedback/      ListStatus, ResultSnackbar, ConfirmDeleteDialog
+  note-dialog/   NoteDialog, NoteFields, SegmentedField, note-form.ts (values ↔ request, checks), use-note-form.ts
   settings/      CategoriesSettingsPage, CategoryRow, CategoryDialog, DeleteCategoryDialog, category-form.ts
 ```
 
@@ -63,8 +65,10 @@ notes/
   `['notes', 'categories']`. Every write invalidates `['notes']`
   ([ADR 0009](../../../decisions/0009-writes-refresh-their-backend-module.md)).
 - Creates send an `Idempotency-Key` (one per opened form or quick-add text, renewed after success); edits and deletes
-  send `version` in `If-Match` ([ADR 0007](../../../decisions/0007-editing-in-dialogs-with-idempotency-and-versions.md)).
-- The signed-in person comes from `platform/member-api` (`useSignedInPerson`), never from the identity feature.
+  send in `If-Match` the `version` the dialog's values were loaded from (a list refetched meanwhile does not move it;
+  a 409 reloads the values and the version together) ([ADR 0007](../../../decisions/0007-editing-in-dialogs-with-idempotency-and-versions.md)).
+- The signed-in person comes from `platform/member-api` (`useCurrentMember`, whose pending state holds the list until
+  the default tab is known), never from the identity feature.
 - URL state with `useSearchParams` ([ADR 0006](../../../decisions/0006-section-pages-as-tabs-with-state-in-the-url.md)).
 
 ### Routes and shell
@@ -92,4 +96,5 @@ Component file ≤ 150 lines, hook or other module ≤ 200 lines, checked by `np
 - [x] Behaviour, states and URLs defined; contract taken from the backend SDD.
 - [x] Delivery: typecheck, lint, tests, format check and build green; the structure check passes for the feature
       (its one finding is `src/platform` at seven files, which this change did not add).
-- [ ] Final frontend code audit: `audit.md`, findings fixed or accepted.
+- [x] Final frontend code audit: [audit.md](audit.md) (AF-001…AF-014), findings fixed or accepted; AF-007 (the
+      profile page link) is open for the identity feature.

@@ -1616,7 +1616,7 @@ export interface components {
         NoteItem: {
             /** Format: uuid */
             id: string;
-            about: components["schemas"]["Person"];
+            about: components["schemas"]["NotePerson"];
             kind: components["schemas"]["NoteKind"];
             title: string;
             details: null | string;
@@ -1626,8 +1626,8 @@ export interface components {
             categoryId: null | string;
             categoryName: null | string;
             categoryEmoji: null | string;
-            createdBy: null | components["schemas"]["Person"];
-            updatedBy: null | components["schemas"]["Person"];
+            createdBy: null | components["schemas"]["NotePerson"];
+            updatedBy: null | components["schemas"]["NotePerson"];
             /** Format: date-time */
             createdAtUtc: string;
             /** Format: date-time */
@@ -1640,8 +1640,13 @@ export interface components {
          * @enum {unknown}
          */
         NoteKind: "Likes" | "Dislikes" | "Fact";
+        /**
+         * @description One of the two people: whom a note is about, who wrote it and who changed it last (R-001, R-008).
+         * @enum {unknown}
+         */
+        NotePerson: "Vitaliy" | "Maria";
         NoteRequest: {
-            about: components["schemas"]["Person"];
+            about: components["schemas"]["NotePerson"];
             kind: components["schemas"]["NoteKind"];
             title: string;
             details: null | string;
@@ -5868,7 +5873,7 @@ export interface operations {
     listNotes: {
         parameters: {
             query?: {
-                about?: components["schemas"]["Person"];
+                about?: components["schemas"]["NotePerson"];
                 kind?: components["schemas"]["NoteKind"][];
                 categoryId?: string;
                 withoutCategory?: boolean;

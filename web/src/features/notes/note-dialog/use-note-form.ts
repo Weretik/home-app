@@ -29,8 +29,9 @@ interface NoteFormOptions {
 
 /**
  * The state of the note dialog: the values, the field messages (the form's checks, then the API's) and the submit. A
- * create sends an Idempotency-Key; an edit sends the version in If-Match. After a 409 the list reloads and the form
- * takes the note as it is now (FR-005).
+ * create sends an Idempotency-Key; an edit and a delete send, in If-Match, the version the values were loaded from, so
+ * a list refetched meanwhile never lets a save overwrite someone else's change (web ADR 0007). After a 409 the list
+ * reloads and the form takes the note as it is now (FR-005).
  */
 export function useNoteForm({
   current,
@@ -39,6 +40,8 @@ export function useNoteForm({
   onGone,
 }: NoteFormOptions) {
   const [values, setValues] = useState(() => noteFormValues(current, draft));
+  // The version the values come from: what If-Match sends, whatever the list holds by now.
+  const [version, setVersion] = useState(current?.version);
   const [checked, setChecked] = useState<FieldErrors>({});
   // The version a 409 answered to; when the list brings a newer one, the form shows it.
   const [staleVersion, setStaleVersion] = useState<number>();
@@ -49,7 +52,10 @@ export function useNoteForm({
   ) {
     setStaleVersion(undefined);
     setValues(noteFormValues(current));
+    setVersion(current.version);
   }
+  /** A write answered 409: show the note as it is once the reloaded list brings it. */
+  const reloadWhenNewer = () => setStaleVersion(version);
   const save = useSaveNote();
   const idempotency = useIdempotencyKey();
   const failure = save.error ? describeWriteError(save.error) : undefined;
@@ -67,15 +73,14 @@ export function useNoteForm({
     setChecked(errors);
     if (!isValid(errors) || save.isPending) return;
     const body = toNoteRequest(values);
-    if (current) {
+    if (current && version !== undefined) {
       save.mutate(
-        { body, edit: { id: current.id, version: current.version } },
+        { body, edit: { id: current.id, version } },
         {
           onSuccess: onSaved,
           onError: (error) => {
             if (isNoteGone(error)) onGone();
-            else if (isChangedMeanwhile(error))
-              setStaleVersion(current.version);
+            else if (isChangedMeanwhile(error)) reloadWhenNewer();
           },
         },
       );
@@ -97,7 +102,9 @@ export function useNoteForm({
   );
   return {
     values,
+    version,
     set,
+    reloadWhenNewer,
     errors: { ...firstMessages(failure), ...shown },
     message: failure?.message,
     submit,
