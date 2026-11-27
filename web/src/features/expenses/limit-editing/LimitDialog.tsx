@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { useState } from 'react';
 import type { LimitPeriod, SpendingLimitItem } from '../budget-data/budget-api';
 import { useSaveSpendingLimit } from '../budget-data/budget-writes-api';
 import { useExpenseCategories } from '../data/expenses-api';
@@ -16,6 +17,7 @@ import { EntryDialog } from '../entry-dialogs/EntryDialog';
 import { fieldMessage } from '../entry-editing/entry-fields';
 import { useEntryForm } from '../entry-editing/use-entry-form';
 import { limitFormValues, toLimitRequest, validateLimit } from './limit-form';
+import { MonthField } from './MonthField';
 
 interface LimitDialogProps {
   /** The limit to change; undefined adds a new one. */
@@ -23,13 +25,14 @@ interface LimitDialogProps {
   onClose: () => void;
 }
 
-/** Adds or changes a spending limit: name, month or quarter, amount and its categories. */
+/** Adds or changes a spending limit: name, month or quarter, amount (when changing, from which month) and its categories. */
 export function LimitDialog({ item, onClose }: LimitDialogProps) {
   const categories = useExpenseCategories();
+  const [initial] = useState(() => limitFormValues(item));
   const form = useEntryForm({
-    initial: limitFormValues(item),
+    initial,
     validate: validateLimit,
-    toBody: toLimitRequest,
+    toBody: (values) => toLimitRequest(values, initial),
     edit: item && { id: item.id, version: item.version },
     save: useSaveSpendingLimit(),
     onSaved: onClose,
@@ -89,6 +92,15 @@ export function LimitDialog({ item, onClose }: LimitDialogProps) {
         onChange={(value) => set('amount', value)}
         errors={errors}
       />
+      {values.amountFrom !== undefined && (
+        <MonthField
+          name="amountFrom"
+          period={values.period}
+          value={values.amountFrom}
+          onChange={(value) => set('amountFrom', value)}
+          errors={errors}
+        />
+      )}
       <TextField
         select
         label="Категорії"

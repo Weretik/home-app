@@ -1,5 +1,6 @@
 using Expenses.Application.Features.Summary.Report;
 using Expenses.Domain.Budget;
+using Expenses.Domain.Budget.Amounts;
 
 namespace Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 
@@ -9,7 +10,7 @@ namespace Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 /// </summary>
 internal static class SummaryFigures
 {
-    /// <summary>One limit's usage in the period that holds <paramref name="month"/>.</summary>
+    /// <summary>One limit's usage in the period that holds <paramref name="month"/>, against that period's amount.</summary>
     /// <param name="counted">Limit-counted spending per category and month (expenses «Не в лимиты» left out).</param>
     /// <param name="planned">Planned amounts per category and month.</param>
     public static LimitUsage Usage(
@@ -23,17 +24,18 @@ internal static class SummaryFigures
         var (start, end) = limit.PeriodAround(month);
         var months = Monthly(counted, limit.CategoryIds.Contains);
         var spent = SpentIn(months, start, end);
+        var amount = limit.AmountFor(start);
         var (carriedIn, carriesOut) = LimitCarryOver.For(
-            limit.Period, limit.Amount, limitsFrom, start, (s, e) => SpentIn(months, s, e));
+            limit.Period, limit.AmountFor, limitsFrom, start, (s, e) => SpentIn(months, s, e));
         var plannedInPeriod = planned
             .Where(x => limit.CategoryIds.Contains(x.CategoryId) && x.Month >= start && x.Month < end)
             .Sum(x => x.Amount);
 
-        var left = limit.Amount - spent - carriedIn;
+        var left = amount - spent - carriedIn;
         var days = DaysLeft(start, end, today);
         decimal? perDay = days is { } d ? Math.Max(0, decimal.Round(left / d, 2)) : null;
-        var percent = limit.Amount > 0
-            ? (int)decimal.Round((spent + carriedIn) / limit.Amount * 100, MidpointRounding.AwayFromZero)
+        var percent = amount > 0
+            ? (int)decimal.Round((spent + carriedIn) / amount * 100, MidpointRounding.AwayFromZero)
             : 0;
         return new LimitUsage(
             limit.Id,
@@ -41,7 +43,7 @@ internal static class SummaryFigures
             limit.Period,
             start,
             end.AddDays(-1),
-            limit.Amount,
+            amount,
             spent,
             carriedIn,
             left,
@@ -51,12 +53,15 @@ internal static class SummaryFigures
             plannedInPeriod);
     }
 
-    /// <summary>The monthly limit on all expenses: what the month takes over and passes on, over every counted expense.</summary>
+    /// <summary>
+    /// The monthly limit on all expenses: what the month takes over and passes on, over every counted expense, each
+    /// month against its own monthly limit.
+    /// </summary>
     public static (decimal CarriedIn, decimal CarriesOut) TotalCarry(
-        decimal monthlyLimit, DateOnly limitsFrom, DateOnly month, IReadOnlyList<CategoryMonthAmount> counted)
+        AmountHistory monthlyLimits, DateOnly limitsFrom, DateOnly month, IReadOnlyList<CategoryMonthAmount> counted)
     {
         var months = Monthly(counted, _ => true);
-        return LimitCarryOver.For(LimitPeriod.Month, monthlyLimit, limitsFrom, month, (s, e) => SpentIn(months, s, e));
+        return LimitCarryOver.For(LimitPeriod.Month, monthlyLimits.For, limitsFrom, month, (s, e) => SpentIn(months, s, e));
     }
 
     /// <summary>

@@ -10,7 +10,8 @@ namespace Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 /// Sums in SQL (grouped), then puts the pieces together in memory with <see cref="SummaryFigures"/>. A quarterly limit counts the whole quarter that
 /// holds the month. Limits and the monthly total carry overspend from the periods since
 /// <see cref="Domain.Budget.BudgetSettings.LimitsFrom"/> (<see cref="LimitCarryOver"/>): one grouped read gives the
-/// limit-counted spending per category and month for that whole stretch, and the carry is iterated in memory.
+/// limit-counted spending per category and month for that whole stretch, and the carry is iterated in memory, each
+/// period against its own amount (ADR 0041); the month is reported with the amounts in force in it.
 /// Expenses marked «Не в лимиты» count in the totals only. "Today" is the household's day in Kyiv, so the per-day
 /// figures change at local midnight.
 /// </summary>
@@ -24,7 +25,7 @@ public sealed class GetMonthSummaryHandler(IExpensesDbContext db, TimeProvider c
         var from = new DateOnly(query.Year, query.Month, 1);
         var to = from.AddMonths(1);
         var quarter = LimitCarryOver.PeriodStart(LimitPeriod.Quarter, from);
-        var today = Today();
+        var today = clock.TodayInKyiv();
 
         var incomes = await db.Incomes.AsNoTracking()
             .Where(i => i.Date >= from && i.Date < to)
@@ -96,12 +97,13 @@ public sealed class GetMonthSummaryHandler(IExpensesDbContext db, TimeProvider c
         var usages = limits
             .Select(limit => SummaryFigures.Usage(limit, from, settings.LimitsFrom, counted, plannedByMonth, today))
             .ToList();
-        var (carriedIn, carriesOut) = SummaryFigures.TotalCarry(settings.MonthlyLimit, settings.LimitsFrom, from, counted);
+        var monthlyLimit = settings.MonthlyLimitFor(from);
+        var (carriedIn, carriesOut) = SummaryFigures.TotalCarry(settings.MonthlyLimits, settings.LimitsFrom, from, counted);
 
         var totalIncomes = incomes.Sum(i => i.Amount);
         var totalExpenses = byPayer.Sum(p => p.Amount);
         var forecast = SummaryFigures.Forecast(
-            from, totalIncomes, totalExpenses, savingsNet, settings.MonthlyLimit, carriedIn, counted, plannedByMonth);
+            from, totalIncomes, totalExpenses, savingsNet, monthlyLimit, carriedIn, counted, plannedByMonth);
 
         return new MonthSummary(
             query.Year,
@@ -112,7 +114,7 @@ public sealed class GetMonthSummaryHandler(IExpensesDbContext db, TimeProvider c
             byPayer.OrderBy(p => p.Payer).ToList(),
             outsideLimits?.Count ?? 0,
             outsideLimits?.Amount ?? 0,
-            settings.MonthlyLimit,
+            monthlyLimit,
             carriedIn,
             carriesOut,
             SummaryFigures.DaysLeft(from, to, today),
@@ -126,17 +128,4 @@ public sealed class GetMonthSummaryHandler(IExpensesDbContext db, TimeProvider c
     }
 
     private static DateOnly Min(DateOnly a, DateOnly b) => a < b ? a : b;
-
-    private DateOnly Today()
-    {
-        var now = clock.GetUtcNow();
-        try
-        {
-            return DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv")).DateTime);
-        }
-        catch (TimeZoneNotFoundException)
-        {
-            return DateOnly.FromDateTime(now.UtcDateTime);
-        }
-    }
 }

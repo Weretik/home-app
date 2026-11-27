@@ -5,4 +5,8 @@
     <ProjectReference Include="..\Expenses.Application\Expenses.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="UnitTests" />
+  </ItemGroup>
+
 </Project>

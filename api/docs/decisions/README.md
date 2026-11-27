@@ -33,7 +33,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0024 | [Gift categories are editable data with a seeded start](0024-gift-categories-as-editable-data.md) |
 | 0025 | [Personal details are reference data of the Gifts module, shown read-only on the home page](0025-gift-details-as-reference-data.md) |
 | 0026 | [The gifts sheet is imported once by a hand-run SQL script](0026-gifts-import-as-sql-script.md) |
-| 0027 | [Overspend carries over like the sheet, computed on read from a start day](0027-limit-carry-over-like-the-sheet.md) |
+| 0027 | [Overspend carries over like the sheet, computed on read from a start day](0027-limit-carry-over-like-the-sheet.md) (past-amount part superseded by 0041) |
 | 0028 | [Planned expenses are their own table and are recorded into real expenses](0028-planned-expenses-for-the-forecast.md) |
 | 0029 | [Every backend rule is checked by a test, or marked review-only with a reason](0029-every-rule-checked-by-a-test.md) |
 | 0030 | [The Todos module and its model](0030-todos-module-model.md) |
@@ -48,6 +48,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0038 | [The allowlist position says who the member is](0038-allowlist-position-says-who-the-member-is.md) |
 | 0039 | [The Notes module and its model](0039-notes-module-model.md) |
 | 0040 | [Other modules learn who is signed in through Identity.Contracts](0040-current-member-through-identity-contracts.md) |
+| 0041 | [Limit amounts are kept by the period they start in](0041-limit-amounts-kept-by-month.md) (supersedes the past-amount part of 0027) |
 
 ## Decisions that must have a record
 

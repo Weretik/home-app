@@ -135,6 +135,10 @@ public sealed class ExpensesBudgetApiTests(ApiFactory api)
         Assert.Equal($"{name}!", updated.GetProperty("name").GetString());
         Assert.Equal("Month", updated.GetProperty("period").GetString());
         Assert.Equal(10m, updated.GetProperty("amount").GetDecimal());
+        // Quarter to month starts the amounts again (SDD 006 SC-LA-005).
+        var steps = updated.GetProperty("amounts");
+        Assert.Equal(1, steps.GetArrayLength());
+        Assert.Equal(("2000-01-01", 10m), (steps[0].GetProperty("from").GetString(), steps[0].GetProperty("amount").GetDecimal()));
         Assert.Equal([second], updated.GetProperty("categoryIds").EnumerateArray().Select(c => c.GetGuid()));
 
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/expenses/budget/limits/{id}")).StatusCode);

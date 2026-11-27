@@ -1084,7 +1084,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "The budget settings (monthly limit, savings goal, limits start day) and every spending limit, in order.",
+        "summary": "The budget settings (monthly limit of the current month with its steps by month, savings goal, limits start day) and every spending limit with its current amount and steps, in order.",
         "operationId": "getBudget",
         "responses": {
           "200": {
@@ -1166,7 +1166,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "Sets the monthly limit on all expenses, the savings goal and the day limits start carrying overspend. Send the budget version in If-Match.",
+        "summary": "Sets the monthly limit on all expenses (from the month of monthlyLimitFrom on, left out: the current month), the savings goal and the day limits start carrying overspend. Send the budget version in If-Match.",
         "operationId": "updateBudgetSettings",
         "parameters": [
           {
@@ -1319,7 +1319,7 @@
         "tags": [
           "Expenses"
         ],
-        "summary": "Changes a spending limit. Send its version in If-Match; 409 when someone changed it meanwhile.",
+        "summary": "Changes a spending limit; the amount applies from the period of amountFrom on (left out: the current one), earlier periods keep theirs. Send its version in If-Match; 409 when someone changed it meanwhile.",
         "operationId": "updateSpendingLimit",
         "parameters": [
           {
@@ -5665,6 +5665,24 @@
           }
         }
       },
+      "AmountStep": {
+        "required": [
+          "from",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "description": "One step of a limit's amounts: the amount that applies from From (the first day of a month, or\nof a quarter for a quarterly limit) until the next step."
+      },
       "Assignee": {
         "enum": [
           "Vitaliy",
@@ -5729,6 +5747,13 @@
               "string"
             ],
             "format": "date"
+          },
+          "monthlyLimitFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -5736,6 +5761,7 @@
         "required": [
           "version",
           "monthlyLimit",
+          "monthlyLimits",
           "savingsGoal",
           "limitsFrom",
           "limits"
@@ -5749,6 +5775,12 @@
           "monthlyLimit": {
             "type": "number",
             "format": "double"
+          },
+          "monthlyLimits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AmountStep"
+            }
           },
           "savingsGoal": {
             "type": "number",
@@ -5765,7 +5797,7 @@
             }
           }
         },
-        "description": "The monthly limit on all expenses (0 = none), the savings goal (0 = none), the day limits start counting and\ncarrying overspend, and the category limits."
+        "description": "The monthly limit on all expenses of the current month (0 = none) and its steps by month, oldest first, the savings\ngoal (0 = none), the day limits start counting and carrying overspend, and the category limits."
       },
       "CategoryAmount": {
         "required": [
@@ -8221,6 +8253,7 @@
           "name",
           "period",
           "amount",
+          "amounts",
           "categoryIds"
         ],
         "type": "object",
@@ -8243,6 +8276,12 @@
             "type": "number",
             "format": "double"
           },
+          "amounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AmountStep"
+            }
+          },
           "categoryIds": {
             "type": "array",
             "items": {
@@ -8251,7 +8290,7 @@
             }
           }
         },
-        "description": "One spending limit with the categories it counts."
+        "description": "One spending limit with the categories it counts: the amount of the current period, and its amounts as steps by\nthe period they start in, oldest first."
       },
       "SpendingLimitRequest": {
         "required": [
@@ -8278,6 +8317,13 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "amountFrom": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },

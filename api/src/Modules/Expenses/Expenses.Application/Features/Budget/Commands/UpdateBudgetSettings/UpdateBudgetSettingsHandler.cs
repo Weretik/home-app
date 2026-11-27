@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Application.Features.Budget.Commands.UpdateBudgetSettings;
 
-public sealed class UpdateBudgetSettingsHandler(IExpensesDbContext db) : ICommandHandler<UpdateBudgetSettingsCommand, Result>
+public sealed class UpdateBudgetSettingsHandler(IExpensesDbContext db, TimeProvider clock) : ICommandHandler<UpdateBudgetSettingsCommand, Result>
 {
     public async ValueTask<Result> Handle(UpdateBudgetSettingsCommand c, CancellationToken cancellationToken)
     {
@@ -17,7 +17,8 @@ public sealed class UpdateBudgetSettingsHandler(IExpensesDbContext db) : IComman
         if (settings.Version != c.Version)
             return EntryErrors.ChangedMeanwhile;
 
-        var updated = settings.Update(c.MonthlyLimit, c.SavingsGoal, c.LimitsFrom ?? settings.LimitsFrom);
+        var updated = settings.Update(
+            c.MonthlyLimit, c.SavingsGoal, c.LimitsFrom ?? settings.LimitsFrom, c.MonthlyLimitFrom, clock.TodayInKyiv());
         if (updated.IsFailure)
             return updated;
 

@@ -2,7 +2,7 @@ using Expenses.Domain.Budget;
 
 namespace UnitTests.Expenses.Domain.Budget;
 
-/// <summary>The carry-over of the old «Бюджет» sheet: carry(next) = max(0, carry + spent - limit).</summary>
+/// <summary>The carry-over of the old «Бюджет» sheet: carry(next) = max(0, carry + spent - limit), each period with its own limit.</summary>
 public sealed class LimitCarryOverTests
 {
     private static readonly DateOnly LimitsFrom = new(2026, 11, 1);
@@ -21,7 +21,7 @@ public sealed class LimitCarryOverTests
     {
         var spent = Monthly(("2026-11", 18_000m));
 
-        var carry = LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2026, 11, 1), spent);
+        var carry = LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2026, 11, 1), spent);
 
         Assert.Equal((0m, 3_000m), carry);
     }
@@ -33,10 +33,10 @@ public sealed class LimitCarryOverTests
         // though January left 3000 unspent.
         var spent = Monthly(("2026-11", 18_000m), ("2026-12", 14_000m), ("2027-01", 10_000m), ("2027-02", 16_000m));
 
-        Assert.Equal((3_000m, 2_000m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2026, 12, 1), spent));
-        Assert.Equal((2_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2027, 1, 1), spent));
-        Assert.Equal((0m, 1_000m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2027, 2, 1), spent));
-        Assert.Equal((1_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2027, 3, 1), spent));
+        Assert.Equal((3_000m, 2_000m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2026, 12, 1), spent));
+        Assert.Equal((2_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2027, 1, 1), spent));
+        Assert.Equal((0m, 1_000m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2027, 2, 1), spent));
+        Assert.Equal((1_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2027, 3, 1), spent));
     }
 
     [Fact]
@@ -44,9 +44,9 @@ public sealed class LimitCarryOverTests
     {
         var spent = Monthly(("2026-11", 40_000m));
 
-        Assert.Equal((25_000m, 10_000m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2026, 12, 1), spent));
-        Assert.Equal((10_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2027, 1, 1), spent));
-        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2027, 2, 1), spent));
+        Assert.Equal((25_000m, 10_000m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2026, 12, 1), spent));
+        Assert.Equal((10_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2027, 1, 1), spent));
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2027, 2, 1), spent));
     }
 
     [Fact]
@@ -54,8 +54,8 @@ public sealed class LimitCarryOverTests
     {
         var spent = Monthly(("2026-10", 100_000m), ("2026-11", 1_000m));
 
-        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2026, 11, 1), spent));
-        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, 15_000m, LimitsFrom, new DateOnly(2026, 10, 1), spent));
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2026, 11, 1), spent));
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(15_000m), LimitsFrom, new DateOnly(2026, 10, 1), spent));
     }
 
     [Fact]
@@ -64,9 +64,9 @@ public sealed class LimitCarryOverTests
         // Q4 2026 (October counts: the quarter holds the start day) is over by 500; Q1 2027 is over by 200 more.
         var spent = Monthly(("2026-10", 1_000m), ("2026-12", 2_000m), ("2027-02", 2_200m));
 
-        Assert.Equal((0m, 500m), LimitCarryOver.For(LimitPeriod.Quarter, 2_500m, LimitsFrom, new DateOnly(2026, 10, 1), spent));
-        Assert.Equal((500m, 200m), LimitCarryOver.For(LimitPeriod.Quarter, 2_500m, LimitsFrom, new DateOnly(2027, 1, 1), spent));
-        Assert.Equal((200m, 0m), LimitCarryOver.For(LimitPeriod.Quarter, 2_500m, LimitsFrom, new DateOnly(2027, 4, 1), spent));
+        Assert.Equal((0m, 500m), LimitCarryOver.For(LimitPeriod.Quarter, Flat(2_500m), LimitsFrom, new DateOnly(2026, 10, 1), spent));
+        Assert.Equal((500m, 200m), LimitCarryOver.For(LimitPeriod.Quarter, Flat(2_500m), LimitsFrom, new DateOnly(2027, 1, 1), spent));
+        Assert.Equal((200m, 0m), LimitCarryOver.For(LimitPeriod.Quarter, Flat(2_500m), LimitsFrom, new DateOnly(2027, 4, 1), spent));
     }
 
     [Fact]
@@ -74,8 +74,32 @@ public sealed class LimitCarryOverTests
     {
         var spent = Monthly(("2026-11", 100_000m));
 
-        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, 0m, LimitsFrom, new DateOnly(2026, 12, 1), spent));
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, Flat(0m), LimitsFrom, new DateOnly(2026, 12, 1), spent));
     }
+
+    [Fact]
+    public void Every_Period_IsMeasured_AgainstItsOwnAmount()
+    {
+        // SC-LA-006: 7 000 in November, 5 000 from December; December takes in 1 000 and passes on 0.
+        var spent = Monthly(("2026-11", 8_000m), ("2026-12", 4_000m));
+        Func<DateOnly, decimal> amount = start => start < new DateOnly(2026, 12, 1) ? 7_000m : 5_000m;
+
+        Assert.Equal((0m, 1_000m), LimitCarryOver.For(LimitPeriod.Month, amount, LimitsFrom, new DateOnly(2026, 11, 1), spent));
+        Assert.Equal((1_000m, 0m), LimitCarryOver.For(LimitPeriod.Month, amount, LimitsFrom, new DateOnly(2026, 12, 1), spent));
+    }
+
+    [Fact]
+    public void A_Period_WithoutALimit_ResetsTheCarry()
+    {
+        // SC-LA-007: 50 000 until November, none in December, 50 000 again from January; November's overspend stops in December.
+        var spent = Monthly(("2026-11", 80_000m), ("2026-12", 10_000m), ("2027-01", 1_000m));
+        Func<DateOnly, decimal> amount = start => start == new DateOnly(2026, 12, 1) ? 0m : 50_000m;
+
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, amount, LimitsFrom, new DateOnly(2026, 12, 1), spent));
+        Assert.Equal((0m, 0m), LimitCarryOver.For(LimitPeriod.Month, amount, LimitsFrom, new DateOnly(2027, 1, 1), spent));
+    }
+
+    private static Func<DateOnly, decimal> Flat(decimal amount) => _ => amount;
 
     /// <summary>What was spent between two days, from amounts per month ("yyyy-MM").</summary>
     private static Func<DateOnly, DateOnly, decimal> Monthly(params (string Month, decimal Amount)[] months)

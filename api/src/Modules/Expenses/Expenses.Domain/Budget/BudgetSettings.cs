@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Budget.Amounts;
 
 namespace Expenses.Domain.Budget;
 
@@ -22,8 +23,11 @@ public sealed class BudgetSettings : Entity<Guid>, IAggregateRoot
     {
     }
 
-    /// <summary>The limit on all expenses of a month; 0 means no limit.</summary>
-    public decimal MonthlyLimit { get; private set; }
+    /// <summary>
+    /// The limit on all expenses of a month by the month it starts in; an amount of 0 means no limit in that month.
+    /// Read one with <see cref="MonthlyLimitFor"/>.
+    /// </summary>
+    public AmountHistory MonthlyLimits { get; private set; } = AmountHistory.Start(0);
 
     /// <summary>How much the savings jar should hold; 0 means no goal.</summary>
     public decimal SavingsGoal { get; private set; }
@@ -39,14 +43,28 @@ public sealed class BudgetSettings : Entity<Guid>, IAggregateRoot
 
     public static BudgetSettings Empty() => new() { Id = SingletonId, LimitsFrom = SheetLimitsFrom };
 
-    public Result Update(decimal monthlyLimit, decimal savingsGoal, DateOnly limitsFrom)
+    /// <summary>The limit on all expenses of the month that starts on <paramref name="month"/>; 0 means none.</summary>
+    public decimal MonthlyLimitFor(DateOnly month) => MonthlyLimits.For(month);
+
+    /// <summary>
+    /// Sets the savings goal and the day limits start counting, and <paramref name="monthlyLimit"/> from the month that
+    /// holds <paramref name="monthlyLimitFrom"/> on (earlier months keep theirs). An explicit month always replaces the
+    /// steps from it on (R-LA-002); without one the change applies from the month of <paramref name="today"/>, and an
+    /// amount already in force there changes nothing (R-LA-005).
+    /// </summary>
+    public Result Update(decimal monthlyLimit, decimal savingsGoal, DateOnly limitsFrom, DateOnly? monthlyLimitFrom, DateOnly today)
     {
         if (!SpendingLimit.IsMoney(monthlyLimit) || !SpendingLimit.IsMoney(savingsGoal))
             return BudgetErrors.SettingsInvalid;
         if (limitsFrom < MinLimitsFrom || limitsFrom > MaxLimitsFrom)
             return BudgetErrors.LimitsFromOutOfRange;
+        var day = monthlyLimitFrom ?? today;
+        if (!AmountHistory.Covers(day))
+            return BudgetErrors.MonthlyLimitFromOutOfRange;
 
-        MonthlyLimit = monthlyLimit;
+        var month = new DateOnly(day.Year, day.Month, 1);
+        if (monthlyLimitFrom is not null || MonthlyLimits.For(month) != monthlyLimit)
+            MonthlyLimits = MonthlyLimits.ChangeFrom(month, monthlyLimit);
         SavingsGoal = savingsGoal;
         LimitsFrom = limitsFrom;
         return Result.Success();

@@ -35,8 +35,8 @@ public sealed class ExpensesSummaryApiTests(ApiFactory api)
         Skip.If(api.Unavailable is not null, api.Unavailable);
         using var client = api.CreateHttpsClient();
         var budget = await client.GetFromJsonAsync<JsonElement>("/api/expenses/budget");
-        var (monthlyLimit, savingsGoal, limitsFrom) = (
-            budget.GetProperty("monthlyLimit").GetDecimal(),
+        var (monthlyLimits, savingsGoal, limitsFrom) = (
+            budget.GetProperty("monthlyLimits").GetRawText(),
             budget.GetProperty("savingsGoal").GetDecimal(),
             DateOnly.Parse(budget.GetProperty("limitsFrom").GetString()!, System.Globalization.CultureInfo.InvariantCulture));
 
@@ -63,7 +63,7 @@ public sealed class ExpensesSummaryApiTests(ApiFactory api)
         finally
         {
             await db.Database.ExecuteSqlAsync(
-                $"INSERT INTO expenses.budget_settings (id, monthly_limit, savings_goal, limits_from) VALUES ({BudgetSettings.SingletonId}, {monthlyLimit}, {savingsGoal}, {limitsFrom})");
+                $"INSERT INTO expenses.budget_settings (id, monthly_limits, savings_goal, limits_from) VALUES ({BudgetSettings.SingletonId}, CAST({monthlyLimits} AS jsonb), {savingsGoal}, {limitsFrom})");
         }
     }
 }

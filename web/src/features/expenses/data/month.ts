@@ -8,6 +8,21 @@ export interface Month {
 
 const monthName = new Intl.DateTimeFormat(locale, { month: 'long' });
 
+/** Digits only («2026-11»), so the locale does not matter; the household's calendar is Kyiv's, like the API's. */
+const kyivMonth = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Kyiv',
+  year: 'numeric',
+  month: '2-digit',
+});
+
+/** The current month in Europe/Kyiv as «YYYY-MM», the value an `<input type="month">` holds. */
+export function kyivMonthText(now: Date = new Date()): string {
+  return kyivMonth.format(now);
+}
+
+/** A month field's «YYYY-MM» as the first day the API takes: «2026-12-01». */
+export const monthStartDay = (monthText: string) => `${monthText}-01`;
+
 export function currentMonth(today: Date = new Date()): Month {
   return { year: today.getFullYear(), month: today.getMonth() + 1 };
 }

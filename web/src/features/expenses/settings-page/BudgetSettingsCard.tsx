@@ -8,6 +8,8 @@ import type { BudgetView } from '../budget-data/budget-api';
 import { useSaveBudgetSettings } from '../budget-data/budget-writes-api';
 import { AmountField } from '../entry-dialogs/AmountField';
 import { useEntryForm } from '../entry-editing/use-entry-form';
+import { MonthField } from '../limit-editing/MonthField';
+import { monthlyLimitHint } from './amount-steps';
 import {
   budgetSettingsValues,
   toBudgetSettingsRequest,
@@ -15,13 +17,22 @@ import {
   type BudgetSettingsValues,
 } from './budget-settings-form';
 
-/** «Загальний ліміт витрат на місяць» and «План скарбнички»: one small form, saved with the budget's version in If-Match. */
+/**
+ * «Загальний ліміт витрат на місяць» with the month it applies from («Ліміт діє з»), the amount before and the one
+ * scheduled, and «План скарбнички»: one small form, saved with the budget's version in If-Match. The month is sent only
+ * when the limit or the month changed (R-WLA-003).
+ */
 export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
   const [saved, setSaved] = useState(false);
+  const [initial] = useState(() => budgetSettingsValues(budget));
   const form = useEntryForm({
-    initial: budgetSettingsValues(budget),
+    initial,
     validate: validateBudgetSettings,
-    toBody: toBudgetSettingsRequest,
+    toBody: (values) =>
+      toBudgetSettingsRequest(values, {
+        monthlyLimit: budget.monthlyLimit,
+        monthlyLimitFrom: initial.monthlyLimitFrom,
+      }),
     save: useSaveBudgetSettings(budget.version),
     onSaved: () => setSaved(true),
   });
@@ -63,9 +74,16 @@ export function BudgetSettingsCard({ budget }: { budget: BudgetView }) {
           label="Загальний ліміт витрат на місяць"
           name="monthlyLimit"
           required={false}
-          hint="Порожньо — без ліміту"
+          hint={monthlyLimitHint(budget.monthlyLimits)}
           value={form.values.monthlyLimit}
           onChange={(value) => set('monthlyLimit', value)}
+          errors={form.errors}
+        />
+        <MonthField
+          label="Ліміт діє з"
+          name="monthlyLimitFrom"
+          value={form.values.monthlyLimitFrom}
+          onChange={(value) => set('monthlyLimitFrom', value)}
           errors={form.errors}
         />
         <AmountField

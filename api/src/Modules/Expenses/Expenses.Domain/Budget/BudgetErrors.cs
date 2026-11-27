@@ -22,6 +22,12 @@ public static class BudgetErrors
     public static readonly Error LimitsFromOutOfRange =
         Error.Validation("expenses.limits_from_out_of_range", "День, з якого рахуються ліміти, має бути між 2000-01-01 і 2100-12-31.", "limitsFrom");
 
+    public static readonly Error AmountFromOutOfRange =
+        Error.Validation("expenses.amount_from_out_of_range", "Місяць, з якого діє сума ліміту, має бути між 2000-01-01 і 2100-12-31.", "amountFrom");
+
+    public static readonly Error MonthlyLimitFromOutOfRange =
+        Error.Validation("expenses.monthly_limit_from_out_of_range", "Місяць, з якого діє загальний ліміт, має бути між 2000-01-01 і 2100-12-31.", "monthlyLimitFrom");
+
     /// <summary>
     /// The one settings row is part of the schema (inserted by the <c>Budget</c> migration); without it the budget can
     /// be neither shown nor saved.

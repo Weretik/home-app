@@ -1,7 +1,9 @@
 import {
   currentMonth,
   formatMonth,
+  kyivMonthText,
   monthDays,
+  monthStartDay,
   parseMonth,
   shiftMonth,
 } from './month';
@@ -54,4 +56,14 @@ test('gives the first and last day of a month', () => {
     from: '2024-02-01',
     to: '2024-02-29',
   });
+});
+
+test('takes the current month in Kyiv, not in the browser zone', () => {
+  expect(kyivMonthText(new Date('2026-11-30T21:30:00Z'))).toBe('2026-11');
+  expect(kyivMonthText(new Date('2026-11-30T22:30:00Z'))).toBe('2026-12');
+  expect(kyivMonthText(new Date('2027-06-30T21:30:00Z'))).toBe('2027-07');
+});
+
+test('turns a month field into its first day', () => {
+  expect(monthStartDay('2027-01')).toBe('2027-01-01');
 });
