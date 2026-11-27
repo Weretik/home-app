@@ -89,6 +89,8 @@ lowercase letters, digits and hyphens, 3 to 6 words in the description.
 - No `claude`, no random suffixes, hashes or dates; `dependabot/*` and `renovate/*` are allowed.
 - The workflow `Branch name` (check `branch name`) fails a pull request from a branch that breaks the rule.
 
+**Authorship:** Commits, merge and squash commits, and pull request descriptions carry no AI attribution: no `Co-Authored-By`, no `Claude-Session`, and no "Generated with Claude Code" line. The author and committer is the repository owner only (Weretik).
+
 ## Task routing
 
 | Task | Skill or process | Project rules |
