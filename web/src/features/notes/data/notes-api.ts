@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, queryOptions } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -24,15 +24,18 @@ export interface NoteQuery {
   search?: string;
 }
 
+/** The query of `useNotes`, also used to load it ahead for offline use (web ADR 0022). */
+export const notesQuery = (query: NoteQuery) =>
+  queryOptions({
+    queryKey: [...noteItemsKey, query],
+    queryFn: ({ signal }) =>
+      apiCall(api.GET('/api/notes/items', { params: { query }, signal })),
+  });
+
 /**
  * The notes of a tab in the API's order: by category, important first, then kind and title (R-012). `enabled` waits
  * for the signed-in member, so the default tab is known before the first request.
  */
 export function useNotes(query: NoteQuery, enabled = true) {
-  return useQuery({
-    queryKey: [...noteItemsKey, query],
-    enabled,
-    queryFn: ({ signal }) =>
-      apiCall(api.GET('/api/notes/items', { params: { query }, signal })),
-  });
+  return useQuery({ ...notesQuery(query), enabled });
 }

@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  queryOptions,
+} from '@tanstack/react-query';
 import { ApiError, apiCall, type Schema } from '../../../../api-client';
 import { api } from '../../../../platform/client/api';
 import { moduleKeys } from '../../../../platform/client/query-client';
@@ -9,15 +14,19 @@ export type FocusTask = Schema<'TodoTaskItem'>;
 export type Assignee = Schema<'Assignee'>;
 export type TodoPriority = Schema<'TodoPriority'>;
 
+/** The query of `useTodoSummary`, also used to load it ahead for offline use (web ADR 0022). */
+export const todoSummaryQuery = () =>
+  queryOptions({
+    queryKey: [...moduleKeys.todos, 'summary'],
+    queryFn: ({ signal }) => apiCall(api.GET('/api/todos/summary', { signal })),
+  });
+
 /**
  * The family's tasks at a glance (`GET /api/todos/summary`). The key sits under the module prefix `moduleKeys.todos`, so every write of the
  * Todos section refreshes the summary too.
  */
 export function useTodoSummary() {
-  return useQuery({
-    queryKey: [...moduleKeys.todos, 'summary'],
-    queryFn: ({ signal }) => apiCall(api.GET('/api/todos/summary', { signal })),
-  });
+  return useQuery({ ...todoSummaryQuery() });
 }
 
 /** Ticks a task of «На сьогодні» done in place (FR-008), with its version; then everything under the module prefix reloads. */

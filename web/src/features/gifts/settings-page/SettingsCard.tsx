@@ -6,6 +6,8 @@ import Card from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { useId, type ReactNode } from 'react';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 interface SettingsCardProps {
   title: string;
@@ -20,6 +22,7 @@ interface SettingsCardProps {
 
 /** A settings card: title, caption and its add button, then loading, a failed load with «Повторити», or the list. */
 export function SettingsCard(props: SettingsCardProps) {
+  const online = useOnline();
   const titleId = useId();
 
   return (
@@ -57,7 +60,9 @@ export function SettingsCard(props: SettingsCardProps) {
         </Button>
       </Box>
       <Box sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
-        {props.isPending ? (
+        {props.isPending && !online ? (
+          <OfflineNotice compact />
+        ) : props.isPending ? (
           <Box sx={{ display: 'grid', placeItems: 'center', py: 4 }}>
             <CircularProgress aria-label={`Завантажую: ${props.title}`} />
           </Box>

@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, infiniteQueryOptions } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { shoppingKey } from '../data/shopping-api';
@@ -17,8 +17,9 @@ export const nextPage = (last: Paged) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
 /** Bought items that left the cart, newest first, page by page («Показати ще»). */
-export function useShoppingHistory() {
-  return useInfiniteQuery({
+/** The history's query, also used to load it ahead for offline use (web ADR 0022). */
+export const shoppingHistoryQuery = () =>
+  infiniteQueryOptions({
     queryKey: [...shoppingKey, 'history'],
     initialPageParam: 1,
     getNextPageParam: nextPage,
@@ -30,4 +31,7 @@ export function useShoppingHistory() {
         }),
       ),
   });
+
+export function useShoppingHistory() {
+  return useInfiniteQuery(shoppingHistoryQuery());
 }

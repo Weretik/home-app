@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { isOnline } from '../../../platform/offline/network-status';
+import { isOnline } from '../../../platform/offline/status/network-status';
 import { useAddItems, useIdempotencyKey } from '../data/item-writes-api';
 import type { ShoppingItem } from '../data/shopping-api';
 import { describeWriteError } from '../data/write-failure-api';

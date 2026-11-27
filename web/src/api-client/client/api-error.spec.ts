@@ -16,7 +16,7 @@ describe('apiCall', () => {
 
   it('throws an ApiError with the problem code, message and camelCase field errors', async () => {
     const problem = {
-      detail: 'Name is required.',
+      detail: 'Потрібна назва.',
       code: 'validation',
       errors: {
         CustomerName: ['Name is required.'],
@@ -34,7 +34,7 @@ describe('apiCall', () => {
     await expect(failure).rejects.toMatchObject({
       status: 400,
       code: 'validation',
-      message: 'Name is required.',
+      message: 'Потрібна назва.',
       fieldErrors: {
         customerName: ['Name is required.'],
         'lines[0].quantity': ['Too many.'],
@@ -51,6 +51,33 @@ describe('apiCall', () => {
       }),
     );
 
-    await expect(failure).rejects.toMatchObject({ code: 'http_502' });
+    await expect(failure).rejects.toMatchObject({
+      code: 'http_502',
+      message: 'Сервер зараз не відповідає. Спробуйте пізніше.',
+    });
+  });
+
+  it('never shows a framework default text in English', async () => {
+    const failure = apiCall(
+      Promise.resolve({
+        error: { title: 'An error occurred while processing your request.' },
+        response: new Response(null, { status: 500 }),
+      }),
+    );
+    await expect(failure).rejects.toHaveProperty(
+      'message',
+      'Сервер зараз не відповідає. Спробуйте пізніше.',
+    );
+
+    const notFound = apiCall(
+      Promise.resolve({
+        error: { title: 'Not Found', status: 404 },
+        response: new Response(null, { status: 404 }),
+      }),
+    );
+    await expect(notFound).rejects.toHaveProperty(
+      'message',
+      'Цього вже немає.',
+    );
   });
 });

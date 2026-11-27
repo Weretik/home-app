@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, queryOptions } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import {
@@ -11,13 +11,17 @@ import { shoppingKey } from '../data/shopping-api';
 export type Department = Schema<'DepartmentItem'>;
 export type DepartmentRequest = Schema<'UpdateShoppingDepartmentRequest'>;
 
-/** The departments in store-walk order with their keyword and needed counts. */
-export function useDepartments() {
-  return useQuery({
+/** The query of `useDepartments`, also used to load it ahead for offline use (web ADR 0022). */
+export const departmentsQuery = () =>
+  queryOptions({
     queryKey: [...shoppingKey, 'departments'],
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/shopping/departments', { signal })),
   });
+
+/** The departments in store-walk order with their keyword and needed counts. */
+export function useDepartments() {
+  return useQuery({ ...departmentsQuery() });
 }
 
 export interface SaveDepartmentInput {

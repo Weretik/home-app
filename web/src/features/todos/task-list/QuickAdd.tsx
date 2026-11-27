@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { useRef, useState, type FormEvent } from 'react';
-import { isOnline } from '../../../platform/offline/network-status';
+import { isOnline } from '../../../platform/offline/status/network-status';
 import type { Assignee } from '../data/todos-api';
 import { quickTask, titleError } from '../task-dialog/task-form';
 import { describeWriteError } from '../writes/failures-api';

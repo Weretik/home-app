@@ -18,12 +18,15 @@ import {
   useReorderDepartments,
   type Department,
 } from './departments-api';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 type Open =
   { kind: 'add' } | { kind: 'edit' | 'delete'; department: Department };
 
 /** «Відділи»: the store-walk order (up / down), add, rename, delete with a confirmation (R-11). */
 export function DepartmentsCard() {
+  const online = useOnline();
   const departments = useDepartments();
   const reorder = useReorderDepartments();
   const remove = useDeleteDepartment();
@@ -65,7 +68,8 @@ export function DepartmentsCard() {
       <Typography variant="body2" sx={{ color: 'text.secondary', px: 2 }}>
         У такому порядку йдуть відділи в списку — як ви обходите магазин.
       </Typography>
-      {departments.isPending && (
+      {departments.isPending && !online && <OfflineNotice />}
+      {departments.isPending && online && (
         <CircularProgress aria-label="Завантажую відділи" sx={{ m: 2 }} />
       )}
       {departments.error && (

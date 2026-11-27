@@ -1,4 +1,8 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  infiniteQueryOptions,
+  useInfiniteQuery,
+  useQuery,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -40,9 +44,12 @@ export interface TaskQuery {
 export const nextPage = (last: TodoTaskList) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
-/** Active tasks or the archive, page by page («Показати ще»), in the API's order (R-012). */
-export function useTasks(view: TaskView, query: TaskQuery) {
-  return useInfiniteQuery({
+/**
+ * Active tasks or the archive, page by page («Показати ще»), in the API's order (R-012); also loaded ahead for
+ * offline use (web ADR 0022).
+ */
+export const tasksQuery = (view: TaskView, query: TaskQuery) =>
+  infiniteQueryOptions({
     queryKey: [...tasksKey, view, query],
     initialPageParam: 1,
     getNextPageParam: nextPage,
@@ -56,6 +63,9 @@ export function useTasks(view: TaskView, query: TaskQuery) {
         }),
       ),
   });
+
+export function useTasks(view: TaskView, query: TaskQuery) {
+  return useInfiniteQuery(tasksQuery(view, query));
 }
 
 /** One task fresh from the API; used for the undo of a done tick, which needs the version after it. */

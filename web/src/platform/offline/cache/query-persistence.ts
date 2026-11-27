@@ -5,8 +5,8 @@ import type {
   Persister,
 } from '@tanstack/react-query-persist-client';
 import { createStore, del, get, set } from 'idb-keyval';
-import { QUERY_GC_TIME } from '../client/query-client';
-import { isQueuedWriteKey } from './queued-request';
+import { QUERY_GC_TIME } from '../../client/query-client';
+import { isQueuedWriteKey } from '../queue/queued-request';
 
 /** How long the data last seen is kept for offline use (web ADR 0022); queries' `gcTime` is the same. */
 export const CACHE_MAX_AGE = QUERY_GC_TIME;

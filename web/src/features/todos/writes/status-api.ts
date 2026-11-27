@@ -3,7 +3,7 @@ import {
   useQueryClient,
   type InfiniteData,
 } from '@tanstack/react-query';
-import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
+import { useQueuedWrite } from '../../../platform/offline/queue/use-queued-write';
 import { apiCall } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import {

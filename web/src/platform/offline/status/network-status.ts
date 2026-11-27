@@ -3,7 +3,7 @@ import {
   type Mutation,
   type MutationCache,
 } from '@tanstack/react-query';
-import { isQueuedWriteKey } from './queued-request';
+import { isQueuedWriteKey } from '../queue/queued-request';
 
 /** Whether the device has a network now (React Query's online manager, the same one that pauses queued writes). */
 export const isOnline = () => onlineManager.isOnline();

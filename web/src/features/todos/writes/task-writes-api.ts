@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { apiCall, newIdempotencyKey, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
-import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
+import { useQueuedWrite } from '../../../platform/offline/queue/use-queued-write';
 import { todosKey } from '../data/todos-api';
 import { isStale } from './failures-api';
 

@@ -5,9 +5,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import { useGiftsSummary } from '../data/summary-api';
 import { SummaryContent } from './SummaryContent';
+import { OfflineNotice } from '../../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../../platform/offline/status/use-network-status';
 
 /** «Подарунки» on the home page: figures per person, the 🔥 wishes, the nearest occasions and the «нюанси», read-only. */
 export function GiftsSummary() {
+  const online = useOnline();
   const { data, error, isPending, refetch } = useGiftsSummary();
 
   return (
@@ -17,7 +20,9 @@ export function GiftsSummary() {
           Відкрити подарунки
         </Button>
       </Box>
-      {isPending ? (
+      {isPending && !online ? (
+        <OfflineNotice compact />
+      ) : isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
           <CircularProgress aria-label="Завантажую зведення подарунків" />
         </Box>

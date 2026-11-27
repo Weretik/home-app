@@ -5,13 +5,17 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { useSystemStatus } from './status-api';
+import { OfflineNotice } from '../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../platform/offline/status/use-network-status';
 
 const checkNames: Record<string, string> = { database: 'База даних' };
 
 /** The API's answer: its status, environment and version, and each dependency's check; loading and error states. */
 export function StatusDetails() {
+  const online = useOnline();
   const { data, error, isPending } = useSystemStatus();
 
+  if (isPending && !online) return <OfflineNotice compact />;
   if (isPending) return <CircularProgress aria-label="Перевіряю API" />;
   if (error)
     return <Alert severity="error">API недоступний: {error.message}</Alert>;

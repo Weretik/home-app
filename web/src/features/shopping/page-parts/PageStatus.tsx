@@ -4,6 +4,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 import { RetryButton } from './RetryButton';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 interface PageStatusProps {
   isPending: boolean;
@@ -28,6 +30,8 @@ export function PageStatus({
   onRetry,
   children,
 }: PageStatusProps) {
+  const online = useOnline();
+  if (isPending && !online) return <OfflineNotice />;
   if (isPending)
     return (
       <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>

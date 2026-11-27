@@ -20,7 +20,8 @@ src/
   main.tsx        entry: router and providers
   app/
     root/         routes and providers (theme, React Query with its IndexedDB cache)
-    pwa/          the update prompt (use-app-update.ts, UpdatePrompt) and the top bar's offline chip (OfflineStatus)
+    pwa/          the update prompt (use-app-update.ts, UpdatePrompt), the top bar's offline chip (OfflineStatus) and the
+                  offline sync of every main page's data (OfflineSync, offline-data.ts) (web ADR 0022)
     service-worker/ the service worker (own tsconfig) and its pure push rules (push-notification.ts) (web ADR 0021)
     theme/        palette, theme, phone and touch overrides (web ADR 0020), light/dark/system switch
                   (docs/design.md)
@@ -34,8 +35,10 @@ src/
                   `uk-UA` (locale.ts)
     session/      the session token store (session.ts) and the middleware that adds the bearer token and ends the
                   session on a 401 (session-middleware.ts)
-    offline/      the IndexedDB cache (query-persistence.ts), queued writes (queued-request.ts, queued-write-api.ts,
-                  use-queued-write.ts), the network state (network-status.ts, use-network-status.ts) (web ADR 0022)
+    offline/      cache/ the IndexedDB cache (query-persistence.ts) and when it is synced (offline-sync.ts); queue/
+                  queued writes (queued-request.ts, queued-write-api.ts, use-queued-write.ts); status/ the network
+                  state (network-status.ts, use-network-status.ts) and the «no data kept yet» notice (OfflineNotice)
+                  (web ADR 0022)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -503,7 +506,11 @@ identity/
   `['queued-write', …]` that pauses offline, is kept across a restart and is sent when the network is back; `404`
   counts as done, `409`/`412` rereads the version and resends once (last write wins). A request without an answer is a
   `NetworkError` with a Ukrainian message and counts the app offline for 15 s (`src/platform/client/connectivity.ts`),
-  so reads keep their data and wait instead of showing an error. The top bar shows «Офлайн»,
+  so reads keep their data and wait instead of showing an error. Every main page's default data (lists, home
+  summaries, the current month, settings) is loaded at start and again when the network is back, when the app is
+  shown and every 5 min (`app/pwa/OfflineSync`), so pages work offline without being opened first; a page without kept
+  data shows `OfflineNotice` instead of loading forever. An answer whose message is not Ukrainian (a framework default)
+  gets a Ukrainian text by status in `ApiError`. The top bar shows «Офлайн»,
   «Очікує: N» and «Не вдалося зберегти: …».
 - The service worker (web ADR 0021, `vite-plugin-pwa`, `injectManifest`) precaches the built shell and answers
   navigations with `index.html`; it never caches the API. A new deploy waits for «Оновити» in the snackbar «Доступна

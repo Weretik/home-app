@@ -5,9 +5,12 @@ import { DepartmentsCard } from '../department-settings/DepartmentsCard';
 import { KeywordsCard } from '../keyword-settings/KeywordsCard';
 import { ListSettingsCard } from './ListSettingsCard';
 import { useShoppingSettings } from './settings-api';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 /** «Налаштування» of Покупки (the gear): departments, their keywords, the list's settings (R-11…R-13). */
 export function SettingsPage() {
+  const online = useOnline();
   const settings = useShoppingSettings();
   return (
     <Box
@@ -21,7 +24,8 @@ export function SettingsPage() {
     >
       <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
         <DepartmentsCard />
-        {settings.isPending && (
+        {settings.isPending && !online && <OfflineNotice compact />}
+        {settings.isPending && online && (
           <CircularProgress aria-label="Завантажую налаштування" />
         )}
         {settings.error && (

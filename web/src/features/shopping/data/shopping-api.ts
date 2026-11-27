@@ -2,11 +2,12 @@ import {
   keepPreviousData,
   useQuery,
   useQueryClient,
+  queryOptions,
 } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
-import { queuedWriteKey } from '../../../platform/offline/queued-request';
+import { queuedWriteKey } from '../../../platform/offline/queue/queued-request';
 
 export type ShoppingItem = Schema<'ShoppingItemView'>;
 export type ShoppingList = Schema<'ShoppingList'>;
@@ -32,6 +33,14 @@ export const statusMutationKey = [
 /** How often the open list asks for the other person's changes. */
 export const POLL_MS = 20_000;
 
+/** The list's query, also used to load it ahead for offline use (web ADR 0022). */
+export const shoppingListQuery = () =>
+  queryOptions({
+    queryKey: listKey,
+    queryFn: ({ signal }) =>
+      apiCall(api.GET('/api/shopping/items', { signal })),
+  });
+
 /**
  * The list (needed items and the cart). It reloads every 20 s while the page is visible (not in a background tab), on
  * window focus and after every write; a pending checkbox pauses the reload (web ADR 0012).
@@ -39,9 +48,7 @@ export const POLL_MS = 20_000;
 export function useShoppingList() {
   const queryClient = useQueryClient();
   return useQuery({
-    queryKey: listKey,
-    queryFn: ({ signal }) =>
-      apiCall(api.GET('/api/shopping/items', { signal })),
+    ...shoppingListQuery(),
     // Always stale, so a return to the tab reloads at once (the app's default keeps data fresh for 30 s).
     staleTime: 0,
     refetchInterval: () =>
@@ -53,13 +60,17 @@ export function useShoppingList() {
   });
 }
 
-/** ⭐ Часті: names often bought lately that are not in the list now. */
-export function useFrequentItems() {
-  return useQuery({
+/** The query of `useFrequentItems`, also used to load it ahead for offline use (web ADR 0022). */
+export const frequentItemsQuery = () =>
+  queryOptions({
     queryKey: [...shoppingKey, 'frequent'],
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/shopping/frequent', { signal })),
   });
+
+/** ⭐ Часті: names often bought lately that are not in the list now. */
+export function useFrequentItems() {
+  return useQuery({ ...frequentItemsQuery() });
 }
 
 /** The department a single item would go to; nothing is asked for an empty name. */
