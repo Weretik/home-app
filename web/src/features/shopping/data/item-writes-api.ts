@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { apiCall, newIdempotencyKey, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
-import type { QueuedRequest } from '../../../platform/offline/queued-request';
-import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
+import type { QueuedRequest } from '../../../platform/offline/queue/queued-request';
+import { useQueuedWrite } from '../../../platform/offline/queue/use-queued-write';
 import { withoutCart } from './item-status';
 import {
   listKey,

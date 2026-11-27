@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import { useTodoSummary } from '../data/todos-summary-api';
 import { AssigneeCards } from './AssigneeCards';
 import { FocusList } from './FocusList';
+import { OfflineNotice } from '../../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../../platform/offline/status/use-network-status';
 
 /**
  * «Справи» on the home page (FR-008): per assignee the active, overdue and due-today counts, done in the last week,
@@ -15,6 +17,7 @@ import { FocusList } from './FocusList';
  * such tasks), and «Відкрити справи».
  */
 export function TodosSummary() {
+  const online = useOnline();
   const { data, error, isPending, refetch } = useTodoSummary();
 
   return (
@@ -38,7 +41,9 @@ export function TodosSummary() {
           Відкрити справи
         </Button>
       </Box>
-      {isPending ? (
+      {isPending && !online ? (
+        <OfflineNotice compact />
+      ) : isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
           <CircularProgress aria-label="Завантажую зведення" />
         </Box>

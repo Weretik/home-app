@@ -4,8 +4,8 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { afterEach, vi } from 'vitest';
-import { ApiError, NetworkError } from '../../api-client';
-import { refusedWrites } from './network-status';
+import { ApiError, NetworkError } from '../../../api-client';
+import { refusedWrites } from '../status/network-status';
 import type { QueuedRequest } from './queued-request';
 import {
   registerQueuedWrites,

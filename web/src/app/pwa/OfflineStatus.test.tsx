@@ -9,7 +9,7 @@ import { afterEach } from 'vitest';
 import {
   recordRefused,
   refusedWrites,
-} from '../../platform/offline/network-status';
+} from '../../platform/offline/status/network-status';
 import { OfflineStatus } from './OfflineStatus';
 
 function renderStatus() {

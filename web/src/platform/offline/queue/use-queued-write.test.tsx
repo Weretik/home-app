@@ -6,7 +6,7 @@ import {
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, vi } from 'vitest';
-import { refusedWrites } from './network-status';
+import { refusedWrites } from '../status/network-status';
 import { useQueuedWrite } from './use-queued-write';
 
 const json = (body: unknown, status = 200) =>

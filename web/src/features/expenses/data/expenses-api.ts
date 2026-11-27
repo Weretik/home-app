@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  infiniteQueryOptions,
+  useInfiniteQuery,
+  useQuery,
+  queryOptions,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -38,16 +43,11 @@ export type ExpenseDays = Month | { from: string; to: string };
 
 /**
  * The expenses of a month or a period, loaded page by page («Показати ще»). `enabled` false sends nothing (a
- * period the page found invalid).
+ * period the page found invalid). Also loaded ahead for offline use (web ADR 0022).
  */
-export function useExpenses(
-  days: ExpenseDays,
-  filter: ExpenseFilter,
-  enabled = true,
-) {
-  return useInfiniteQuery({
+export const expensesQuery = (days: ExpenseDays, filter: ExpenseFilter) =>
+  infiniteQueryOptions({
     queryKey: [...moduleKeys.expenses, 'list', days, filter],
-    enabled,
     initialPageParam: 1,
     getNextPageParam: nextPage,
     queryFn: ({ pageParam, signal }) =>
@@ -65,11 +65,18 @@ export function useExpenses(
         }),
       ),
   });
+
+export function useExpenses(
+  days: ExpenseDays,
+  filter: ExpenseFilter,
+  enabled = true,
+) {
+  return useInfiniteQuery({ ...expensesQuery(days, filter), enabled });
 }
 
-/** One month's incomes, loaded page by page. */
-export function useIncomes(month: Month, filter: IncomeFilter) {
-  return useInfiniteQuery({
+/** One month's incomes, loaded page by page; also loaded ahead for offline use (web ADR 0022). */
+export const incomesQuery = (month: Month, filter: IncomeFilter) =>
+  infiniteQueryOptions({
     queryKey: [...moduleKeys.expenses, 'incomes', month, filter],
     initialPageParam: 1,
     getNextPageParam: nextPage,
@@ -88,14 +95,21 @@ export function useIncomes(month: Month, filter: IncomeFilter) {
         }),
       ),
   });
+
+export function useIncomes(month: Month, filter: IncomeFilter) {
+  return useInfiniteQuery(incomesQuery(month, filter));
 }
 
-/** Expense categories for the filter; they change rarely. */
-export function useExpenseCategories() {
-  return useQuery({
+/** The query of `useExpenseCategories`, also used to load it ahead for offline use (web ADR 0022). */
+export const expenseCategoriesQuery = () =>
+  queryOptions({
     queryKey: [...moduleKeys.expenses, 'categories'],
     staleTime: 5 * 60_000,
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/expenses/categories', { signal })),
   });
+
+/** Expense categories for the filter; they change rarely. */
+export function useExpenseCategories() {
+  return useQuery({ ...expenseCategoriesQuery() });
 }

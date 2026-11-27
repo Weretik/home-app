@@ -5,9 +5,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import { useShoppingSummary } from '../data/shopping-summary-api';
 import { SummaryContent } from './SummaryContent';
+import { OfflineNotice } from '../../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../../platform/offline/status/use-network-status';
 
 /** «Покупки» on the home page (R-14): the figures, departments, next items, the most bought, «Відкрити список». */
 export function ShoppingSummary() {
+  const online = useOnline();
   const { data, error, isPending, refetch } = useShoppingSummary();
 
   return (
@@ -17,7 +20,9 @@ export function ShoppingSummary() {
           Відкрити список
         </Button>
       </Box>
-      {isPending ? (
+      {isPending && !online ? (
+        <OfflineNotice compact />
+      ) : isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
           <CircularProgress aria-label="Завантажую зведення" />
         </Box>

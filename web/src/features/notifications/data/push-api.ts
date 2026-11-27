@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  queryOptions,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { notificationsKeys } from './notifications-api';
@@ -9,13 +14,17 @@ export type SavePushSubscriptionRequest = Schema<'SavePushSubscriptionRequest'>;
 
 export const pushKey = [...notificationsKeys.all, 'push'] as const;
 
-/** Whether push is set up, the key to subscribe with and the signed-in person's devices (`getPushStatus`). */
-export function usePushStatus() {
-  return useQuery({
+/** The query of `usePushStatus`, also used to load it ahead for offline use (web ADR 0022). */
+export const pushStatusQuery = () =>
+  queryOptions({
     queryKey: pushKey,
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/notifications/push', { signal })),
   });
+
+/** Whether push is set up, the key to subscribe with and the signed-in person's devices (`getPushStatus`). */
+export function usePushStatus() {
+  return useQuery({ ...pushStatusQuery() });
 }
 
 /** Saves this browser's subscription; the API makes it an upsert by endpoint, so a repeat is harmless (R-102). */

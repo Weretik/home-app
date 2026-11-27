@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, queryOptions } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -15,11 +15,15 @@ export const notificationsKeys = {
   status: [...moduleKeys.notifications, 'status'] as const,
 };
 
-/** The bot, the linked chats, the schedule and the last deliveries (`getNotificationsStatus`). */
-export function useNotificationsStatus() {
-  return useQuery({
+/** The query of `useNotificationsStatus`, also used to load it ahead for offline use (web ADR 0022). */
+export const notificationsStatusQuery = () =>
+  queryOptions({
     queryKey: notificationsKeys.status,
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/notifications/status', { signal })),
   });
+
+/** The bot, the linked chats, the schedule and the last deliveries (`getNotificationsStatus`). */
+export function useNotificationsStatus() {
+  return useQuery({ ...notificationsStatusQuery() });
 }

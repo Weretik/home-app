@@ -3,9 +3,13 @@ import Skeleton from '@mui/material/Skeleton';
 import { InfoCard } from '../page/InfoCard';
 import { usePushStatus } from '../data/push-api';
 import { PUSH_CAPTION, PUSH_TITLE, PushSettings } from './PushSettings';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 /** «Push-сповіщення» (notifications 002): the switch for this device, a test, and the person's devices. */
 export function PushCard() {
+  const online = useOnline();
   const status = usePushStatus();
+  if (status.isPending && !online) return <OfflineNotice />;
   if (status.isPending)
     return (
       <InfoCard title={PUSH_TITLE} caption={PUSH_CAPTION}>

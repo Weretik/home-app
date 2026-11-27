@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { moduleKeys } from '../client/query-client';
-import { isOnline, recordRefused } from './network-status';
+import { moduleKeys } from '../../client/query-client';
+import { isOnline, recordRefused } from '../status/network-status';
 import {
   queuedWriteKey,
   type QueuedRequest,

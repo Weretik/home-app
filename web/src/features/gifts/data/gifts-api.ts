@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, queryOptions } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -27,9 +27,9 @@ export const giftKeys = {
   details: [...moduleKeys.gifts, 'details'] as const,
 };
 
-/** The wanted gifts («Список», archived=false) or the gifted and dropped ones («Подаровані»), in the server's order. */
-export function useGifts(archived: boolean) {
-  return useQuery({
+/** The query of `useGifts`, also used to load it ahead for offline use (web ADR 0022). */
+export const giftsQuery = (archived: boolean) =>
+  queryOptions({
     queryKey: giftKeys.list(archived),
     queryFn: ({ signal }) =>
       apiCall(
@@ -39,21 +39,33 @@ export function useGifts(archived: boolean) {
         }),
       ),
   });
+
+/** The wanted gifts («Список», archived=false) or the gifted and dropped ones («Подаровані»), in the server's order. */
+export function useGifts(archived: boolean) {
+  return useQuery({ ...giftsQuery(archived) });
 }
 
-/** The categories for the filter, the gift form and the settings. */
-export function useGiftCategories() {
-  return useQuery({
+/** The query of `useGiftCategories`, also used to load it ahead for offline use (web ADR 0022). */
+export const giftCategoriesQuery = () =>
+  queryOptions({
     queryKey: giftKeys.categories,
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/gifts/categories', { signal })),
   });
+
+/** The categories for the filter, the gift form and the settings. */
+export function useGiftCategories() {
+  return useQuery({ ...giftCategoriesQuery() });
 }
 
-/** The «нюанси» of every recipient, in the server's order. */
-export function useGiftDetails() {
-  return useQuery({
+/** The query of `useGiftDetails`, also used to load it ahead for offline use (web ADR 0022). */
+export const giftDetailsQuery = () =>
+  queryOptions({
     queryKey: giftKeys.details,
     queryFn: ({ signal }) => apiCall(api.GET('/api/gifts/details', { signal })),
   });
+
+/** The «нюанси» of every recipient, in the server's order. */
+export function useGiftDetails() {
+  return useQuery({ ...giftDetailsQuery() });
 }

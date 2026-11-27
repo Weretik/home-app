@@ -11,12 +11,15 @@ import { useCategories, type TodoCategoryItem } from '../data/categories-api';
 import { CategoryDialog } from './CategoryDialog';
 import { CategoryRow } from './CategoryRow';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 type Open =
   { mode: 'add' } | { mode: 'edit' | 'delete'; item: TodoCategoryItem } | null;
 
 /** «Налаштування» of the section: the categories with emoji, name and active count; add, change, delete (FR-007). */
 export function CategoriesSettingsPage() {
+  const online = useOnline();
   const categories = useCategories();
   const [open, setOpen] = useState<Open>(null);
   const items = categories.data ?? [];
@@ -56,7 +59,9 @@ export function CategoriesSettingsPage() {
           Додати категорію
         </Button>
       </Box>
-      {categories.isPending ? (
+      {categories.isPending && !online ? (
+        <OfflineNotice />
+      ) : categories.isPending ? (
         <Box
           role="progressbar"
           aria-label="Завантажую категорії"

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
+import { useQueuedWrite } from '../../../platform/offline/queue/use-queued-write';
 import { withStatus, type StatusChange } from './item-status';
 import {
   listKey,

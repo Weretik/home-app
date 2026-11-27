@@ -7,8 +7,8 @@ import { createQueryClient } from '../../platform/client/query-client';
 import {
   cachePersistence,
   indexedDbStorage,
-} from '../../platform/offline/query-persistence';
-import { registerQueuedWrites } from '../../platform/offline/queued-write-api';
+} from '../../platform/offline/cache/query-persistence';
+import { registerQueuedWrites } from '../../platform/offline/queue/queued-write-api';
 import { session } from '../../platform/session/session';
 import { theme } from '../theme/theme';
 

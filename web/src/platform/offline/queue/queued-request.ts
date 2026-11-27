@@ -1,4 +1,4 @@
-import type { moduleKeys } from '../client/query-client';
+import type { moduleKeys } from '../../client/query-client';
 
 /**
  * A write that waits for the network (web ADR 0022): plain data, so it is kept in IndexedDB with the paused mutation

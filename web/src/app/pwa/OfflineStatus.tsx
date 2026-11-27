@@ -3,12 +3,12 @@ import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import Snackbar from '@mui/material/Snackbar';
-import { refusedWrites } from '../../platform/offline/network-status';
+import { refusedWrites } from '../../platform/offline/status/network-status';
 import {
   useOnline,
   useQueuedWriteCount,
   useRefusedWrites,
-} from '../../platform/offline/use-network-status';
+} from '../../platform/offline/status/use-network-status';
 
 /** One chip for both states, short enough for a 360 px header; the full words go to `aria-label`. */
 const chipLabel = (online: boolean, waiting: number) => {

@@ -1,9 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { ApiError, apiCall } from '../../api-client';
-import { markOffline } from '../client/connectivity';
-import { api } from '../client/api';
-import { moduleKeys } from '../client/query-client';
-import { recordRefused } from './network-status';
+import { ApiError, apiCall } from '../../../api-client';
+import { markOffline } from '../../client/connectivity';
+import { api } from '../../client/api';
+import { moduleKeys } from '../../client/query-client';
+import { recordRefused } from '../status/network-status';
 import {
   queuedWriteKey,
   type QueuedRequest,

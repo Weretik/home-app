@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 interface ListStatusProps {
   isPending: boolean;
@@ -32,6 +34,8 @@ export function ListStatus({
   onResetFilters,
   children,
 }: ListStatusProps) {
+  const online = useOnline();
+  if (isPending && !online) return <OfflineNotice />;
   if (isPending)
     return (
       <Box

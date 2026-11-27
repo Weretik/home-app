@@ -6,7 +6,7 @@ const problem = (
   status: number,
   code?: string,
   errors?: Record<string, string[]>,
-) => new ApiError(status, { detail: 'Server says no.', code, errors });
+) => new ApiError(status, { detail: 'Сервер відмовив.', code, errors });
 
 describe('describeWriteError', () => {
   it('says there is no connection when the request never got an answer', () => {
@@ -61,13 +61,13 @@ describe('describeWriteError', () => {
     const failure = describeWriteError(
       problem(400, 'validation', { link: ['Bad link'] }),
     );
-    expect(failure.message).toBe('Перевірте поля: Server says no.');
+    expect(failure.message).toBe('Перевірте поля: Сервер відмовив.');
     expect(failure.fieldErrors).toEqual({ link: ['Bad link'] });
   });
 
   it('names the failed action otherwise', () => {
     expect(describeWriteError(problem(500), 'видалити').message).toBe(
-      'Не вдалося видалити: Server says no.',
+      'Не вдалося видалити: Сервер відмовив.',
     );
   });
 });

@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+  queryOptions,
+  infiniteQueryOptions,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { moduleKeys } from '../../../platform/client/query-client';
@@ -13,8 +18,9 @@ export type SavingsDirection = Schema<'SavingsDirection'>;
 const savingsKey = [...moduleKeys.expenses, 'savings'] as const;
 
 /** One month's movements of the jar, page by page, with the month's sums and balances. */
-export function useSavingsMovements(month: Month) {
-  return useInfiniteQuery({
+/** A month's jar movements' query, also used to load it ahead for offline use (web ADR 0022). */
+export const savingsMovementsQuery = (month: Month) =>
+  infiniteQueryOptions({
     queryKey: [...savingsKey, 'movements', month],
     initialPageParam: 1,
     getNextPageParam: nextPage,
@@ -28,13 +34,20 @@ export function useSavingsMovements(month: Month) {
         }),
       ),
   });
+
+export function useSavingsMovements(month: Month) {
+  return useInfiniteQuery(savingsMovementsQuery(month));
 }
 
-/** The jar's balance today and its movement month by month, newest first. */
-export function useSavingsOverview() {
-  return useQuery({
+/** The query of `useSavingsOverview`, also used to load it ahead for offline use (web ADR 0022). */
+export const savingsOverviewQuery = () =>
+  queryOptions({
     queryKey: [...savingsKey, 'months'],
     queryFn: ({ signal }) =>
       apiCall(api.GET('/api/expenses/savings/months', { signal })),
   });
+
+/** The jar's balance today and its movement month by month, newest first. */
+export function useSavingsOverview() {
+  return useQuery({ ...savingsOverviewQuery() });
 }

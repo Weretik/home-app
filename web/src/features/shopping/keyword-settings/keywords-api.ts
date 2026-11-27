@@ -1,4 +1,8 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useQuery,
+  queryOptions,
+} from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import {
@@ -16,11 +20,10 @@ export interface KeywordFilter {
   search?: string;
 }
 
-/** The keywords that pick a department, filtered on the server; the old rows stay while a new search loads. */
-export function useKeywords(filter: KeywordFilter) {
-  return useQuery({
+/** The query of `useKeywords`, also used to load it ahead for offline use (web ADR 0022). */
+export const keywordsQuery = (filter: KeywordFilter) =>
+  queryOptions({
     queryKey: [...shoppingKey, 'keywords', filter],
-    placeholderData: keepPreviousData,
     queryFn: ({ signal }) =>
       apiCall(
         api.GET('/api/shopping/keywords', {
@@ -28,6 +31,13 @@ export function useKeywords(filter: KeywordFilter) {
           signal,
         }),
       ),
+  });
+
+/** The keywords that pick a department, filtered on the server; the old rows stay while a new search loads. */
+export function useKeywords(filter: KeywordFilter) {
+  return useQuery({
+    ...keywordsQuery(filter),
+    placeholderData: keepPreviousData,
   });
 }
 

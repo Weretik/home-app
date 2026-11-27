@@ -9,12 +9,15 @@ import { PushCard } from '../push/PushCard';
 import { BotCard } from './BotCard';
 import { DeliveriesCard } from './DeliveriesCard';
 import { ScheduleCard } from './ScheduleCard';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 /**
  * «Сповіщення» (notifications 001, 002): push for this device, the bot, the linked chats, the schedule and the last
  * deliveries.
  */
 export function NotificationsPage() {
+  const online = useOnline();
   const status = useNotificationsStatus();
 
   return (
@@ -28,7 +31,9 @@ export function NotificationsPage() {
           Telegram і push-сповіщеннях
         </Typography>
       </Box>
-      {status.isPending ? (
+      {status.isPending && !online ? (
+        <OfflineNotice compact />
+      ) : status.isPending ? (
         <Box aria-label="Завантажую стан бота" sx={{ display: 'grid', gap: 2 }}>
           <Skeleton variant="rounded" height={120} />
           <Skeleton variant="rounded" height={180} />

@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 export interface ListStatusProps {
   isPending: boolean;
@@ -50,6 +52,8 @@ export function ListStatus({
   onResetFilters,
   children,
 }: ListStatusProps) {
+  const online = useOnline();
+  if (isPending && !online) return <OfflineNotice />;
   if (isPending)
     return (
       <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>

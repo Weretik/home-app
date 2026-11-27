@@ -6,6 +6,8 @@ import Card from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { OfflineNotice } from '../../../platform/offline/status/OfflineNotice';
+import { useOnline } from '../../../platform/offline/status/use-network-status';
 
 interface ListStatusProps {
   isPending: boolean;
@@ -21,7 +23,9 @@ interface ListStatusProps {
 
 /** Loading, error and empty states of a gift tab (docs/design.md: designed, not blank); the list otherwise. */
 export function ListStatus(props: ListStatusProps) {
+  const online = useOnline();
   const { isPending, error, isEmpty, isFiltered, empty, children } = props;
+  if (isPending && !online) return <OfflineNotice />;
   if (isPending)
     return (
       <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
