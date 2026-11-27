@@ -221,7 +221,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The budget settings (monthly limit, savings goal, limits start day) and every spending limit, in order. */
+        /** The budget settings (monthly limit of the current month with its steps by month, savings goal, limits start day) and every spending limit with its current amount and steps, in order. */
         get: operations["getBudget"];
         put?: never;
         post?: never;
@@ -256,7 +256,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets the monthly limit on all expenses, the savings goal and the day limits start carrying overspend. Send the budget version in If-Match. */
+        /** Sets the monthly limit on all expenses (from the month of monthlyLimitFrom on, left out: the current month), the savings goal and the day limits start carrying overspend. Send the budget version in If-Match. */
         put: operations["updateBudgetSettings"];
         post?: never;
         delete?: never;
@@ -290,7 +290,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Changes a spending limit. Send its version in If-Match; 409 when someone changed it meanwhile. */
+        /** Changes a spending limit; the amount applies from the period of amountFrom on (left out: the current one), earlier periods keep theirs. Send its version in If-Match; 409 when someone changed it meanwhile. */
         put: operations["updateSpendingLimit"];
         post?: never;
         /** Deletes a spending limit for good; its expenses stay. */
@@ -1040,6 +1040,16 @@ export interface components {
             urgent: null | boolean;
         };
         /**
+         * @description One step of a limit's amounts: the amount that applies from From (the first day of a month, or
+         *     of a quarter for a quarterly limit) until the next step.
+         */
+        AmountStep: {
+            /** Format: date */
+            from: string;
+            /** Format: double */
+            amount: number;
+        };
+        /**
          * @description Whose task it is (the sheet's «Чьё» column): one of the two people or both of them.
          * @enum {unknown}
          */
@@ -1066,16 +1076,19 @@ export interface components {
             savingsGoal: number;
             /** Format: date */
             limitsFrom?: null | string;
+            /** Format: date */
+            monthlyLimitFrom?: null | string;
         };
         /**
-         * @description The monthly limit on all expenses (0 = none), the savings goal (0 = none), the day limits start counting and
-         *     carrying overspend, and the category limits.
+         * @description The monthly limit on all expenses of the current month (0 = none) and its steps by month, oldest first, the savings
+         *     goal (0 = none), the day limits start counting and carrying overspend, and the category limits.
          */
         BudgetView: {
             /** Format: uint32 */
             version: number;
             /** Format: double */
             monthlyLimit: number;
+            monthlyLimits: components["schemas"]["AmountStep"][];
             /** Format: double */
             savingsGoal: number;
             /** Format: date */
@@ -1940,7 +1953,10 @@ export interface components {
         SignInRequest: {
             credential: string;
         };
-        /** @description One spending limit with the categories it counts. */
+        /**
+         * @description One spending limit with the categories it counts: the amount of the current period, and its amounts as steps by
+         *     the period they start in, oldest first.
+         */
         SpendingLimitItem: {
             /** Format: uuid */
             id: string;
@@ -1950,6 +1966,7 @@ export interface components {
             period: components["schemas"]["LimitPeriod"];
             /** Format: double */
             amount: number;
+            amounts: components["schemas"]["AmountStep"][];
             categoryIds: string[];
         };
         SpendingLimitRequest: {
@@ -1958,6 +1975,8 @@ export interface components {
             /** Format: double */
             amount: number;
             categoryIds: string[];
+            /** Format: date */
+            amountFrom?: null | string;
         };
         /** @description A department with something to buy. */
         SummaryDepartment: {

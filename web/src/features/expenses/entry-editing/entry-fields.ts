@@ -58,6 +58,18 @@ export function dateError(text: string): string | undefined {
   return undefined;
 }
 
+/** A month field's «YYYY-MM»: empty, malformed or out of 2000–2100 blocks saving. */
+export function monthError(text: string): string | undefined {
+  const [year = 0, month = 0] = text.split('-').map(Number);
+  const valid =
+    /^\d{4}-\d{2}$/.test(text) &&
+    year >= 2000 &&
+    year <= 2100 &&
+    month >= 1 &&
+    month <= 12;
+  return valid ? undefined : 'Виберіть місяць';
+}
+
 export function commentError(text: string): string | undefined {
   return text.length > MAX_COMMENT
     ? `Не довше ${MAX_COMMENT} символів`

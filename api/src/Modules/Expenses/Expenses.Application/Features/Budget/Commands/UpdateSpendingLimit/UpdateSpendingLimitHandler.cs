@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Application.Features.Budget.Commands.UpdateSpendingLimit;
 
-public sealed class UpdateSpendingLimitHandler(IExpensesDbContext db) : ICommandHandler<UpdateSpendingLimitCommand, Result>
+public sealed class UpdateSpendingLimitHandler(IExpensesDbContext db, TimeProvider clock) : ICommandHandler<UpdateSpendingLimitCommand, Result>
 {
     public async ValueTask<Result> Handle(UpdateSpendingLimitCommand c, CancellationToken cancellationToken)
     {
@@ -21,7 +21,7 @@ public sealed class UpdateSpendingLimitHandler(IExpensesDbContext db) : ICommand
         if (await BudgetCategories.FirstMissingAsync(db, c.CategoryIds, cancellationToken) is { } missing)
             return CategoryErrors.NotFoundById(missing);
 
-        var updated = limit.Update(c.Name, c.Period, c.Amount, c.CategoryIds, limit.SortOrder);
+        var updated = limit.Update(c.Name, c.Period, c.Amount, c.CategoryIds, limit.SortOrder, c.AmountFrom, clock.TodayInKyiv());
         if (updated.IsFailure)
             return updated;
 

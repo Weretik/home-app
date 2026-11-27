@@ -1,4 +1,5 @@
 using Expenses.Domain.Budget;
+using Expenses.Domain.Budget.Amounts;
 
 namespace UnitTests.Expenses.Domain.Budget;
 
@@ -7,6 +8,9 @@ public sealed class SpendingLimitTests
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 12, 0, 0, TimeSpan.Zero);
     private static readonly Guid Groceries = Guid.NewGuid();
     private static readonly Guid Household = Guid.NewGuid();
+    private static readonly DateOnly November = new(2026, 11, 1);
+    private static readonly DateOnly December = new(2026, 12, 1);
+    private static readonly DateOnly Today = new(2026, 12, 10);
 
     [Fact]
     public void A_Valid_Limit_IsCreated_WithATrimmedName()
@@ -16,7 +20,7 @@ public sealed class SpendingLimitTests
         Assert.True(result.IsSuccess);
         Assert.Equal("Еда и быт", result.Value.Name);
         Assert.Equal(LimitPeriod.Month, result.Value.Period);
-        Assert.Equal(15_000m, result.Value.Amount);
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 15_000m)], result.Value.Amounts.Steps);
         Assert.Equal([Groceries, Household], result.Value.CategoryIds);
         Assert.Equal(10, result.Value.SortOrder);
         Assert.NotEqual(Guid.Empty, result.Value.Id);
@@ -81,12 +85,12 @@ public sealed class SpendingLimitTests
     {
         var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 100m, [Groceries], 10, Now).Value;
 
-        var result = limit.Update(" Уход ", LimitPeriod.Quarter, 3_000m, [Household], 50);
+        var result = limit.Update(" Уход ", LimitPeriod.Quarter, 3_000m, [Household], 50, December, Today);
 
         Assert.True(result.IsSuccess);
         Assert.Equal("Уход", limit.Name);
         Assert.Equal(LimitPeriod.Quarter, limit.Period);
-        Assert.Equal(3_000m, limit.Amount);
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 3_000m)], limit.Amounts.Steps);
         Assert.Equal([Household], limit.CategoryIds);
         Assert.Equal(50, limit.SortOrder);
     }
@@ -96,18 +100,103 @@ public sealed class SpendingLimitTests
     {
         var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 100m, [Groceries, Household], 10, Now).Value;
 
-        var badAmount = limit.Update("Другое", LimitPeriod.Quarter, -5m, [Household], 20);
-        var badCategories = limit.Update("Другое", LimitPeriod.Quarter, 5m, [], 20);
-        var badName = limit.Update(" ", LimitPeriod.Quarter, 5m, [Household], 20);
+        var badAmount = limit.Update("Другое", LimitPeriod.Quarter, -5m, [Household], 20, December, Today);
+        var badCategories = limit.Update("Другое", LimitPeriod.Quarter, 5m, [], 20, December, Today);
+        var badName = limit.Update(" ", LimitPeriod.Quarter, 5m, [Household], 20, December, Today);
 
         Assert.True(badAmount.IsFailure);
         Assert.True(badCategories.IsFailure);
         Assert.True(badName.IsFailure);
         Assert.Equal("Еда", limit.Name);
         Assert.Equal(LimitPeriod.Month, limit.Period);
-        Assert.Equal(100m, limit.Amount);
+        Assert.Equal(AmountHistory.Start(100m), limit.Amounts);
         Assert.Equal([Groceries, Household], limit.CategoryIds);
         Assert.Equal(10, limit.SortOrder);
+    }
+
+    [Fact]
+    public void A_New_Amount_AppliesFromThePeriodOfTheGivenDay_AndEarlierPeriods_KeepTheirs()
+    {
+        var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+
+        var result = limit.Update("Еда", LimitPeriod.Month, 5_000m, [Groceries], 10, new DateOnly(2026, 12, 10), Today);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(7_000m, limit.AmountFor(November));
+        Assert.Equal(5_000m, limit.AmountFor(December));
+    }
+
+    [Fact]
+    public void A_Quarterly_Amount_StartsOnTheQuarter_OfTheGivenDay()
+    {
+        // SC-LA-004
+        var limit = SpendingLimit.Create("Уход", LimitPeriod.Quarter, 3_000m, [Groceries], 10, Now).Value;
+
+        limit.Update("Уход", LimitPeriod.Quarter, 4_000m, [Groceries], 10, new DateOnly(2027, 2, 14), Today);
+
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 3_000m), new AmountStep(new DateOnly(2027, 1, 1), 4_000m)], limit.Amounts.Steps);
+    }
+
+    [Fact]
+    public void Changing_MonthToQuarter_StartsTheHistoryAgain()
+    {
+        // SC-LA-005
+        var limit = SpendingLimit.Create("Уход", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+        limit.Update("Уход", LimitPeriod.Month, 5_000m, [Groceries], 10, December, Today);
+
+        limit.Update("Уход", LimitPeriod.Quarter, 18_000m, [Groceries], 10, December, Today);
+
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 18_000m)], limit.Amounts.Steps);
+    }
+
+    [Fact]
+    public void A_Rename_WithTheAmountInForce_AndNoDay_LeavesTheSteps_Alone()
+    {
+        // R-LA-005: a later step stays when the name changes and the amount in force today is sent back without a day.
+        var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+        limit.Update("Еда", LimitPeriod.Month, 5_000m, [Groceries], 10, new DateOnly(2027, 1, 1), Today);
+        var steps = limit.Amounts;
+
+        limit.Update("Еда и быт", LimitPeriod.Month, 7_000m, [Groceries, Household], 10, null, Today);
+
+        Assert.Equal("Еда и быт", limit.Name);
+        Assert.Same(steps, limit.Amounts);
+    }
+
+    [Fact]
+    public void An_Explicit_Day_WithTheAmountInForce_CancelsALaterStep()
+    {
+        // R-LA-002: 7 000 now and 5 000 planned from January; 7 000 from December removes the planned decrease.
+        var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+        limit.Update("Еда", LimitPeriod.Month, 5_000m, [Groceries], 10, new DateOnly(2027, 1, 1), Today);
+
+        limit.Update("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, December, Today);
+
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 7_000m)], limit.Amounts.Steps);
+        Assert.Equal(7_000m, limit.AmountFor(new DateOnly(2027, 1, 1)));
+    }
+
+    [Fact]
+    public void Without_A_Day_A_New_Amount_AppliesFromThePeriodOfToday()
+    {
+        var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+
+        limit.Update("Еда", LimitPeriod.Month, 5_000m, [Groceries], 10, null, Today);
+
+        Assert.Equal([new AmountStep(AmountHistory.Beginning, 7_000m), new AmountStep(December, 5_000m)], limit.Amounts.Steps);
+    }
+
+    [Theory]
+    [InlineData(1999, 12, 1)]
+    [InlineData(2101, 1, 1)]
+    public void An_AmountFrom_OutsideTheSupportedYears_IsRejected(int year, int month, int day)
+    {
+        var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 7_000m, [Groceries], 10, Now).Value;
+
+        var result = limit.Update("Еда", LimitPeriod.Month, 5_000m, [Groceries], 10, new DateOnly(year, month, day), Today);
+
+        Assert.Equal("expenses.amount_from_out_of_range", result.Error!.Code);
+        Assert.Equal(AmountHistory.Start(7_000m), limit.Amounts);
     }
 
     [Fact]

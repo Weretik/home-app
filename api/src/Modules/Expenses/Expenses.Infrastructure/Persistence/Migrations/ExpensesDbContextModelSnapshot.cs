@@ -66,10 +66,10 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .HasColumnType("date")
                         .HasColumnName("limits_from");
 
-                    b.Property<decimal>("MonthlyLimit")
-                        .HasPrecision(12, 2)
-                        .HasColumnType("numeric(12,2)")
-                        .HasColumnName("monthly_limit");
+                    b.Property<string>("MonthlyLimits")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("monthly_limits");
 
                     b.Property<decimal>("SavingsGoal")
                         .HasPrecision(12, 2)
@@ -91,7 +91,7 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         {
                             Id = new Guid("5b0f3a2e-1c4d-4e8a-9f6b-2d7c8e9a0b1c"),
                             LimitsFrom = new DateOnly(2026, 11, 1),
-                            MonthlyLimit = 50000m,
+                            MonthlyLimits = "[{\"from\":\"2000-01-01\",\"amount\":50000}]",
                             SavingsGoal = 100000m
                         });
                 });
@@ -102,10 +102,10 @@ namespace Expenses.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(12, 2)
-                        .HasColumnType("numeric(12,2)")
-                        .HasColumnName("amount");
+                    b.Property<string>("Amounts")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("amounts");
 
                     b.Property<string>("Name")
                         .IsRequired()

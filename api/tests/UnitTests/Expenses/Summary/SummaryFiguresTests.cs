@@ -1,5 +1,6 @@
 using Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 using Expenses.Domain.Budget;
+using Expenses.Domain.Budget.Amounts;
 
 namespace UnitTests.Expenses.Summary;
 
@@ -98,11 +99,36 @@ public sealed class SummaryFiguresTests
     {
         CategoryMonthAmount[] counted = [Row(Groceries, 2026, 11, 50_000m), Row(Pets, 2026, 11, 2_000m)];
 
-        var december = SummaryFigures.TotalCarry(50_000m, LimitsFrom, new DateOnly(2026, 12, 1), counted);
-        var noLimit = SummaryFigures.TotalCarry(0m, LimitsFrom, new DateOnly(2026, 12, 1), counted);
+        var december = SummaryFigures.TotalCarry(AmountHistory.Start(50_000m), LimitsFrom, new DateOnly(2026, 12, 1), counted);
+        var noLimit = SummaryFigures.TotalCarry(AmountHistory.Start(0m), LimitsFrom, new DateOnly(2026, 12, 1), counted);
 
         Assert.Equal((2_000m, 0m), december);
         Assert.Equal((0m, 0m), noLimit);
+    }
+
+    [Fact]
+    public void A_Lowered_Limit_KeepsTheOldAmount_ForEarlierMonths_AndTheirCarry()
+    {
+        // SC-LA-001: 7 000 until November, 5 000 from December (changed on 10 December).
+        var limit = Limit(LimitPeriod.Month, 7_000m, Groceries);
+        limit.Update("limit", LimitPeriod.Month, 5_000m, [Groceries], 10, new DateOnly(2026, 12, 10), new DateOnly(2026, 12, 10));
+        CategoryMonthAmount[] counted = [Row(Groceries, 2026, 11, 8_000m), Row(Groceries, 2026, 12, 4_000m)];
+
+        var november = SummaryFigures.Usage(limit, new DateOnly(2026, 11, 1), LimitsFrom, counted, [], new DateOnly(2026, 12, 10));
+        var december = SummaryFigures.Usage(limit, new DateOnly(2026, 12, 1), LimitsFrom, counted, [], new DateOnly(2026, 12, 10));
+
+        Assert.Equal((7_000m, -1_000m, 1_000m), (november.Amount, november.Left, november.CarriesOut));
+        Assert.Equal((5_000m, 1_000m, 0m, 0m), (december.Amount, december.CarriedIn, december.Left, december.CarriesOut));
+        Assert.Equal(100, december.Percent);
+    }
+
+    [Fact]
+    public void The_MonthlyTotal_CarriesAgainst_EachMonthsOwnLimit()
+    {
+        var limits = AmountHistory.Start(7_000m).ChangeFrom(new DateOnly(2026, 12, 1), 5_000m);
+        CategoryMonthAmount[] counted = [Row(Groceries, 2026, 11, 8_000m), Row(Pets, 2026, 12, 4_000m)];
+
+        Assert.Equal((1_000m, 0m), SummaryFigures.TotalCarry(limits, LimitsFrom, new DateOnly(2026, 12, 1), counted));
     }
 
     [Fact]

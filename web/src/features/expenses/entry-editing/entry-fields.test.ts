@@ -5,6 +5,7 @@ import {
   dateError,
   defaultDateIn,
   defaultEntryDate,
+  monthError,
   parseAmount,
 } from './entry-fields';
 
@@ -44,4 +45,13 @@ test('checks amount, date and comment', () => {
   expect(dateError('2026-11-26')).toBeUndefined();
   expect(commentError('x'.repeat(501))).toBeDefined();
   expect(commentError('x'.repeat(500))).toBeUndefined();
+});
+
+test('needs a month between 2000 and 2100', () => {
+  expect(monthError('2026-12')).toBeUndefined();
+  expect(monthError('')).toBe('Виберіть місяць');
+  expect(monthError('2026-13')).toBe('Виберіть місяць');
+  expect(monthError('2026-1')).toBe('Виберіть місяць');
+  expect(monthError('1999-12')).toBe('Виберіть місяць');
+  expect(monthError('2026-12-01')).toBe('Виберіть місяць');
 });

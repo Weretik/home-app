@@ -53,7 +53,7 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 | `/expenses/incomes`  | Доходы: the month's incomes, «Кто» filter, add / edit / delete                                                        | `expenses/income-list`   |
 | `/expenses/savings`  | Копилка: the balance now and the goal ring, the month's movements with add / edit / delete, the months                | `expenses/savings-page`  |
 | `/expenses/forecast` | Прогноз: the month's planned expenses and «Запланировано», add / edit / delete, «Записать как расход»                 | `expenses/forecast-page` |
-| `/expenses/settings` | Настройки (the gear next to the tabs): monthly limit, savings goal, spending limits                                   | `expenses/settings-page` |
+| `/expenses/settings` | Налаштування (the gear next to the tabs): monthly limit, savings goal, spending limits                                | `expenses/settings-page` |
 | `/shopping`          | Покупки, Список: quick add, ⭐ Частые, groups by department, ticks, «В корзине»                                       | `shopping/list-page`     |
 | `/shopping/history`  | История: bought items by month and day, «Вернуть в список», delete                                                    | `shopping/history-page`  |
 | `/shopping/settings` | Настройки (the gear): departments and their order, keywords, cart hours and the frequent window                       | `shopping/settings-page` |
@@ -145,7 +145,7 @@ expenses/
   write-data/       what every write shares: write-hooks-api.ts (the Writer shape, useSave / useChange / useRemove,
                     If-Match, the Idempotency-Key hook, the module refresh) and write-errors-api.ts (Ukrainian text of
                     a failed write)
-  section/          ExpensesSection (title, month picker, tabs and the «Настройки» gear, <Outlet />), the list of pages
+  section/          ExpensesSection (title, month picker, tabs and the «Налаштування» gear, <Outlet />), the list of pages
   url-state/        the month (?year=&month=), the Расходы period (?from=&to=, its checks) and filters
                     (?category=&payer=, ?person=) in the URL
   month-view/       parts every month page uses: the toolbar row with the add button, the paged list card
@@ -165,8 +165,11 @@ expenses/
   savings-editing/  the savings form (direction + positive amount → signed request) and its dialogs
   savings-goal/     «План копилки» card on Копилка: percent ring, now / goal / left, or a link to set a goal
   budget-data/      budget-api.ts (the budget read) and budget-writes-api.ts (settings and spending limit writes)
-  settings-page/    «Настройки» page: the monthly limit and savings goal form, the spending limits list
-  limit-editing/    the spending limit form (name, month / quarter, amount, categories) and its dialogs
+  settings-page/    «Налаштування» page: the monthly limit and savings goal form, the spending limits list,
+                    amount-steps.ts (the step in force and the one before: «з грудня 2026 · раніше 7 000,00 ₴»;
+                    a change saved ahead: «з квітня 2027 — 6 000,00 ₴»)
+  limit-editing/    the spending limit form (name, month / quarter, amount, categories, «Діє з» when changing), its
+                    dialogs and MonthField (the «Діє з» month input, also used by the settings card)
   planned-data/     planned-api.ts (the month's plans, «Запланировано») and planned-writes-api.ts (plan writes and
                     «Записать как расход»)
   forecast-page/    «Прогноз» page: «Запланировано» (PlannedTotal), «Добавить план», phone list, computer table
@@ -188,11 +191,19 @@ expenses/
   (`moduleKeys.expenses`, `['expenses']`): the lists, the budget, the plans and the home summary
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)); a 404 or `expenses.changed_meanwhile` reloads them
   too. Only the queries on screen refetch; the rest refetch when they are shown again.
-- «Настройки» (`/expenses/settings`, no month picker, not a tab) reads `/api/expenses/budget`. The monthly limit and
+- «Налаштування» (`/expenses/settings`, no month picker, not a tab) reads `/api/expenses/budget`. The monthly limit and
   the savings goal are one form saved with the budget's `version` in `If-Match` (empty = 0 = none); spending limits
   are added (`Idempotency-Key`), changed (`If-Match`) and deleted in dialogs like entries. Like every write, a budget
   write invalidates the module's queries, so the home summary's limits and goal follow. The settings are changed
   through `useChange` (a write with no create or delete), bound to the budget's version.
+- A limit amount applies from a month ([ADR 0018](decisions/0018-limit-change-applies-from-a-month.md),
+  [SDD 006](specs/expenses/006-limit-amounts-by-month/README.md)): changing a spending limit, and the settings form,
+  show a native month field «Діє з» («Ліміт діє з» on the settings card) that starts at the current month in
+  Europe/Kyiv (`kyivMonthText` in `data/month.ts`) and is sent as that month's first day (`amountFrom`,
+  `monthlyLimitFrom`; the server moves a quarterly limit's to the quarter start) only when the amount differs from the
+  one in force or the month was moved: an explicit month replaces every later step, so a rename or a goal-only save
+  leaves it out. A new limit has no such field. The page reads `amounts` / `monthlyLimits` only to caption the step in
+  force today, the amount before it and the next change saved ahead; every limit and carry figure stays on the server.
 - An expense marked «Не в лимиты» counts in the month's totals but in no limit and no carry-over; the lists mark it
   with a small «вне лимитов» chip.
 - «Прогноз» (`/expenses/forecast`) lists the open month's planned expenses (`/api/expenses/planned?year=&month=`) with

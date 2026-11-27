@@ -1,6 +1,6 @@
 # 0027. Overspend carries over like the sheet, computed on read from a start day
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; superseded in part by [0041](0041-limit-amounts-kept-by-month.md)
 
 Specification: [SDD 005 — budget forecast, carry-over, expenses outside limits](../specs/expenses/005-budget-forecast-carryover/README.md).
 

@@ -14,7 +14,8 @@ internal sealed class SpendingLimitConfiguration : IEntityTypeConfiguration<Spen
         builder.Property(l => l.Id).HasColumnName("id").ValueGeneratedNever();
         builder.Property(l => l.Name).HasColumnName("name").HasMaxLength(SpendingLimit.MaxNameLength).IsRequired();
         builder.Property(l => l.Period).HasColumnName("period").HasConversion<string>().HasMaxLength(20);
-        builder.Property(l => l.Amount).HasColumnName("amount").HasPrecision(12, 2);
+        builder.Property(l => l.Amounts).HasColumnName("amounts").HasColumnType(AmountHistoryColumn.Type)
+            .HasConversion(AmountHistoryColumn.Converter, AmountHistoryColumn.Comparer);
         builder.Property(l => l.SortOrder).HasColumnName("sort_order");
         builder.Property(l => l.Version).IsRowVersion();
         builder.HasIndex(l => l.SortOrder).IsUnique().HasDatabaseName(CreateSpendingLimitHandler.SortOrderIndex);

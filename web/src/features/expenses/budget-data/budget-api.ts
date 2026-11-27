@@ -6,6 +6,7 @@ import { moduleKeys } from '../../../platform/query-client';
 export type BudgetView = Schema<'BudgetView'>;
 export type SpendingLimitItem = Schema<'SpendingLimitItem'>;
 export type LimitPeriod = Schema<'LimitPeriod'>;
+export type AmountStep = Schema<'AmountStep'>;
 
 /** The budget's query key, under the module's prefix (every write refreshes it). */
 const budgetKey = [...moduleKeys.expenses, 'budget'] as const;

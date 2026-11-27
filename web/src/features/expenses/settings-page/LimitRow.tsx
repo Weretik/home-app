@@ -7,6 +7,7 @@ import { formatAmount } from '../data/formatting';
 import { limitPeriodLabels } from '../data/labels';
 import { RowActions } from '../entry-dialogs/RowActions';
 import type { RowHandlers } from '../entry-editing/use-entry-editor';
+import { earlierAmountCaption, nextAmountCaption } from './amount-steps';
 
 interface LimitRowProps extends RowHandlers<SpendingLimitItem> {
   limit: SpendingLimitItem;
@@ -15,7 +16,10 @@ interface LimitRowProps extends RowHandlers<SpendingLimitItem> {
   divider: boolean;
 }
 
-/** One spending limit: its name and categories as chips, the amount per month or quarter, and the «⋮» menu. */
+/**
+ * One spending limit: its name and categories as chips, today's amount per month or quarter (with since when and the
+ * amount before, once it changed, and a change saved ahead), and the «⋮» menu.
+ */
 export function LimitRow({
   limit,
   categoryNames,
@@ -23,6 +27,10 @@ export function LimitRow({
   onEdit,
   onDelete,
 }: LimitRowProps) {
+  const captions = [
+    earlierAmountCaption(limit.amounts),
+    nextAmountCaption(limit.amounts),
+  ].filter(Boolean);
   return (
     <ListItem
       divider={divider}
@@ -52,6 +60,16 @@ export function LimitRow({
           <Typography variant="caption" color="text.secondary">
             {limitPeriodLabels[limit.period]}
           </Typography>
+          {captions.map((caption) => (
+            <Typography
+              key={caption}
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'block' }}
+            >
+              {caption}
+            </Typography>
+          ))}
         </Box>
         <RowActions
           label={`${limit.name}, ${formatAmount(limit.amount)}`}

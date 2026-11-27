@@ -15,7 +15,7 @@ internal static class UpdateSpendingLimitEndpoint
     {
         group.MapPut("/budget/limits/{id:guid}", HandleAsync)
             .WithName("updateSpendingLimit")
-            .WithSummary("Changes a spending limit. Send its version in If-Match; 409 when someone changed it meanwhile.")
+            .WithSummary("Changes a spending limit; the amount applies from the period of amountFrom on (left out: the current one), earlier periods keep theirs. Send its version in If-Match; 409 when someone changed it meanwhile.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
@@ -34,7 +34,7 @@ internal static class UpdateSpendingLimitEndpoint
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(
-            new UpdateSpendingLimitCommand(id, EntryVersionHeader.Parse(ifMatch), request.Name, request.Period, request.Amount, request.CategoryIds ?? []), cancellationToken);
+            new UpdateSpendingLimitCommand(id, EntryVersionHeader.Parse(ifMatch), request.Name, request.Period, request.Amount, request.CategoryIds ?? [], request.AmountFrom), cancellationToken);
         return result.ToHttpResult(http);
     }
 }
