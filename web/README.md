@@ -27,6 +27,7 @@ You need Node.js 22.
 
 ## Environment variables
 
-| Name           | Meaning                                                                                                                             |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_URL` | The API origin without a trailing slash, baked in at build time. Public, not a secret. CI sets it to the Azure App Service address. |
+| Name                    | Meaning                                                                                                                                                                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`          | The API origin without a trailing slash, baked in at build time. Public, not a secret. CI sets it to the Azure App Service address.                                                                                                                                                   |
+| `VITE_GOOGLE_CLIENT_ID` | The Google OAuth client id of «Sign in with Google» ([ADR 0015](docs/decisions/0015-sign-in-gate-with-google-button-and-bearer-token.md)). Public, not a secret. CI takes it from the repository variable of the same name; without it the sign-in screen says sign-in is not set up. |

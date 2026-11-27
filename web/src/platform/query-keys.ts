@@ -9,4 +9,5 @@ export const moduleKeys = {
   gifts: ['gifts'],
   todos: ['todos'],
   notifications: ['notifications'],
+  identity: ['identity'],
 } as const;

@@ -1,6 +1,6 @@
 # 0015. Expenses are readable and editable without sign-in until the Identity module
 
-Status: accepted, 2026-11-26 (temporary; amended 2026-11-26 to allow writes)
+Status: superseded by [0037](0037-google-sign-in-with-server-sessions.md) on 2026-11-27 (was temporary; amended 2026-11-26 to allow writes)
 
 ## Context
 

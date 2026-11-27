@@ -150,8 +150,8 @@ details is `xmin`, without a column of its own.
 
 ## HTTP API
 
-All under `/api/gifts`, tag `Gifts`, open without sign-in like Expenses
-([ADR 0015](../decisions/0015-expenses-open-until-identity.md)). Every write uses the `PublicWrite` rate limit and can
+All under `/api/gifts`, tag `Gifts`, behind sign-in like every module
+([ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md)). Every write uses the `PublicWrite` rate limit and can
 answer `429`.
 
 | Operation | Route | Notes |

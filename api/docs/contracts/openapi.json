@@ -26,6 +26,152 @@
         }
       }
     },
+    "/api/identity/sign-in": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Signs a family member in with a Google ID token and returns a session token. 401 when Google did not confirm the token, 403 when the e-mail is not on the family list, 409 when sign-in is not configured.",
+        "operationId": "signIn",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentitySession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/identity/sign-out": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Ends the current session; the token stops working at once. Other devices stay signed in.",
+        "operationId": "signOut",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/identity/me": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Returns the signed-in family member: e-mail, name and Google picture.",
+        "operationId": "getCurrentMember",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyMember"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/expenses": {
       "get": {
         "tags": [
@@ -5328,6 +5474,29 @@
           }
         }
       },
+      "FamilyMember": {
+        "required": [
+          "email",
+          "name",
+          "pictureUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pictureUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "The signed-in member as the web app shows it: e-mail, name and the Google picture."
+      },
       "FrequentItem": {
         "required": [
           "name",
@@ -5864,6 +6033,27 @@
             }
           }
         }
+      },
+      "IdentitySession": {
+        "required": [
+          "token",
+          "expiresAtUtc",
+          "member"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "member": {
+            "$ref": "#/components/schemas/FamilyMember"
+          }
+        },
+        "description": "A started session: the bearer token (shown only now), when it expires if unused, and who signed in."
       },
       "IncomeItem": {
         "required": [
@@ -7143,6 +7333,17 @@
         },
         "description": "Counts, departments with needed items in store order, the next items to buy and the top frequent names."
       },
+      "SignInRequest": {
+        "required": [
+          "credential"
+        ],
+        "type": "object",
+        "properties": {
+          "credential": {
+            "type": "string"
+          }
+        }
+      },
       "SpendingLimitItem": {
         "required": [
           "id",
@@ -7907,6 +8108,9 @@
   "tags": [
     {
       "name": "System"
+    },
+    {
+      "name": "Identity"
     },
     {
       "name": "Expenses"

@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
+import { MemberMenu } from '../../features/identity/member/MemberMenu';
 import { ColorModeMenu } from '../theme/ColorModeMenu';
 import { Brand } from './Brand';
 import { SIDE_NAV_WIDE } from './SideNav';
@@ -15,7 +16,7 @@ interface TopBarProps {
 
 /**
  * The full-width header: the logo, the button that collapses the side menu (computer only),
- * and the theme switch on the right.
+ * the theme switch and the member's menu on the right.
  */
 export function TopBar({ menuCollapsed, onToggleMenu }: TopBarProps) {
   const label = menuCollapsed ? 'Развернуть меню' : 'Свернуть меню';
@@ -75,6 +76,7 @@ export function TopBar({ menuCollapsed, onToggleMenu }: TopBarProps) {
         </Tooltip>
         <Box sx={{ flex: 1 }} />
         <ColorModeMenu />
+        <MemberMenu />
       </Toolbar>
     </Box>
   );

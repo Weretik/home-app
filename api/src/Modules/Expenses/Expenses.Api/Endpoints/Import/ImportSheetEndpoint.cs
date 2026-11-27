@@ -14,7 +14,8 @@ namespace Expenses.Api.Endpoints.Import;
 /// <summary>
 /// <c>POST /api/expenses/imports/sheet</c>: the one-time move from the old Google Sheet. An operator call, not part
 /// of the web app, so it is hidden from the OpenAPI document and needs the <c>X-Import-Key</c> header; without a
-/// configured key it answers 404. See <c>api/docs/modules/expenses.md</c>.
+/// configured key it answers 404. Anonymous for sign-in, since the key guards it (ADR 0037). See
+/// <c>api/docs/modules/expenses.md</c>.
 /// </summary>
 internal static class ImportSheetEndpoint
 {
@@ -24,7 +25,8 @@ internal static class ImportSheetEndpoint
     {
         group.MapPost("/imports/sheet", HandleAsync)
             .ExcludeFromDescription()
-            .RequireRateLimiting(RateLimitPolicies.PublicWrite);
+            .RequireRateLimiting(RateLimitPolicies.PublicWrite)
+            .AllowAnonymous();
         return group;
     }
 

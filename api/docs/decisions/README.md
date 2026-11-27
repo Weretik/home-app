@@ -15,13 +15,13 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0006 | [Outbox delivered by a scheduled HTTP tick](0006-outbox-with-scheduled-tick.md) |
 | 0007 | [Idempotency-Key for creates that must not happen twice](0007-idempotency-key-for-creates.md) |
 | 0008 | [The OpenAPI document is generated from the code](0008-openapi-generated-from-code.md) |
-| 0009 | Authentication for the two users: open, decided with the identity module |
+| 0009 | Authentication for the two users: decided in [0037](0037-google-sign-in-with-server-sessions.md) |
 | 0010 | [Source-generated Mediator with a validation pipeline](0010-mediator-pipeline.md) |
 | 0011 | [Folder rules enforced by tests](0011-folder-rules-enforced-by-tests.md) |
 | 0012 | [Rate limits on anonymous writes and sign-in](0012-rate-limits-on-anonymous-writes.md) |
 | 0013 | [The Expenses module and its model](0013-expenses-module-model.md) |
 | 0014 | [One-time import from the Google Sheet through a keyed endpoint](0014-one-time-sheet-import.md) |
-| 0015 | [Expenses are readable and editable without sign-in until the Identity module](0015-expenses-open-until-identity.md) (temporary) |
+| 0015 | [Expenses are readable and editable without sign-in until the Identity module](0015-expenses-open-until-identity.md) (superseded by 0037) |
 | 0016 | [Production migrations run as EF bundles in the deploy job](0016-migrations-as-bundles-in-deploy.md) |
 | 0017 | [Edits are guarded by a row version from PostgreSQL xmin](0017-row-version-via-xmin-for-edits.md) |
 | 0018 | [The savings jar is a log of signed movements](0018-savings-jar-as-signed-movements.md) |
@@ -54,3 +54,4 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 
 New record: copy the newest file, take the next number, and keep the sections Context, Decision, Consequences. A record
 that is replaced stays, with its status changed to `superseded by NNNN`.
+| 0037 | [Google sign-in for the family, server-side sessions, everything closed by default](0037-google-sign-in-with-server-sessions.md) |

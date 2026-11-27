@@ -16,6 +16,7 @@ internal static class MediatorSetup
             // Each module adds its Application assembly here: typeof(<Module>.Application.<Module>ApplicationRegistration).Assembly.
             options.Assemblies =
             [
+                typeof(Identity.Application.IdentityApplicationRegistration).Assembly,
                 typeof(Expenses.Application.ExpensesApplicationRegistration).Assembly,
                 typeof(Shopping.Application.ShoppingApplicationRegistration).Assembly,
                 typeof(Gifts.Application.GiftsApplicationRegistration).Assembly,

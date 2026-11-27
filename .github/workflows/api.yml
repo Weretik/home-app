@@ -63,6 +63,9 @@ jobs:
         run: |
           dotnet tool restore
           dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
+            --project src/Modules/Identity/Identity.Infrastructure --startup-project src/Host/Host.Api \
+            --context IdentityDbContext --output ${{ runner.temp }}/migrations/identity
+          dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
             --project src/Modules/Expenses/Expenses.Infrastructure --startup-project src/Host/Host.Api \
             --context ExpensesDbContext --output ${{ runner.temp }}/migrations/expenses
           dotnet ef migrations bundle --configuration Release --self-contained --target-runtime linux-x64 \
@@ -157,8 +160,16 @@ jobs:
       # /health only proves the app and the database are up. Every section page reads one of these endpoints, so a 500
       # in any module (a bad setting, a missing migration, an outside call that throws) fails the deploy instead of
       # showing «Не удалось загрузить» on the site (docs/decisions/0005-post-deploy-smoke-reads-every-section.md).
+      # Every section needs a signed-in member since ADR 0037 (api/docs); the deploy reads them with the scheduler key,
+      # which a GET accepts as the read-only service «scheduler».
       - name: Smoke test the read endpoint of every section
+        env:
+          SCHEDULER_KEY: ${{ secrets.SCHEDULER_KEY }}
         run: |
+          if [ -z "$SCHEDULER_KEY" ]; then
+            echo "::error::Secret SCHEDULER_KEY is not set (see docs/deploy.md); the sections cannot be read without it."
+            exit 1
+          fi
           year=$(date -u +%Y); month=$(date -u +%-m)
           failed=0
           for path in \
@@ -169,8 +180,31 @@ jobs:
             /api/gifts/summary \
             /api/todos/summary \
             /api/notifications/status; do
-            code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 "$APP_URL$path" || echo 000)
+            code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 \
+              -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL$path" || echo 000)
             echo "$code $path"
             if [ "$code" != "200" ]; then failed=1; fi
           done
           exit $failed
+
+      # The site must be closed without a session, and sign-in must be configured: 401 for a made-up Google token means
+      # the client id is set; 409 means Identity__Google__ClientId is missing and nobody can sign in.
+      - name: Smoke test sign-in
+        run: |
+          closed=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 "$APP_URL/api/todos/summary" || echo 000)
+          echo "$closed /api/todos/summary without a session"
+          signin=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 -X POST \
+            -H 'Content-Type: application/json' -d '{"credential":"smoke-test"}' "$APP_URL/api/identity/sign-in" || echo 000)
+          echo "$signin POST /api/identity/sign-in with a made-up token"
+          if [ "$closed" != "401" ]; then
+            echo "::error::The API answered $closed without a session; it must be 401."
+            exit 1
+          fi
+          if [ "$signin" = "409" ]; then
+            echo "::error::Sign-in is not configured: set Identity__Google__ClientId and Identity__AllowedEmails__0/1 in the App Service (docs/deploy.md)."
+            exit 1
+          fi
+          if [ "$signin" != "401" ]; then
+            echo "::error::Sign-in answered $signin to a made-up token; expected 401."
+            exit 1
+          fi

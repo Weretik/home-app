@@ -58,9 +58,10 @@ environments migrations run as a separate step before the deploy (see [Deploy](#
 | `ConnectionStrings:Database` | PostgreSQL connection string; all modules share the database, each in its own schema. Empty: the API runs without a database and `/health` has no `database` check. |
 | `Database:InitializeOnStartup` | Apply migrations and seed data on start. Development only. |
 | `Cors:Origins` | Browser origins allowed to call the API with credentials. |
-| `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. |
+| `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. A `GET` with it reads as the read-only service `scheduler` (deploy checks, ADR 0037). |
+| `Identity:Google:ClientId`, `Identity:AllowedEmails` | The Google OAuth client id the ID tokens must be issued for, and the family's e-mails; without a client id nobody can sign in ([Identity](docs/modules/identity.md)). |
 | `Expenses:Import:Key` | Shared secret for the sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing, normally on a local run ([module page](docs/modules/expenses.md#the-one-time-import-from-the-sheet)). |
-| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for anonymous writes (60 a minute, for the open Expenses, Shopping and Gifts edits) and sign-in ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
+| `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for writes (60 a minute) and sign-in (5 a minute) ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
 | `ForwardedHeaders:Enabled`, `:KnownProxies`, `:KnownNetworks` | Read the client address and scheme from a trusted reverse proxy (see [Deploy behind a reverse proxy](#deploy-behind-a-reverse-proxy)). |
 
 Keep real values in user secrets or environment variables (`ConnectionStrings__Database=...`), never in the

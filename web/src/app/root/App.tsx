@@ -9,6 +9,7 @@ import { GiftsSection } from '../../features/gifts/section/GiftsSection';
 import { GiftSettingsPage } from '../../features/gifts/settings-page/GiftSettingsPage';
 import { ArchivePage } from '../../features/gifts/pages/ArchivePage';
 import { GiftsPage } from '../../features/gifts/pages/GiftsPage';
+import { SessionGate } from '../../features/identity/sign-in/SessionGate';
 import { HomePage } from '../../features/home/page/HomePage';
 import { HistoryPage } from '../../features/shopping/history-page/HistoryPage';
 import { ListPage } from '../../features/shopping/list-page/ListPage';
@@ -22,37 +23,40 @@ import { TodosSection } from '../../features/todos/section/TodosSection';
 import { ActiveTasksPage } from '../../features/todos/task-list/ActiveTasksPage';
 import { AppLayout } from '../shell/AppLayout';
 
+/** Every route sits behind the sign-in gate; there is no /sign-in route, so the URL survives sign-in. */
 export function App() {
   return (
-    <Routes>
-      <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="/expenses" element={<ExpensesSection />}>
-          <Route index element={<ExpensesPage />} />
-          <Route path="incomes" element={<IncomesPage />} />
-          <Route path="savings" element={<SavingsPage />} />
-          <Route path="forecast" element={<ForecastPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+    <SessionGate>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="/expenses" element={<ExpensesSection />}>
+            <Route index element={<ExpensesPage />} />
+            <Route path="incomes" element={<IncomesPage />} />
+            <Route path="savings" element={<SavingsPage />} />
+            <Route path="forecast" element={<ForecastPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+          <Route path="/shopping" element={<ShoppingSection />}>
+            <Route index element={<ListPage />} />
+            <Route path="history" element={<HistoryPage />} />
+            <Route path="settings" element={<ShoppingSettingsPage />} />
+          </Route>
+          <Route path="/gifts" element={<GiftsSection />}>
+            <Route index element={<GiftsPage />} />
+            <Route path="archive" element={<ArchivePage />} />
+            <Route path="settings" element={<GiftSettingsPage />} />
+          </Route>
+          <Route path="/todos" element={<TodosSection />}>
+            <Route index element={<ActiveTasksPage />} />
+            <Route path="archive" element={<TodosArchivePage />} />
+            <Route path="settings" element={<CategoriesSettingsPage />} />
+          </Route>
+          <Route path="/status" element={<StatusPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
-        <Route path="/shopping" element={<ShoppingSection />}>
-          <Route index element={<ListPage />} />
-          <Route path="history" element={<HistoryPage />} />
-          <Route path="settings" element={<ShoppingSettingsPage />} />
-        </Route>
-        <Route path="/gifts" element={<GiftsSection />}>
-          <Route index element={<GiftsPage />} />
-          <Route path="archive" element={<ArchivePage />} />
-          <Route path="settings" element={<GiftSettingsPage />} />
-        </Route>
-        <Route path="/todos" element={<TodosSection />}>
-          <Route index element={<ActiveTasksPage />} />
-          <Route path="archive" element={<TodosArchivePage />} />
-          <Route path="settings" element={<CategoriesSettingsPage />} />
-        </Route>
-        <Route path="/status" element={<StatusPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </SessionGate>
   );
 }

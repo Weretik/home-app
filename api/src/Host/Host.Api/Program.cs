@@ -4,6 +4,7 @@ using Expenses.Api;
 using Shopping.Api;
 using Gifts.Api;
 using Host.Api.Composition;
+using Identity.Api;
 using Notifications.Api;
 using Todos.Api;
 
@@ -19,6 +20,7 @@ builder.Host.UseDefaultServiceProvider(options =>
 
 // Each module adds itself here: .Add<Module>Module(builder.Configuration).
 builder.Services.AddPlatform(builder.Configuration);
+builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddExpensesModule(builder.Configuration);
 builder.Services.AddShoppingModule(builder.Configuration);
 builder.Services.AddGiftsModule(builder.Configuration);
@@ -39,6 +41,7 @@ app.MapApiDocumentation();
 app.MapHealth();
 app.MapOutboxTick();
 // Each module maps its endpoints here: app.Map<Module>Module().
+app.MapIdentityModule();
 app.MapExpensesModule();
 app.MapShoppingModule();
 app.MapGiftsModule();

@@ -37,7 +37,7 @@ public sealed class NotificationsBotApiTests(ApiFactory api)
                 services.AddSingleton<TimeProvider>(new FixedClock(new DateTimeOffset(2026, 12, 2, 6, 30, 0, TimeSpan.Zero)));
             });
         });
-        using var client = host.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+        using var client = api.SignedIn(host.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") }));
 
         Assert.Equal(HttpStatusCode.Unauthorized, (await WebhookAsync(client, new { update_id = 1 }, "wrong")).StatusCode);
 

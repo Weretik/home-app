@@ -33,7 +33,7 @@ public sealed class NotificationsTelegramHttpTests(ApiFactory api)
             builder.ConfigureTestServices(services =>
                 services.AddHttpClient<ITelegramBot, TelegramBotClient>().ConfigurePrimaryHttpMessageHandler(() => network));
         });
-        using var client = host.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+        using var client = api.SignedIn(host.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") }));
 
         var statusResponse = await client.GetAsync("/api/notifications/status");
         Assert.Equal(HttpStatusCode.OK, statusResponse.StatusCode);

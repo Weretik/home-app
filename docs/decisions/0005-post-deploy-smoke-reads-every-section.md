@@ -1,6 +1,6 @@
 # 0005. Tests use real-format secrets, outside clients run for real, and the deploy reads every section
 
-**Status:** accepted, 2026-11-27
+**Status:** accepted, 2026-11-27; amended 2026-11-27 by [API ADR 0037](../../api/docs/decisions/0037-google-sign-in-with-server-sessions.md) (reads with the scheduler key)
 
 ## Context
 
@@ -35,3 +35,10 @@ page answered 500 in production. A BotFather token has a colon (`123456:ABC…`)
   request, but the failure is visible on the commit at once.
 - The smoke test only reads, so it changes nothing in production; it costs a few requests per deploy.
 - The list of endpoints is kept by hand in `.github/workflows/api.yml`; forgetting a new section is a review finding.
+
+## Amendment, 2026-11-27: sign-in
+
+Since sign-in ([API ADR 0037](../../api/docs/decisions/0037-google-sign-in-with-server-sessions.md)) every section
+answers `401` without a session. The smoke test sends `X-Scheduler-Key` with the GitHub secret `SCHEDULER_KEY`; a
+`GET` with that key reads as the read-only service `scheduler`. A last step checks that the API answers `401` without
+a session and that sign-in is configured (a made-up Google token gets `401`, not `409`).

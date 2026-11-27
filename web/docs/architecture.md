@@ -23,8 +23,9 @@ src/
     theme/        palette, theme, light/dark/system switch (docs/design.md)
     shell/        header, side menu, bottom bar, the list of sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
-  platform/       the API client instance (VITE_API_URL), the query client and each backend module's query key
-                  prefix (query-keys.ts)
+  platform/       the API client instance (VITE_API_URL) with the session middleware (bearer token, 401 ends the
+                  session), the session token store (session.ts), the query client and each backend module's query
+                  key prefix (query-keys.ts)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -33,6 +34,7 @@ src/
     gifts/        the «Подарки» section, the Gifts module (below)
     todos/        the «Дела» section, the Todos module (below)
     notifications/ the «Телеграм» service page, the Notifications module (below)
+    identity/     sign-in with Google: the gate before every route, the member menu in the header (below)
 ```
 
 A feature folder holds its page components, its `<area>-api.ts` with React Query hooks, and tests next to the code.
@@ -376,6 +378,33 @@ notifications/
 Chats are linked in Telegram (`/start`, «Я Виталий / Я Маша», the bot added to the group); the page never asks for a
 chat id. Todos marks a task made from a gift with 🎁 and links it back with `task-row/GiftSourceLink`
 (`/gifts?gift=<id>`).
+
+## Sign-in (`src/features/identity`)
+
+Only Masha and Vitaliy use the site ([ADR 0015](decisions/0015-sign-in-gate-with-google-button-and-bearer-token.md),
+[SDD](specs/identity/001-sign-in/README.md)).
+
+```
+identity/
+  data/     identity-api.ts (useSignIn, useSignOut, useCurrentMember under ['identity', 'me']), google-identity.ts
+            (loads accounts.google.com/gsi/client once, the button and One Tap with auto_select, off after «Вийти»), sign-in-errors.ts
+            (problem code → Ukrainian text), use-session.ts (the token store as React state)
+  sign-in/  SessionGate (the app or the sign-in screen), SignInPage, GoogleButton and use-google-button.ts (loading,
+            retry)
+  member/   MemberMenu (avatar button, name, e-mail, «Вийти»), MemberAvatar (Google picture or the first letter)
+```
+
+- `SessionGate` wraps every route in `App.tsx`. Without a token the same URL shows the sign-in screen, so the page
+  that was opened shows after sign-in; there is no `/sign-in` route.
+- The token is the API's session token, kept in `localStorage` (`home.session`) by `src/platform/session.ts` and read
+  synchronously at start. `src/platform/session-middleware.ts` adds `Authorization: Bearer` to every call of the
+  client; a `401` to the stored token clears it as expired and the screen says «Сесія закінчилась, увійдіть знову».
+  Other tabs follow through the `storage` event.
+- Any change of the session (sign-in, «Вийти», expiry, another tab) clears the whole React Query cache, so no data of
+  one session shows in the next. «Вийти» calls `POST /api/identity/sign-out` best effort and signs the device out
+  even when it fails.
+- The Google client id is the public build variable `VITE_GOOGLE_CLIENT_ID`; without it the screen says «Вхід ще не
+  налаштовано». The sign-in texts are Ukrainian.
 
 ## API client (`src/api-client`)
 

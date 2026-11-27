@@ -22,7 +22,8 @@ Settings → Secrets and variables → Actions:
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | secret | portal: Static Web App `home-web` → Overview → Manage deployment token |
 | `VITE_API_URL` | variable, optional | the API address; when not set, the address above is used |
 | `DATABASE_CONNECTION_STRING` | secret of the `production` environment | the same string as the App Service's `ConnectionStrings__Database`; the deploy job applies migrations with it |
-| `SCHEDULER_KEY` | secret | a long random value, the same as the App Service's `OutboxTick__Key`; the `scheduler.yml` cron sends it every 15 minutes. Until it is set the cron only prints a notice ([ADR 0034](../api/docs/decisions/0034-scheduler-github-actions-cron.md)) |
+| `SCHEDULER_KEY` | secret | a long random value, the same as the App Service's `OutboxTick__Key`; the `scheduler.yml` cron sends it every 15 minutes. Until it is set the cron only prints a notice ([ADR 0034](../api/docs/decisions/0034-scheduler-github-actions-cron.md)). The deploy also reads every section with it ([ADR 0037](../api/docs/decisions/0037-google-sign-in-with-server-sessions.md)), so the deploy fails without it |
+| `VITE_GOOGLE_CLIENT_ID` | variable | the Google OAuth client id ([below](#sign-in-with-google)); public, it ends up in the JS |
 
 The API deploys through OIDC: GitHub gets a short-lived Azure token, with no passwords or publish profile (basic auth on
 the App Service is off, and that is fine). Sign-in is allowed only from this repository's `production` environment. GitHub puts the owner and repository ids into
@@ -61,6 +62,8 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `Expenses__Import__Key` | long random value | normally never: the sheet is imported on a local API and the rows reach production as a SQL script; set it only for a direct import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
 | `OutboxTick__Key` | long random value, equal to the GitHub secret `SCHEDULER_KEY` | for the outbox and the Telegram bot; without it both ticks answer `404` |
 | `Telegram__BotToken` | the token from @BotFather | for the Telegram bot; empty means the bot is off and the webhook answers `404` |
+| `Identity__Google__ClientId` | the Google OAuth client id ([below](#sign-in-with-google)) | always; without it nobody can sign in and the site stays closed |
+| `Identity__AllowedEmails__0`, `Identity__AllowedEmails__1` | Vitaliy's and Masha's Google e-mails | always; only these may sign in. Removing one locks that person out at once |
 
 Or with one command:
 
@@ -131,6 +134,24 @@ Save (the app restarts) and open `/health`: `checks.database` should be `Healthy
 
 Locally keep using the Docker database from `api/compose.yaml`, or point at a real one with
 `dotnet user-secrets set "ConnectionStrings:Database" "<string>"` in `api/src/Host/Host.Api`. Never commit the string.
+
+## Sign in with Google
+
+Only the e-mails in `Identity__AllowedEmails__*` may use the site
+([ADR 0037](../api/docs/decisions/0037-google-sign-in-with-server-sessions.md)). Free, no client secret.
+
+1. [Google Cloud Console](https://console.cloud.google.com) → any project (or a new one) → APIs & Services → OAuth
+   consent screen: External, app name «Дом», add both e-mails as test users (or publish the app; the basic
+   `openid email profile` scopes need no verification).
+2. APIs & Services → Credentials → Create credentials → OAuth client ID → **Web application**. Authorized JavaScript
+   origins: `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` and `http://localhost:5173`. No redirect URIs:
+   the web app uses the Google button, not a redirect.
+3. App Service variables: `Identity__Google__ClientId` = the client id, `Identity__AllowedEmails__0` and `__1` = the
+   two e-mails. GitHub repository variable `VITE_GOOGLE_CLIENT_ID` = the same client id.
+4. Set them before merging the sign-in change; the deploy fails its sign-in smoke step while the client id is missing.
+
+Locally: `dotnet user-secrets set "Identity:Google:ClientId" "<id>"` (and `Identity:AllowedEmails:0`) in
+`src/Host/Host.Api`, and `VITE_GOOGLE_CLIENT_ID` in `web/.env.local`.
 
 ## Telegram bot
 

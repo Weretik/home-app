@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\Modules\Shopping\Shopping.Application\Shopping.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Shopping\Shopping.Infrastructure\Shopping.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Modules\Gifts\Gifts.Application\Gifts.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Identity\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Todos\Todos.Application\Todos.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Notifications\Notifications.Application\Notifications.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />

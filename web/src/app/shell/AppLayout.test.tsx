@@ -1,22 +1,40 @@
 import { ThemeProvider } from '@mui/material/styles';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { afterEach, vi } from 'vitest';
+import { createQueryClient } from '../../platform/query-client';
 import { theme } from '../theme/theme';
 import { AppLayout } from './AppLayout';
 
 const mainSections = ['Главная', 'Бюджет', 'Покупки', 'Дела', 'Подарки'];
 
+// The header's member menu reads GET /api/identity/me.
+const member = { email: 'v@example.com', name: 'Віталій', pictureUrl: null };
+
 function renderAt(path: string) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify(member), {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    ),
+  );
   render(
     <ThemeProvider theme={theme}>
-      <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="*" element={<p>Страница</p>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="*" element={<p>Страница</p>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     </ThemeProvider>,
   );
 }
@@ -34,6 +52,7 @@ function bottomBarLinks() {
 }
 
 beforeEach(() => localStorage.clear());
+afterEach(() => vi.unstubAllGlobals());
 
 test('the side menu lists the main sections and the service pages', () => {
   renderAt('/');

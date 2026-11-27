@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- Verifies Google ID tokens against Google's published keys. -->
+    <PackageReference Include="Google.Apis.Auth" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UnitTests" />
+    <InternalsVisibleTo Include="IntegrationTests" />
+  </ItemGroup>
+
+</Project>

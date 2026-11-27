@@ -270,8 +270,8 @@ and the settings: monthly limit 50 000, savings goal 100 000. Later changes are 
 
 ## HTTP API
 
-All under `/api/expenses`, tag `Expenses`. Reads and writes are open without sign-in for now, see
-[ADR 0015](../decisions/0015-expenses-open-until-identity.md). Every write uses the `PublicWrite` rate limit (60
+All under `/api/expenses`, tag `Expenses`. Reads and writes need a signed-in member
+([ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md)). Every write uses the `PublicWrite` rate limit (60
 requests a minute per client address in `appsettings.json`) and can answer `429`.
 
 | Operation | Route | Notes |
