@@ -41,7 +41,7 @@ public sealed class NotificationsApiTests(ApiFactory api)
     }
 
     [SkippableFact]
-    public async Task The_Webhook_Is404_WithoutAToken_AndTheTick_NeedsTheSchedulerKey()
+    public async Task The_Webhook_Is404_WithoutAToken_AndTheTick_NeedsTheSchedulerKey_AndLeavesAHeartbeat()
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);
         using var client = api.CreateHttpsClient();
@@ -51,11 +51,14 @@ public sealed class NotificationsApiTests(ApiFactory api)
         using var keyed = new HttpRequestMessage(HttpMethod.Post, "/internal/notifications/tick");
         keyed.Headers.Add("X-Scheduler-Key", ApiFactory.TickKey);
         var tick = await client.SendAsync(keyed);
+        var status = await client.GetFromJsonAsync<JsonElement>("/api/notifications/status");
 
         Assert.Equal(HttpStatusCode.NotFound, webhook.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, noKey.StatusCode);
         Assert.Equal(HttpStatusCode.OK, tick.StatusCode);
         Assert.False((await tick.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("configured").GetBoolean());
+        Assert.NotEqual(JsonValueKind.Null, status.GetProperty("lastTickAtUtc").ValueKind);
+        Assert.False(status.GetProperty("schedulerSilent").GetBoolean());
     }
 
     private static async Task<string?> CodeAsync(HttpResponseMessage response) =>

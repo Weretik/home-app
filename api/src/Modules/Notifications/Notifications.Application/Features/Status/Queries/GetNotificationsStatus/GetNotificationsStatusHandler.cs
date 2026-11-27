@@ -6,7 +6,7 @@ using Notifications.Domain.Schedule;
 
 namespace Notifications.Application.Features.Status.Queries.GetNotificationsStatus;
 
-public sealed class GetNotificationsStatusHandler(INotificationsDbContext db, ITelegramBot bot)
+public sealed class GetNotificationsStatusHandler(INotificationsDbContext db, ITelegramBot bot, TimeProvider clock)
     : IQueryHandler<GetNotificationsStatusQuery, Result<NotificationsStatus>>
 {
     private const int DeliveryCount = 10;
@@ -19,6 +19,8 @@ public sealed class GetNotificationsStatusHandler(INotificationsDbContext db, IT
             .Take(DeliveryCount)
             .Select(d => new NotificationDeliveryItem(d.Kind, d.Channel, d.Audience, d.Key, d.CreatedAtUtc, d.SentAtUtc))
             .ToListAsync(cancellationToken);
+        var lastTick = await db.Heartbeats.AsNoTracking()
+            .Where(h => h.Id == SchedulerHeartbeat.SingletonId).Select(h => h.LastTickAtUtc).FirstOrDefaultAsync(cancellationToken);
         var username = bot.IsConfigured ? await bot.GetUsernameAsync(cancellationToken) : null;
 
         var chats = Enum.GetValues<Audience>()
@@ -33,6 +35,8 @@ public sealed class GetNotificationsStatusHandler(INotificationsDbContext db, IT
             username is null ? null : $"https://t.me/{username}",
             chats,
             [.. DigestSchedule.Windows.Select(w => new NotificationScheduleItem(w.Kind, w.Title, w.When))],
-            deliveries);
+            deliveries,
+            lastTick,
+            SchedulerHeartbeat.IsSilent(lastTick, clock.GetUtcNow()));
     }
 }

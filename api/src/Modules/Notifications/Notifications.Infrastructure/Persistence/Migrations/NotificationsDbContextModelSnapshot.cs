@@ -216,6 +216,27 @@ namespace Notifications.Infrastructure.Persistence.Migrations
 
                     b.ToTable("push_subscriptions", "notifications");
                 });
+
+            modelBuilder.Entity("Notifications.Domain.Schedule.SchedulerHeartbeat", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("LastTickAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_tick_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("scheduler_heartbeat", "notifications");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1
+                        });
+                });
 #pragma warning restore 612, 618
         }
     }

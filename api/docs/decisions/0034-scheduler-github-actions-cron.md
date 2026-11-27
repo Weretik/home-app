@@ -1,6 +1,6 @@
 # 0034. The scheduler is a GitHub Actions cron
 
-Status: accepted, 2026-11-26
+Status: accepted, 2026-11-26; amended by [0043](0043-external-cron-and-scheduler-heartbeat.md) (cron-job.org is the main scheduler, GitHub the backup)
 
 ## Context
 

@@ -1768,7 +1768,8 @@ export interface components {
         };
         /**
          * @description Whether the bot token is set, the bot's @username and link, the three chats (linked or not), the schedule and the
-         *     last ten planned messages.
+         *     last ten planned messages, and when the scheduler last called the tick (silent when that is more than an hour ago or
+         *     never, so no digest can go out).
          */
         NotificationsStatus: {
             configured: boolean;
@@ -1777,6 +1778,9 @@ export interface components {
             chats: components["schemas"]["NotificationChatItem"][];
             schedule: components["schemas"]["NotificationScheduleItem"][];
             deliveries: components["schemas"]["NotificationDeliveryItem"][];
+            /** Format: date-time */
+            lastTickAtUtc: null | string;
+            schedulerSilent: boolean;
         };
         NotificationsTestRequest: {
             audience: components["schemas"]["Audience"];

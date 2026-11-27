@@ -193,6 +193,19 @@ jobs:
           done
           exit $failed
 
+      # Digests only go out when an outside scheduler calls the tick (cron-job.org, GitHub cron as a backup). GitHub
+      # skipped most */15 runs on the night of 27.11 and nobody noticed, so the deploy says when the scheduler is silent.
+      # A warning, not a failure: right after a first deploy no tick has come yet (api/docs/decisions/0043).
+      - name: Scheduler heartbeat
+        env:
+          SCHEDULER_KEY: ${{ secrets.SCHEDULER_KEY }}
+        run: |
+          body=$(curl --silent --max-time 60 -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL/api/notifications/status" || true)
+          echo "$body" | grep -o '"lastTickAtUtc":[^,]*' || true
+          if echo "$body" | grep -q '"schedulerSilent":true'; then
+            echo "::warning::No scheduler tick for over an hour: digests are not going out. Check the cron-job.org jobs (docs/deploy.md)."
+          fi
+
       # The site must be closed without a session, and sign-in must be configured: 401 for a made-up Google token means
       # the client id is set; 409 means Identity__Google__ClientId is missing and nobody can sign in.
       - name: Smoke test sign-in

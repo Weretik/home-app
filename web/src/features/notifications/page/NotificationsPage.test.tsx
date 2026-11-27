@@ -42,6 +42,8 @@ const status = (
       sentAtUtc: null,
     },
   ],
+  lastTickAtUtc: '2026-11-27T06:00:00Z',
+  schedulerSilent: false,
   ...overrides,
 });
 
@@ -102,6 +104,21 @@ test('shows the bot, the chats, the schedule and the deliveries', async () => {
   const deliveries = screen.getByRole('region', { name: 'Останні надсилання' });
   expect(within(deliveries).getByText('Ранкові справи')).toBeInTheDocument();
   expect(within(deliveries).getByText('у черзі')).toBeInTheDocument();
+});
+
+test('warns when the scheduler has been silent', async () => {
+  renderPage(status({ schedulerSilent: true }));
+
+  expect(
+    await screen.findByText(/Планувальник мовчить з 27\.11, 08:00/),
+  ).toBeInTheDocument();
+});
+
+test('does not warn while the scheduler ticks', async () => {
+  renderPage(status());
+
+  expect(await screen.findByText('@home_bot')).toBeInTheDocument();
+  expect(screen.queryByText(/Планувальник мовчить/)).toBeNull();
 });
 
 test('says what to set when the bot has no token', async () => {
