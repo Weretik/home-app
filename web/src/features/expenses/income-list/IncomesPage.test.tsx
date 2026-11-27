@@ -102,13 +102,13 @@ test('shows each income and no month total card', async () => {
   );
 
   const rows = within(
-    await screen.findByRole('list', { name: 'Доходы за месяц' }),
+    await screen.findByRole('list', { name: 'Доходи за місяць' }),
   ).getAllByRole('listitem');
   expect(screen.queryByText(normalized('80 000,00 ₴'))).not.toBeInTheDocument();
-  expect(rows[0]).toHaveTextContent('Виталий');
+  expect(rows[0]).toHaveTextContent('Віталій');
   expect(rows[0]).toHaveTextContent('Зарплата');
   expect(rows[1]).toHaveTextContent('Маша');
-  expect(screen.getByRole('tab', { name: 'Доходы' })).toHaveAttribute(
+  expect(screen.getByRole('tab', { name: 'Доходи' })).toHaveAttribute(
     'aria-current',
     'page',
   );
@@ -118,9 +118,9 @@ test('shows each income and no month total card', async () => {
 
 test('filters by person', async () => {
   const { lastUrl } = renderPage(() => json(page([income()], 50000)));
-  await screen.findByRole('list', { name: 'Доходы за месяц' });
+  await screen.findByRole('list', { name: 'Доходи за місяць' });
 
-  await userEvent.click(screen.getByRole('combobox', { name: 'Кто' }));
+  await userEvent.click(screen.getByRole('combobox', { name: 'Хто' }));
   await userEvent.click(screen.getByRole('option', { name: 'Маша' }));
 
   expect(lastUrl().searchParams.get('person')).toBe('Maria');
@@ -130,7 +130,7 @@ test('says when the month has no incomes', async () => {
   renderPage(() => json(page([], 0)));
 
   expect(
-    await screen.findByText('За этот месяц записей нет'),
+    await screen.findByText('За цей місяць записів немає'),
   ).toBeInTheDocument();
 });
 
@@ -138,7 +138,7 @@ test('shows an error when the API fails', async () => {
   renderPage(() => json({ title: 'Ошибка' }, 500));
 
   expect(await screen.findByRole('alert')).toHaveTextContent(
-    'Не удалось загрузить',
+    'Не вдалося завантажити',
   );
 });
 
@@ -148,23 +148,23 @@ test('adds an income with an Idempotency-Key and reloads the list', async () => 
       ? json({ id: crypto.randomUUID() }, 201)
       : json(page([income()], 50000)),
   );
-  await screen.findByRole('list', { name: 'Доходы за месяц' });
+  await screen.findByRole('list', { name: 'Доходи за місяць' });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить доход' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Новый доход' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати дохід' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Новий дохід' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Введите сумму')).toBeInTheDocument();
+  expect(within(dialog).getByText('Введіть суму')).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 
-  await userEvent.click(within(dialog).getByRole('combobox', { name: 'Кто' }));
+  await userEvent.click(within(dialog).getByRole('combobox', { name: 'Хто' }));
   await userEvent.click(await screen.findByRole('option', { name: 'Маша' }));
-  await userEvent.type(within(dialog).getByLabelText(/Сумма/), '30000');
-  await userEvent.type(within(dialog).getByLabelText('Комментарий'), 'Аванс');
+  await userEvent.type(within(dialog).getByLabelText(/Сума/), '30000');
+  await userEvent.type(within(dialog).getByLabelText('Коментар'), 'Аванс');
   const loads = listLoads();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -186,19 +186,17 @@ test('changes an income with its version in If-Match', async () => {
   const { writes } = renderPage((_, sent) =>
     sent.method === 'PUT' ? noContent() : json(page([item], 50000)),
   );
-  await screen.findByRole('list', { name: 'Доходы за месяц' });
+  await screen.findByRole('list', { name: 'Доходи за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Виталий/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Изменить доход' });
-  const amount = within(dialog).getByLabelText(/Сумма/);
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Віталій/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Змінити дохід' });
+  const amount = within(dialog).getByLabelText(/Сума/);
   expect(amount).toHaveValue('50000');
   await userEvent.clear(amount);
   await userEvent.type(amount, '52000');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -220,16 +218,14 @@ test('deletes an income only after the confirmation', async () => {
   const { writes } = renderPage((_, sent) =>
     sent.method === 'DELETE' ? noContent() : json(page([item], 50000)),
   );
-  await screen.findByRole('list', { name: 'Доходы за месяц' });
+  await screen.findByRole('list', { name: 'Доходи за місяць' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Виталий/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Удалить доход?' });
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Віталій/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Видалити дохід?' });
   expect(writes()).toHaveLength(0);
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await dialogClosed();
 

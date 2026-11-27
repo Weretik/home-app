@@ -22,7 +22,7 @@ to-dos and close themselves when the to-do is done; and the Notifications module
 to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
 see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); the Identity module: Google sign-in for Masha and Vitaliy only (an e-mail allowlist), server sessions, and every
 endpoint closed by default ([ADR 0037](api/docs/decisions/0037-google-sign-in-with-server-sessions.md), see
-[api/docs/modules/identity.md](api/docs/modules/identity.md)). Not indexed, no SEO. UI text is Russian; everything else (docs, comments, commits)
+[api/docs/modules/identity.md](api/docs/modules/identity.md)). Not indexed, no SEO. UI text is Ukrainian ([web ADR 0014](web/docs/decisions/0014-ukrainian-interface.md)); everything else (docs, comments, commits)
 is English.
 
 ## Project context

@@ -37,11 +37,11 @@ export function GiftEditor({ state, categories, onClose }: GiftEditorProps) {
   };
   return (
     <DeleteDialog
-      title="Удалить подарок?"
+      title="Видалити подарунок?"
       summary={`${gift.name} · ${recipientLabels[gift.recipient]}`}
       error={
         remove.error
-          ? describeWriteError(remove.error, 'удалить').message
+          ? describeWriteError(remove.error, 'видалити').message
           : undefined
       }
       isPending={remove.isPending}

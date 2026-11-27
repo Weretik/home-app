@@ -20,7 +20,7 @@ export interface IncomeFormValues {
   comment: string;
 }
 
-/** The form of an existing income, or a new one for Виталий on the default date. */
+/** The form of an existing income, or a new one for Віталій on the default date. */
 export function incomeFormValues(
   item: IncomeItem | undefined,
   month: Month,

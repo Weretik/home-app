@@ -11,7 +11,7 @@ interface SegmentedFieldProps<T extends string> {
   onChange: (value: T) => void;
 }
 
-/** A labelled choice of a few options as one row of buttons (Кому, Поставил(а), Приоритет); it fills the width. */
+/** A labelled choice of a few options as one row of buttons (Кому, Поставив(-ла), Пріоритет); it fills the width. */
 export function SegmentedField<T extends string>({
   label,
   value,

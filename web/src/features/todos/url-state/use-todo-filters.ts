@@ -69,7 +69,7 @@ export function useDebouncedSearch(
 ) {
   const [text, setText] = useState(value ?? '');
   const [synced, setSynced] = useState(value);
-  // The URL changed from outside (a «Сбросить фильтр»): show it.
+  // The URL changed from outside (a «Скинути фільтр»): show it.
   if (value !== synced) {
     setSynced(value);
     setText(value ?? '');

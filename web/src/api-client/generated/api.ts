@@ -942,7 +942,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sends «✅ Бот на связи» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused. */
+        /** Sends «✅ Бот на зв’язку» to a linked chat at once. 404 when the chat is not linked, 409 when the bot token is not set or Telegram refused. */
         post: operations["sendNotificationsTest"];
         delete?: never;
         options?: never;
@@ -983,7 +983,7 @@ export interface components {
             dueToday: number;
         };
         /**
-         * @description Who a message is for: Виталий or Маша in their private chats, or the family group.
+         * @description Who a message is for: Віталій or Маша in their private chats, or the family group.
          * @enum {unknown}
          */
         Audience: "Vitaliy" | "Maria" | "Family";
@@ -1530,7 +1530,7 @@ export interface components {
             /** Format: date-time */
             sentAtUtc: null | string;
         };
-        /** @description One line of the schedule: the kind, what it is and when it comes (Russian, Kyiv time). */
+        /** @description One line of the schedule: the kind, what it is and when it comes (Ukrainian, Kyiv time). */
         NotificationScheduleItem: {
             kind: components["schemas"]["DigestKind"];
             title: string;

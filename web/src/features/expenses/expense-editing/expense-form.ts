@@ -18,7 +18,7 @@ export interface ExpenseFormValues {
   amount: string;
   paymentMethod: PaymentMethod;
   comment: string;
-  /** «Не в лимиты»: counts in the month's totals, not in any limit or carry-over. */
+  /** «Не в ліміти»: counts in the month's totals, not in any limit or carry-over. */
   outsideLimits: boolean;
 }
 
@@ -51,7 +51,7 @@ export function expenseFormValues(
 export function validateExpense(values: ExpenseFormValues): FieldErrors {
   return {
     date: dateError(values.date),
-    categoryId: values.categoryId ? undefined : 'Выберите категорию',
+    categoryId: values.categoryId ? undefined : 'Виберіть категорію',
     amount: amountError(values.amount),
     comment: commentError(values.comment),
   };

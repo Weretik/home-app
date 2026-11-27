@@ -3,14 +3,14 @@ import Typography from '@mui/material/Typography';
 import type { NotificationScheduleItem } from '../data/notifications-api';
 import { InfoCard } from './InfoCard';
 
-/** «Расписание» (FR-005): what the bot sends and when, as the API words it (Kyiv time). */
+/** «Розклад» (FR-005): what the bot sends and when, as the API words it (Kyiv time). */
 export function ScheduleCard({
   schedule,
 }: {
   schedule: NotificationScheduleItem[];
 }) {
   return (
-    <InfoCard title="Расписание" caption="Время киевское">
+    <InfoCard title="Розклад" caption="Час київський">
       <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {schedule.map((item, index) => (
           <Box

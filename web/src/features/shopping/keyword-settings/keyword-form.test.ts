@@ -20,15 +20,15 @@ test('normalises like the API: lower case, ё as е, single spaces', () => {
 
 test('needs a keyword of the right length and a department', () => {
   expect(checkKeyword({ keyword: ' ', departmentId: '' })).toEqual({
-    keyword: 'Введите слово',
-    departmentId: 'Выберите отдел',
+    keyword: 'Введіть слово',
+    departmentId: 'Виберіть відділ',
   });
   expect(checkKeyword({ keyword: 'я', departmentId: 'd1' })).toEqual({
-    keyword: `Не короче ${KEYWORD_MIN} букв`,
+    keyword: `Не коротше ${KEYWORD_MIN} літер`,
   });
   expect(
     checkKeyword({ keyword: 'я'.repeat(KEYWORD_MAX + 1), departmentId: 'd1' }),
-  ).toEqual({ keyword: `Не длиннее ${KEYWORD_MAX} символов` });
+  ).toEqual({ keyword: `Не довше ${KEYWORD_MAX} символів` });
   expect(checkKeyword({ keyword: 'чай', departmentId: 'd1' })).toEqual({});
 });
 

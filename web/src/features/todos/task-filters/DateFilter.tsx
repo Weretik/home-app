@@ -7,8 +7,8 @@ import type { useTodoFilters } from '../url-state/use-todo-filters';
 const fieldSx = { minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 180px' } };
 
 /**
- * «Срок» on the active list, «Когда сделано» in the archive (FR-002, FR-006): a select of quick choices and, for
- * «Период», two day fields «С» and «По» (either may stay empty).
+ * «Термін» on the active list, «Коли зроблено» in the archive (FR-002, FR-006): a select of quick choices and, for
+ * «Період», two day fields «З» and «По» (either may stay empty).
  */
 export function DateFilter({
   view,
@@ -50,7 +50,7 @@ export function DateFilter({
           inputLabel: { shrink: true },
         }}
       >
-        <MenuItem value="">Любой</MenuItem>
+        <MenuItem value="">Будь-який</MenuItem>
         {whenOptions[view].map((option) => (
           <MenuItem key={option} value={option}>
             {whenLabels[option]}
@@ -59,7 +59,7 @@ export function DateFilter({
       </TextField>
       {when === 'period' && (
         <>
-          {day('С', from, (value) => state.setPeriod(value, to))}
+          {day('З', from, (value) => state.setPeriod(value, to))}
           {day('По', to, (value) => state.setPeriod(from, value))}
         </>
       )}

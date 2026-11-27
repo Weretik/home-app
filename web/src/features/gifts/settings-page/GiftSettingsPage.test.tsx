@@ -87,37 +87,37 @@ function renderSettings(
   return { writes: () => sent.filter((s) => s.method !== 'GET'), sent };
 }
 
-test('shows the нюансы grouped by person', async () => {
+test('shows the нюанси grouped by person', async () => {
   renderSettings({ details: [ring, shoes], categories: [books] });
-  const card = await screen.findByRole('region', { name: 'Нюансы' });
+  const card = await screen.findByRole('region', { name: 'Нюанси' });
   const masha = await within(card).findByRole('list', { name: 'Маша' });
   expect(within(masha).getByText('Кольцо')).toBeInTheDocument();
   expect(within(masha).getByText('18,5–19,0')).toBeInTheDocument();
-  expect(within(card).getByRole('list', { name: 'Виталий' })).toHaveTextContent(
+  expect(within(card).getByRole('list', { name: 'Віталій' })).toHaveTextContent(
     'Обувь',
   );
-  expect(within(card).queryByRole('list', { name: 'Вместе' })).toBeNull();
+  expect(within(card).queryByRole('list', { name: 'Разом' })).toBeNull();
 });
 
-test('says when there are no нюансы yet', async () => {
+test('says when there are no нюанси yet', async () => {
   renderSettings({ details: [], categories: [] });
-  expect(await screen.findByText(/Нюансов пока нет/)).toBeInTheDocument();
-  expect(await screen.findByText(/Категорий пока нет/)).toBeInTheDocument();
+  expect(await screen.findByText(/Нюансів поки немає/)).toBeInTheDocument();
+  expect(await screen.findByText(/Категорій поки немає/)).toBeInTheDocument();
 });
 
 test('adds a нюанс for a person with one key, and edits one with its version', async () => {
   const { writes } = renderSettings({ details: [ring], categories: [books] });
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Добавить нюанс для Маша' }),
+    await screen.findByRole('button', { name: 'Додати нюанс для Маша' }),
   );
-  const dialog = screen.getByRole('dialog', { name: 'Новый нюанс' });
+  const dialog = screen.getByRole('dialog', { name: 'Новий нюанс' });
   expect(
     within(dialog).getByRole('combobox', { name: 'Для кого' }),
   ).toHaveTextContent('Маша');
-  await userEvent.type(within(dialog).getByLabelText('Что'), 'Браслет');
-  await userEvent.type(within(dialog).getByLabelText('Значение'), '17 см');
+  await userEvent.type(within(dialog).getByLabelText('Що'), 'Браслет');
+  await userEvent.type(within(dialog).getByLabelText('Значення'), '17 см');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   const post = writes()[0]!;
@@ -129,16 +129,12 @@ test('adds a нюанс for a person with one key, and edits one with its versio
     value: '17 см',
   });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Действия: Кольцо' }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  const edit = screen.getByRole('dialog', { name: 'Изменить нюанс' });
-  await userEvent.clear(within(edit).getByLabelText('Значение'));
-  await userEvent.type(within(edit).getByLabelText('Значение'), '19');
-  await userEvent.click(
-    within(edit).getByRole('button', { name: 'Сохранить' }),
-  );
+  await userEvent.click(screen.getByRole('button', { name: 'Дії: Кольцо' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  const edit = screen.getByRole('dialog', { name: 'Змінити нюанс' });
+  await userEvent.clear(within(edit).getByLabelText('Значення'));
+  await userEvent.type(within(edit).getByLabelText('Значення'), '19');
+  await userEvent.click(within(edit).getByRole('button', { name: 'Зберегти' }));
   await waitFor(() => expect(writes()).toHaveLength(2));
   expect(writes()[1]!.url.pathname).toBe('/api/gifts/details/d1');
   expect(writes()[1]!.headers.get('If-Match')).toBe('5');
@@ -147,13 +143,13 @@ test('adds a нюанс for a person with one key, and edits one with its versio
 test('deletes a нюанс after asking', async () => {
   const { writes } = renderSettings({ details: [ring], categories: [] });
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Кольцо' }),
+    await screen.findByRole('button', { name: 'Дії: Кольцо' }),
   );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
   await userEvent.click(
-    within(screen.getByRole('dialog', { name: 'Удалить нюанс?' })).getByRole(
+    within(screen.getByRole('dialog', { name: 'Видалити нюанс?' })).getByRole(
       'button',
-      { name: 'Удалить' },
+      { name: 'Видалити' },
     ),
   );
   await waitFor(() => expect(writes()[0]).toMatchObject({ method: 'DELETE' }));
@@ -172,26 +168,24 @@ test('adds, renames and refuses to delete a used category', async () => {
     },
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Добавить категорию' }),
+    await screen.findByRole('button', { name: 'Додати категорію' }),
   );
-  const add = screen.getByRole('dialog', { name: 'Новая категория' });
-  await userEvent.type(within(add).getByLabelText('Название'), 'Книги');
-  await userEvent.click(within(add).getByRole('button', { name: 'Сохранить' }));
+  const add = screen.getByRole('dialog', { name: 'Нова категорія' });
+  await userEvent.type(within(add).getByLabelText('Назва'), 'Книги');
+  await userEvent.click(within(add).getByRole('button', { name: 'Зберегти' }));
   expect(
-    await within(add).findByText('Такая категория уже есть'),
+    await within(add).findByText('Така категорія вже є'),
   ).toBeInTheDocument();
-  await userEvent.click(within(add).getByRole('button', { name: 'Отмена' }));
+  await userEvent.click(within(add).getByRole('button', { name: 'Скасувати' }));
 
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Действия: Книги' }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Дії: Книги' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
   const rename = screen.getByRole('dialog', {
-    name: 'Переименовать категорию',
+    name: 'Перейменувати категорію',
   });
-  await userEvent.type(within(rename).getByLabelText('Название'), ' и комиксы');
+  await userEvent.type(within(rename).getByLabelText('Назва'), ' и комиксы');
   await userEvent.click(
-    within(rename).getByRole('button', { name: 'Сохранить' }),
+    within(rename).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   const put = writes().find((w) => w.method === 'PUT')!;
@@ -199,17 +193,15 @@ test('adds, renames and refuses to delete a used category', async () => {
   expect(put.headers.get('If-Match')).toBeNull();
   expect(put.body).toEqual({ name: 'Книги и комиксы' });
 
+  await userEvent.click(screen.getByRole('button', { name: 'Дії: Книги' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const remove = screen.getByRole('dialog', { name: 'Видалити категорію?' });
   await userEvent.click(
-    screen.getByRole('button', { name: 'Действия: Книги' }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const remove = screen.getByRole('dialog', { name: 'Удалить категорию?' });
-  await userEvent.click(
-    within(remove).getByRole('button', { name: 'Удалить' }),
+    within(remove).getByRole('button', { name: 'Видалити' }),
   );
   expect(
     await within(remove).findByText(
-      'Эта категория есть у подарков — сначала перенесите их в другую.',
+      'Ця категорія є в подарунків — спершу перенесіть їх в іншу.',
     ),
   ).toBeInTheDocument();
 });

@@ -19,7 +19,7 @@ interface TopBarProps {
  * the theme switch and the member's menu on the right.
  */
 export function TopBar({ menuCollapsed, onToggleMenu }: TopBarProps) {
-  const label = menuCollapsed ? 'Развернуть меню' : 'Свернуть меню';
+  const label = menuCollapsed ? 'Розгорнути меню' : 'Згорнути меню';
 
   return (
     <Box

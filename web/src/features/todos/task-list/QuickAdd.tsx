@@ -12,7 +12,7 @@ import { describeWriteError } from '../writes/failures-api';
 import { useIdempotencyKey, useSaveTask } from '../writes/task-writes-api';
 
 /**
- * «Новая задача…» on top of the list (FR-003): Enter or «Добавить» adds a task for `assignee`, Обычно, without a date;
+ * «Нова справа…» on top of the list (FR-003): Enter or «Додати» adds a task for `assignee`, Звичайна, without a date;
  * the field clears and keeps focus. The pencil opens the full form with the typed title.
  */
 export function QuickAdd({
@@ -28,7 +28,7 @@ export function QuickAdd({
   const save = useSaveTask();
   const idempotency = useIdempotencyKey();
   const failure = save.error
-    ? describeWriteError(save.error, 'добавить')
+    ? describeWriteError(save.error, 'додати')
     : undefined;
 
   const submit = (event: FormEvent) => {
@@ -63,7 +63,7 @@ export function QuickAdd({
           inputRef={input}
           size="small"
           fullWidth
-          placeholder="Новая задача…"
+          placeholder="Нова справа…"
           value={title}
           onChange={(event) => {
             setTitle(event.target.value);
@@ -73,24 +73,24 @@ export function QuickAdd({
           error={Boolean(check)}
           helperText={check}
           slotProps={{
-            htmlInput: { 'aria-label': 'Новая задача', enterKeyHint: 'done' },
+            htmlInput: { 'aria-label': 'Нова справа', enterKeyHint: 'done' },
           }}
         />
-        <Tooltip title="Добавить">
+        <Tooltip title="Додати">
           <span>
             <IconButton
               type="submit"
               color="primary"
-              aria-label="Добавить"
+              aria-label="Додати"
               disabled={save.isPending}
             >
               <AddOutlinedIcon />
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title="Подробная форма">
+        <Tooltip title="Детальна форма">
           <IconButton
-            aria-label="Подробная форма"
+            aria-label="Детальна форма"
             onClick={() => onOpenForm(title.trim())}
           >
             <EditNoteOutlinedIcon />

@@ -18,14 +18,14 @@ export function PlannedTable({
 }: PlannedRowsProps) {
   return (
     <TableContainer>
-      <Table size="small" aria-label="Запланированные расходы">
+      <Table size="small" aria-label="Заплановані витрати">
         <TableHead>
           <TableRow>
-            <TableCell>Название</TableCell>
-            <TableCell>Категория</TableCell>
-            <TableCell>Кто</TableCell>
-            <TableCell align="right">Сумма</TableCell>
-            <TableCell padding="checkbox" aria-label="Действия" />
+            <TableCell>Назва</TableCell>
+            <TableCell>Категорія</TableCell>
+            <TableCell>Хто</TableCell>
+            <TableCell align="right">Сума</TableCell>
+            <TableCell padding="checkbox" aria-label="Дії" />
           </TableRow>
         </TableHead>
         <TableBody>

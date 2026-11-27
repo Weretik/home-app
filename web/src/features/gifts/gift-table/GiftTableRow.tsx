@@ -52,7 +52,7 @@ export function GiftTableRow({
           {count > 0 && (
             <Button
               size="small"
-              aria-label={`Варианты: ${count}`}
+              aria-label={`Варіанти: ${count}`}
               aria-expanded={open}
               aria-controls={open ? variantsId : undefined}
               onClick={() => setOpen((value) => !value)}

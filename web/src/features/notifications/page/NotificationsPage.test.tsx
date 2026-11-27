@@ -20,7 +20,7 @@ const status = (
     {
       audience: 'Vitaliy',
       linked: true,
-      title: 'Виталий',
+      title: 'Віталій',
       linkedAtUtc: '2026-11-27T06:00:00Z',
     },
     { audience: 'Maria', linked: false, title: null, linkedAtUtc: null },
@@ -28,8 +28,8 @@ const status = (
   schedule: [
     {
       kind: 'TodosMorning',
-      title: 'Утренние дела',
-      when: 'каждый день в 8:00',
+      title: 'Ранкові справи',
+      when: 'щодня о 8:00',
     },
   ],
   deliveries: [
@@ -78,19 +78,19 @@ test('shows the bot, the chats, the schedule and the deliveries', async () => {
   renderPage(status());
 
   expect(await screen.findByText('@home_bot')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Открыть бота' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: 'Відкрити бота' })).toHaveAttribute(
     'href',
     'https://t.me/home_bot',
   );
-  const chats = screen.getByRole('region', { name: 'Чаты' });
-  expect(within(chats).getByText('Семейная группа')).toBeInTheDocument();
-  expect(within(chats).getAllByText('не подключён')).toHaveLength(2);
-  expect(within(chats).getByText('Виталий · с 27.11')).toBeInTheDocument();
-  const schedule = screen.getByRole('region', { name: 'Расписание' });
-  expect(within(schedule).getByText('каждый день в 8:00')).toBeInTheDocument();
-  const deliveries = screen.getByRole('region', { name: 'Последние отправки' });
-  expect(within(deliveries).getByText('Утренние дела')).toBeInTheDocument();
-  expect(within(deliveries).getByText('в очереди')).toBeInTheDocument();
+  const chats = screen.getByRole('region', { name: 'Чати' });
+  expect(within(chats).getByText('Сімейна група')).toBeInTheDocument();
+  expect(within(chats).getAllByText('не підключено')).toHaveLength(2);
+  expect(within(chats).getByText('Віталій · з 27.11')).toBeInTheDocument();
+  const schedule = screen.getByRole('region', { name: 'Розклад' });
+  expect(within(schedule).getByText('щодня о 8:00')).toBeInTheDocument();
+  const deliveries = screen.getByRole('region', { name: 'Останні надсилання' });
+  expect(within(deliveries).getByText('Ранкові справи')).toBeInTheDocument();
+  expect(within(deliveries).getByText('у черзі')).toBeInTheDocument();
 });
 
 test('says what to set when the bot has no token', async () => {
@@ -104,9 +104,9 @@ test('says what to set when the bot has no token', async () => {
     }),
   );
 
-  expect(await screen.findByText(/Бот ещё не настроен/)).toBeInTheDocument();
+  expect(await screen.findByText(/Бот ще не налаштовано/)).toBeInTheDocument();
   expect(
-    screen.queryByRole('region', { name: 'Последние отправки' }),
+    screen.queryByRole('region', { name: 'Останні надсилання' }),
   ).toBeNull();
 });
 
@@ -115,19 +115,21 @@ test('unlinks a chat after asking', async () => {
   const writes = renderPage(status());
 
   await user.click(
-    await screen.findByRole('button', { name: 'Отвязать: Виталий' }),
+    await screen.findByRole('button', { name: 'Відв’язати: Віталій' }),
   );
   const dialog = screen.getByRole('dialog', {
-    name: 'Отвязать чат «Виталий»?',
+    name: 'Відв’язати чат «Віталій»?',
   });
-  await user.click(within(dialog).getByRole('button', { name: 'Отвязать' }));
+  await user.click(within(dialog).getByRole('button', { name: 'Відв’язати' }));
 
   await waitFor(() => expect(writes).toHaveLength(1));
   expect(writes[0]?.method).toBe('DELETE');
   expect(new URL(writes[0]!.url).pathname).toBe(
     '/api/notifications/chats/Vitaliy',
   );
-  expect(await screen.findByText('Чат «Виталий» отвязан')).toBeInTheDocument();
+  expect(
+    await screen.findByText('Чат «Віталій» відв’язано'),
+  ).toBeInTheDocument();
 });
 
 test('sends a test message at once', async () => {
@@ -135,13 +137,13 @@ test('sends a test message at once', async () => {
   const writes = renderPage(status());
 
   await user.click(
-    await screen.findByRole('button', { name: 'Тест: Виталий' }),
+    await screen.findByRole('button', { name: 'Тест: Віталій' }),
   );
 
   await waitFor(() => expect(writes).toHaveLength(1));
   expect(writes[0]?.method).toBe('POST');
   expect(await writes[0]!.json()).toEqual({ audience: 'Vitaliy' });
   expect(
-    await screen.findByText('Тест отправлен: проверьте Телеграм'),
+    await screen.findByText('Тест надіслано: перевірте Телеграм'),
   ).toBeInTheDocument();
 });

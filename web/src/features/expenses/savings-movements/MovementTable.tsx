@@ -19,14 +19,14 @@ export function MovementTable({
 }: { items: SavingsMovementItem[] } & RowHandlers<SavingsMovementItem>) {
   return (
     <TableContainer>
-      <Table size="small" aria-label="Движения копилки за месяц">
+      <Table size="small" aria-label="Операції скарбнички за місяць">
         <TableHead>
           <TableRow>
             <TableCell>Дата</TableCell>
-            <TableCell>Кто</TableCell>
-            <TableCell align="right">Сумма</TableCell>
-            <TableCell>Комментарий</TableCell>
-            <TableCell padding="checkbox" aria-label="Действия" />
+            <TableCell>Хто</TableCell>
+            <TableCell align="right">Сума</TableCell>
+            <TableCell>Коментар</TableCell>
+            <TableCell padding="checkbox" aria-label="Дії" />
           </TableRow>
         </TableHead>
         <TableBody>

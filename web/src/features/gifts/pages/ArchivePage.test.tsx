@@ -89,11 +89,11 @@ test('shows gifted and dropped gifts in a block per person, with how each ended'
   const masha = await screen.findByRole('region', { name: 'Маша' });
   expect(within(masha).getByText('Серьги')).toBeInTheDocument();
   expect(
-    within(masha).getByText('Подарено 26 ноября 2026'),
+    within(masha).getByText('Подаровано 26 листопада 2026'),
   ).toBeInTheDocument();
-  const together = screen.getByRole('region', { name: 'Вместе' });
+  const together = screen.getByRole('region', { name: 'Разом' });
   expect(within(together).getByText('Плед')).toBeInTheDocument();
-  expect(within(together).getByText('Не актуально')).toBeInTheDocument();
+  expect(within(together).getByText('Неактуально')).toBeInTheDocument();
   const list = sent.find((s) => s.url.pathname === '/api/gifts/items')!;
   expect(list.url.searchParams.get('archived')).toBe('true');
 });
@@ -101,7 +101,7 @@ test('shows gifted and dropped gifts in a block per person, with how each ended'
 test('says when nothing was gifted yet', async () => {
   renderArchive(() => []);
   expect(
-    await screen.findByText('Здесь появятся подаренные подарки'),
+    await screen.findByText('Тут з’являться подаровані подарунки'),
   ).toBeInTheDocument();
 });
 
@@ -115,13 +115,13 @@ test('returns a gift to the list', async () => {
     },
   );
   await userEvent.click(
-    await screen.findByRole('button', { name: 'Действия: Серьги' }),
+    await screen.findByRole('button', { name: 'Дії: Серьги' }),
   );
   await userEvent.click(
-    screen.getByRole('menuitem', { name: 'Вернуть в список' }),
+    screen.getByRole('menuitem', { name: 'Повернути до списку' }),
   );
   expect(
-    await screen.findByText('Здесь появятся подаренные подарки'),
+    await screen.findByText('Тут з’являться подаровані подарунки'),
   ).toBeInTheDocument();
   const put = sent.find((s) => s.method === 'PUT')!;
   expect(put.url.pathname).toBe(`/api/gifts/items/${item.id}/status`);

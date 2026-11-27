@@ -19,10 +19,10 @@ export const departmentValues = (
 export function checkDepartment(values: DepartmentValues) {
   const errors: Partial<Record<keyof DepartmentValues, string>> = {};
   const name = values.name.trim();
-  if (!name) errors.name = 'Введите название';
+  if (!name) errors.name = 'Введіть назву';
   else if (name.length > DEPARTMENT_NAME_MAX)
-    errors.name = `Не длиннее ${DEPARTMENT_NAME_MAX} символов`;
-  if (values.icon.trim().length > ICON_MAX) errors.icon = 'Один-два эмодзи';
+    errors.name = `Не довше ${DEPARTMENT_NAME_MAX} символів`;
+  if (values.icon.trim().length > ICON_MAX) errors.icon = 'Один-два емодзі';
   return errors;
 }
 

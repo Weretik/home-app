@@ -57,8 +57,8 @@ public sealed class NotificationsBotApiTests(ApiFactory api)
         Assert.Equal(0, await PlannedAsync(client));
         await TickAsync(client, "/internal/outbox/tick");
 
-        Assert.Contains(bot.TextsTo(MashaChat), t => t.Contains("Доброе утро") && t.Contains("Бот: купить батарейки"));
-        Assert.Contains(bot.TextsTo(FamilyChat), t => t.Contains("Дела семьи"));
+        Assert.Contains(bot.TextsTo(MashaChat), t => t.Contains("Доброго ранку") && t.Contains("Бот: купить батарейки"));
+        Assert.Contains(bot.TextsTo(FamilyChat), t => t.Contains("Справи родини"));
         Assert.Contains(bot.Sent, m => m.Buttons.Any(b => b.Data == "done:" + taskId.ToString("N")));
 
         await WebhookAsync(client, new { update_id = 5, callback_query = new { id = "c2", data = "done:" + taskId.ToString("N"), message = new { chat = new { id = MashaChat, type = "private" } } } });

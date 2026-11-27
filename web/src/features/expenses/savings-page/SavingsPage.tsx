@@ -16,7 +16,7 @@ const twoColumns = {
   },
 } as const;
 
-/** «Копилка»: what is in the jar now and how far to its goal, the open month's movements, and every month's sums. */
+/** «Скарбничка»: what is in the jar now and how far to its goal, the open month's movements, and every month's sums. */
 export function SavingsPage() {
   const [month, setMonth] = useMonthParam();
   const overview = useSavingsOverview();

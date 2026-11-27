@@ -16,15 +16,15 @@ interface ItemRowProps {
 }
 
 /**
- * One item: a big checkbox, the name with its quantity, the note and who added it; urgent ones carry «Срочно» and a
+ * One item: a big checkbox, the name with its quantity, the note and who added it; urgent ones carry «Терміново» and a
  * tinted edge. A bought item (in the cart) is struck through. Tapping the text opens the edit dialog.
  */
 export function ItemRow({ item, onToggle, onOpen, divider }: ItemRowProps) {
   const nameId = useId();
   const bought = item.status === 'Bought';
   const caption = bought
-    ? `купил(а) ${personLabel(item.boughtBy)}${item.boughtAtUtc ? ` · ${formatWhen(item.boughtAtUtc)}` : ''}`
-    : `добавил(а) ${personLabel(item.addedBy)}`;
+    ? `купив(ла) ${personLabel(item.boughtBy)}${item.boughtAtUtc ? ` · ${formatWhen(item.boughtAtUtc)}` : ''}`
+    : `додав(ла) ${personLabel(item.addedBy)}`;
 
   return (
     <ListItem
@@ -50,7 +50,7 @@ export function ItemRow({ item, onToggle, onOpen, divider }: ItemRowProps) {
       />
       <ButtonBase
         onClick={() => onOpen(item)}
-        aria-label={`Изменить: ${item.name}`}
+        aria-label={`Змінити: ${item.name}`}
         sx={{
           flex: 1,
           minWidth: 0,
@@ -88,7 +88,7 @@ export function ItemRow({ item, onToggle, onOpen, divider }: ItemRowProps) {
               />
             )}
             {item.urgent && !bought && (
-              <Chip size="small" color="secondary" label="Срочно" />
+              <Chip size="small" color="secondary" label="Терміново" />
             )}
           </Box>
           {item.note && (

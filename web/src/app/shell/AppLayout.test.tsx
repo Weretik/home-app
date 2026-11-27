@@ -8,7 +8,7 @@ import { createQueryClient } from '../../platform/query-client';
 import { theme } from '../theme/theme';
 import { AppLayout } from './AppLayout';
 
-const mainSections = ['Главная', 'Бюджет', 'Покупки', 'Дела', 'Подарки'];
+const mainSections = ['Головна', 'Бюджет', 'Покупки', 'Справи', 'Подарунки'];
 
 // The header's member menu reads GET /api/identity/me.
 const member = { email: 'v@example.com', name: 'Віталій', pictureUrl: null };
@@ -30,7 +30,7 @@ function renderAt(path: string) {
         <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route element={<AppLayout />}>
-              <Route path="*" element={<p>Страница</p>} />
+              <Route path="*" element={<p>Сторінка</p>} />
             </Route>
           </Routes>
         </MemoryRouter>
@@ -46,7 +46,7 @@ const sideMenu = () => screen.getByRole('navigation', { name: 'Меню' });
  * and Testing Library gives it no accessible name; find it by its label instead.
  */
 function bottomBarLinks() {
-  const bar = document.querySelector('nav[aria-label="Разделы"]');
+  const bar = document.querySelector('nav[aria-label="Розділи"]');
   if (!(bar instanceof HTMLElement)) throw new Error('No bottom bar');
   return within(bar).getAllByRole('link', { hidden: true });
 }
@@ -57,7 +57,7 @@ afterEach(() => vi.unstubAllGlobals());
 test('the side menu lists the main sections and the service pages', () => {
   renderAt('/');
 
-  for (const name of [...mainSections, 'Состояние'])
+  for (const name of [...mainSections, 'Стан'])
     expect(within(sideMenu()).getByRole('link', { name })).toBeInTheDocument();
 });
 
@@ -76,7 +76,7 @@ test('marks the current section in both menus', () => {
     within(sideMenu()).getByRole('link', { name: 'Бюджет' }),
   ).toHaveAttribute('aria-current', 'page');
   expect(
-    within(sideMenu()).getByRole('link', { name: 'Главная' }),
+    within(sideMenu()).getByRole('link', { name: 'Головна' }),
   ).not.toHaveAttribute('aria-current');
   const selected = bottomBarLinks().filter((link) =>
     link.classList.contains('Mui-selected'),
@@ -87,7 +87,7 @@ test('marks the current section in both menus', () => {
 test('collapses the side menu to icons and remembers it', async () => {
   renderAt('/');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Свернуть меню' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Згорнути меню' }));
 
   expect(within(sideMenu()).queryByText('Бюджет')).not.toBeInTheDocument();
   expect(
@@ -95,6 +95,6 @@ test('collapses the side menu to icons and remembers it', async () => {
   ).toBeInTheDocument();
   expect(localStorage.getItem('home.side-nav.collapsed')).toBe('true');
   expect(
-    screen.getByRole('button', { name: 'Развернуть меню' }),
+    screen.getByRole('button', { name: 'Розгорнути меню' }),
   ).toBeInTheDocument();
 });

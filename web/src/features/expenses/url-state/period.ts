@@ -28,13 +28,13 @@ function dayNumber(text: string): number | undefined {
 
 /** Why the period cannot be shown, in Russian; undefined when the list can load it. */
 export function periodError({ from, to }: Period): string | undefined {
-  if (!from || !to) return 'Выберите обе даты';
+  if (!from || !to) return 'Виберіть обидві дати';
   const start = dayNumber(from);
   const end = dayNumber(to);
   if (start === undefined || end === undefined)
-    return 'Даты между 2000 и 2100 годом';
-  if (start > end) return 'Дата «с» позже даты «по»';
+    return 'Дати між 2000 і 2100 роком';
+  if (start > end) return 'Дата «з» пізніше за дату «по»';
   if (end - start + 1 > MAX_PERIOD_DAYS)
-    return `Период не длиннее ${MAX_PERIOD_DAYS} дней`;
+    return `Період не довше ${MAX_PERIOD_DAYS} днів`;
   return undefined;
 }

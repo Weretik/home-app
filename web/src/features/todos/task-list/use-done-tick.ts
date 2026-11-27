@@ -5,7 +5,7 @@ import { describeWriteError } from '../writes/failures-api';
 import { useMoveTask, useRestoreStatus } from '../writes/status-api';
 
 /**
- * The one-tap done of the active list (FR-004): the row leaves at once, «Готово · Отменить» shows, and «Отменить»
+ * The one-tap done of the active list (FR-004): the row leaves at once, «Готово · Скасувати» shows, and «Скасувати»
  * puts back the status the task had. A failed write brings the row back and says why.
  */
 export function useDoneTick() {
@@ -25,18 +25,18 @@ export function useDoneTick() {
       .then(
         () => true,
         (error: Error) => {
-          fail('отметить задачу')(error);
+          fail('позначити справу')(error);
           return false;
         },
       );
-    // «Отменить» waits for the tick: undoing before it is saved would read the old version and race the tick. A failed
+    // «Скасувати» waits for the tick: undoing before it is saved would read the old version and race the tick. A failed
     // tick has nothing to undo (its row is already back).
     const undo = () =>
       void moved.then((done) =>
         done
           ? restore
               .mutateAsync({ id: task.id, status: task.status })
-              .then(() => undefined, fail('вернуть задачу'))
+              .then(() => undefined, fail('повернути справу'))
           : undefined,
       );
     setMessage({ text: `Готово: ${task.title}`, severity: 'success', undo });

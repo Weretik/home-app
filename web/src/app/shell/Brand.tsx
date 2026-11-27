@@ -8,7 +8,7 @@ export function Brand() {
     <Box
       component={Link}
       to="/"
-      aria-label="Дом, на главную"
+      aria-label="Дім, на головну"
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -31,7 +31,7 @@ export function Brand() {
         variant="h6"
         sx={{ textTransform: 'uppercase', letterSpacing: '0.14em' }}
       >
-        Дом
+        Дім
       </Typography>
     </Box>
   );

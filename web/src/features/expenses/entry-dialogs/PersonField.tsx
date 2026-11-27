@@ -6,7 +6,7 @@ import { fieldMessage, type FieldErrors } from '../entry-editing/entry-fields';
 
 const people = Object.keys(personLabels) as Person[];
 
-/** «Кто»: one of the two people. */
+/** «Хто»: one of the two people. */
 export function PersonField({
   value,
   onChange,
@@ -19,7 +19,7 @@ export function PersonField({
   return (
     <TextField
       select
-      label="Кто"
+      label="Хто"
       value={value}
       onChange={(event) => onChange(event.target.value as Person)}
       {...fieldMessage(errors, 'person')}

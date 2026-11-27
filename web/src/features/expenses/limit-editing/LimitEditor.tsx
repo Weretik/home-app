@@ -18,7 +18,7 @@ export function LimitEditor({
   if (state.mode === 'delete')
     return (
       <DeleteEntryDialog
-        title="Удалить лимит?"
+        title="Видалити ліміт?"
         summary={`${state.item.name} · ${formatAmount(state.item.amount)} ${limitPeriodLabels[state.item.period]}`}
         id={state.item.id}
         remove={remove}

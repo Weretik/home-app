@@ -2,7 +2,7 @@ import { limitName } from '../data/labels';
 import { formatExact, percentOf } from '../data/money';
 import type { MonthSummary } from '../data/summary-api';
 
-/** One row of the «Лимиты» table. `limit` and `left` are null when there is nothing to compare with. */
+/** One row of the «Ліміти» table. `limit` and `left` are null when there is nothing to compare with. */
 export interface LimitRow {
   key: string;
   name: string;
@@ -26,16 +26,16 @@ export type Fill = 'success' | 'warning' | 'error';
 export const fillOf = (percent: number): Fill =>
   percent > 100 ? 'error' : percent >= 80 ? 'warning' : 'success';
 
-/** The month's expenses that count against the limits: all of them but those marked «Не в лимиты». */
+/** The month's expenses that count against the limits: all of them but those marked «Не в ліміти». */
 export const limitCounted = (summary: MonthSummary) =>
   Math.round((summary.expenses - summary.outsideLimitsAmount) * 100) / 100;
 
-/** How full the monthly limit is, counting the overspend carried in, as the «ИТОГО» row and the «Расходы» card show it. */
+/** How full the monthly limit is, counting the overspend carried in, as the «РАЗОМ» row and the «Витрати» card show it. */
 export const totalPercent = (summary: MonthSummary) =>
   percentOf(limitCounted(summary) + summary.carriedIn, summary.monthlyLimit);
 
 /**
- * The limits of a month, then «ИТОГО»: the expenses that count against the limits (not those marked «Не в лимиты»),
+ * The limits of a month, then «РАЗОМ»: the expenses that count against the limits (not those marked «Не в ліміти»),
  * plus the overspend carried in, against the monthly limit, with what may still be spent per day (never below zero)
  * while the month runs, the way the API counts it for each limit.
  */
@@ -60,7 +60,7 @@ export function limitRows(summary: MonthSummary): LimitRow[] {
     Math.round((summary.monthlyLimit - spent - summary.carriedIn) * 100) / 100;
   rows.push({
     key: 'total',
-    name: 'ИТОГО',
+    name: 'РАЗОМ',
     spent,
     limit: hasLimit ? summary.monthlyLimit : null,
     left: hasLimit ? left : null,
@@ -77,13 +77,13 @@ export function limitRows(summary: MonthSummary): LimitRow[] {
   return rows;
 }
 
-/** The notes after a row's figures, only those that are not zero: «перенос …», «→ след. мес. …», «план …». */
+/** The notes after a row's figures, only those that are not zero: «перенесення …», «→ наст. міс. …», «план …». */
 export function limitNotes(
   row: Pick<LimitRow, 'carriedIn' | 'carriesOut' | 'planned'>,
 ): { key: string; text: string }[] {
   const notes = [
-    { key: 'in', value: row.carriedIn, label: 'перенос' },
-    { key: 'out', value: row.carriesOut, label: '→ след. мес.' },
+    { key: 'in', value: row.carriedIn, label: 'перенесення' },
+    { key: 'out', value: row.carriesOut, label: '→ наст. міс.' },
     { key: 'planned', value: row.planned, label: 'план' },
   ];
   return notes
@@ -95,7 +95,7 @@ export function limitNotes(
 }
 
 /** The accessible name of the limits table and list. */
-export const limitsLabel = 'Лимиты месяца';
+export const limitsLabel = 'Ліміти місяця';
 /** Money columns: never wrapped, digits aligned. */
 export const numberSx = {
   whiteSpace: 'nowrap',

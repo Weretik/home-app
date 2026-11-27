@@ -127,7 +127,7 @@ const openTask = async (title: string) => {
   await userEvent.click(
     await screen.findByRole('button', { name: new RegExp(title) }),
   );
-  return screen.findByRole('dialog', { name: 'Задача' });
+  return screen.findByRole('dialog', { name: 'Справа' });
 };
 
 test('saves steps of an existing task at once and the task with its current version', async () => {
@@ -172,11 +172,11 @@ test('saves steps of an existing task at once and the task with its current vers
     return noContent();
   });
   const dialog = await openTask('Приклеить деревяшки');
-  const stepList = within(dialog).getByRole('list', { name: 'Список шагов' });
+  const stepList = within(dialog).getByRole('list', { name: 'Список кроків' });
   expect(within(stepList).getAllByRole('listitem')).toHaveLength(3);
 
   await userEvent.click(
-    within(dialog).getByRole('checkbox', { name: 'Шаг выполнен: Шлифовать' }),
+    within(dialog).getByRole('checkbox', { name: 'Крок виконано: Шлифовать' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.method).toBe('PUT');
@@ -187,36 +187,36 @@ test('saves steps of an existing task at once and the task with its current vers
   expect(writes()[0]!.headers.has('If-Match')).toBe(false);
 
   await userEvent.type(
-    within(dialog).getByRole('textbox', { name: 'Новый шаг' }),
+    within(dialog).getByRole('textbox', { name: 'Новий крок' }),
     'Лак{Enter}',
   );
   await waitFor(() => expect(writes()).toHaveLength(2));
   expect(writes()[1]!.body).toEqual({ title: 'Лак' });
   expect(
-    await within(dialog).findByRole('textbox', { name: 'Шаг: Лак' }),
+    await within(dialog).findByRole('textbox', { name: 'Крок: Лак' }),
   ).toBeInTheDocument();
 
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить шаг: Покрасить' }),
+    within(dialog).getByRole('button', { name: 'Видалити крок: Покрасить' }),
   );
   await waitFor(() => expect(writes()).toHaveLength(3));
   expect(writes()[2]!.method).toBe('DELETE');
   await waitFor(() =>
     expect(
-      within(dialog).queryByRole('textbox', { name: 'Шаг: Покрасить' }),
+      within(dialog).queryByRole('textbox', { name: 'Крок: Покрасить' }),
     ).not.toBeInTheDocument(),
   );
 
-  const title = within(dialog).getByRole('textbox', { name: /Название/ });
+  const title = within(dialog).getByRole('textbox', { name: /Назва/ });
   await userEvent.clear(title);
   await userEvent.type(title, 'Приклеить рейки');
   await waitFor(() =>
     expect(
-      within(dialog).getByRole('button', { name: 'Сохранить' }),
+      within(dialog).getByRole('button', { name: 'Зберегти' }),
     ).toBeEnabled(),
   );
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -260,16 +260,16 @@ test('reloads the form when the task was changed elsewhere', async () => {
   const dialog = await openTask('Старое');
 
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
 
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-    'Задачу изменили в другом месте',
+    'Справу змінили в іншому місці',
   );
   await waitFor(() =>
-    expect(
-      within(dialog).getByRole('textbox', { name: /Название/ }),
-    ).toHaveValue('Новое от Маши'),
+    expect(within(dialog).getByRole('textbox', { name: /Назва/ })).toHaveValue(
+      'Новое от Маши',
+    ),
   );
 });
 
@@ -281,44 +281,46 @@ test('creates a task from the full form with its steps and quick due date', asyn
         : json(page([task()])),
     '/todos?who=maria',
   );
-  await screen.findByRole('list', { name: 'Без срока' });
+  await screen.findByRole('list', { name: 'Без терміну' });
   await userEvent.type(
-    screen.getByRole('textbox', { name: 'Новая задача' }),
+    screen.getByRole('textbox', { name: 'Нова справа' }),
     'Приклеить деревяшки',
   );
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Подробная форма' }),
-  );
-  const dialog = await screen.findByRole('dialog', { name: 'Новая задача' });
-  expect(within(dialog).getByRole('textbox', { name: /Название/ })).toHaveValue(
+  await userEvent.click(screen.getByRole('button', { name: 'Детальна форма' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Нова справа' });
+  expect(within(dialog).getByRole('textbox', { name: /Назва/ })).toHaveValue(
     'Приклеить деревяшки',
   );
 
-  await userEvent.click(within(dialog).getByRole('button', { name: /Важно/ }));
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: /Важливо/ }),
+  );
   await userEvent.click(within(dialog).getByRole('button', { name: 'Завтра' }));
   const author = within(dialog).getAllByRole('group', {
-    name: 'Поставил(а)',
+    name: 'Поставив(-ла)',
   })[0]!;
   await userEvent.click(
-    within(author).getByRole('button', { name: 'Виталий' }),
+    within(author).getByRole('button', { name: 'Віталій' }),
   );
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: 'Категория' }),
+    within(dialog).getByRole('combobox', { name: 'Категорія' }),
   );
   await userEvent.click(await screen.findByRole('option', { name: '🏠 Дом' }));
   await userEvent.type(
-    within(dialog).getByRole('textbox', { name: 'Новый шаг' }),
+    within(dialog).getByRole('textbox', { name: 'Новий крок' }),
     'Купить клей{Enter}',
   );
   await userEvent.type(
-    within(dialog).getByRole('textbox', { name: 'Новый шаг' }),
+    within(dialog).getByRole('textbox', { name: 'Новий крок' }),
     'Шлифовать{Enter}',
   );
   expect(
-    within(dialog).getByRole('checkbox', { name: 'Шаг выполнен: Купить клей' }),
+    within(dialog).getByRole('checkbox', {
+      name: 'Крок виконано: Купить клей',
+    }),
   ).toBeDisabled();
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await waitFor(() =>
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
@@ -351,14 +353,14 @@ test('asks before deleting a task', async () => {
   const dialog = await openTask('Лишняя');
 
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   const confirm = await screen.findByRole('dialog', {
-    name: 'Удалить задачу?',
+    name: 'Видалити справу?',
   });
   expect(writes()).toHaveLength(0);
   await userEvent.click(
-    within(confirm).getByRole('button', { name: 'Удалить' }),
+    within(confirm).getByRole('button', { name: 'Видалити' }),
   );
 
   await waitFor(() =>

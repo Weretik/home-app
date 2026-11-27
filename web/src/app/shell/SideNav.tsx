@@ -108,9 +108,9 @@ export function SideNav({ collapsed }: { collapsed: boolean }) {
         }),
       })}
     >
-      {group('Разделы', mainSections)}
+      {group('Розділи', mainSections)}
       <Divider sx={{ mx: 2 }} />
-      {group('Сервис', serviceSections)}
+      {group('Сервіс', serviceSections)}
     </Box>
   );
 }

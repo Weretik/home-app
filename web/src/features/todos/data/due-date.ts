@@ -1,5 +1,5 @@
 /**
- * Due dates of tasks: today in Kyiv (R-013), day arithmetic and the short Russian labels («сегодня», «завтра»,
+ * Due dates of tasks: today in Kyiv (R-013), day arithmetic and the short Ukrainian labels («сьогодні», «завтра»,
  * «пн 30.11»). Dates are contract days («2026-11-30») and are compared as strings; arithmetic goes through UTC so no
  * time zone or daylight saving shift moves a day.
  */
@@ -11,7 +11,7 @@ const kyivDay = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 });
 
-const weekdays = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
+const weekdays = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
 /** Today in Europe/Kyiv as «YYYY-MM-DD», the day the API calls today. */
 export function kyivToday(now: Date = new Date()): string {
@@ -43,11 +43,11 @@ export function weekendOf(today: string): string {
 export const isOverdue = (dueDate: string | null | undefined, today: string) =>
   Boolean(dueDate && dueDate < today);
 
-/** «сегодня», «завтра», «вчера», else «пн 30.11» (with the year when it is not this year: «пн 30.11.2027»). */
+/** «сьогодні», «завтра», «вчора», else «пн 30.11» (with the year when it is not this year: «пн 30.11.2027»). */
 export function formatDue(day: string, today: string): string {
-  if (day === today) return 'сегодня';
+  if (day === today) return 'сьогодні';
   if (day === addDays(today, 1)) return 'завтра';
-  if (day === addDays(today, -1)) return 'вчера';
+  if (day === addDays(today, -1)) return 'вчора';
   return formatShortDay(day, today);
 }
 

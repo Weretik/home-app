@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import { useExpenseCategories } from '../data/expenses-api';
 import { fieldMessage, type FieldErrors } from '../entry-editing/entry-fields';
 
-/** «Категория»: one expense category, required; disabled while the categories load. */
+/** «Категорія»: one expense category, required; disabled while the categories load. */
 export function CategoryField({
   value,
   onChange,
@@ -17,7 +17,7 @@ export function CategoryField({
   return (
     <TextField
       select
-      label="Категория"
+      label="Категорія"
       required
       value={value}
       disabled={categories.isPending}

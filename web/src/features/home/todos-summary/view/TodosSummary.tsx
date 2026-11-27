@@ -10,9 +10,9 @@ import { AssigneeCards } from './AssigneeCards';
 import { FocusList } from './FocusList';
 
 /**
- * «Дела» on the home page (FR-008): per assignee the active, overdue and due-today counts, done in the last week,
- * «На сегодня» (overdue, today's and urgent tasks, each ticks done in place; the card is shown only when there are
- * such tasks), and «Открыть дела».
+ * «Справи» on the home page (FR-008): per assignee the active, overdue and due-today counts, done in the last week,
+ * «На сьогодні» (overdue, today's and urgent tasks, each ticks done in place; the card is shown only when there are
+ * such tasks), and «Відкрити справи».
  */
 export function TodosSummary() {
   const { data, error, isPending, refetch } = useTodoSummary();
@@ -32,26 +32,26 @@ export function TodosSummary() {
           color="text.secondary"
           sx={{ fontVariantNumeric: 'tabular-nums' }}
         >
-          {data ? `Сделано за неделю: ${data.doneLast7Days}` : ' '}
+          {data ? `Зроблено за тиждень: ${data.doneLast7Days}` : ' '}
         </Typography>
         <Button component={Link} to="/todos">
-          Открыть дела
+          Відкрити справи
         </Button>
       </Box>
       {isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
-          <CircularProgress aria-label="Загружаю сводку" />
+          <CircularProgress aria-label="Завантажую зведення" />
         </Box>
       ) : error ? (
         <Alert
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить сводку: {error.message}
+          Не вдалося завантажити зведення: {error.message}
         </Alert>
       ) : (
         <>
@@ -76,10 +76,10 @@ export function TodosSummary() {
                   component="h2"
                   sx={{ fontWeight: 600 }}
                 >
-                  На сегодня
+                  На сьогодні
                 </Typography>
                 <Button component={Link} to="/todos?when=today" size="small">
-                  Все на сегодня
+                  Усі на сьогодні
                 </Button>
               </Box>
               <FocusList tasks={data.focus} today={data.today} />

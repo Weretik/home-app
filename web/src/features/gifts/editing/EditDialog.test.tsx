@@ -14,22 +14,22 @@ describe('EditDialog', () => {
     const onSubmit = vi.fn();
     wrap(
       <EditDialog
-        title="Новый подарок"
-        error="Слишком много изменений подряд."
+        title="Новий подарунок"
+        error="Забагато змін поспіль."
         isPending={false}
         onSubmit={onSubmit}
         onClose={vi.fn()}
       >
-        <input aria-label="Название" />
+        <input aria-label="Назва" />
       </EditDialog>,
     );
     expect(
-      screen.getByRole('dialog', { name: 'Новый подарок' }),
+      screen.getByRole('dialog', { name: 'Новий подарунок' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'Слишком много изменений подряд.',
+      'Забагато змін поспіль.',
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(onSubmit).toHaveBeenCalledOnce();
   });
 
@@ -39,17 +39,17 @@ describe('EditDialog', () => {
         {null}
       </EditDialog>,
     );
-    expect(screen.getByRole('button', { name: 'Сохраняю…' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Отмена' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Зберігаю…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Скасувати' })).toBeDisabled();
   });
 });
 
 describe('DeleteDialog', () => {
-  it('names the item and confirms with a red «Удалить»', async () => {
+  it('names the item and confirms with a red «Видалити»', async () => {
     const onConfirm = vi.fn();
     wrap(
       <DeleteDialog
-        title="Удалить подарок?"
+        title="Видалити подарунок?"
         summary="Серьги · Маша"
         isPending={false}
         onConfirm={onConfirm}
@@ -57,24 +57,24 @@ describe('DeleteDialog', () => {
       />,
     );
     expect(screen.getByText('Серьги · Маша')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Удалить' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Видалити' }));
     expect(onConfirm).toHaveBeenCalledOnce();
   });
 
   it('shows why a delete failed and locks while deleting', () => {
     wrap(
       <DeleteDialog
-        title="Удалить категорию?"
+        title="Видалити категорію?"
         summary="Книги"
-        error="Эта категория есть у подарков"
+        error="Ця категорія є в подарунків"
         isPending
         onConfirm={vi.fn()}
         onClose={vi.fn()}
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'Эта категория есть у подарков',
+      'Ця категорія є в подарунків',
     );
-    expect(screen.getByRole('button', { name: 'Удаляю…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Видаляю…' })).toBeDisabled();
   });
 });

@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Link, useLocation } from 'react-router-dom';
 import { pageUrl, settingsPath, shoppingPages } from './shopping-pages';
 
-/** Список / История tabs and the «Настройки» gear at their end (web ADR 0006). */
+/** Список / Історія tabs and the «Налаштування» gear at their end (web ADR 0006). */
 export function SectionTabs() {
   const { pathname } = useLocation();
   const current = pathname.replace(/\/$/, '');
@@ -27,7 +27,7 @@ export function SectionTabs() {
     >
       <Tabs
         component="nav"
-        aria-label="Страницы раздела"
+        aria-label="Сторінки розділу"
         value={active ? pageUrl(active) : false}
         variant="scrollable"
         scrollButtons="auto"
@@ -46,11 +46,11 @@ export function SectionTabs() {
           />
         ))}
       </Tabs>
-      <Tooltip title="Настройки">
+      <Tooltip title="Налаштування">
         <IconButton
           component={Link}
           to={settingsPath}
-          aria-label="Настройки"
+          aria-label="Налаштування"
           aria-current={onSettings ? 'page' : undefined}
           color={onSettings ? 'primary' : 'default'}
           sx={(theme) => ({

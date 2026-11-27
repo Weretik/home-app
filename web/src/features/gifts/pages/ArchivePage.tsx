@@ -6,7 +6,7 @@ import { ListStatus } from '../list-view/ListStatus';
 import { StatusSnackbar } from '../list-view/StatusSnackbar';
 import { useGiftList } from '../list-view/use-gift-list';
 
-/** «Подаренные»: gifted and dropped gifts per person, the latest gifted first; «Вернуть в список» moves one back. */
+/** «Подаровані»: gifted and dropped gifts per person, the latest gifted first; «Повернути до списку» moves one back. */
 export function ArchivePage() {
   const list = useGiftList(true);
   const { filterState } = list;
@@ -19,10 +19,10 @@ export function ArchivePage() {
         error={list.gifts.error}
         isEmpty={list.items.length === 0}
         isFiltered={filterState.isFiltered && list.all.length > 0}
-        loadingLabel="Загружаю подаренные"
+        loadingLabel="Завантажую подаровані"
         empty={{
-          title: 'Здесь появятся подаренные подарки',
-          hint: 'Отметьте подарок «Подарено» в списке, и он переедет сюда.',
+          title: 'Тут з’являться подаровані подарунки',
+          hint: 'Позначте подарунок «Подаровано» у списку, і він переїде сюди.',
         }}
         onRetry={() => void list.gifts.refetch()}
         onReset={filterState.clear}
@@ -30,7 +30,7 @@ export function ArchivePage() {
         <GiftRows
           items={list.items}
           variant="archive"
-          label="Подаренные подарки"
+          label="Подаровані подарунки"
           grouped={!filterState.filters.recipient}
           isChanging={list.isChanging}
           onStatus={list.changeStatus}

@@ -12,7 +12,7 @@ interface ItemFieldsProps {
   onChange: (values: ItemValues) => void;
 }
 
-/** Name, quantity, note, department and «Срочно» of an item, one per row. */
+/** Name, quantity, note, department and «Терміново» of an item, one per row. */
 export function ItemFields({
   values,
   errors,
@@ -27,7 +27,7 @@ export function ItemFields({
   return (
     <>
       <TextField
-        label="Название"
+        label="Назва"
         required
         value={values.name}
         onChange={(e) => set('name')(e.target.value)}
@@ -35,7 +35,7 @@ export function ItemFields({
         helperText={errors.name}
       />
       <TextField
-        label="Количество"
+        label="Кількість"
         placeholder="2, 300 г, 1 л"
         value={values.quantity}
         onChange={(e) => set('quantity')(e.target.value)}
@@ -43,17 +43,17 @@ export function ItemFields({
         helperText={errors.quantity}
       />
       <TextField
-        label="Заметка"
+        label="Нотатка"
         multiline
         minRows={2}
         value={values.note}
         onChange={(e) => set('note')(e.target.value)}
         error={!!errors.note}
-        helperText={errors.note ?? `До ${NOTE_MAX} символов`}
+        helperText={errors.note ?? `До ${NOTE_MAX} символів`}
       />
       <TextField
         select
-        label="Отдел"
+        label="Відділ"
         required
         value={
           departments.some((d) => d.id === values.departmentId)
@@ -63,7 +63,7 @@ export function ItemFields({
         onChange={(e) => set('departmentId')(e.target.value)}
         error={!!errors.departmentId}
         helperText={
-          errors.departmentId ?? 'Новый отдел запомнится для этого товара'
+          errors.departmentId ?? 'Новий відділ запам’ятається для цього товару'
         }
       >
         {departments.map((department) => (
@@ -80,7 +80,7 @@ export function ItemFields({
             color="secondary"
           />
         }
-        label="Срочно"
+        label="Терміново"
       />
     </>
   );

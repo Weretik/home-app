@@ -16,7 +16,7 @@ interface ItemDialogProps {
   onClose: () => void;
 }
 
-/** «Изменить товар» (R-6): saves with the item's version in If-Match; «Удалить» asks first. */
+/** «Змінити товар» (R-6): saves with the item's version in If-Match; «Видалити» asks first. */
 export function ItemDialog({ item, onClose }: ItemDialogProps) {
   const form = useCheckedForm(() => itemValues(item), checkItem);
   const [confirming, setConfirming] = useState(false);
@@ -35,12 +35,12 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
   if (confirming)
     return (
       <ConfirmDialog
-        title="Удалить из списка?"
+        title="Видалити зі списку?"
         summary={itemTitle(item)}
-        consequence="Товар уйдёт из списка, не попав в историю."
+        consequence="Товар зникне зі списку, не потрапивши в історію."
         error={
           remove.error
-            ? describeWriteError(remove.error, 'удалить').message
+            ? describeWriteError(remove.error, 'видалити').message
             : undefined
         }
         isPending={remove.isPending}
@@ -51,7 +51,7 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
 
   return (
     <FormDialog
-      title="Изменить товар"
+      title="Змінити товар"
       error={form.message}
       isPending={update.isPending}
       onSubmit={save}
@@ -62,7 +62,7 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
           onClick={() => setConfirming(true)}
           disabled={update.isPending}
         >
-          Удалить
+          Видалити
         </Button>
       }
     >

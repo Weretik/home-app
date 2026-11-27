@@ -14,9 +14,9 @@ internal sealed class AddItemsValidator : AbstractValidator<AddItemsCommand>
         RuleFor(c => c.IdempotencyKey).NotEmpty().MaximumLength(CreateRequest.MaxKeyLength);
         RuleFor(c => c.Text).NotEmpty().MaximumLength(MaxTextLength);
         RuleFor(c => c.Text)
-            .Must(text => ItemTextParser.Parse(text).Count > 0).WithMessage("The text holds no item.")
+            .Must(text => ItemTextParser.Parse(text).Count > 0).WithMessage("У тексті немає жодного товару.")
             .Must(text => ItemTextParser.Parse(text).Count <= ShoppingItem.MaxItemsPerAdd)
-            .WithMessage($"At most {ShoppingItem.MaxItemsPerAdd} items can be added at once.")
+            .WithMessage($"За раз можна додати не більше {ShoppingItem.MaxItemsPerAdd} товарів.")
             .When(c => !string.IsNullOrWhiteSpace(c.Text) && c.Text.Length <= MaxTextLength);
         RuleFor(c => c.AddedBy).IsInEnum();
         RuleFor(c => c.DepartmentId).NotEqual(Guid.Empty);

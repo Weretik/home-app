@@ -28,14 +28,14 @@ export function TaskFilters({
   return (
     <Box
       role="group"
-      aria-label="Фильтры"
+      aria-label="Фільтри"
       sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}
     >
       <WhoChips value={filters.who} onChange={state.setWho} />
       <TextField
         select
         size="small"
-        label="Категория"
+        label="Категорія"
         value={known ? (filters.category ?? '') : ''}
         disabled={categories.isPending}
         onChange={(event) => state.setCategory(event.target.value || undefined)}
@@ -45,8 +45,8 @@ export function TaskFilters({
           inputLabel: { shrink: true },
         }}
       >
-        <MenuItem value="">Все</MenuItem>
-        <MenuItem value="none">Без категории</MenuItem>
+        <MenuItem value="">Усі</MenuItem>
+        <MenuItem value="none">Без категорії</MenuItem>
         {options.map((category) => (
           <MenuItem key={category.id} value={category.id}>
             {categoryLabel(category)}

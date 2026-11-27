@@ -10,8 +10,8 @@ import { usePeriodParam } from '../url-state/use-period-param';
 const payers = Object.keys(payerLabels) as Payer[];
 
 /**
- * Which expenses «Расходы» shows, all from the URL: the open month, or a period of days when «Период» is on, with the
- * category and «Кто» filters. A wrong period loads nothing and says why (`periodProblem`).
+ * Which expenses «Витрати» shows, all from the URL: the open month, or a period of days when «Період» is on, with the
+ * category and «Хто» filters. A wrong period loads nothing and says why (`periodProblem`).
  */
 export function useShownExpenses() {
   const [month] = useMonthParam();
@@ -38,7 +38,7 @@ export function useShownExpenses() {
     },
     isFiltered: Boolean(categoryId || payer),
     clearFilters,
-    listLabel: periodParam.active ? 'Расходы за период' : 'Расходы за месяц',
+    listLabel: periodParam.active ? 'Витрати за період' : 'Витрати за місяць',
     /** The date a new expense starts with: today when it is in the shown days, else their first day. */
     newDate: defaultDateIn(period ?? monthDays(month)),
   };

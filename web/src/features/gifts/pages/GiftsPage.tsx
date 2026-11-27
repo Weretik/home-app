@@ -8,7 +8,7 @@ import { ListStatus } from '../list-view/ListStatus';
 import { StatusSnackbar } from '../list-view/StatusSnackbar';
 import { useGiftList } from '../list-view/use-gift-list';
 
-/** «Список»: the wanted gifts in a block per person unless one is picked; «Подарено» moves a gift to «Подаренные». */
+/** «Список»: the wanted gifts in a block per person unless one is picked; «Подаровано» moves a gift to «Подаровані». */
 export function GiftsPage() {
   const list = useGiftList(false);
   const { filterState } = list;
@@ -24,7 +24,7 @@ export function GiftsPage() {
             startIcon={<AddOutlinedIcon />}
             onClick={list.add}
           >
-            Добавить подарок
+            Додати подарунок
           </Button>
         }
       />
@@ -33,10 +33,10 @@ export function GiftsPage() {
         error={list.gifts.error}
         isEmpty={list.items.length === 0}
         isFiltered={filterState.isFiltered && list.all.length > 0}
-        loadingLabel="Загружаю список подарков"
+        loadingLabel="Завантажую список подарунків"
         empty={{
-          title: 'Список желаний пуст',
-          hint: 'Добавьте первый подарок: для кого, что и, если знаете, ссылку и цену.',
+          title: 'Список бажань порожній',
+          hint: 'Додайте перший подарунок: для кого, що і, якщо знаєте, посилання та ціну.',
         }}
         onRetry={() => void list.gifts.refetch()}
         onReset={filterState.clear}
@@ -44,7 +44,7 @@ export function GiftsPage() {
         <GiftRows
           items={list.items}
           variant="active"
-          label="Список подарков"
+          label="Список подарунків"
           grouped={!filterState.filters.recipient}
           isChanging={list.isChanging}
           onStatus={list.changeStatus}

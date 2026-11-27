@@ -6,24 +6,24 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { useSystemStatus } from './status-api';
 
-const checkNames: Record<string, string> = { database: 'База данных' };
+const checkNames: Record<string, string> = { database: 'База даних' };
 
 /** The API's answer: its status, environment and version, and each dependency's check; loading and error states. */
 export function StatusDetails() {
   const { data, error, isPending } = useSystemStatus();
 
-  if (isPending) return <CircularProgress aria-label="Проверяю API" />;
+  if (isPending) return <CircularProgress aria-label="Перевіряю API" />;
   if (error)
-    return <Alert severity="error">API недоступен: {error.message}</Alert>;
+    return <Alert severity="error">API недоступний: {error.message}</Alert>;
 
   const checks = Object.entries(data.checks);
   return (
-    <section aria-label="Состояние API">
+    <section aria-label="Стан API">
       <Alert severity={data.status === 'Healthy' ? 'success' : 'warning'}>
         API: <strong>{data.status}</strong>
       </Alert>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        {data.environment}, версия {data.version}
+        {data.environment}, версія {data.version}
       </Typography>
       {checks.length > 0 && (
         <List dense>

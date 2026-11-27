@@ -9,7 +9,7 @@ interface LoadMoreButtonProps {
   onClick: () => void;
 }
 
-/** «Показать ещё» under a list that has more pages; says how many rows are shown. */
+/** «Показати ще» under a list that has more pages; says how many rows are shown. */
 export function LoadMoreButton({
   shown,
   total,
@@ -33,10 +33,10 @@ export function LoadMoreButton({
         color="text.secondary"
         sx={{ fontVariantNumeric: 'tabular-nums' }}
       >
-        Показано {shown} из {total}
+        Показано {shown} з {total}
       </Typography>
       <Button variant="outlined" onClick={onClick} disabled={isLoading}>
-        {isLoading ? 'Загружаю…' : 'Показать ещё'}
+        {isLoading ? 'Завантажую…' : 'Показати ще'}
       </Button>
     </Box>
   );

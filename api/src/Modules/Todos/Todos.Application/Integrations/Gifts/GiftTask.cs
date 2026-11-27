@@ -10,14 +10,14 @@ public static class GiftTask
     /// <summary>The seeded category «🛍️ Покупки» (Todos CategorySeed); a deleted category leaves the task without one.</summary>
     public static readonly Guid ShoppingCategoryId = new("0193b6a0-0000-7000-8000-000000000070");
 
-    private const string Prefix = "🎁 Купить подарок: ";
+    private const string Prefix = "🎁 Купити подарунок: ";
 
     public static string Title(string giftName, GiftParty recipient)
     {
         var suffix = recipient switch
         {
-            GiftParty.Maria => " (для Маши)",
-            GiftParty.Vitaliy => " (для Виталия)",
+            GiftParty.Maria => " (для Маші)",
+            GiftParty.Vitaliy => " (для Віталія)",
             _ => string.Empty,
         };
         var room = TodoTask.MaxTitleLength - Prefix.Length - suffix.Length;
@@ -27,7 +27,7 @@ public static class GiftTask
         return Prefix + name + suffix;
     }
 
-    public static string Notes(string link) => $"Подарок на сайте: {link}";
+    public static string Notes(string link) => $"Подарунок на сайті: {link}";
 
     public static Assignee AssigneeOf(GiftParty giver) => giver switch
     {

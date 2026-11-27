@@ -14,17 +14,17 @@ describe('gifts summary formatting', () => {
   });
 
   it('never shows an unknown price as zero', () => {
-    expect(formatPrice(null)).toBe('цена не указана');
+    expect(formatPrice(null)).toBe('ціну не вказано');
     expect(plain(formatPrice(1234.5))).toBe('1 234,50 ₴');
   });
 
   it('shows a contract date as a calendar day', () => {
-    expect(formatDay('2027-03-12')).toBe('12 марта 2027');
+    expect(formatDay('2027-03-12')).toBe('12 березня 2027');
   });
 
-  it('declines «желание»', () => {
-    expect(formatWishes(1)).toBe('1 желание');
-    expect(formatWishes(3)).toBe('3 желания');
-    expect(formatWishes(12)).toBe('12 желаний');
+  it('declines «бажання»', () => {
+    expect(formatWishes(1)).toBe('1 бажання');
+    expect(formatWishes(3)).toBe('3 бажання');
+    expect(formatWishes(12)).toBe('12 бажань');
   });
 });

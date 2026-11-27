@@ -4,11 +4,11 @@ import { audienceLabels, deliveryTitle, formatKyivTime } from '../data/labels';
 import type { NotificationsStatus } from '../data/notifications-api';
 import { InfoCard } from './InfoCard';
 
-/** «Последние отправки» (FR-006): what was planned, to whom, and whether it went out; hidden when there is nothing. */
+/** «Останні надсилання» (FR-006): what was planned, to whom, and whether it went out; hidden when there is nothing. */
 export function DeliveriesCard({ status }: { status: NotificationsStatus }) {
   if (status.deliveries.length === 0) return null;
   return (
-    <InfoCard title="Последние отправки">
+    <InfoCard title="Останні надсилання">
       <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {status.deliveries.map((delivery, index) => (
           <Box
@@ -39,8 +39,8 @@ export function DeliveriesCard({ status }: { status: NotificationsStatus }) {
               sx={{ alignSelf: 'center' }}
             >
               {delivery.sentAtUtc
-                ? `отправлено ${formatKyivTime(delivery.sentAtUtc)}`
-                : 'в очереди'}
+                ? `надіслано ${formatKyivTime(delivery.sentAtUtc)}`
+                : 'у черзі'}
             </Typography>
           </Box>
         ))}

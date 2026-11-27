@@ -16,7 +16,7 @@ export function useCategories() {
   });
 }
 
-/** «🏠 Дом», or the bare name without an emoji. */
+/** «🏠 Дім», or the bare name without an emoji. */
 export const categoryLabel = (category: {
   name: string;
   emoji?: string | null;

@@ -12,7 +12,7 @@ export function BottomNav() {
   return (
     <Paper
       component="nav"
-      aria-label="Разделы"
+      aria-label="Розділи"
       square
       sx={(theme) => ({
         display: { xs: 'block', md: 'none' },

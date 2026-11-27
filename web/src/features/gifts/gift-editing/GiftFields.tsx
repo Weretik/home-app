@@ -53,14 +53,14 @@ export function GiftFields({
         ))}
       </TextField>
       <TextField
-        label="Название"
+        label="Назва"
         value={values.name}
         onChange={(event) => set('name', event.target.value)}
         {...field('name')}
       />
       <TextField
         select
-        label="Категория"
+        label="Категорія"
         value={values.categoryId}
         onChange={(event) => set('categoryId', event.target.value)}
         {...field('categoryId')}
@@ -73,7 +73,7 @@ export function GiftFields({
       </TextField>
       <TextField
         select
-        label="Приоритет"
+        label="Пріоритет"
         value={values.priority}
         onChange={(event) =>
           set('priority', event.target.value as GiftPriority)
@@ -86,13 +86,13 @@ export function GiftFields({
         ))}
       </TextField>
       <PriceField
-        label="Цена (если известна)"
+        label="Ціна (якщо відома)"
         value={values.price}
         error={errors.price}
         onChange={(price) => set('price', price)}
       />
       <TextField
-        label="Ссылка"
+        label="Посилання"
         value={values.link}
         onChange={(event) => set('link', event.target.value)}
         slotProps={{ htmlInput: { inputMode: 'url' } }}

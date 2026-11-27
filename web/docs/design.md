@@ -41,7 +41,7 @@ second colour. Colours and mood only: no game art, logos or fonts.
   (Cyrillic and Latin subsets), imported in `src/main.tsx`; no font CDN.
 - A page title is `<Typography variant="h4" component="h1">`; a card title is `subtitle1` with weight 600 as `h2`.
 - Numbers that line up (amounts, counts) use `fontVariantNumeric: 'tabular-nums'`.
-- UI text is Russian, written plainly; buttons say what they do («Добавить», «Сохранить»).
+- UI text is Ukrainian ([glossary](specs/platform/001-ukrainian-interface/glossary.md)), written plainly; buttons say what they do («Додати», «Зберегти»).
 
 ## Layout (the shell)
 

@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import { CategoriesCard } from './CategoriesCard';
 import { DetailsCard } from './DetailsCard';
 
-/** «Настройки» of the Gifts section (the gear next to the tabs): the «нюансы» and the categories. */
+/** «Налаштування» of the Gifts section (the gear next to the tabs): the «нюанси» and the categories. */
 export function GiftSettingsPage() {
   return (
     <Box

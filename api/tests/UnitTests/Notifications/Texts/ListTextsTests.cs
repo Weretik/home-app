@@ -18,8 +18,8 @@ public sealed class ListTextsTests
             "https://web.example/shopping")!;
 
         Assert.Equal(
-            "🛒 <b>В списке покупок: 3</b>\n\n🥛 <b>Молочное</b>\n• ❗ Молоко — 2 л\n• Сыр\n\n🍞 <b>Выпечка</b>\n• Хлеб\n\n"
-            + "<a href=\"https://web.example/shopping\">Открыть список</a>",
+            "🛒 <b>У списку покупок: 3</b>\n\n🥛 <b>Молочное</b>\n• ❗ Молоко — 2 л\n• Сыр\n\n🍞 <b>Выпечка</b>\n• Хлеб\n\n"
+            + "<a href=\"https://web.example/shopping\">Відкрити список</a>",
             text);
         Assert.Null(ShoppingText.For([], "u"));
     }
@@ -30,10 +30,10 @@ public sealed class ListTextsTests
         var gift = new GiftPurchase(Guid.NewGuid(), "Кольцо", GiftParty.Maria, GiftParty.Vitaliy, new DateOnly(2026, 12, 20), "https://web.example/gifts?gift=1");
 
         Assert.Equal(
-            "🎁 <b>Пора купить подарок</b>\nКольцо (для: Маша)\nКупить до 20.12 — через 14 дн.\n"
-            + "<a href=\"https://web.example/gifts?gift=1\">Открыть подарок</a>",
+            "🎁 <b>Час купити подарунок</b>\nКольцо (для: Маша)\nКупити до 20.12 — через 14 дн.\n"
+            + "<a href=\"https://web.example/gifts?gift=1\">Відкрити подарунок</a>",
             GiftReminderText.For(gift, new DateOnly(2026, 12, 6)));
         Assert.Contains("— завтра", GiftReminderText.For(gift, new DateOnly(2026, 12, 19)));
-        Assert.Contains("— сегодня", GiftReminderText.For(gift, new DateOnly(2026, 12, 20)));
+        Assert.Contains("— сьогодні", GiftReminderText.For(gift, new DateOnly(2026, 12, 20)));
     }
 }

@@ -63,7 +63,7 @@ export function applyFilters<T extends Filterable>(
   );
 }
 
-/** The items per recipient (Маша, Виталий, Вместе) with their price sum, server order kept; empty groups left out. */
+/** The items per recipient (Маша, Віталій, Разом) with their price sum, server order kept; empty groups left out. */
 export function groupByRecipient<T extends Filterable & Priced>(
   items: readonly T[],
 ): GiftGroup<T>[] {

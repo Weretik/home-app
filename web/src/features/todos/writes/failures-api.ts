@@ -19,8 +19,8 @@ export interface WriteFailure {
 
 /** How the messages name what was written: a task (with its steps) or a category. */
 const subjects = {
-  task: { changed: 'Задачу изменили', gone: 'Этой задачи уже нет' },
-  category: { changed: 'Категорию изменили', gone: 'Этой категории уже нет' },
+  task: { changed: 'Справу змінили', gone: 'Цієї справи вже немає' },
+  category: { changed: 'Категорію змінили', gone: 'Цієї категорії вже немає' },
 } as const;
 
 /**
@@ -29,18 +29,19 @@ const subjects = {
  */
 export function describeWriteError(
   error: Error,
-  action = 'сохранить',
+  action = 'зберегти',
   subject: keyof typeof subjects = 'task',
 ): WriteFailure {
   const words = subjects[subject];
   if (!(error instanceof ApiError))
     return {
-      message: 'Нет связи с сервером. Проверьте интернет и попробуйте снова.',
+      message:
+        'Немає зв’язку з сервером. Перевірте інтернет і спробуйте знову.',
       fieldErrors: {},
     };
   const fieldErrors = error.fieldErrors;
   const gone = {
-    message: `${words.gone}: её удалили в другом месте.`,
+    message: `${words.gone}: її видалили в іншому місці.`,
     fieldErrors,
   };
   // A category's own 404 is `todos.category_not_found` too, but nothing is left to choose there.
@@ -48,39 +49,42 @@ export function describeWriteError(
   switch (error.code) {
     case 'todos.changed_meanwhile':
       return {
-        message: `${words.changed} в другом месте — данные обновлены, проверьте и попробуйте снова.`,
+        message: `${words.changed} в іншому місці — дані оновлено, перевірте й спробуйте знову.`,
         fieldErrors,
       };
     case 'todos.category_not_found':
       return {
-        message: 'Этой категории уже нет: выберите другую.',
-        fieldErrors: { ...fieldErrors, categoryId: ['Категории уже нет'] },
+        message: 'Цієї категорії вже немає: виберіть іншу.',
+        fieldErrors: { ...fieldErrors, categoryId: ['Категорії вже немає'] },
       };
     case 'todos.category_name_taken':
       return {
-        message: 'Категория с таким названием уже есть.',
-        fieldErrors: { ...fieldErrors, name: ['Такое название уже есть'] },
+        message: 'Категорія з такою назвою вже є.',
+        fieldErrors: { ...fieldErrors, name: ['Така назва вже є'] },
       };
     case 'todos.step_not_found':
-      return { message: 'Этого шага уже нет: список обновлён.', fieldErrors };
+      return {
+        message: 'Цього кроку вже немає: список оновлено.',
+        fieldErrors,
+      };
     case 'todos.too_many_steps':
-      return { message: 'В задаче не больше 50 шагов.', fieldErrors };
+      return { message: 'У справі не більше 50 кроків.', fieldErrors };
   }
   if (error.status === 404) return gone;
   if (error.status === 409)
     return {
-      message: 'Это уже отправляли с другими данными. Попробуйте ещё раз.',
+      message: 'Це вже надсилали з іншими даними. Спробуйте ще раз.',
       fieldErrors,
       renewKey: true,
     };
   if (error.status === 429)
     return {
-      message: 'Слишком много изменений подряд. Подождите минуту и повторите.',
+      message: 'Забагато змін поспіль. Зачекайте хвилину й повторіть.',
       fieldErrors,
     };
   if (error.status === 400)
-    return { message: `Проверьте поля: ${error.message}`, fieldErrors };
-  return { message: `Не удалось ${action}: ${error.message}`, fieldErrors };
+    return { message: `Перевірте поля: ${error.message}`, fieldErrors };
+  return { message: `Не вдалося ${action}: ${error.message}`, fieldErrors };
 }
 
 /** The first message of each field the API rejected, for the form's fields. */

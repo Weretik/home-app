@@ -5,11 +5,11 @@ namespace Expenses.Domain.Planning;
 public static class PlannedExpenseErrors
 {
     public static readonly Error NameRequired =
-        Error.Validation("expenses.planned_name_required", "The planned expense needs a name.", "name");
+        Error.Validation("expenses.planned_name_required", "Запланованій витраті потрібна назва.", "name");
 
     public static readonly Error NameTooLong =
-        Error.Validation("expenses.planned_name_too_long", $"The name is longer than {PlannedExpense.MaxNameLength} characters.", "name");
+        Error.Validation("expenses.planned_name_too_long", $"Назва задовга: не більше {PlannedExpense.MaxNameLength} символів.", "name");
 
     public static readonly Error MonthInvalid =
-        Error.Validation("expenses.planned_month_invalid", "A plan belongs to a month: the first day of a month between 2000 and 2100.", "month");
+        Error.Validation("expenses.planned_month_invalid", "План належить до місяця: перший день місяця між 2000 і 2100 роками.", "month");
 }

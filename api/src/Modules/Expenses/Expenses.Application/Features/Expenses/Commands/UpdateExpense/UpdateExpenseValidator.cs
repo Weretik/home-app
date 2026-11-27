@@ -8,7 +8,7 @@ internal sealed class UpdateExpenseValidator : AbstractValidator<UpdateExpenseCo
     public UpdateExpenseValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the entry you edited in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію зміненого запису у заголовку If-Match.");
         RuleFor(c => c.Payer).IsInEnum();
         RuleFor(c => c.CategoryId).NotEmpty();
         RuleFor(c => c.Amount).GreaterThan(0);

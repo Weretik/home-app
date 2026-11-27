@@ -1,5 +1,6 @@
 import type { TodoCategoryItem } from '../data/categories-api';
 import type { TodoCategoryRequest } from '../writes/category-writes-api';
+import { locale } from '../../../platform/locale';
 
 /** The API limits (R-011). */
 export const MAX_NAME = 50;
@@ -21,13 +22,13 @@ export function validateCategory(
   return {
     name:
       name === ''
-        ? 'Введите название'
+        ? 'Введіть назву'
         : name.length > MAX_NAME
-          ? `Название не длиннее ${MAX_NAME} символов`
+          ? `Назва не довша за ${MAX_NAME} символів`
           : undefined,
     emoji:
       values.emoji.trim().length > MAX_EMOJI
-        ? `Не больше ${MAX_EMOJI} символов`
+        ? `Не більше ${MAX_EMOJI} символів`
         : undefined,
   };
 }
@@ -39,14 +40,14 @@ export function toCategoryRequest(
   return { name: values.name.trim(), emoji: emoji === '' ? null : emoji };
 }
 
-/** «нет активных задач», «1 активная задача», «3 активные задачи», «5 активных задач». */
+/** «немає активних справ», «1 активна справа», «3 активні справи», «5 активних справ». */
 export function formatActiveCount(count: number): string {
-  if (count === 0) return 'нет активных задач';
+  if (count === 0) return 'немає активних справ';
   const forms = {
-    one: 'активная задача',
-    few: 'активные задачи',
-    many: 'активных задач',
+    one: 'активна справа',
+    few: 'активні справи',
+    many: 'активних справ',
   } as const;
-  const rule = new Intl.PluralRules('ru-RU').select(count);
+  const rule = new Intl.PluralRules(locale).select(count);
   return `${count} ${forms[rule as keyof typeof forms] ?? forms.many}`;
 }

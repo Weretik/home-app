@@ -5,9 +5,9 @@ import { audienceLabels, deliveryTitle, formatKyivTime } from './labels';
 describe('audienceLabels', () => {
   it('names every chat in Russian', () => {
     expect(audienceLabels).toEqual({
-      Vitaliy: 'Виталий',
+      Vitaliy: 'Віталій',
       Maria: 'Маша',
-      Family: 'Семейная группа',
+      Family: 'Сімейна група',
     });
   });
 });
@@ -16,13 +16,13 @@ describe('deliveryTitle', () => {
   const schedule: NotificationScheduleItem[] = [
     {
       kind: 'TodosMorning',
-      title: 'Утренние дела',
-      when: 'каждый день в 8:00',
+      title: 'Ранкові справи',
+      when: 'щодня о 8:00',
     },
   ];
 
   it('takes the title from the schedule, else the kind', () => {
-    expect(deliveryTitle('TodosMorning', schedule)).toBe('Утренние дела');
+    expect(deliveryTitle('TodosMorning', schedule)).toBe('Ранкові справи');
     expect(deliveryTitle('ExpensesWeek', schedule)).toBe('ExpensesWeek');
   });
 });

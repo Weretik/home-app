@@ -9,7 +9,7 @@ function useRefresh() {
     void queryClient.invalidateQueries({ queryKey: notificationsKeys.all });
 }
 
-/** «Отвязать»: forgets the chat of a person or the family group (`unlinkNotificationsChat`). */
+/** «Відв’язати»: forgets the chat of a person or the family group (`unlinkNotificationsChat`). */
 export function useUnlinkChat() {
   const refresh = useRefresh();
   return useMutation({
@@ -24,7 +24,7 @@ export function useUnlinkChat() {
 }
 
 /**
- * «Тест»: the API sends «✅ Бот на связи» to a linked chat at once (`sendNotificationsTest`). Nothing is stored, so no
+ * «Тест»: the API sends «✅ Бот на зв’язку» to a linked chat at once (`sendNotificationsTest`). Nothing is stored, so no
  * Idempotency-Key: a repeat only sends one more test message (backend SDD notifications 001, "Contract").
  */
 export function useSendTest() {

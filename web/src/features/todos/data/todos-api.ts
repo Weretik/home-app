@@ -40,7 +40,7 @@ export interface TaskQuery {
 export const nextPage = (last: TodoTaskList) =>
   last.page * last.pageSize < last.totalCount ? last.page + 1 : undefined;
 
-/** Active tasks or the archive, page by page («Показать ещё»), in the API's order (R-012). */
+/** Active tasks or the archive, page by page («Показати ще»), in the API's order (R-012). */
 export function useTasks(view: TaskView, query: TaskQuery) {
   return useInfiniteQuery({
     queryKey: [...tasksKey, view, query],

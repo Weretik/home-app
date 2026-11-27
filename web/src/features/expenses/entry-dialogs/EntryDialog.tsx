@@ -16,9 +16,9 @@ interface EntryDialogProps {
   isPending: boolean;
   onSubmit: () => void;
   onClose: () => void;
-  /** The submit button: «Сохранить» by default. */
+  /** The submit button: «Зберегти» by default. */
   submitLabel?: string;
-  /** The submit button while saving: «Сохраняю…» by default. */
+  /** The submit button while saving: «Зберігаю…» by default. */
   pendingLabel?: string;
   children: ReactNode;
 }
@@ -30,8 +30,8 @@ export function EntryDialog({
   isPending,
   onSubmit,
   onClose,
-  submitLabel = 'Сохранить',
-  pendingLabel = 'Сохраняю…',
+  submitLabel = 'Зберегти',
+  pendingLabel = 'Зберігаю…',
   children,
 }: EntryDialogProps) {
   const titleId = useId();
@@ -71,7 +71,7 @@ export function EntryDialog({
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose} disabled={isPending}>
-            Отмена
+            Скасувати
           </Button>
           <Button type="submit" variant="contained" disabled={isPending}>
             {isPending ? pendingLabel : submitLabel}

@@ -12,7 +12,7 @@ import {
   type Month,
 } from '../data/month';
 
-/** Previous / next month arrows around the month name; «К текущему» when another month is open. */
+/** Previous / next month arrows around the month name; «До поточного» when another month is open. */
 export function MonthPicker({
   month,
   onChange,
@@ -26,12 +26,12 @@ export function MonthPicker({
   return (
     <Box
       role="group"
-      aria-label="Месяц"
+      aria-label="Місяць"
       sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}
     >
-      <Tooltip title="Предыдущий месяц">
+      <Tooltip title="Попередній місяць">
         <IconButton
-          aria-label="Предыдущий месяц"
+          aria-label="Попередній місяць"
           onClick={() => onChange(shiftMonth(month, -1))}
         >
           <ChevronLeftOutlinedIcon />
@@ -48,9 +48,9 @@ export function MonthPicker({
       >
         {formatMonth(month)}
       </Typography>
-      <Tooltip title="Следующий месяц">
+      <Tooltip title="Наступний місяць">
         <IconButton
-          aria-label="Следующий месяц"
+          aria-label="Наступний місяць"
           onClick={() => onChange(shiftMonth(month, 1))}
         >
           <ChevronRightOutlinedIcon />
@@ -58,7 +58,7 @@ export function MonthPicker({
       </Tooltip>
       {!isCurrent && (
         <Button size="small" onClick={() => onChange(today)}>
-          К текущему
+          До поточного
         </Button>
       )}
     </Box>

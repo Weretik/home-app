@@ -145,23 +145,23 @@ test('shows done and cancelled tasks with their completion and pages them', asyn
         }),
   );
 
-  const list = await screen.findByRole('list', { name: 'Сегодня' });
-  expect(list).toHaveTextContent('Сделано');
+  const list = await screen.findByRole('list', { name: 'Сьогодні' });
+  expect(list).toHaveTextContent('Зроблено');
   expect(lists()[0]!.url.searchParams.get('view')).toBe('archive');
-  expect(screen.getByRole('tab', { name: 'Задачи' })).toHaveAttribute(
+  expect(screen.getByRole('tab', { name: 'Справи' })).toHaveAttribute(
     'href',
     '/todos',
   );
 
-  await userEvent.click(screen.getByRole('button', { name: 'Показать ещё' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Показати ще' }));
 
   expect(await screen.findByText('Старый план')).toBeInTheDocument();
-  const older = screen.getByRole('list', { name: /5 января/ });
-  expect(older).toHaveTextContent('Не актуально');
+  const older = screen.getByRole('list', { name: /5 січня/ });
+  expect(older).toHaveTextContent('Неактуально');
   expect(lists().at(-1)!.url.searchParams.get('page')).toBe('2');
 });
 
-test('returns a task to the active list with «Вернуть»', async () => {
+test('returns a task to the active list with «Повернути»', async () => {
   const item = archived({ title: 'Приклеить деревяшки', version: 4 });
   let returned = false;
   const { writes } = renderPage((s) => {
@@ -171,44 +171,44 @@ test('returns a task to the active list with «Вернуть»', async () => {
     }
     return json(page(returned ? [] : [item]));
   }, '/todos/archive?who=maria');
-  await screen.findByRole('list', { name: 'Сегодня' });
-  expect(screen.getByRole('tab', { name: 'Задачи' })).toHaveAttribute(
+  await screen.findByRole('list', { name: 'Сьогодні' });
+  expect(screen.getByRole('tab', { name: 'Справи' })).toHaveAttribute(
     'href',
     '/todos?who=maria',
   );
 
   await userEvent.click(
-    screen.getByRole('button', { name: 'Вернуть: Приклеить деревяшки' }),
+    screen.getByRole('button', { name: 'Повернути: Приклеить деревяшки' }),
   );
 
   expect(
-    await screen.findByText('Вернули в задачи: Приклеить деревяшки'),
+    await screen.findByText('Повернули до справ: Приклеить деревяшки'),
   ).toBeInTheDocument();
   const [put] = writes();
   expect(put!.url.pathname).toBe(`/api/todos/tasks/${item.id}/status`);
   expect(put!.headers.get('If-Match')).toBe('4');
   expect(put!.body).toEqual({ status: 'Todo' });
   expect(
-    await screen.findByText('С этим фильтром задач нет'),
+    await screen.findByText('З цим фільтром справ немає'),
   ).toBeInTheDocument();
 });
 
 test('says the archive is empty', async () => {
   renderPage(() => json(page([])));
 
-  expect(await screen.findByText('Архив пуст')).toBeInTheDocument();
+  expect(await screen.findByText('Архів порожній')).toBeInTheDocument();
 });
 
 test('filters the archive by the day of completion', async () => {
   const { lists } = renderPage(() =>
     json(page([archived({ title: 'Позвонить' })])),
   );
-  await screen.findByRole('list', { name: 'Сегодня' });
+  await screen.findByRole('list', { name: 'Сьогодні' });
 
   await userEvent.click(
-    screen.getByRole('combobox', { name: 'Когда сделано' }),
+    screen.getByRole('combobox', { name: 'Коли зроблено' }),
   );
-  await userEvent.click(screen.getByRole('option', { name: 'Вчера' }));
+  await userEvent.click(screen.getByRole('option', { name: 'Вчора' }));
 
   await vi.waitFor(() => {
     const query = lists().at(-1)!.url.searchParams;

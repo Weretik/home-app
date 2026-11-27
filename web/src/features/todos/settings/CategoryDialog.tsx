@@ -31,7 +31,7 @@ export function CategoryDialog({
     {},
   );
   const failure = save.error
-    ? describeWriteError(save.error, 'сохранить', 'category')
+    ? describeWriteError(save.error, 'зберегти', 'category')
     : undefined;
   const errors = { ...firstMessages(failure), ...stripEmpty(checked) };
 
@@ -69,7 +69,7 @@ export function CategoryDialog({
     >
       <Box component="form" noValidate onSubmit={submit}>
         <DialogTitle id={titleId}>
-          {item ? 'Изменить категорию' : 'Новая категория'}
+          {item ? 'Змінити категорію' : 'Нова категорія'}
         </DialogTitle>
         <DialogContent
           sx={{
@@ -79,20 +79,20 @@ export function CategoryDialog({
           }}
         >
           {failure && <Alert severity="error">{failure.message}</Alert>}
-          <TextField label="Название" required {...field('name')} />
+          <TextField label="Назва" required {...field('name')} />
           <TextField
-            label="Эмодзи"
+            label="Емодзі"
             placeholder="🏠"
             {...field('emoji')}
-            helperText={errors.emoji ?? 'Необязательно, например 🏠'}
+            helperText={errors.emoji ?? 'Необов’язково, наприклад 🏠'}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose} disabled={save.isPending}>
-            Отмена
+            Скасувати
           </Button>
           <Button type="submit" variant="contained" disabled={save.isPending}>
-            {save.isPending ? 'Сохраняю…' : 'Сохранить'}
+            {save.isPending ? 'Зберігаю…' : 'Зберегти'}
           </Button>
         </DialogActions>
       </Box>

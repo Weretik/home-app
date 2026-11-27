@@ -1,11 +1,13 @@
-const whole = new Intl.NumberFormat('ru-RU', {
+import { locale } from '../../../../platform/locale';
+
+const whole = new Intl.NumberFormat(locale, {
   style: 'currency',
   currency: 'UAH',
   currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
-const exact = new Intl.NumberFormat('ru-RU', {
+const exact = new Intl.NumberFormat(locale, {
   style: 'currency',
   currency: 'UAH',
   currencyDisplay: 'narrowSymbol',
@@ -29,7 +31,7 @@ export const percentOf = (part: number, total: number) =>
 
 /**
  * How much of the savings goal the jar holds, in whole percent rounded down (100 only once the goal is reached), never
- * below 0, 0 without a goal. The same rule as `goalPercent` of «План копилки» on «Копилка»
+ * below 0, 0 without a goal. The same rule as `goalPercent` of «План скарбнички» on «Скарбничка»
  * (`expenses/savings-goal/goal-progress.ts`); features never import each other, so both sides test the same cases.
  */
 export const goalPercentOf = (balance: number, goal: number) =>

@@ -41,26 +41,26 @@ export function amountText(value: number): string {
 }
 
 export function amountError(text: string): string | undefined {
-  if (text.trim() === '') return 'Введите сумму';
+  if (text.trim() === '') return 'Введіть суму';
   const value = parseAmount(text);
   if (value === undefined)
-    return 'Сумма — число, не больше двух знаков после запятой';
-  if (value <= 0) return 'Сумма больше нуля';
-  if (value > MAX_AMOUNT) return 'Слишком большая сумма';
+    return 'Сума — число, не більше двох знаків після коми';
+  if (value <= 0) return 'Сума має бути більшою за нуль';
+  if (value > MAX_AMOUNT) return 'Завелика сума';
   return undefined;
 }
 
 export function dateError(text: string): string | undefined {
-  if (!text) return 'Выберите дату';
+  if (!text) return 'Виберіть дату';
   const year = Number(text.slice(0, 4));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(text) || year < 2000 || year > 2100)
-    return 'Дата между 2000 и 2100 годом';
+    return 'Дата між 2000 і 2100 роком';
   return undefined;
 }
 
 export function commentError(text: string): string | undefined {
   return text.length > MAX_COMMENT
-    ? `Не длиннее ${MAX_COMMENT} символов`
+    ? `Не довше ${MAX_COMMENT} символів`
     : undefined;
 }
 

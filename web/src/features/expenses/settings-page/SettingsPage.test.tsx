@@ -101,36 +101,38 @@ test('shows the monthly limit, the savings goal and the limits', async () => {
   renderSettings();
 
   expect(
-    await screen.findByLabelText('Общий лимит расходов в месяц'),
+    await screen.findByLabelText('Загальний ліміт витрат на місяць'),
   ).toHaveValue('50000');
-  expect(screen.getByLabelText('План копилки')).toHaveValue('100000');
-  const list = screen.getByRole('list', { name: 'Лимиты' });
+  expect(screen.getByLabelText('План скарбнички')).toHaveValue('100000');
+  const list = screen.getByRole('list', { name: 'Ліміти' });
   const rows = within(list).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
   expect(rows[0]).toHaveTextContent('Еда и быт');
-  expect(rows[0]).toHaveTextContent('в месяц');
+  expect(rows[0]).toHaveTextContent('на місяць');
   expect(await within(rows[0]!).findByText('Продукты')).toBeInTheDocument();
   expect(within(rows[0]!).getByText('Быт')).toBeInTheDocument();
-  expect(rows[1]).toHaveTextContent('в квартал');
+  expect(rows[1]).toHaveTextContent('на квартал');
 
   expect(
-    screen.queryByRole('group', { name: 'Месяц' }),
+    screen.queryByRole('group', { name: 'Місяць' }),
   ).not.toBeInTheDocument();
-  const gear = screen.getByRole('link', { name: 'Настройки' });
+  const gear = screen.getByRole('link', { name: 'Налаштування' });
   expect(gear).toHaveAttribute('aria-current', 'page');
   expect(gear).toHaveAttribute('href', '/expenses/settings?year=2026&month=10');
 });
 
 test('saves the limit and the goal with the version in If-Match', async () => {
   const { writes } = renderSettings();
-  const goal = await screen.findByLabelText('План копилки');
+  const goal = await screen.findByLabelText('План скарбнички');
 
   await userEvent.clear(goal);
   await userEvent.type(goal, '120 000');
-  await userEvent.clear(screen.getByLabelText('Общий лимит расходов в месяц'));
-  await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+  await userEvent.clear(
+    screen.getByLabelText('Загальний ліміт витрат на місяць'),
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
-  expect(await screen.findByText('Сохранено')).toBeInTheDocument();
+  expect(await screen.findByText('Збережено')).toBeInTheDocument();
   const [put] = writes();
   expect(put!.method).toBe('PUT');
   expect(put!.url.pathname).toBe('/api/expenses/budget/settings');
@@ -140,46 +142,46 @@ test('saves the limit and the goal with the version in If-Match', async () => {
 
 test('checks the amounts before saving the settings', async () => {
   const { writes } = renderSettings();
-  const goal = await screen.findByLabelText('План копилки');
+  const goal = await screen.findByLabelText('План скарбнички');
 
   await userEvent.clear(goal);
   await userEvent.type(goal, 'много');
-  await userEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
   expect(
-    screen.getByText('Сумма — число, не больше двух знаков после запятой'),
+    screen.getByText('Сума — число, не більше двох знаків після коми'),
   ).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 });
 
 test('adds a limit with an Idempotency-Key and its categories', async () => {
   const { writes } = renderSettings();
-  await screen.findByRole('list', { name: 'Лимиты' });
+  await screen.findByRole('list', { name: 'Ліміти' });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить лимит' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Новый лимит' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати ліміт' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Новий ліміт' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Введите название')).toBeInTheDocument();
+  expect(within(dialog).getByText('Введіть назву')).toBeInTheDocument();
   expect(
-    within(dialog).getByText('Выберите хотя бы одну категорию'),
+    within(dialog).getByText('Виберіть хоча б одну категорію'),
   ).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 
-  await userEvent.type(within(dialog).getByLabelText(/Название/), 'Зоотовары');
+  await userEvent.type(within(dialog).getByLabelText(/Назва/), 'Зоотовары');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'в квартал' }),
+    within(dialog).getByRole('button', { name: 'на квартал' }),
   );
-  await userEvent.type(within(dialog).getByLabelText(/Сумма лимита/), '2500');
+  await userEvent.type(within(dialog).getByLabelText(/Сума ліміту/), '2500');
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: /Категории/ }),
+    within(dialog).getByRole('combobox', { name: /Категорії/ }),
   );
   await userEvent.click(await screen.findByRole('option', { name: 'Кафе' }));
   await userEvent.click(screen.getByRole('option', { name: 'Продукты' }));
   await userEvent.keyboard('{Escape}');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -197,17 +199,17 @@ test('adds a limit with an Idempotency-Key and its categories', async () => {
 
 test('changes a limit with its version in If-Match', async () => {
   const { writes } = renderSettings();
-  await screen.findByRole('list', { name: 'Лимиты' });
+  await screen.findByRole('list', { name: 'Ліміти' });
 
-  await userEvent.click(screen.getByRole('button', { name: /Действия: Кафе/ }));
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Изменить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Изменить лимит' });
-  const amount = within(dialog).getByLabelText(/Сумма лимита/);
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Кафе/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Змінити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Змінити ліміт' });
+  const amount = within(dialog).getByLabelText(/Сума ліміту/);
   expect(amount).toHaveValue('3000');
   await userEvent.clear(amount);
   await userEvent.type(amount, '4000');
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -224,17 +226,15 @@ test('changes a limit with its version in If-Match', async () => {
 
 test('deletes a limit only after the confirmation', async () => {
   const { writes } = renderSettings();
-  await screen.findByRole('list', { name: 'Лимиты' });
+  await screen.findByRole('list', { name: 'Ліміти' });
 
-  await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Еда и быт/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Удалить лимит?' });
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Еда и быт/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Видалити ліміт?' });
   expect(dialog).toHaveTextContent('Еда и быт');
   expect(writes()).toHaveLength(0);
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await dialogClosed();
 

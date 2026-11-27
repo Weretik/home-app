@@ -7,6 +7,6 @@ internal sealed class DeleteItemValidator : AbstractValidator<DeleteItemCommand>
     public DeleteItemValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the item in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію товару у заголовку If-Match.");
     }
 }

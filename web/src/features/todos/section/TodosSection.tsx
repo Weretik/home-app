@@ -8,7 +8,7 @@ export function TodosSection() {
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
       <Typography variant="h4" component="h1">
-        Дела
+        Справи
       </Typography>
       <SectionTabs />
       <Outlet />

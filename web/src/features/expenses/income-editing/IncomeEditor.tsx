@@ -21,7 +21,7 @@ export function IncomeEditor({
   if (state.mode === 'delete')
     return (
       <DeleteEntryDialog
-        title="Удалить доход?"
+        title="Видалити дохід?"
         summary={`${personLabels[state.item.person]} · ${formatAmount(state.item.amount)} · ${formatDay(state.item.date)}`}
         id={state.item.id}
         remove={remove}

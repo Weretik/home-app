@@ -12,7 +12,7 @@ interface ChatRowProps {
   onUnlink: () => void;
 }
 
-/** One chat (FR-004): whose it is, its Telegram title and since when, or «не подключён»; «Тест» and «Отвязать». */
+/** One chat (FR-004): whose it is, its Telegram title and since when, or «не підключено»; «Тест» and «Відв’язати». */
 export function ChatRow({
   chat,
   divider,
@@ -46,11 +46,11 @@ export function ChatRow({
             ? [
                 chat.title,
                 chat.linkedAtUtc &&
-                  `с ${formatKyivTime(chat.linkedAtUtc).split(',')[0]}`,
+                  `з ${formatKyivTime(chat.linkedAtUtc).split(',')[0]}`,
               ]
                 .filter(Boolean)
-                .join(' · ') || 'подключён'
-            : 'не подключён'}
+                .join(' · ') || 'підключено'
+            : 'не підключено'}
         </Typography>
       </Box>
       {chat.linked && (
@@ -61,15 +61,15 @@ export function ChatRow({
             disabled={isTesting}
             aria-label={`Тест: ${name}`}
           >
-            {isTesting ? 'Отправляю…' : 'Тест'}
+            {isTesting ? 'Надсилаю…' : 'Тест'}
           </Button>
           <Button
             size="small"
             color="error"
             onClick={onUnlink}
-            aria-label={`Отвязать: ${name}`}
+            aria-label={`Відв’язати: ${name}`}
           >
-            Отвязать
+            Відв’язати
           </Button>
         </Box>
       )}

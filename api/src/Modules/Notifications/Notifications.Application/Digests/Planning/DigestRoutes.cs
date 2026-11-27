@@ -18,7 +18,7 @@ public static class DigestRoutes
     public static IReadOnlyList<Audience> Common(IReadOnlyDictionary<Audience, long> chats) =>
         chats.ContainsKey(Audience.Family) ? [Audience.Family] : [.. People.Where(chats.ContainsKey)];
 
-    /// <summary>The giver's chat (both people for «Вместе»); the family group for a giver without a chat of their own.</summary>
+    /// <summary>The giver's chat (both people for «Разом»); the family group for a giver without a chat of their own.</summary>
     public static IReadOnlyList<Audience> Givers(GiftParty giver, IReadOnlyDictionary<Audience, long> chats)
     {
         Audience[] people = giver switch

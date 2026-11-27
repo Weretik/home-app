@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useGiftsSummary } from '../data/summary-api';
 import { SummaryContent } from './SummaryContent';
 
-/** «Подарки» on the home page: figures per person, the 🔥 wishes, the nearest occasions and the «нюансы», read-only. */
+/** «Подарунки» on the home page: figures per person, the 🔥 wishes, the nearest occasions and the «нюанси», read-only. */
 export function GiftsSummary() {
   const { data, error, isPending, refetch } = useGiftsSummary();
 
@@ -14,23 +14,23 @@ export function GiftsSummary() {
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 } }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button component={Link} to="/gifts">
-          Открыть подарки
+          Відкрити подарунки
         </Button>
       </Box>
       {isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
-          <CircularProgress aria-label="Загружаю сводку подарков" />
+          <CircularProgress aria-label="Завантажую зведення подарунків" />
         </Box>
       ) : error ? (
         <Alert
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить сводку: {error.message}
+          Не вдалося завантажити зведення: {error.message}
         </Alert>
       ) : (
         <SummaryContent summary={data} />

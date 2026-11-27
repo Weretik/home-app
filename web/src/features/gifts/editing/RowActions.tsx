@@ -19,15 +19,15 @@ export interface RowAction {
 }
 
 interface RowActionsProps {
-  /** What the row is, for the button's label: «Серьги с топазом». */
+  /** What the row is, for the button's label: «Сережки з топазом». */
   label: string;
   onEdit: () => void;
   onDelete: () => void;
-  /** Actions shown before «Изменить» and «Удалить» (e.g. «Подарено»). */
+  /** Actions shown before «Змінити» and «Видалити» (e.g. «Подаровано»). */
   extra?: RowAction[];
 }
 
-/** The «⋮» button of a row: any extra actions, then «Изменить» and «Удалить». */
+/** The «⋮» button of a row: any extra actions, then «Змінити» and «Видалити». */
 export function RowActions({
   label,
   onEdit,
@@ -38,12 +38,12 @@ export function RowActions({
   const actions: RowAction[] = [
     ...extra,
     {
-      label: 'Изменить',
+      label: 'Змінити',
       icon: <EditOutlinedIcon fontSize="small" />,
       onClick: onEdit,
     },
     {
-      label: 'Удалить',
+      label: 'Видалити',
       icon: <DeleteOutlineOutlinedIcon fontSize="small" />,
       onClick: onDelete,
       danger: true,
@@ -52,10 +52,10 @@ export function RowActions({
 
   return (
     <>
-      <Tooltip title="Действия">
+      <Tooltip title="Дії">
         <IconButton
           size="small"
-          aria-label={`Действия: ${label}`}
+          aria-label={`Дії: ${label}`}
           aria-haspopup="menu"
           aria-expanded={anchor ? 'true' : undefined}
           onClick={(event) => setAnchor(event.currentTarget)}

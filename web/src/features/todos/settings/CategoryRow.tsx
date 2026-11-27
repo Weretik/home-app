@@ -42,13 +42,13 @@ export function CategoryRow({
         primary={item.name}
         secondary={formatActiveCount(item.activeCount)}
       />
-      <Tooltip title="Изменить">
-        <IconButton aria-label={`Изменить: ${item.name}`} onClick={onEdit}>
+      <Tooltip title="Змінити">
+        <IconButton aria-label={`Змінити: ${item.name}`} onClick={onEdit}>
           <EditOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Удалить">
-        <IconButton aria-label={`Удалить: ${item.name}`} onClick={onDelete}>
+      <Tooltip title="Видалити">
+        <IconButton aria-label={`Видалити: ${item.name}`} onClick={onDelete}>
           <DeleteOutlineOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>

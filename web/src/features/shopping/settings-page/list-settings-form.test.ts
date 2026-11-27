@@ -13,13 +13,13 @@ test('says what is wrong with each field', () => {
   expect(
     checkListSettings({ cartKeepHours: '100', frequentDays: '2,5' }),
   ).toEqual({
-    cartKeepHours: 'От 1 до 72',
-    frequentDays: 'Введите целое число',
+    cartKeepHours: 'Від 1 до 72',
+    frequentDays: 'Введіть ціле число',
   });
   expect(
     checkListSettings({ cartKeepHours: '0', frequentDays: '731' }),
   ).toEqual({
-    cartKeepHours: 'От 1 до 72',
-    frequentDays: 'От 30 до 730',
+    cartKeepHours: 'Від 1 до 72',
+    frequentDays: 'Від 30 до 730',
   });
 });

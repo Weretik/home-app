@@ -15,7 +15,7 @@ test('records a plan today, by card, without a comment', () => {
 test('checks the date and the comment', () => {
   expect(
     validateRecord({ date: '', paymentMethod: 'Card', comment: '' }).date,
-  ).toBe('Выберите дату');
+  ).toBe('Виберіть дату');
   expect(
     validateRecord({
       date: '2026-11-26',

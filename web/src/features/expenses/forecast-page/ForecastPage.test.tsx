@@ -117,7 +117,7 @@ test('lists the month plans with their categories and the total', async () => {
   );
 
   const list = await screen.findByRole('list', {
-    name: 'Запланированные расходы',
+    name: 'Заплановані витрати',
   });
   expect(screen.getByRole('heading', { name: 'Бюджет' })).toBeInTheDocument();
   expect(screen.getByRole('tab', { name: 'Прогноз' })).toHaveAttribute(
@@ -126,11 +126,11 @@ test('lists the month plans with their categories and the total', async () => {
   );
   const rows = within(list).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
-  expect(plain(rows[0]!)).toContain('СтраховкаМашина · Виталий');
-  expect(plain(rows[1]!)).toContain('Подарки · Общее');
+  expect(plain(rows[0]!)).toContain('СтраховкаМашина · Віталій');
+  expect(plain(rows[1]!)).toContain('Подарки · Спільне');
   await waitFor(() =>
     expect(plain(screen.getByRole('status'))).toContain(
-      'Запланировано 5 700,50 ₴',
+      'Заплановано 5 700,50 ₴',
     ),
   );
   const query = reads()[0]!.url.searchParams;
@@ -142,7 +142,7 @@ test('says when nothing is planned', async () => {
   renderForecast(() => json(plans([])));
 
   expect(
-    await screen.findByText('На этот месяц ничего не запланировано'),
+    await screen.findByText('На цей місяць нічого не заплановано'),
   ).toBeInTheDocument();
 });
 
@@ -152,25 +152,25 @@ test('adds a plan to the open month with an Idempotency-Key', async () => {
       ? json({ id: crypto.randomUUID() }, 201)
       : json(plans([])),
   );
-  await screen.findByText('На этот месяц ничего не запланировано');
+  await screen.findByText('На цей місяць нічого не заплановано');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Добавить план' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Новый план' });
+  await userEvent.click(screen.getByRole('button', { name: 'Додати план' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Новий план' });
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
-  expect(within(dialog).getByText('Введите название')).toBeInTheDocument();
+  expect(within(dialog).getByText('Введіть назву')).toBeInTheDocument();
   expect(writes()).toHaveLength(0);
 
-  await userEvent.type(within(dialog).getByLabelText(/Название/), 'Подарок');
+  await userEvent.type(within(dialog).getByLabelText(/Назва/), 'Подарок');
   await userEvent.click(
-    within(dialog).getByRole('combobox', { name: /Категория/ }),
+    within(dialog).getByRole('combobox', { name: /Категорія/ }),
   );
   await userEvent.click(await screen.findByRole('option', { name: 'Подарки' }));
-  await userEvent.type(within(dialog).getByLabelText(/Сумма/), '1500');
+  await userEvent.type(within(dialog).getByLabelText(/Сума/), '1500');
   const loads = reads().length;
   await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Сохранить' }),
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
   );
   await dialogClosed();
 
@@ -195,27 +195,23 @@ test('records a plan as an expense with its version in If-Match', async () => {
       ? json({ id: crypto.randomUUID() }, 201)
       : json(plans([item])),
   );
-  await screen.findByRole('list', { name: 'Запланированные расходы' });
+  await screen.findByRole('list', { name: 'Заплановані витрати' });
 
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Страховка/ }));
   await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Страховка/ }),
-  );
-  await userEvent.click(
-    screen.getByRole('menuitem', { name: 'Записать как расход' }),
+    screen.getByRole('menuitem', { name: 'Записати як витрату' }),
   );
   const dialog = await screen.findByRole('dialog', {
-    name: 'Записать как расход',
+    name: 'Записати як витрату',
   });
-  expect(plain(dialog)).toContain('Страховка · Машина · Виталий · 4 200,00 ₴');
+  expect(plain(dialog)).toContain('Страховка · Машина · Віталій · 4 200,00 ₴');
   expect(within(dialog).getByLabelText(/Дата/)).toHaveValue(todayIso());
   await userEvent.click(
     within(dialog).getByRole('combobox', { name: 'Оплата' }),
   );
+  await userEvent.click(await screen.findByRole('option', { name: 'Готівка' }));
   await userEvent.click(
-    await screen.findByRole('option', { name: 'Наличные' }),
-  );
-  await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Записать' }),
+    within(dialog).getByRole('button', { name: 'Записати' }),
   );
   await dialogClosed();
 
@@ -237,15 +233,13 @@ test('deletes a plan only after the confirmation', async () => {
       ? Promise.resolve(new Response(null, { status: 204 }))
       : json(plans([item])),
   );
-  await screen.findByRole('list', { name: 'Запланированные расходы' });
+  await screen.findByRole('list', { name: 'Заплановані витрати' });
 
+  await userEvent.click(screen.getByRole('button', { name: /Дії: Страховка/ }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Видалити план?' });
   await userEvent.click(
-    screen.getByRole('button', { name: /Действия: Страховка/ }),
-  );
-  await userEvent.click(screen.getByRole('menuitem', { name: 'Удалить' }));
-  const dialog = await screen.findByRole('dialog', { name: 'Удалить план?' });
-  await userEvent.click(
-    within(dialog).getByRole('button', { name: 'Удалить' }),
+    within(dialog).getByRole('button', { name: 'Видалити' }),
   );
   await dialogClosed();
 

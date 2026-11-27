@@ -35,7 +35,7 @@ to open the site to keep track.
 | ID | Rule |
 | --- | --- |
 | R-001 | There are three audiences: `Vitaliy`, `Maria` (private chats) and `Family` (a group). Each audience has at most one linked chat and a chat serves at most one audience (unique indexes). |
-| R-002 | `/start` in a private chat that is not linked asks «Кто вы?» with buttons «Я Виталий» / «Я Маша». The button links the chat when the slot is free; when the slot holds another chat the bot says so and points to the site. A linked chat answers who it is linked as. |
+| R-002 | `/start` in a private chat that is not linked asks «Хто ви?» with buttons «Я Віталій» / «Я Маша». The button links the chat when the slot is free; when the slot holds another chat the bot says so and points to the site. A linked chat answers who it is linked as. |
 | R-003 | Adding the bot to a group, or `/start` in a group, links the group as `Family` when the slot is free; otherwise the bot says the family chat is already linked. |
 | R-004 | A chat that is not linked gets only the `/start` flow and a short refusal; `/today` and «✅» need a linked chat. |
 | R-005 | Unlinking from the site frees the slot (`404` `notifications.chat_not_linked` when it is free). |
@@ -58,15 +58,15 @@ to open the site to keep track.
 
 | ID | Scenario |
 | --- | --- |
-| SC-001 | Vitaliy writes `/start`, taps «Я Виталий»: the site shows his chat as linked. Masha does the same. A third person taps «Я Виталий»: refused. |
+| SC-001 | Vitaliy writes `/start`, taps «Я Віталій»: the site shows his chat as linked. Masha does the same. A third person taps «Я Віталій»: refused. |
 | SC-002 | The bot is added to the family group: the group is linked as `Family`. |
 | SC-003 | 08:00 Kyiv: Vitaliy gets his overdue and today's tasks with ✅ buttons, Masha hers; then the group gets the common message. The tick at 08:15 sends nothing new. |
 | SC-004 | Vitaliy taps «✅ Купить батарейки»: the task is done on the site; the answer says «Готово». |
-| SC-005 | A gift for Masha with giver Vitaliy and buy-by 10.12 exists on 26.11: on 26.11 at 08:00 Vitaliy gets «🎁 Пора купить подарок…» with the link; never again for that date. |
+| SC-005 | A gift for Masha with giver Vitaliy and buy-by 10.12 exists on 26.11: on 26.11 at 08:00 Vitaliy gets «🎁 Час купити подарунок…» with the link; never again for that date. |
 | SC-006 | 18:00: two items are needed: the group gets them by department; on a day with an empty list nothing is sent. |
 | SC-007 | Sunday 20:00: the group gets the week's spending; on 30.11 at 20:00 the November summary; if that tick was missed, it comes on 1.12 in the morning. |
 | SC-008 | A tick with a wrong key answers `401`; a webhook call with a wrong secret answers `401`. |
-| SC-009 | The site's «Отправить тест» sends «✅ Бот на связи» to the chosen chat. |
+| SC-009 | The site's «Отправить тест» sends «✅ Бот на зв’язку» to the chosen chat. |
 
 ## Non-functional requirements
 
@@ -74,5 +74,5 @@ to open the site to keep track.
 | --- | --- | --- |
 | Free hosting | no background thread (F1 sleeps); a public-repo cron calls the API | `HostRulesTests.Nothing_RunsInTheBackground`, ADR 0034 |
 | Delivery | at least once; a duplicate is possible only when Telegram accepted a message and the save of `sent_at_utc` failed | outbox retries, R-007 |
-| Message size | each message under Telegram's 4096 characters: lists are cut with «и ещё N» | formatter unit tests |
+| Message size | each message under Telegram's 4096 characters: lists are cut with «…і ще N» | formatter unit tests |
 | Secrets | only `Telegram:BotToken` and `OutboxTick:Key`, from App Service settings; nothing in the repo | `ConfigurationRulesTests` |

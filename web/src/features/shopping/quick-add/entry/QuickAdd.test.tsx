@@ -75,7 +75,7 @@ function renderQuickAdd() {
     </ThemeProvider>,
   );
   return {
-    field: screen.getByRole('combobox', { name: 'Что купить' }),
+    field: screen.getByRole('combobox', { name: 'Що купити' }),
     asked: () =>
       sent
         .filter((s) => s.url.pathname === '/api/shopping/items/suggestions')
@@ -84,7 +84,7 @@ function renderQuickAdd() {
   };
 }
 
-test('suggests names for the segment being typed, with department, count and «уже в списке»', async () => {
+test('suggests names for the segment being typed, with department, count and «вже в списку»', async () => {
   const { field, asked } = renderQuickAdd();
 
   await userEvent.type(field, 'молоко, хле');
@@ -92,10 +92,10 @@ test('suggests names for the segment being typed, with department, count and «�
   const options = await screen.findAllByRole('option');
   expect(options).toHaveLength(2);
   expect(options[0]).toHaveTextContent('Хлеб');
-  expect(options[0]).toHaveTextContent('Хлеб · брали 3 раза');
-  expect(within(options[0]!).getByText('уже в списке')).toBeInTheDocument();
-  expect(options[1]).toHaveTextContent('Бакалея · ещё не брали');
-  expect(options[1]).not.toHaveTextContent('уже в списке');
+  expect(options[0]).toHaveTextContent('Хлеб · брали 3 рази');
+  expect(within(options[0]!).getByText('вже в списку')).toBeInTheDocument();
+  expect(options[1]).toHaveTextContent('Бакалея · ще не брали');
+  expect(options[1]).not.toHaveTextContent('вже в списку');
   // Asked once, after the pause, for the last segment only.
   expect(asked()).toEqual([`query=${encodeURIComponent('хле')}&limit=8`]);
 });

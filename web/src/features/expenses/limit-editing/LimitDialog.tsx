@@ -41,14 +41,14 @@ export function LimitDialog({ item, onClose }: LimitDialogProps) {
 
   return (
     <EntryDialog
-      title={item ? 'Изменить лимит' : 'Новый лимит'}
+      title={item ? 'Змінити ліміт' : 'Новий ліміт'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
       onClose={onClose}
     >
       <TextField
-        label="Название"
+        label="Назва"
         required
         value={values.name}
         onChange={(event) => set('name', event.target.value)}
@@ -56,7 +56,7 @@ export function LimitDialog({ item, onClose }: LimitDialogProps) {
       />
       <FormControl>
         <FormLabel id="limit-period" sx={{ mb: 1, typography: 'body2' }}>
-          Период
+          Період
         </FormLabel>
         <ToggleButtonGroup
           exclusive
@@ -84,14 +84,14 @@ export function LimitDialog({ item, onClose }: LimitDialogProps) {
         )}
       </FormControl>
       <AmountField
-        label="Сумма лимита"
+        label="Сума ліміту"
         value={values.amount}
         onChange={(value) => set('amount', value)}
         errors={errors}
       />
       <TextField
         select
-        label="Категории"
+        label="Категорії"
         required
         value={values.categoryIds}
         disabled={categories.isPending}

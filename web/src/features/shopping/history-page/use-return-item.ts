@@ -5,7 +5,7 @@ import { describeWriteError } from '../data/write-failure-api';
 import { useMe } from '../section/use-me';
 
 /**
- * «Вернуть в список» (R-10): adds the bought item again with its quantity and department, as «Я», with an
+ * «Повернути до списку» (R-10): adds the bought item again with its quantity and department, as «Я», with an
  * Idempotency-Key per attempt. `returning` is the id whose button waits; `notice` is the snackbar text.
  */
 export function useReturnItem() {
@@ -29,9 +29,9 @@ export function useReturnItem() {
       {
         onSuccess: () => {
           idempotency.renew();
-          setNotice(`Вернули в список: ${item.name}`);
+          setNotice(`Повернули до списку: ${item.name}`);
         },
-        onError: (e) => setNotice(describeWriteError(e, 'вернуть').message),
+        onError: (e) => setNotice(describeWriteError(e, 'повернути').message),
         onSettled: () => setReturning(null),
       },
     );

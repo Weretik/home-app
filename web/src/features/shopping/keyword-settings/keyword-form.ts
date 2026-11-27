@@ -24,12 +24,12 @@ export const normalizeKeyword = (text: string) =>
 export function checkKeyword(values: KeywordValues) {
   const errors: Partial<Record<keyof KeywordValues, string>> = {};
   const keyword = normalizeKeyword(values.keyword);
-  if (!keyword) errors.keyword = 'Введите слово';
+  if (!keyword) errors.keyword = 'Введіть слово';
   else if (keyword.length < KEYWORD_MIN)
-    errors.keyword = `Не короче ${KEYWORD_MIN} букв`;
+    errors.keyword = `Не коротше ${KEYWORD_MIN} літер`;
   else if (keyword.length > KEYWORD_MAX)
-    errors.keyword = `Не длиннее ${KEYWORD_MAX} символов`;
-  if (!values.departmentId) errors.departmentId = 'Выберите отдел';
+    errors.keyword = `Не довше ${KEYWORD_MAX} символів`;
+  if (!values.departmentId) errors.departmentId = 'Виберіть відділ';
   return errors;
 }
 

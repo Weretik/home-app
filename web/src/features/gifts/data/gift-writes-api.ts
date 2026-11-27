@@ -17,7 +17,7 @@ export type GiftVariantRequest = Schema<'GiftVariantRequest'>;
 
 /**
  * Every Gifts write refreshes the whole module (web ADR 0009): both tabs, the settings and the home summary. A gift
- * with a giver and a buy-by day also has a to-do in the Todos module (gifts 002), so «Дела» refresh too.
+ * with a giver and a buy-by day also has a to-do in the Todos module (gifts 002), so «Справи» refresh too.
  */
 const giftQueries = [giftKeys.all, moduleKeys.todos];
 
@@ -46,8 +46,8 @@ export interface StatusChange {
 }
 
 /**
- * «Подарено», «Не актуально», «Вернуть в список»: moves a gift between the tabs with its version in If-Match. No
- * `giftedOn` is sent, so the server takes today in Kyiv for «Подарено».
+ * «Подаровано», «Неактуально», «Повернути до списку»: moves a gift between the tabs with its version in If-Match. No
+ * `giftedOn` is sent, so the server takes today in Kyiv for «Подаровано».
  */
 export function useChangeGiftStatus() {
   const refresh = useRefresh(giftQueries);

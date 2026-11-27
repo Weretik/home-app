@@ -10,29 +10,29 @@ internal sealed class ListTodoTasksValidator : AbstractValidator<ListTodoTasksQu
     {
         RuleFor(q => q.View)
             .Must(v => v is TaskViews.ActiveView or TaskViews.ArchiveView)
-            .WithMessage("The view is 'active' or 'archive'.");
+            .WithMessage("Вигляд — 'active' або 'archive'.");
         RuleForEach(q => q.Assignees).IsInEnum();
         RuleFor(q => q.CategoryId).NotEqual(Guid.Empty);
         RuleFor(q => q)
             .Must(q => !(q.WithoutCategory && q.CategoryId is not null))
             .WithName("categoryId")
-            .WithMessage("Send either categoryId or withoutCategory, not both.");
+            .WithMessage("Надішліть або categoryId, або withoutCategory, але не обидва.");
         RuleFor(q => q)
             .Must(q => !(q.WithoutDueDate && (q.DueFrom is not null || q.DueTo is not null)))
             .WithName("withoutDueDate")
-            .WithMessage("Send either a due period or withoutDueDate, not both.");
+            .WithMessage("Надішліть або період термінів, або withoutDueDate, але не обидва.");
         RuleFor(q => q)
             .Must(q => q.DueFrom is null || q.DueTo is null || q.DueFrom <= q.DueTo)
             .WithName("dueTo")
-            .WithMessage("dueTo is not before dueFrom.");
+            .WithMessage("dueTo не може бути раніше за dueFrom.");
         RuleFor(q => q)
             .Must(q => q.View == TaskViews.ArchiveView || (q.CompletedFrom is null && q.CompletedTo is null))
             .WithName("completedFrom")
-            .WithMessage("A completion period applies only to view=archive.");
+            .WithMessage("Період виконання діє лише для view=archive.");
         RuleFor(q => q)
             .Must(q => q.CompletedFrom is null || q.CompletedTo is null || q.CompletedFrom <= q.CompletedTo)
             .WithName("completedTo")
-            .WithMessage("completedTo is not before completedFrom.");
+            .WithMessage("completedTo не може бути раніше за completedFrom.");
         RuleFor(q => q.Search).ValidSearch();
         RuleFor(q => q.Page).ValidPage();
         RuleFor(q => q.PageSize).ValidPageSize();

@@ -47,9 +47,9 @@ export function useGiftList(archived: boolean) {
       status.isPending && status.variables?.gift.id === gift.id,
     /** A failed quick status change, or a link to a gift neither tab holds (web ADR 0013). */
     statusError: status.error
-      ? describeWriteError(status.error, 'изменить').message
+      ? describeWriteError(status.error, 'змінити').message
       : link.missing
-        ? 'Подарок не найден: возможно, его удалили'
+        ? 'Подарунок не знайдено: можливо, його видалили'
         : undefined,
     clearStatusError: () => {
       status.reset();

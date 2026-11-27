@@ -5,34 +5,34 @@ namespace Expenses.Domain.Budget;
 public static class BudgetErrors
 {
     public static readonly Error NameRequired =
-        Error.Validation("expenses.limit_name_required", "The limit needs a name.", "name");
+        Error.Validation("expenses.limit_name_required", "Ліміту потрібна назва.", "name");
 
     public static readonly Error NameTooLong =
-        Error.Validation("expenses.limit_name_too_long", $"The limit name is longer than {SpendingLimit.MaxNameLength} characters.", "name");
+        Error.Validation("expenses.limit_name_too_long", $"Назва ліміту задовга: не більше {SpendingLimit.MaxNameLength} символів.", "name");
 
     public static readonly Error AmountInvalid =
-        Error.Validation("expenses.limit_amount_invalid", "A limit is a positive amount in hryvnias with at most two digits after the point.", "amount");
+        Error.Validation("expenses.limit_amount_invalid", "Ліміт — додатна сума в гривнях, не більше двох знаків після коми.", "amount");
 
     public static readonly Error CategoriesRequired =
-        Error.Validation("expenses.limit_categories_required", "A limit covers at least one category, each once.", "categoryIds");
+        Error.Validation("expenses.limit_categories_required", "Ліміт охоплює щонайменше одну категорію, кожну один раз.", "categoryIds");
 
     public static readonly Error SettingsInvalid =
-        Error.Validation("expenses.budget_settings_invalid", "The total limit and the savings goal are amounts from 0 with at most two digits after the point.");
+        Error.Validation("expenses.budget_settings_invalid", "Загальний ліміт і ціль скарбнички — суми від 0, не більше двох знаків після коми.");
 
     public static readonly Error LimitsFromOutOfRange =
-        Error.Validation("expenses.limits_from_out_of_range", "The day limits start counting must be between 2000-01-01 and 2100-12-31.", "limitsFrom");
+        Error.Validation("expenses.limits_from_out_of_range", "День, з якого рахуються ліміти, має бути між 2000-01-01 і 2100-12-31.", "limitsFrom");
 
     /// <summary>
     /// The one settings row is part of the schema (inserted by the <c>Budget</c> migration); without it the budget can
     /// be neither shown nor saved.
     /// </summary>
     public static readonly Error SettingsNotFound =
-        Error.NotFound("expenses.budget_settings_not_found", "The budget settings row is missing; restore it from the Budget migration.");
+        Error.NotFound("expenses.budget_settings_not_found", "Немає рядка налаштувань бюджету; відновіть його з міграції Budget.");
 
     /// <summary>Two limits were added at the same moment and got the same place in the list.</summary>
     public static readonly Error LimitAddedMeanwhile =
-        Error.Conflict("expenses.limit_added_meanwhile", "Another limit was added at the same moment. Try again.");
+        Error.Conflict("expenses.limit_added_meanwhile", "Саме в цю мить додали інший ліміт. Спробуйте ще раз.");
 
     public static Error LimitNotFound(Guid id) =>
-        Error.NotFound("expenses.limit_not_found", $"There is no spending limit {id}.");
+        Error.NotFound("expenses.limit_not_found", $"Ліміту {id} немає.");
 }

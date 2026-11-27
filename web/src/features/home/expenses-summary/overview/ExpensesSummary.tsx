@@ -9,8 +9,8 @@ import { MonthPicker } from './MonthPicker';
 import { SummaryContent } from './SummaryContent';
 
 /**
- * «Сводка» of «Бюджет» on the home page: the old sheet's «Сводка» tab, with the forecast from the planned expenses. The month is in
- * `?year=&month=`, the same params the Expenses pages read, so «Открыть расходы» opens the same month.
+ * «Зведення» of «Бюджет» on the home page: the old sheet's «Сводка» tab, with the forecast from the planned expenses. The month is in
+ * `?year=&month=`, the same params the Expenses pages read, so «Відкрити витрати» opens the same month.
  */
 export function ExpensesSummary() {
   const [month, setMonth] = useMonthParam();
@@ -32,23 +32,23 @@ export function ExpensesSummary() {
           component={Link}
           to={`/expenses?year=${month.year}&month=${month.month}`}
         >
-          Открыть расходы
+          Відкрити витрати
         </Button>
       </Box>
       {isPending ? (
         <Box sx={{ display: 'grid', placeItems: 'center', py: 6 }}>
-          <CircularProgress aria-label="Загружаю сводку" />
+          <CircularProgress aria-label="Завантажую зведення" />
         </Box>
       ) : error ? (
         <Alert
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
-              Повторить
+              Повторити
             </Button>
           }
         >
-          Не удалось загрузить сводку: {error.message}
+          Не вдалося завантажити зведення: {error.message}
         </Alert>
       ) : (
         <SummaryContent summary={data} />

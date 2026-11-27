@@ -18,7 +18,7 @@ interface SettingsCardProps {
   children: ReactNode;
 }
 
-/** A settings card: title, caption and its add button, then loading, a failed load with «Повторить», or the list. */
+/** A settings card: title, caption and its add button, then loading, a failed load with «Повторити», or the list. */
 export function SettingsCard(props: SettingsCardProps) {
   const titleId = useId();
 
@@ -59,18 +59,18 @@ export function SettingsCard(props: SettingsCardProps) {
       <Box sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
         {props.isPending ? (
           <Box sx={{ display: 'grid', placeItems: 'center', py: 4 }}>
-            <CircularProgress aria-label={`Загружаю: ${props.title}`} />
+            <CircularProgress aria-label={`Завантажую: ${props.title}`} />
           </Box>
         ) : props.error ? (
           <Alert
             severity="error"
             action={
               <Button color="inherit" size="small" onClick={props.onRetry}>
-                Повторить
+                Повторити
               </Button>
             }
           >
-            Не удалось загрузить: {props.error.message}
+            Не вдалося завантажити: {props.error.message}
           </Alert>
         ) : (
           props.children

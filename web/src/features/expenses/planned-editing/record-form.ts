@@ -8,7 +8,7 @@ import {
 } from '../entry-editing/entry-fields';
 import type { RecordPlannedExpenseRequest } from '../planned-data/planned-writes-api';
 
-/** «Записать как расход»: what the plan does not know yet. Payer, category and amount come from the plan. */
+/** «Записати як витрату»: what the plan does not know yet. Payer, category and amount come from the plan. */
 export interface RecordFormValues {
   date: string;
   paymentMethod: PaymentMethod;

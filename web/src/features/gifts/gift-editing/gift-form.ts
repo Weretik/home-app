@@ -35,7 +35,7 @@ export interface GiftFormValues {
   link: string;
   occasion: string;
   occasionDate: string;
-  /** «Кто дарит»; with `buyBy` the server makes a to-do and a reminder (gifts 002). */
+  /** «Хто дарує»; with `buyBy` the server makes a to-do and a reminder (gifts 002). */
   giver: Giver | '';
   buyBy: string;
   notes: string;
@@ -94,9 +94,9 @@ export const fromGift = (gift: GiftItem): GiftFormValues => ({
 /** The field messages; server field names are used as keys (`variants[0].link`), so the API's errors land there too. */
 export function validateGift(values: GiftFormValues): FieldErrors {
   const errors: FieldErrors = {
-    recipient: values.recipient ? undefined : 'Выберите, для кого',
-    name: checkLength(values.name, 200, 'Введите название'),
-    categoryId: values.categoryId ? undefined : 'Выберите категорию',
+    recipient: values.recipient ? undefined : 'Виберіть, для кого',
+    name: checkLength(values.name, 200, 'Введіть назву'),
+    categoryId: values.categoryId ? undefined : 'Виберіть категорію',
     price: checkPrice(values.price),
     link: checkLink(values.link),
     occasion: checkLength(values.occasion, 100),
@@ -105,13 +105,13 @@ export function validateGift(values: GiftFormValues): FieldErrors {
     notes: checkLength(values.notes, 2000),
     variants:
       values.variants.length > MAX_VARIANTS
-        ? `Не больше ${MAX_VARIANTS} вариантов`
+        ? `Не більше ${MAX_VARIANTS} варіантів`
         : undefined,
   };
   values.variants.forEach((variant, index) => {
     const at = `variants[${index}]`;
     errors[`${at}.link`] = checkLink(variant.link, {
-      required: 'Укажите ссылку варианта',
+      required: 'Вкажіть посилання варіанта',
     });
     errors[`${at}.title`] = checkLength(variant.title, 200);
     errors[`${at}.price`] = checkPrice(variant.price);

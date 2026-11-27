@@ -45,14 +45,14 @@ export function SavingsDialog({ item, month, onClose }: SavingsDialogProps) {
 
   return (
     <EntryDialog
-      title={item ? 'Изменить движение' : 'Копилка: новое движение'}
+      title={item ? 'Змінити операцію' : 'Скарбничка: нова операція'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
       onClose={onClose}
     >
       <FormControl>
-        <FormLabel id={directionId}>Что сделали</FormLabel>
+        <FormLabel id={directionId}>Що зробили</FormLabel>
         <RadioGroup
           aria-labelledby={directionId}
           value={values.direction}
@@ -92,7 +92,7 @@ export function SavingsDialog({ item, month, onClose }: SavingsDialogProps) {
         errors={errors}
       />
       <TextField
-        label="Комментарий"
+        label="Коментар"
         multiline
         minRows={2}
         value={values.comment}

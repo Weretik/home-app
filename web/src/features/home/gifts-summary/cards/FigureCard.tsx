@@ -6,7 +6,7 @@ import type { GiftCounts, Recipient } from '../data/summary-api';
 import { personColors } from '../persons/person-colors';
 
 interface FigureCardProps {
-  /** The person's circle, or an emoji for «Всего». */
+  /** The person's circle, or an emoji for «Усього». */
   mark: ReactNode;
   title: string;
   counts: GiftCounts;
@@ -14,7 +14,7 @@ interface FigureCardProps {
   recipient?: Recipient;
 }
 
-/** One person's (or «Всего») wishes: how many, their sum, how many 🔥, and what was given. */
+/** One person's (or «Усього») wishes: how many, their sum, how many 🔥, and what was given. */
 export function FigureCard({
   mark,
   title,
@@ -60,14 +60,14 @@ export function FigureCard({
         sx={{ fontVariantNumeric: 'tabular-nums' }}
       >
         ≈ {formatWhole(counts.wantedPriceSum)} · {counts.wantedWithoutPrice} без
-        цены
+        ціни
       </Typography>
       <Typography
         variant="body2"
         color="text.secondary"
         sx={{ fontVariantNumeric: 'tabular-nums' }}
       >
-        🔥 {counts.highCount} · подарено {counts.giftedCount} на{' '}
+        🔥 {counts.highCount} · подаровано {counts.giftedCount} на{' '}
         {formatWhole(counts.giftedPriceSum)}
       </Typography>
     </Card>

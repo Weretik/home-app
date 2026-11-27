@@ -11,7 +11,7 @@ interface KeywordRowsProps {
   onDelete: (keyword: Keyword) => void;
 }
 
-/** The keywords: the word, its department, «выучено» for the ones learned from a moved item, and «⋮». */
+/** The keywords: the word, its department, «вивчено» for the ones learned from a moved item, and «⋮». */
 export function KeywordRows({ rows, onEdit, onDelete }: KeywordRowsProps) {
   return (
     <List aria-labelledby="keywords-title" dense>
@@ -32,7 +32,7 @@ export function KeywordRows({ rows, onEdit, onDelete }: KeywordRowsProps) {
               <>
                 {keyword.keyword}
                 {keyword.learned && (
-                  <Chip size="small" label="выучено" sx={{ ml: 1 }} />
+                  <Chip size="small" label="вивчено" sx={{ ml: 1 }} />
                 )}
               </>
             }

@@ -16,13 +16,13 @@ import {
 
 interface RecordDialogProps {
   item: PlannedExpenseItem;
-  /** The plan in one line: «Страховка · Машина · Виталий · 4 200,00 ₴». */
+  /** The plan in one line: «Страховка · Машина · Віталій · 4 200,00 ₴». */
   summary: string;
   onClose: () => void;
 }
 
 /**
- * «Записать как расход»: the plan becomes an expense with its category, payer and amount on the chosen day, and the
+ * «Записати як витрату»: the plan becomes an expense with its category, payer and amount on the chosen day, and the
  * plan is gone. Sent with the plan's version in If-Match.
  */
 export function RecordDialog({ item, summary, onClose }: RecordDialogProps) {
@@ -37,13 +37,13 @@ export function RecordDialog({ item, summary, onClose }: RecordDialogProps) {
 
   return (
     <EntryDialog
-      title="Записать как расход"
+      title="Записати як витрату"
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
       onClose={onClose}
-      submitLabel="Записать"
-      pendingLabel="Записываю…"
+      submitLabel="Записати"
+      pendingLabel="Записую…"
     >
       <Typography sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
         {summary}
@@ -73,7 +73,7 @@ export function RecordDialog({ item, summary, onClose }: RecordDialogProps) {
         ))}
       </TextField>
       <TextField
-        label="Комментарий"
+        label="Коментар"
         multiline
         minRows={2}
         value={values.comment}

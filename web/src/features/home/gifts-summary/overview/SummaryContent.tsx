@@ -7,8 +7,8 @@ import { TopWishesCard } from '../top-wishes/TopWishesCard';
 import { NoWishes } from './NoWishes';
 
 /**
- * The loaded summary: the figures, «🔥 Очень хочу» across the full width, then the occasions (or «Желаний пока нет»)
- * and the «нюансы» side by side from `md`.
+ * The loaded summary: the figures, «🔥 Дуже хочу» across the full width, then the occasions (or «Бажань поки немає»)
+ * and the «нюанси» side by side from `md`.
  */
 export function SummaryContent({ summary }: { summary: GiftsSummaryView }) {
   const hasWishes = summary.total.wantedCount > 0;

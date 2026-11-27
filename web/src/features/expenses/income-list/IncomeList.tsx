@@ -16,7 +16,7 @@ export function IncomeList({
   onDelete,
 }: { items: IncomeItem[] } & RowHandlers<IncomeItem>) {
   return (
-    <List disablePadding aria-label="Доходы за месяц">
+    <List disablePadding aria-label="Доходи за місяць">
       {items.map((item, index) => (
         <ListItem
           key={item.id}

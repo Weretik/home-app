@@ -6,7 +6,7 @@ import { summarySections } from './summary-sections';
 
 /**
  * Switches the home page between section summaries. Sections without a summary yet stay visible but disabled,
- * marked «скоро». Scrolls sideways on a narrow phone instead of wrapping.
+ * marked «згодом». Scrolls sideways on a narrow phone instead of wrapping.
  */
 export function SummarySwitcher({
   value,
@@ -23,7 +23,7 @@ export function SummarySwitcher({
         exclusive
         size="small"
         color="primary"
-        aria-label="Сводка"
+        aria-label="Зведення"
         value={value}
         onChange={(_, next: string | null) => next && onChange(next)}
         sx={{ bgcolor: 'background.paper' }}
@@ -39,7 +39,7 @@ export function SummarySwitcher({
             {label}
             {Summary === null && (
               <Typography component="span" variant="caption">
-                скоро
+                згодом
               </Typography>
             )}
           </ToggleButton>

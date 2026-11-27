@@ -20,13 +20,13 @@ public sealed class TodoTextsTests
     [Fact]
     public void The_Morning_ShowsOverdueTodayAndShared_WithADoneButtonEach()
     {
-        var (text, buttons) = TodoTexts.Morning(TodoAssignee.Vitaliy, "Виталий", Active, Today)!.Value;
+        var (text, buttons) = TodoTexts.Morning(TodoAssignee.Vitaliy, "Віталію", Active, Today)!.Value;
 
         Assert.Equal(
-            "☀️ <b>Доброе утро, Виталий!</b> Дела на сегодня:\n\n"
-            + "🔴 <b>Просрочено</b>\n• ❗ Оплатить &lt;свет&gt; — с 30.11\n\n"
-            + "📌 <b>Сегодня</b>\n• Забрать посылку\n\n"
-            + "👥 <b>Общие</b>\n• Вынести мусор",
+            "☀️ <b>Доброго ранку, Віталію!</b> Справи на сьогодні:\n\n"
+            + "🔴 <b>Прострочено</b>\n• ❗ Оплатить &lt;свет&gt; — з 30.11\n\n"
+            + "📌 <b>Сьогодні</b>\n• Забрать посылку\n\n"
+            + "👥 <b>Спільні</b>\n• Вынести мусор",
             text);
         Assert.Equal(3, buttons.Count);
         Assert.Equal("done:" + Overdue.ToString("N"), buttons[0].Data);
@@ -36,7 +36,7 @@ public sealed class TodoTextsTests
     [Fact]
     public void A_Morning_WithNothingForToday_IsNotSent()
     {
-        Assert.Null(TodoTexts.Morning(TodoAssignee.Maria, "Маша", [Active[3]], Today));
+        Assert.Null(TodoTexts.Morning(TodoAssignee.Maria, "Машо", [Active[3]], Today));
     }
 
     [Fact]
@@ -44,10 +44,10 @@ public sealed class TodoTextsTests
     {
         var text = TodoTexts.Common(Active, Today, "https://web.example/todos")!;
 
-        Assert.Contains("Открыто: Виталий — 3, Маша — 1, Общее — 1", text);
-        Assert.Contains("• Оплатить &lt;свет&gt; — Виталий, с 30.11", text);
-        Assert.EndsWith("<a href=\"https://web.example/todos\">Открыть дела</a>", text);
-        Assert.Contains("Просроченных нет", TodoTexts.Common([Active[1]], Today, "u")!);
+        Assert.Contains("Відкрито: Віталій — 3, Маша — 1, Спільне — 1", text);
+        Assert.Contains("• Оплатить &lt;свет&gt; — Віталій, з 30.11", text);
+        Assert.EndsWith("<a href=\"https://web.example/todos\">Відкрити справи</a>", text);
+        Assert.Contains("Прострочених немає", TodoTexts.Common([Active[1]], Today, "u")!);
         Assert.Null(TodoTexts.Common([], Today, "u"));
     }
 }

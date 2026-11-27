@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import { useState, type ReactNode } from 'react';
 
-/** One more step a row offers before «Изменить» and «Удалить»: «Записать как расход». */
+/** One more step a row offers before «Змінити» and «Видалити»: «Записати як витрату». */
 export interface RowAction {
   label: string;
   icon: ReactNode;
@@ -24,7 +24,7 @@ interface RowActionsProps {
   extra?: RowAction;
 }
 
-/** The «⋮» button of a list row with «Изменить» and «Удалить», and an optional step of its own first. */
+/** The «⋮» button of a list row with «Змінити» and «Видалити», and an optional step of its own first. */
 export function RowActions({
   label,
   onEdit,
@@ -39,10 +39,10 @@ export function RowActions({
 
   return (
     <>
-      <Tooltip title="Действия">
+      <Tooltip title="Дії">
         <IconButton
           size="small"
-          aria-label={`Действия: ${label}`}
+          aria-label={`Дії: ${label}`}
           aria-haspopup="menu"
           aria-expanded={anchor ? 'true' : undefined}
           onClick={(event) => setAnchor(event.currentTarget)}
@@ -65,13 +65,13 @@ export function RowActions({
           <ListItemIcon>
             <EditOutlinedIcon fontSize="small" />
           </ListItemIcon>
-          Изменить
+          Змінити
         </MenuItem>
         <MenuItem onClick={pick(onDelete)} sx={{ color: 'error.main' }}>
           <ListItemIcon sx={{ color: 'inherit' }}>
             <DeleteOutlineOutlinedIcon fontSize="small" />
           </ListItemIcon>
-          Удалить
+          Видалити
         </MenuItem>
       </Menu>
     </>

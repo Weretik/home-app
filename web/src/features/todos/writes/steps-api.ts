@@ -9,7 +9,7 @@ const path = (taskId: string, stepId: string) => ({
 
 /**
  * The steps of an existing task, saved at once (FR-005). They need no version (R-010), but they change the task's,
- * so each write waits for the refresh: the dialog then holds the new version before «Сохранить» can be pressed.
+ * so each write waits for the refresh: the dialog then holds the new version before «Зберегти» can be pressed.
  */
 export function useStepWrites(taskId: string) {
   const refresh = useTodosRefresh();

@@ -1,3 +1,5 @@
+import { locale } from '../../../platform/locale';
+
 /**
  * Google Identity Services (web ADR 0015): the «Sign in with Google» button and One Tap. The script is loaded once,
  * only by the sign-in screen; tests put a fake `window.google` in place and never load the real one.
@@ -5,10 +7,9 @@
 export const GOOGLE_SCRIPT_URL = 'https://accounts.google.com/gsi/client';
 
 /**
- * The button's language. Kept as the one literal here until the locale moves to `src/platform/locale.ts` (another
- * change adds it, with a rule against locale literals); reconcile at merge.
+ * The button's language: Google takes only the language part of the interface locale.
  */
-const BUTTON_LOCALE = 'uk';
+const BUTTON_LOCALE = locale.split('-')[0];
 
 interface CredentialResponse {
   credential: string;

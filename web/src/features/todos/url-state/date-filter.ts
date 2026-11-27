@@ -1,7 +1,7 @@
 /**
  * The date filter of a list (FR-002, FR-006), kept in the URL as `?when=` (and `?from=&to=` for a period). On the
- * active list it reads the due date («Срок»); in the archive the Kyiv day of completion («Когда сделано»). «Неделя» and
- * «Месяц» on the active list keep the overdue tasks, since they still have to be done in that time.
+ * active list it reads the due date («Термін»); in the archive the Kyiv day of completion («Коли зроблено»). «Тиждень» and
+ * «Місяць» on the active list keep the overdue tasks, since they still have to be done in that time.
  */
 import { addDays } from '../data/due-date';
 import type { TaskQuery, TaskView } from '../data/todos-api';
@@ -23,19 +23,19 @@ export const whenOptions: Record<TaskView, readonly When[]> = {
 };
 
 export const whenLabels: Record<When, string> = {
-  overdue: 'Просрочено',
-  today: 'Сегодня',
+  overdue: 'Прострочено',
+  today: 'Сьогодні',
   tomorrow: 'Завтра',
-  yesterday: 'Вчера',
-  week: 'Неделя',
-  month: 'Месяц',
-  none: 'Без срока',
-  period: 'Период',
+  yesterday: 'Вчора',
+  week: 'Тиждень',
+  month: 'Місяць',
+  none: 'Без терміну',
+  period: 'Період',
 };
 
 export const whenTitles: Record<TaskView, string> = {
-  active: 'Срок',
-  archive: 'Когда сделано',
+  active: 'Термін',
+  archive: 'Коли зроблено',
 };
 
 export interface DateFilter {

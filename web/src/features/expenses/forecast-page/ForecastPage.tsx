@@ -18,8 +18,8 @@ import { PlannedTotal } from './PlannedTotal';
 import { planLine } from './planned-rows';
 
 /**
- * «Прогноз»: the expenses planned for the open month with their total «Запланировано»; each plan can be changed,
- * deleted or recorded as a real expense («Записать как расход»). The plans count in the summary's forecast and limits.
+ * «Прогноз»: the expenses planned for the open month with their total «Заплановано»; each plan can be changed,
+ * deleted or recorded as a real expense («Записати як витрату»). The plans count in the summary's forecast and limits.
  */
 export function ForecastPage() {
   const [month] = useMonthParam();
@@ -40,7 +40,7 @@ export function ForecastPage() {
 
   return (
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
-      <PageToolbar addLabel="Добавить план" onAdd={editor.add}>
+      <PageToolbar addLabel="Додати план" onAdd={editor.add}>
         <PlannedTotal
           plans={
             query.data && {
@@ -56,7 +56,7 @@ export function ForecastPage() {
           error={query.error}
           isEmpty={items.length === 0}
           scope="plan"
-          loadingLabel="Загружаю план"
+          loadingLabel="Завантажую план"
           onRetry={() => void query.refetch()}
         >
           {isComputer ? <PlannedTable {...rows} /> : <PlannedList {...rows} />}

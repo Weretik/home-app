@@ -51,8 +51,8 @@ public static class RateLimitingRegistration
         var problem = new ProblemDetails
         {
             Status = StatusCodes.Status429TooManyRequests,
-            Title = "Too many requests.",
-            Detail = "Too many requests from this address. Wait a little and try again.",
+            Title = "Забагато запитів.",
+            Detail = "Забагато запитів із цієї адреси. Зачекайте трохи й спробуйте ще раз.",
         };
         problem.Extensions["code"] = "too_many_requests";
         problem.Extensions["traceId"] = http.TraceIdentifier;

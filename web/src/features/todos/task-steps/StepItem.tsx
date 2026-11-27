@@ -46,7 +46,7 @@ export function StepItem({
         checked={step.isDone}
         disabled={!canTick}
         onChange={onToggle}
-        slotProps={{ input: { 'aria-label': `Шаг выполнен: ${step.title}` } }}
+        slotProps={{ input: { 'aria-label': `Крок виконано: ${step.title}` } }}
       />
       <InputBase
         value={title}
@@ -60,16 +60,16 @@ export function StepItem({
             (event.target as HTMLElement).blur();
           }
         }}
-        inputProps={{ 'aria-label': `Шаг: ${step.title}`, maxLength: 200 }}
+        inputProps={{ 'aria-label': `Крок: ${step.title}`, maxLength: 200 }}
         sx={{
           py: 1,
           textDecoration: step.isDone ? 'line-through' : undefined,
           color: step.isDone ? 'text.secondary' : 'text.primary',
         }}
       />
-      <Tooltip title="Удалить шаг">
+      <Tooltip title="Видалити крок">
         <IconButton
-          aria-label={`Удалить шаг: ${step.title}`}
+          aria-label={`Видалити крок: ${step.title}`}
           onClick={onRemove}
           sx={{ mt: 0.5 }}
         >

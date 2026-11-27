@@ -41,7 +41,7 @@ const without = (id: string) => (data: Pages | undefined) =>
   };
 
 /**
- * Moves a task to another list: done or cancelled from the active list, «Вернуть» from the archive. Optimistic: the
+ * Moves a task to another list: done or cancelled from the active list, «Повернути» from the archive. Optimistic: the
  * row leaves its list at once and comes back if the write fails (the caller shows why). Everything reloads after.
  */
 export function useMoveTask() {
@@ -66,7 +66,7 @@ export function useMoveTask() {
 }
 
 /**
- * Puts a task back to the status it had before a tick («Отменить» in the snackbar). The tick changed the version, so
+ * Puts a task back to the status it had before a tick («Скасувати» in the snackbar). The tick changed the version, so
  * the task is read again first.
  */
 export function useRestoreStatus() {

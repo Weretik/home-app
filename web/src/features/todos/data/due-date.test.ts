@@ -44,9 +44,9 @@ describe('isOverdue', () => {
 
 describe('formatDue', () => {
   it('says today, tomorrow and yesterday in words', () => {
-    expect(formatDue('2026-11-26', today)).toBe('сегодня');
+    expect(formatDue('2026-11-26', today)).toBe('сьогодні');
     expect(formatDue('2026-11-27', today)).toBe('завтра');
-    expect(formatDue('2026-11-25', today)).toBe('вчера');
+    expect(formatDue('2026-11-25', today)).toBe('вчора');
   });
 
   it('shows other days with the weekday, and the year outside this one', () => {

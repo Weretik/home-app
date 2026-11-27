@@ -8,7 +8,7 @@ internal sealed class RecordPlannedExpenseValidator : AbstractValidator<RecordPl
     public RecordPlannedExpenseValidator()
     {
         RuleFor(c => c.Id).NotEmpty();
-        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Send the version of the plan you record in the If-Match header.");
+        RuleFor(c => c.Version).NotEqual(0u).WithMessage("Надішліть версію плану, який записуєте, у заголовку If-Match.");
         RuleFor(c => c.PaymentMethod).IsInEnum();
         RuleFor(c => c.Comment).MaximumLength(EntryRules.MaxCommentLength);
     }

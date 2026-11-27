@@ -31,7 +31,7 @@ describe('checkPrice', () => {
     expect(checkPrice('')).toBeUndefined();
     expect(checkPrice('100')).toBeUndefined();
     expect(checkPrice('0')).toBe(
-      'Цена больше нуля, до двух знаков после запятой',
+      'Ціна більша за нуль, до двох знаків після коми',
     );
   });
 });
@@ -44,27 +44,27 @@ describe('checkLink', () => {
   });
 
   it('asks for a link when it is required', () => {
-    expect(checkLink(' ', { required: 'Укажите ссылку варианта' })).toBe(
-      'Укажите ссылку варианта',
+    expect(checkLink(' ', { required: 'Вкажіть посилання варіанта' })).toBe(
+      'Вкажіть посилання варіанта',
     );
   });
 
   it('rejects other schemes, bare addresses and too long links', () => {
-    const message = 'Ссылка должна начинаться с http:// или https://';
+    const message = 'Посилання має починатися з http:// або https://';
     expect(checkLink('shop.ua/item')).toBe(message);
     expect(checkLink('ftp://a.ua')).toBe(message);
     expect(checkLink(`https://a.ua/${'x'.repeat(2000)}`)).toBe(
-      'Ссылка не длиннее 2000 символов',
+      'Посилання не довше 2000 символів',
     );
   });
 });
 
 describe('checkLength', () => {
   it('checks required text and its length after trimming', () => {
-    expect(checkLength('  ', 200, 'Введите название')).toBe('Введите название');
-    expect(checkLength(' Кольцо ', 200, 'Введите название')).toBeUndefined();
-    expect(checkLength('x'.repeat(201), 200, 'Введите название')).toBe(
-      'Не длиннее 200 символов',
+    expect(checkLength('  ', 200, 'Введіть назву')).toBe('Введіть назву');
+    expect(checkLength(' Кольцо ', 200, 'Введіть назву')).toBeUndefined();
+    expect(checkLength('x'.repeat(201), 200, 'Введіть назву')).toBe(
+      'Не довше 200 символів',
     );
     expect(checkLength('', 100)).toBeUndefined();
   });
@@ -75,8 +75,8 @@ describe('checkYear', () => {
     expect(checkYear('')).toBeUndefined();
     expect(checkYear('2000-01-01')).toBeUndefined();
     expect(checkYear('2100-12-31')).toBeUndefined();
-    expect(checkYear('1999-12-31')).toBe('Дата между 2000 и 2100 годом');
-    expect(checkYear('2101-01-01')).toBe('Дата между 2000 и 2100 годом');
+    expect(checkYear('1999-12-31')).toBe('Дата між 2000 і 2100 роком');
+    expect(checkYear('2101-01-01')).toBe('Дата між 2000 і 2100 роком');
   });
 });
 

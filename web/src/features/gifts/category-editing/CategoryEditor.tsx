@@ -10,7 +10,7 @@ interface CategoryEditorProps {
   onClose: () => void;
 }
 
-/** The open dialog of the «Категории» card; a category that gifts use cannot be deleted, and the dialog says why. */
+/** The open dialog of the «Категорії» card; a category that gifts use cannot be deleted, and the dialog says why. */
 export function CategoryEditor({ state, onClose }: CategoryEditorProps) {
   const remove = useDeleteCategory();
   if (!state) return null;
@@ -25,11 +25,11 @@ export function CategoryEditor({ state, onClose }: CategoryEditorProps) {
   };
   return (
     <DeleteDialog
-      title="Удалить категорию?"
+      title="Видалити категорію?"
       summary={category.name}
       error={
         remove.error
-          ? describeWriteError(remove.error, 'удалить').message
+          ? describeWriteError(remove.error, 'видалити').message
           : undefined
       }
       isPending={remove.isPending}

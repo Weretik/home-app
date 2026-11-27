@@ -7,7 +7,7 @@ import { LimitFill } from './LimitFill';
 import { LimitNotes } from './LimitNotes';
 import { leftColor, limitsLabel, numberSx, type LimitRow } from './limit-rows';
 
-/** The limits on a phone: one list item per limit with its fill and sums, «ИТОГО» last. */
+/** The limits on a phone: one list item per limit with its fill and sums, «РАЗОМ» last. */
 export function LimitList({ rows }: { rows: LimitRow[] }) {
   return (
     <List aria-label={limitsLabel} sx={{ pb: 1 }}>
@@ -46,20 +46,20 @@ export function LimitList({ rows }: { rows: LimitRow[] }) {
               sx={{ fontVariantNumeric: 'tabular-nums' }}
             >
               <Box component="span" sx={numberSx}>
-                {formatExact(row.spent)} из {formatExact(row.limit)}
+                {formatExact(row.spent)} з {formatExact(row.limit)}
               </Box>
               {' · '}
               <Box
                 component="span"
                 sx={{ ...numberSx, color: leftColor(row.left) }}
               >
-                остаток {formatExact(row.left)}
+                залишок {formatExact(row.left)}
               </Box>
               {row.perDay !== null && (
                 <>
                   {' · '}
                   <Box component="span" sx={numberSx}>
-                    в день {formatExact(row.perDay)}
+                    на день {formatExact(row.perDay)}
                   </Box>
                 </>
               )}

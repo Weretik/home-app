@@ -13,7 +13,7 @@ namespace Expenses.Application.Idempotency;
 public static class IdempotentCreates
 {
     public static readonly Error KeyReused = Error.Conflict(
-        "expenses.idempotency_key_reused", "This Idempotency-Key was already used for different data.");
+        "expenses.idempotency_key_reused", "Цей Idempotency-Key уже використано для інших даних.");
 
     public static string Fingerprint<T>(T payload) =>
         Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload))));

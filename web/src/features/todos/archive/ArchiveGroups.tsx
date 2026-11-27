@@ -11,7 +11,7 @@ interface ArchiveGroupsProps {
   onReturn: (task: TodoTaskItem) => void;
 }
 
-/** The archive by the Kyiv day of completion (FR-006): Сегодня, Вчера, then «Пт, 20 ноября» and older. */
+/** The archive by the Kyiv day of completion (FR-006): Сьогодні, Вчора, then «Пт, 20 листопада» and older. */
 export function ArchiveGroups({
   items,
   today,

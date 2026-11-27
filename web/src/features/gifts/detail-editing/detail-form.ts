@@ -2,7 +2,7 @@ import type { GiftDetailItem, Recipient } from '../data/gifts-api';
 import type { GiftDetailRequest } from '../data/settings-writes-api';
 import { checkLength, type FieldErrors } from '../editing/field-checks';
 
-/** A «нюанс» as the form holds it: for whom, what («Кольцо») and its value («18,5–19,0»). */
+/** A «нюанс» as the form holds it: for whom, what («Каблучка») and its value («18,5–19,0»). */
 export interface DetailFormValues {
   recipient: Recipient | '';
   label: string;
@@ -22,9 +22,9 @@ export const fromDetail = (detail: GiftDetailItem): DetailFormValues => ({
 });
 
 export const validateDetail = (values: DetailFormValues): FieldErrors => ({
-  recipient: values.recipient ? undefined : 'Выберите, для кого',
-  label: checkLength(values.label, 100, 'Введите, что это'),
-  value: checkLength(values.value, 200, 'Введите значение'),
+  recipient: values.recipient ? undefined : 'Виберіть, для кого',
+  label: checkLength(values.label, 100, 'Введіть, що це'),
+  value: checkLength(values.value, 200, 'Введіть значення'),
 });
 
 export const toDetailRequest = (

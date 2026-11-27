@@ -18,7 +18,7 @@ interface DetailDialogProps {
   onClose: () => void;
 }
 
-/** «Новый нюанс» / «Изменить нюанс»: for whom, what and its value. */
+/** «Новий нюанс» / «Змінити нюанс»: for whom, what and its value. */
 export function DetailDialog({ detail, preset, onClose }: DetailDialogProps) {
   const form = useEditForm({
     initial: detail ? fromDetail(detail) : emptyDetail(preset),
@@ -32,7 +32,7 @@ export function DetailDialog({ detail, preset, onClose }: DetailDialogProps) {
 
   return (
     <EditDialog
-      title={detail ? 'Изменить нюанс' : 'Новый нюанс'}
+      title={detail ? 'Змінити нюанс' : 'Новий нюанс'}
       error={form.message}
       isPending={form.isPending}
       onSubmit={form.submit}
@@ -53,15 +53,15 @@ export function DetailDialog({ detail, preset, onClose }: DetailDialogProps) {
         ))}
       </TextField>
       <TextField
-        label="Что"
-        placeholder="Кольцо"
+        label="Що"
+        placeholder="Каблучка"
         value={values.label}
         onChange={(event) => set('label', event.target.value)}
         error={Boolean(errors.label)}
         helperText={errors.label}
       />
       <TextField
-        label="Значение"
+        label="Значення"
         placeholder="18,5–19,0"
         value={values.value}
         onChange={(event) => set('value', event.target.value)}

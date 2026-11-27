@@ -27,7 +27,7 @@ interface PagedListCardProps<Item> extends StatusProps {
   children: (items: Item[], isComputer: boolean) => ReactNode;
 }
 
-/** A month list in a card: loading, error and empty states, the rows, and «Показать ещё» while pages remain. */
+/** A month list in a card: loading, error and empty states, the rows, and «Показати ще» while pages remain. */
 export function PagedListCard<Item>({
   query,
   children,

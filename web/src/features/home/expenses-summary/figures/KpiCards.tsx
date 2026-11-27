@@ -31,13 +31,13 @@ export function KpiCards({ summary }: { summary: MonthSummary }) {
     >
       <KpiCard
         emoji="💰"
-        title="Доходы"
+        title="Доходи"
         value={summary.incomes}
         caption={incomesCaption(summary)}
       />
       <KpiCard
         emoji="💸"
-        title="Расходы"
+        title="Витрати"
         value={summary.expenses}
         caption={expensesCaption(summary)}
       >
@@ -53,14 +53,14 @@ export function KpiCards({ summary }: { summary: MonthSummary }) {
       </KpiCard>
       <KpiCard
         emoji="📌"
-        title="Итог месяца"
+        title="Підсумок місяця"
         value={summary.result}
         tone={summary.result >= 0 ? 'success' : 'error'}
-        caption={`отложено ${formatWhole(summary.savingsNet)}`}
+        caption={`відкладено ${formatWhole(summary.savingsNet)}`}
       />
       <KpiCard
         emoji="🐷"
-        title="Копилка"
+        title="Скарбничка"
         value={summary.savingsBalance}
         caption={savingsCaption(summary)}
       >
@@ -68,7 +68,7 @@ export function KpiCards({ summary }: { summary: MonthSummary }) {
           <LinearProgress
             variant="determinate"
             value={Math.min(goalPercent, 100)}
-            aria-label="Копилка: доля от цели"
+            aria-label="Скарбничка: частка від цілі"
             sx={{ mt: 1.5, height: 6, borderRadius: 3 }}
           />
         )}
