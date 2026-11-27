@@ -9,7 +9,7 @@ import { InfoCard } from './InfoCard';
 const steps = [
   'Откройте бота и отправьте /start.',
   'Нажмите «Я Виталий» или «Я Маша» — этот чат будет вашим.',
-  'Добавьте бота в семейную группу — он подключит её сам.',
+  'Группа не обязательна: без неё общие сводки приходят каждому в личку.',
 ];
 
 /** «Бот» (FR-002, FR-003): whether the bot is set up and reachable, its link, and how to connect a chat. */
