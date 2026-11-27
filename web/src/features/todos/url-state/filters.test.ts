@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isFiltered, quickAddAssignee, toTaskQuery } from './filters';
+import {
+  everyoneParam,
+  isFiltered,
+  quickAddAssignee,
+  resolveWho,
+  toTaskQuery,
+} from './filters';
 
 describe('toTaskQuery', () => {
   it('sends nothing without filters', () => {
@@ -49,5 +55,23 @@ describe('quickAddAssignee and isFiltered', () => {
     expect(isFiltered({ q: ' ' })).toBe(false);
     expect(isFiltered({ category: 'none' })).toBe(true);
     expect(isFiltered({ when: 'week' })).toBe(true);
+  });
+});
+
+describe('resolveWho', () => {
+  it('a «Кому» in the link wins', () => {
+    expect(resolveWho('shared', 'Vitaliy')).toBe('shared');
+    expect(resolveWho('maria', 'Vitaliy')).toBe('maria');
+  });
+
+  it('no «Кому» starts on the signed-in person', () => {
+    expect(resolveWho(null, 'Maria')).toBe('maria');
+    expect(resolveWho(null, 'Vitaliy')).toBe('vitaliy');
+    expect(resolveWho(null, undefined)).toBeUndefined();
+  });
+
+  it('«Усі» picked by hand, or junk, shows everyone', () => {
+    expect(resolveWho(everyoneParam, 'Maria')).toBeUndefined();
+    expect(resolveWho('someone', 'Maria')).toBeUndefined();
   });
 });

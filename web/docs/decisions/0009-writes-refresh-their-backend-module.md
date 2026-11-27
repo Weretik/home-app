@@ -13,7 +13,7 @@ generic add/change/delete writer with a create and a delete that always failed (
 
 ## Decision
 
-- `src/platform/query-keys.ts` holds one query key prefix per backend module (`moduleKeys.expenses = ['expenses']`).
+- `src/platform/query-client.ts` (was `query-keys.ts`) holds one query key prefix per backend module (`moduleKeys.expenses = ['expenses']`).
   Every read of the module starts its key with it, in whichever feature it lives.
 - Every successful write to the module invalidates the whole prefix (`write-data/write-hooks-api.ts`, `useWrite`);
   a stale entry (404, `expenses.changed_meanwhile`) does the same. React Query refetches only the queries on screen;
@@ -30,6 +30,6 @@ generic add/change/delete writer with a create and a delete that always failed (
 - A write refetches the other queries of the module that are on screen (for example the category list next to the
   expenses): one or two small extra requests per write, accepted for a two-person app.
 - A new feature that shows a module's data only has to start its keys with the module's prefix; a new module adds one
-  entry to `query-keys.ts`.
+  entry to `moduleKeys` in `query-client.ts`.
 - Another browser still sees a change only after its own `staleTime` or a reload; live updates would need a push
   channel and a new decision.

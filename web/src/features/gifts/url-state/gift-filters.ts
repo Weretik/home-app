@@ -1,3 +1,4 @@
+import type { FamilyPerson } from '../../../platform/member-api';
 import type { GiftPriority, Recipient } from '../data/gifts-api';
 import { priorities, recipients } from '../display/labels';
 
@@ -31,17 +32,23 @@ const isRecipient = (value: string | null): value is Recipient =>
 const isPriority = (value: string | null): value is GiftPriority =>
   (priorities as readonly (string | null)[]).includes(value);
 
+/** `?recipient=all`: «Усі» picked by hand, so the list does not fall back to the signed-in person. */
+export const everyoneParam = 'all';
+
 /**
  * Reads the filters from the URL. An unknown recipient or priority is ignored; a category is kept only when it exists, or while
- * the categories are not loaded yet (`categoryIds` undefined).
+ * the categories are not loaded yet (`categoryIds` undefined). Without `recipient` the list starts on the signed-in
+ * `person` (identity 002 FR-003); `recipient=all` shows everyone.
  */
 export function parseFilters(
   params: URLSearchParams,
   categoryIds?: readonly string[],
+  person?: FamilyPerson,
 ): GiftFilters {
   const filters: GiftFilters = {};
   const recipient = params.get('recipient');
   if (isRecipient(recipient)) filters.recipient = recipient;
+  else if (recipient === null && person) filters.recipient = person;
   const category = params.get('category');
   if (category && (!categoryIds || categoryIds.includes(category)))
     filters.categoryId = category;

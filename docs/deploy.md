@@ -63,7 +63,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `OutboxTick__Key` | long random value, equal to the GitHub secret `SCHEDULER_KEY` | for the outbox and the Telegram bot; without it both ticks answer `404` |
 | `Telegram__BotToken` | the token from @BotFather | for the Telegram bot; empty means the bot is off and the webhook answers `404` |
 | `Identity__Google__ClientId` | the Google OAuth client id ([below](#sign-in-with-google)) | always; without it nobody can sign in and the site stays closed |
-| `Identity__AllowedEmails__0`, `Identity__AllowedEmails__1` | Vitaliy's and Masha's Google e-mails | always; only these may sign in. Removing one locks that person out at once |
+| `Identity__AllowedEmails__0`, `Identity__AllowedEmails__1` | Vitaliy's (`__0`) and Masha's (`__1`) Google e-mails | always; only these may sign in, and the index says who is who (pages start on that person, API ADR 0038). Removing one locks that person out at once |
 
 Or with one command:
 
@@ -147,8 +147,12 @@ Only the e-mails in `Identity__AllowedEmails__*` may use the site
    origins: `https://ambitious-beach-0b1d13b10.6.azurestaticapps.net` and `http://localhost:5173`. No redirect URIs:
    the web app uses the Google button, not a redirect.
 3. App Service variables: `Identity__Google__ClientId` = the client id, `Identity__AllowedEmails__0` and `__1` = the
-   two e-mails. GitHub repository variable `VITE_GOOGLE_CLIENT_ID` = the same client id.
-4. Set them before merging the sign-in change; the deploy fails its sign-in smoke step while the client id is missing.
+   two e-mails (`__0` Vitaliy, `__1` Masha). GitHub repository variable `VITE_GOOGLE_CLIENT_ID` = the same client id
+   (Settings → Secrets and variables → Actions → **Variables**; a secret of the same name works too). It is baked into
+   the web build, so a change needs a new web deploy (re-run the latest «Web» workflow).
+4. Set them before merging the sign-in change. The API deploy fails its sign-in smoke step while the API client id is
+   missing; the web deploy refuses to build without `VITE_GOOGLE_CLIENT_ID` and, after uploading, checks that the
+   site's JS carries it (otherwise the sign-in screen says «Вхід ще не налаштовано»).
 
 Locally: `dotnet user-secrets set "Identity:Google:ClientId" "<id>"` (and `Identity:AllowedEmails:0`) in
 `src/Host/Host.Api`, and `VITE_GOOGLE_CLIENT_ID` in `web/.env.local`.

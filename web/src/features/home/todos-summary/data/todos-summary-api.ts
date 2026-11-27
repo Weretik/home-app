@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, apiCall, type Schema } from '../../../../api-client';
 import { api } from '../../../../platform/api';
-import { moduleKeys } from '../../../../platform/query-keys';
+import { moduleKeys } from '../../../../platform/query-client';
 
 export type TodoSummary = Schema<'TodoSummary'>;
 export type AssigneeCounts = Schema<'AssigneeCounts'>;

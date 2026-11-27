@@ -1,51 +1,58 @@
 import { useSyncExternalStore } from 'react';
+import { useCurrentMember } from '../../../platform/member-api';
 import type { ShoppingPerson } from '../data/shopping-api';
 
-/** Where this device remembers who uses it (web ADR 0012); no sign-in yet. */
-export const meStorageKey = 'home.shopping.me';
+/**
+ * Where a hand-picked «Я» is kept: per signed-in e-mail and only for this tab (sessionStorage), so the next visit
+ * starts on the signed-in person again (web ADR 0016, superseding the per-device choice of web ADR 0012).
+ */
+export const meStorageKey = (email: string) => `home.shopping.me:${email}`;
 const fallback: ShoppingPerson = 'Vitaliy';
 const people: readonly ShoppingPerson[] = ['Vitaliy', 'Maria'];
 const listeners = new Set<() => void>();
-/** The choice when storage refuses to keep it. */
-let memory: ShoppingPerson | null = null;
+/** The choices when storage refuses to keep them. */
+const memory = new Map<string, ShoppingPerson>();
 
-/** The stored person; the default when storage is empty, blocked or holds something else. */
-export function readMe(): ShoppingPerson {
+/** The person picked by hand in this tab, or null when nobody was picked (or storage holds something else). */
+export function readMe(email: string): ShoppingPerson | null {
+  const kept = memory.get(email);
+  if (kept) return kept;
   try {
-    const stored = window.localStorage.getItem(meStorageKey);
-    return people.find((p) => p === stored) ?? fallback;
+    const stored = window.sessionStorage.getItem(meStorageKey(email));
+    return people.find((p) => p === stored) ?? null;
   } catch {
-    return fallback;
+    return null;
   }
 }
 
-/** Remembers the person on this device and tells every component that shows it. */
-export function writeMe(person: ShoppingPerson) {
+/** Keeps a hand-picked person for this tab and tells every component that shows it. */
+export function writeMe(email: string, person: ShoppingPerson) {
   try {
-    window.localStorage.setItem(meStorageKey, person);
+    window.sessionStorage.setItem(meStorageKey(email), person);
   } catch {
     // Private mode or blocked storage: the choice lasts until the page closes.
-    memory = person;
+    memory.set(email, person);
   }
   listeners.forEach((listener) => listener());
 }
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === meStorageKey) listener();
-  };
-  window.addEventListener('storage', onStorage);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener('storage', onStorage);
-  };
+  return () => listeners.delete(listener);
 }
 
-const snapshot = () => memory ?? readMe();
-
-/** «Я» on this device: who adds and buys items. Shared by the header toggle and the pages. */
+/**
+ * «Я»: who adds and buys items. The person picked by hand in this tab, else the signed-in person, else Віталій (while
+ * the member loads, or for a member who is neither). Shared by the header toggle and the pages.
+ */
 export function useMe(): [ShoppingPerson, (person: ShoppingPerson) => void] {
-  const me = useSyncExternalStore(subscribe, snapshot, () => fallback);
-  return [me, writeMe];
+  const { data: member } = useCurrentMember();
+  const email = member?.email ?? '';
+  const picked = useSyncExternalStore(
+    subscribe,
+    () => readMe(email),
+    () => null,
+  );
+  const me = picked ?? member?.person ?? fallback;
+  return [me, (person) => writeMe(email, person)];
 }

@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
+import { useSignedInPerson } from '../../../platform/member-api';
 import type { GiftPriority, Recipient } from '../data/gifts-api';
-import { parseFilters, type GiftFilters } from './gift-filters';
+import { everyoneParam, parseFilters, type GiftFilters } from './gift-filters';
 
 export interface GiftFilterState {
   filters: GiftFilters;
@@ -15,12 +16,13 @@ export interface GiftFilterState {
 /**
  * The list filters in the URL (`?recipient=&category=&priority=`), so a link, a reload or «Назад» keeps them (web ADR 0006).
  * A change replaces the history entry instead of adding one. `categoryIds` drops a category that does not exist.
+ * Without `recipient` the list shows the signed-in person; «Усі» and «Скинути» write `recipient=all` (identity 002).
  */
 export function useGiftFilters(
   categoryIds?: readonly string[],
 ): GiftFilterState {
   const [params, setParams] = useSearchParams();
-  const filters = parseFilters(params, categoryIds);
+  const filters = parseFilters(params, categoryIds, useSignedInPerson());
 
   const update = (changes: Record<string, string | undefined>) =>
     setParams(
@@ -40,12 +42,12 @@ export function useGiftFilters(
     isFiltered: Boolean(
       filters.recipient || filters.categoryId || filters.priority,
     ),
-    setRecipient: (value) => update({ recipient: value }),
+    setRecipient: (value) => update({ recipient: value ?? everyoneParam }),
     setCategory: (value) => update({ category: value }),
     setPriority: (value) => update({ priority: value }),
     clear: () =>
       update({
-        recipient: undefined,
+        recipient: everyoneParam,
         category: undefined,
         priority: undefined,
       }),

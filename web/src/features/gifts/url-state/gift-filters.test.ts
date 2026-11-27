@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { GiftPriority, Recipient } from '../data/gifts-api';
-import { applyFilters, groupByRecipient, parseFilters } from './gift-filters';
+import {
+  applyFilters,
+  everyoneParam,
+  groupByRecipient,
+  parseFilters,
+} from './gift-filters';
 
 const gift = (
   id: string,
@@ -15,6 +20,26 @@ const gift = (
 });
 
 describe('parseFilters', () => {
+  it('starts on the signed-in person without a recipient in the link', () => {
+    expect(parseFilters(new URLSearchParams(), [], 'Maria')).toEqual({
+      recipient: 'Maria',
+    });
+    expect(parseFilters(new URLSearchParams(), [], undefined)).toEqual({});
+  });
+
+  it('keeps a recipient from the link, and «Усі» picked by hand, over the signed-in person', () => {
+    expect(
+      parseFilters(new URLSearchParams('recipient=Together'), [], 'Maria'),
+    ).toEqual({ recipient: 'Together' });
+    expect(
+      parseFilters(
+        new URLSearchParams(`recipient=${everyoneParam}`),
+        [],
+        'Maria',
+      ),
+    ).toEqual({});
+  });
+
   it('reads a known recipient and category', () => {
     const params = new URLSearchParams('recipient=Maria&category=c1');
     expect(parseFilters(params, ['c1', 'c2'])).toEqual({
