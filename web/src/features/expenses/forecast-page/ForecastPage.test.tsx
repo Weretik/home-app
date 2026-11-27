@@ -126,7 +126,7 @@ test('lists the month plans with their categories and the total', async () => {
   );
   const rows = within(list).getAllByRole('listitem');
   expect(rows).toHaveLength(2);
-  expect(plain(rows[0]!)).toContain('СтраховкаМашина · Віталій');
+  expect(plain(rows[0]!)).toContain('Страховка4 200,00 ₴Машина · Віталій');
   expect(plain(rows[1]!)).toContain('Подарки · Спільне');
   await waitFor(() =>
     expect(plain(screen.getByRole('status'))).toContain(

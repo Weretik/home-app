@@ -9,6 +9,8 @@ import { MoreSheet } from './MoreSheet';
 import { mainSections, phoneMoreSections, sectionOf } from './sections';
 
 const MORE = 'more';
+const TYPING =
+  'input:not([type=checkbox], [type=radio], [type=button]):focus, textarea:focus';
 
 const actionSx = (theme: Theme) => ({
   minWidth: 0,
@@ -49,6 +51,9 @@ export function BottomNav() {
       square
       sx={(theme) => ({
         display: { xs: 'block', md: 'none' },
+        // While a text field has focus the keyboard is open: the bar steps aside so the field and the page keep the
+        // room above the keyboard (web ADR 0020).
+        [`body:has(${TYPING}) &`]: { display: 'none' },
         position: 'fixed',
         left: 0,
         right: 0,

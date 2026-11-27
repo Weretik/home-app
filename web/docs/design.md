@@ -82,6 +82,20 @@ Computer (md, 900px and wider)              Phone (below md)
 - Grids: one column on a phone, two from `sm`, three from `lg` where cards are small.
 - A page starts with its title (`h4` as `h1`); the shell shows no extra page header.
 
+## Phone and touch
+
+Most use is the installed app on an Android phone ([ADR 0020](decisions/0020-phone-touch-targets-and-keyboard.md)).
+
+- Tap targets are at least 44px on a touch screen. The theme does it (`src/app/theme/phone-overrides.ts`, only under
+  `(pointer: coarse)`): icon and toggle buttons grow to 44px, buttons to 40px with an invisible 44px hit area, small
+  controls in dense rows keep their look with the same hit area. A screen never sets its own touch sizes.
+- A phone row never puts a name in a narrow column next to other content. Title, amount and «⋮» share the first line;
+  the details take the whole width under them (`expenses/month-view/CompactRow.tsx`); a row with more to say stacks.
+- Filters on a phone pair up two per row (selects, search) so the list starts in the first screen.
+- Every add or edit dialog is full screen below `sm`. The page shrinks above the keyboard
+  (`interactive-widget=resizes-content`) and the bottom bar hides while a text field has focus.
+- Section tabs on a phone have no minimum width; scroll arrows show only when there is more to scroll to.
+
 ## Sections with several pages and month lists
 
 - A section with several pages shows them as tabs under the title (scrollable on a phone), one tab per built page,
@@ -100,7 +114,8 @@ Computer (md, 900px and wider)              Phone (below md)
   list loads nothing.
 - Amounts are formatted as hryvnias with two decimals («95 024,00 ₴»), right-aligned and in tabular figures.
 - A month list starts with its filters and the add button («Добавить расход») on one row, then the list in a card.
-  Below `md` the list is compact (title, a caption line, the amount on the right); from `md` it is a small table.
+  Below `md` the list is compact (title, amount and «⋮» on the first line, the caption lines under them across the
+  whole row); from `md` it is a small table.
   More rows load with «Показать ещё». Lists show no month total card; totals belong to a summary page.
 - An empty month says «За этот месяц записей нет»; an empty filtered list offers «Сбросить фильтр». An error shows
   the reason and «Повторить».

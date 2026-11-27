@@ -39,7 +39,7 @@ export function TaskFilters({
         value={known ? (filters.category ?? '') : ''}
         disabled={categories.isPending}
         onChange={(event) => state.setCategory(event.target.value || undefined)}
-        sx={{ minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 200px' } }}
+        sx={{ minWidth: 0, flex: { xs: '1 1 40%', sm: '0 1 200px' } }}
         slotProps={{
           select: { displayEmpty: true },
           inputLabel: { shrink: true },

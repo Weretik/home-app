@@ -1,6 +1,6 @@
 # Platform 002: Mobile view of every page
 
-Kind: change · Status: in implementation (phase 1 done) · Backend counterpart: none (web only)
+Kind: change · Status: implemented, audited ([audit](audit.md)) · Backend counterpart: none (web only)
 
 ## Goal
 
@@ -30,4 +30,30 @@ forms that fit with the keyboard open. Vitaliy asked for a deep review of every 
 
 1. **Menu (R-M-001):** «Ще» in the bottom bar ([web ADR 0019](../../../decisions/0019-phone-more-sheet-in-the-bottom-bar.md)).
    The shell folder split into `frame/` and `navigation/` to stay within six files per folder.
-2. **Pages (R-M-002 – R-M-005):** the findings of the per-page review and their fixes, added here with that change.
+2. **Pages (R-M-002 – R-M-005)** ([web ADR 0020](../../../decisions/0020-phone-touch-targets-and-keyboard.md)): the
+   findings below and their fixes.
+
+## Findings (review at 360 and 412px, 2026-11-27)
+
+Checked in a phone-sized browser (touch, 360×760 and 412×760) on every route with long generated texts, measuring
+sideways scroll, elements past the right edge, tap targets under 40px, clipped text and text squeezed into a narrow
+column; then the pages read in code.
+
+| Id      | Page                                                   | Finding                                                                                       | Fix                                                                   |
+| ------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| F-M-001 | all                                                    | «Про нас», «Стан», «Телеграм», «Профіль» not in the phone menu                                | «Ще» in the bottom bar (phase 1)                                      |
+| F-M-002 | all                                                    | No page scrolls sideways at 360 or 412px                                                      | none needed                                                           |
+| F-M-003 | Бюджет (all tabs), Подарунки, Налаштування             | Row «⋮» buttons 30×30px; icon buttons 36×36px; buttons 37px high                              | Theme touch sizes under `(pointer: coarse)`                           |
+| F-M-004 | Покупки history and settings, Справи, Про нас settings | Icon buttons (return, delete, up, down, edit) 36×36px                                         | Theme touch sizes                                                     |
+| F-M-005 | Бюджет: Витрати, Доходи, Скарбничка, Прогноз           | The comment sits in a ~150px column beside the amount, wrapping into many lines               | `CompactRow`: details across the whole row                            |
+| F-M-006 | Бюджет › Налаштування                                  | A limit's name and chips squeezed to a few characters per line beside its amount and captions | Limit row stacks: name with «⋮», amount and captions, chips           |
+| F-M-007 | Справи and Про нас settings                            | «Нова категорія» dialog is a small centred box on a phone                                     | Full screen below `sm`, like every other dialog                       |
+| F-M-008 | all full-screen dialogs                                | Android keeps the layout height when the keyboard opens, so «Зберегти» can hide under it      | `interactive-widget=resizes-content`; bottom bar hides while typing   |
+| F-M-009 | Про нас, Справи, Подарунки, Покупки, Бюджет            | Section tabs: a 90px minimum width and an empty space for the disabled left arrow             | Phone tabs without minimum width; disabled arrows take no room        |
+| F-M-010 | Справи, Про нас                                        | Filters one per row: about 260px before the first task or note                                | Category and term (Справи), category and search (Про нас) two per row |
+| F-M-011 | Профіль                                                | The «Про нас» caption squeezed beside «Відкрити»; long name and e-mail cut with «…»           | The caption wraps the button under it; name and e-mail wrap           |
+| F-M-012 | Подарунки list row                                     | Name squeezed beside the price                                                                | Done in the Gifts change (#34), not here                              |
+
+Kept as they are: category rows in settings (emoji, name, two 44px buttons: real names are short); the home page
+figure cards in one column (two columns would cut the amounts); the shopping row (the checkbox is the main action and
+already 52px).
