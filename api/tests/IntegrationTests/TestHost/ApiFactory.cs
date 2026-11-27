@@ -20,6 +20,7 @@ namespace IntegrationTests.TestHost;
 public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public const string TickKey = "integration-tick-key";
+    public const string DeployCheckKey = "integration-deploy-check-key";
     public const string ImportKey = "integration-import-key";
     public const string WebOrigin = "https://web.example";
     public const string GoogleClientId = "integration-client-id";
@@ -93,6 +94,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Database", _database!.GetConnectionString());
         builder.UseSetting("Database:InitializeOnStartup", "true");
         builder.UseSetting("OutboxTick:Key", TickKey);
+        builder.UseSetting("DeployCheck:Key", DeployCheckKey);
         builder.UseSetting("Expenses:Import:Key", ImportKey);
         builder.UseSetting("Cors:Origins:0", WebOrigin);
         // The shared host runs many requests from one address.

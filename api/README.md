@@ -58,7 +58,8 @@ environments migrations run as a separate step before the deploy (see [Deploy](#
 | `ConnectionStrings:Database` | PostgreSQL connection string; all modules share the database, each in its own schema. Empty: the API runs without a database and `/health` has no `database` check. |
 | `Database:InitializeOnStartup` | Apply migrations and seed data on start. Development only. |
 | `Cors:Origins` | Browser origins allowed to call the API with credentials. |
-| `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. A `GET` with it reads as the read-only service `scheduler` (deploy checks, ADR 0037). |
+| `OutboxTick:Key` | Shared secret for `POST /internal/outbox/tick`; empty disables the endpoint. It reads nothing (ADR 0045). |
+| `DeployCheck:Key` | Key of the read-only deploy checks (`X-Deploy-Check-Key`): a `GET` with it reads as the service `deploy-check`; empty turns it off ([ADR 0045](docs/decisions/0045-separate-deploy-check-key.md)). |
 | `Identity:Google:ClientId`, `Identity:AllowedEmails` | The Google OAuth client id the ID tokens must be issued for, and the family's e-mails; without a client id nobody can sign in ([Identity](docs/modules/identity.md)). |
 | `Expenses:Import:Key` | Shared secret for the sheet import (`X-Import-Key`); empty (the default) disables it. Set only while importing, normally on a local run ([module page](docs/modules/expenses.md#the-one-time-import-from-the-sheet)). |
 | `RateLimiting:PublicWrite`, `:SignIn` | `PermitLimit` and `WindowSeconds` per client address for writes (60 a minute) and sign-in (5 a minute) ([ADR 0012](docs/decisions/0012-rate-limits-on-anonymous-writes.md)). |
@@ -118,7 +119,7 @@ To react to something that happened in another module without waiting for it, pu
 (below) instead of calling the other module inside the request.
 
 To learn who sends the request (to record an author, as Notes does), take `Identity.Contracts.ICurrentMember`; it answers
-the signed-in member and their person in the home, or `null` for the scheduler key. No module but Identity reads claims
+the signed-in member and their person in the home, or `null` for the deploy check key. No module but Identity reads claims
 or `HttpContext.User` ([ADR 0040](docs/decisions/0040-current-member-through-identity-contracts.md)).
 
 ## Outbox and the scheduled tick

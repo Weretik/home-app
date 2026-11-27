@@ -39,15 +39,15 @@ public sealed class CurrentMemberTests
     }
 
     [Fact]
-    public void The_SchedulerKey_AndNoRequest_HaveNoMember()
+    public void The_DeployCheckKey_AndNoRequest_HaveNoMember()
     {
-        var scheduler = new DefaultHttpContext
+        var deployCheck = new DefaultHttpContext
         {
             User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(
-                [new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "scheduler")], IdentitySchemes.SchedulerKey)),
+                [new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "deploy-check")], IdentitySchemes.DeployCheckKey)),
         };
 
-        Assert.Null(MemberOf(scheduler));
+        Assert.Null(MemberOf(deployCheck));
         Assert.Null(MemberOf(new DefaultHttpContext()));
         Assert.Null(MemberOf(null));
     }

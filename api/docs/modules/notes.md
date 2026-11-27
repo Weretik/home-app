@@ -110,11 +110,11 @@ Seeded categories (fixed ids, `CategorySeed`):
 
 The deploy workflow builds a `notes` migrations bundle with the other modules' and runs it before the new version
 starts ([ADR 0016](../decisions/0016-migrations-as-bundles-in-deploy.md)); the smoke step then reads
-`GET /api/notes/items` and `GET /api/notes/categories` with the scheduler key.
+`GET /api/notes/items` and `GET /api/notes/categories` with the deploy check key.
 
 ## HTTP API
 
-Group `/api/notes`, tag `Notes`. Every endpoint needs a signed-in member (ADR 0037) and lists `401`; the scheduler key
+Group `/api/notes`, tag `Notes`. Every endpoint needs a signed-in member (ADR 0037) and lists `401`; the deploy check key
 only reads. Every write uses the `PublicWrite` rate limit and lists `429`.
 
 | Operation | Method and path | Request | Response |
@@ -140,6 +140,6 @@ quoted or not; a missing header is a `400`.
   keeps claims and `HttpContext.User` out of every module but Identity (ADR 0040).
 - Integration (`tests/IntegrationTests/Api/Notes`): the author from the session (Vitaliy and Masha), the last editor,
   `409` on a stale edit or delete, repeats with the same key, list order, filters, the word search, categories (seed,
-  unique names, rename, delete keeps notes), the rate limit on every write, `401` without a session, the scheduler key
+  unique names, rename, delete keeps notes), the rate limit on every write, `401` without a session, the deploy check key
   reads but cannot write, and the indexes the migration creates. `IdentityProtectionApiTests` covers both reads too,
   since it walks every `GET` of the contract.

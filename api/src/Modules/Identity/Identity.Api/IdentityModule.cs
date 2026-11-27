@@ -15,7 +15,7 @@ namespace Identity.Api;
 
 /// <summary>
 /// The Identity module: Google sign-in for the family, sessions, and who may call the API (ADR 0037). Every endpoint
-/// of every module needs a member (or, for reads, the scheduler key) unless it says <c>AllowAnonymous</c> in its own
+/// of every module needs a member (or, for reads, the deploy check key) unless it says <c>AllowAnonymous</c> in its own
 /// file. The host calls <see cref="AddIdentityModule"/> and <see cref="MapIdentityModule"/>.
 /// </summary>
 public static class IdentityModule
@@ -29,11 +29,12 @@ public static class IdentityModule
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentMember, CurrentMember>();
 
+        services.Configure<DeployCheckOptions>(configuration.GetSection(DeployCheckOptions.SectionName));
         services.AddAuthentication(IdentitySchemes.Session)
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(IdentitySchemes.Session, null)
-            .AddScheme<AuthenticationSchemeOptions, SchedulerKeyAuthenticationHandler>(IdentitySchemes.SchedulerKey, null);
+            .AddScheme<AuthenticationSchemeOptions, DeployCheckKeyAuthenticationHandler>(IdentitySchemes.DeployCheckKey, null);
         services.AddAuthorizationBuilder()
-            .SetFallbackPolicy(new AuthorizationPolicyBuilder(IdentitySchemes.Session, IdentitySchemes.SchedulerKey)
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder(IdentitySchemes.Session, IdentitySchemes.DeployCheckKey)
                 .RequireAuthenticatedUser()
                 .Build());
         return services;

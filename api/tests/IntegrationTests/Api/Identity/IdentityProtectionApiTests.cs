@@ -7,8 +7,9 @@ using IntegrationTests.TestHost;
 namespace IntegrationTests.Api.Identity;
 
 /// <summary>
-/// Closed by default: every read of the API needs a session, the scheduler key only reads, and the open endpoints
-/// stay open (spec identity/001, R-006, R-009, R-010; ADR 0037).
+/// Closed by default: every read of the API needs a session, the deploy check key only reads, the scheduler key
+/// reads nothing, and the open endpoints
+/// stay open (spec identity/001, R-006, R-009, R-010; ADR 0037, 0045).
 /// </summary>
 [Collection(ApiCollection.Name)]
 public sealed class IdentityProtectionApiTests(ApiFactory api)
@@ -54,11 +55,11 @@ public sealed class IdentityProtectionApiTests(ApiFactory api)
 
     [SkippableTheory]
     [MemberData(nameof(SectionReads))]
-    public async Task The_SchedulerKey_ReadsEverySection(string path)
+    public async Task The_DeployCheckKey_ReadsEverySection(string path)
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);
         using var deploy = api.CreateAnonymousClient();
-        deploy.DefaultRequestHeaders.Add("X-Scheduler-Key", ApiFactory.TickKey);
+        deploy.DefaultRequestHeaders.Add("X-Deploy-Check-Key", ApiFactory.DeployCheckKey);
 
         var response = await deploy.GetAsync(path);
 
@@ -67,19 +68,30 @@ public sealed class IdentityProtectionApiTests(ApiFactory api)
     }
 
     [SkippableFact]
-    public async Task The_SchedulerKey_NeverWrites_AndAWrongKeyReadsNothing()
+    public async Task The_DeployCheckKey_NeverWrites_AndAWrongKeyReadsNothing()
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);
         using var deploy = api.CreateAnonymousClient();
-        deploy.DefaultRequestHeaders.Add("X-Scheduler-Key", ApiFactory.TickKey);
+        deploy.DefaultRequestHeaders.Add("X-Deploy-Check-Key", ApiFactory.DeployCheckKey);
         using var wrong = api.CreateAnonymousClient();
-        wrong.DefaultRequestHeaders.Add("X-Scheduler-Key", "wrong-key");
+        wrong.DefaultRequestHeaders.Add("X-Deploy-Check-Key", "wrong-key");
 
         var write = await deploy.PostAsJsonAsync("/api/shopping/items", new { text = "Хлеб" });
 
         Assert.Equal(HttpStatusCode.Unauthorized, write.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await wrong.GetAsync("/api/expenses")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await deploy.GetAsync("/api/identity/me")).StatusCode);
+    }
+
+    [SkippableFact]
+    public async Task The_SchedulerKey_ReadsNothing()
+    {
+        Skip.If(api.Unavailable is not null, api.Unavailable);
+        using var scheduler = api.CreateAnonymousClient();
+        scheduler.DefaultRequestHeaders.Add("X-Scheduler-Key", ApiFactory.TickKey);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await scheduler.GetAsync("/api/expenses")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await scheduler.GetAsync("/api/notes/items")).StatusCode);
     }
 
     [SkippableFact]

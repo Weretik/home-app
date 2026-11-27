@@ -7,7 +7,7 @@ namespace Identity.Contracts;
 public interface ICurrentMember
 {
     /// <summary>
-    /// The signed-in member, or null outside a member's request: the scheduler key, background work, no request.
+    /// The signed-in member, or null outside a member's request: the deploy check key, background work, no request.
     /// </summary>
     SignedInMember? Get();
 }

@@ -138,10 +138,10 @@ through `src/platform/client/api.ts` from their `*-api.ts`.
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
 transaction go through the outbox, and their handlers are safe to run twice.
 
-**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `Telegram__BotToken`, `WebPush__PublicKey`, `WebPush__PrivateKey`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1` (and
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `DeployCheck__Key`, `Telegram__BotToken`, `WebPush__PublicKey`, `WebPush__PrivateKey`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1` (and
 `Expenses__Import__Key` only during an import) come from App Service environment variables; production migrations use
 the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; the scheduler cron uses the GitHub
-secret `SCHEDULER_KEY` (= `OutboxTick__Key`); locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
+secret `SCHEDULER_KEY` (= `OutboxTick__Key`) and the deploy check the secret `DEPLOY_CHECK_KEY` (= `DeployCheck__Key`); locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
 `web/` (everything `VITE_*` ends up in the build). Never commit secrets.
 
 Commits, pushes, branches, PRs and other remote actions only on the user's direct request. Keep unrelated working tree

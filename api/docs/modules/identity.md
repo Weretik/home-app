@@ -29,13 +29,15 @@ Code: [`src/Modules/Identity`](../../src/Modules/Identity). Schema: `identity`.
    session by hash, checks that it is active and that its e-mail is still on the allowlist, and slides its expiry.
 4. The authorization fallback policy requires an authenticated user for every endpoint that does not say
    `.AllowAnonymous()`. `POST /api/identity/sign-out` revokes the current session.
-5. A `GET` with the right `X-Scheduler-Key` authenticates as the read-only service `scheduler` (scheme
-   `SchedulerKey`), so the deploy can check that every section reads; the header does nothing on other methods.
+5. A `GET` with the right `X-Deploy-Check-Key` authenticates as the read-only service `deploy-check` (scheme
+   `DeployCheckKey`), so the deploy can check that every section reads; the header does nothing on other methods. The
+   scheduler key (`X-Scheduler-Key`) only runs the ticks and reads nothing
+   ([ADR 0045](../decisions/0045-separate-deploy-check-key.md)).
 
 ## Who is signed in, for other modules
 
 `Identity.Contracts` exposes `ICurrentMember.Get()`, which returns `SignedInMember(Email, Name, Person)` with
-`HouseholdPerson` `Vitaliy` or `Maria` (by the allowlist order), or `null` for the scheduler key and outside a request
+`HouseholdPerson` `Vitaliy` or `Maria` (by the allowlist order), or `null` for the deploy check key and outside a request
 ([ADR 0040](../decisions/0040-current-member-through-identity-contracts.md)). `Identity.Api` implements it
 (`Authentication/CurrentMember`, scoped, over `IHttpContextAccessor`). Notes uses it for the author of a note; no other
 module reads claims or `HttpContext.User`, which `ModuleBoundaryTests.Only_TheIdentityModule_ReadsClaims` checks.
@@ -72,7 +74,7 @@ Every other operation of the API answers `401` with a problem body without a ses
 | --- | --- | --- |
 | `Identity:Google:ClientId` | App Service `Identity__Google__ClientId` | the Google OAuth client id (Web application); not a secret. Empty: sign-in answers `409` and the site stays closed. |
 | `Identity:AllowedEmails` | App Service `Identity__AllowedEmails__0`, `__1` | the family's Google e-mails: `__0` Vitaliy, `__1` Masha |
-| `OutboxTick:Key` | App Service, GitHub secret `SCHEDULER_KEY` | also grants the read-only deploy checks |
+| `DeployCheck:Key` | App Service `DeployCheck__Key` = GitHub secret `DEPLOY_CHECK_KEY` | the read-only deploy checks; never given to an outside service. Empty: the header authenticates nobody. |
 
 Setup steps: [deployment](../../../docs/deploy.md#sign-in-with-google).
 
@@ -87,6 +89,6 @@ bundle first.
   verifier, `SessionAuthenticator`.
 - Architecture: `AuthorizationRulesTests` (the anonymous list).
 - Integration: `IdentityApiTests` (sign-in, refusals, sign-out, `me`, allowlist on every request, expiry slide),
-  `IdentityProtectionApiTests` (every `GET` is `401` without a token, the scheduler key reads but does not write). The
+  `IdentityProtectionApiTests` (every `GET` is `401` without a token, the deploy check key reads but does not write, the scheduler key reads nothing). The
   test host signs in through the real endpoint with a fake Google verifier; `ApiFactory.CreateHttpsClient()` is
   signed in, `CreateAnonymousClient()` is not.
