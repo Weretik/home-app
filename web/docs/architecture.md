@@ -24,8 +24,9 @@ src/
     shell/        header, side menu, bottom bar, the list of sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/       the API client instance (VITE_API_URL) with the session middleware (bearer token, 401 ends the
-                  session), the session token store (session.ts), the query client and each backend module's query
-                  key prefix (query-keys.ts), the interface locale `uk-UA` (locale.ts)
+                  session), the session token store (session.ts), the signed-in member and person (member-api.ts,
+                  web ADR 0016), the query client with each backend module's query key prefix (query-client.ts), the
+                  interface locale `uk-UA` (locale.ts)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -117,7 +118,7 @@ home/
   «перенос N» (carried in), «→ след. мес. N» (moves on) and «план N» (planned), each only when it is not zero;
   «Прогноз» (expected expenses, planned, the expected result, what stays of the monthly limit, «Открыть план»); who
   spent what; the top five categories. Its query key is `['expenses', 'summary', month]`, under the Expenses prefix
-  (`moduleKeys.expenses` in `src/platform/query-keys.ts`), so every write on the Бюджет pages refreshes it
+  (`moduleKeys.expenses` in `src/platform/query-client.ts`), so every write on the Бюджет pages refreshes it
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)). «Открыть расходы» opens the same month. A month
   with no entries and no plans shows the empty state.
 - The summary keeps its own labels and formatters: features never import each other. Rules both features show keep
@@ -240,7 +241,7 @@ shopping/
   prefix (list, frequent, history, departments, the home summary), as [ADR 0009](decisions/0009-writes-refresh-their-backend-module.md) asks.
 - Needed items are grouped by department in its sort order, urgent first, then oldest added; the cart is newest
   bought first. Moving an item to another department in the dialog teaches the dictionary on the server.
-- «Я» (Виталий / Маша) is per device and is the author of adds and ticks.
+- «Я» (Віталій / Маша) starts on the signed-in person, a tap switches it for the tab (web ADR 0016); it is the author of adds and ticks.
 - The quick add suggests names from everything ever added (`GET /api/shopping/items/suggestions`, key
   `['shopping', 'suggestions', query]`) for the text after the last `,` `;` or new line, 200 ms after typing pauses;
   a choice replaces only that segment and adds nothing, Enter without a highlighted option adds the text.
@@ -433,7 +434,9 @@ identity/
             (problem code → Ukrainian text), use-session.ts (the token store as React state)
   sign-in/  SessionGate (the app or the sign-in screen), SignInPage, GoogleButton and use-google-button.ts (loading,
             retry)
-  member/   MemberMenu (avatar button, name, e-mail, «Вийти»), MemberAvatar (Google picture or the first letter)
+  member/   MemberMenu (avatar button, name, e-mail, «Профіль», «Вийти»), MemberAvatar (Google picture or the first letter)
+  profile/  ProfilePage (`/profile`: member, «У домі», Telegram, «Вийти»), TelegramRow, profile-api.ts (the person's chat
+            from getNotificationsStatus)
 ```
 
 - `SessionGate` wraps every route in `App.tsx`. Without a token the same URL shows the sign-in screen, so the page
@@ -445,6 +448,9 @@ identity/
 - Any change of the session (sign-in, «Вийти», expiry, another tab) clears the whole React Query cache, so no data of
   one session shows in the next. «Вийти» calls `POST /api/identity/sign-out` best effort and signs the device out
   even when it fails.
+- Pages start on the signed-in person (web ADR 0016): `useSignedInPerson()` from `src/platform/member-api.ts` is
+  the default of Покупки «Я» (a tap overrides it for the tab), Справи `?who=` and Подарунки `?recipient=` (the URL
+  wins; «Усі» writes `all`).
 - The Google client id is the public build variable `VITE_GOOGLE_CLIENT_ID`; without it the screen says «Вхід ще не
   налаштовано». The sign-in texts are Ukrainian.
 
@@ -460,7 +466,7 @@ identity/
 ## App
 
 - Server state lives in React Query. Every read of a backend module starts its query key with the module's prefix
-  (`src/platform/query-keys.ts`), and every write invalidates that whole prefix, so a page or summary of another
+  (`src/platform/query-client.ts`), and every write invalidates that whole prefix, so a page or summary of another
   feature that shows the same module's data refreshes too ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
   Failures with a 4xx status are not retried.
 - `index.html` has `noindex` and `robots.txt` disallows everything.

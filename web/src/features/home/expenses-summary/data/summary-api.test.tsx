@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, vi } from 'vitest';
 import { createQueryClient } from '../../../../platform/query-client';
-import { moduleKeys } from '../../../../platform/query-keys';
+import { moduleKeys } from '../../../../platform/query-client';
 import { useMonthSummary } from './summary-api';
 
 afterEach(() => vi.unstubAllGlobals());

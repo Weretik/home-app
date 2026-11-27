@@ -62,9 +62,21 @@ jobs:
           # The API origin is public (it ends up in the JS), so it is a repository variable, not a secret.
           VITE_API_URL: ${{ vars.VITE_API_URL || 'https://vitaliy-home-api-ase3bfeab4e9gren.polandcentral-01.azurewebsites.net' }}
           # The Google OAuth client id of the sign-in button is public too (it is in every page); without it the
-          # sign-in screen says sign-in is not set up.
-          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
-        run: npm run build
+          # sign-in screen says sign-in is not set up. Read from a repository variable, or a secret of the same
+          # name if it was saved there instead.
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID || secrets.VITE_GOOGLE_CLIENT_ID }}
+          IS_DEPLOY: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        run: |
+          # A deploy without the client id would lock the family out («Вхід ще не налаштовано»), so it stops here.
+          if [ "$IS_DEPLOY" = "true" ] && [ -z "$VITE_GOOGLE_CLIENT_ID" ]; then
+            echo "::error::VITE_GOOGLE_CLIENT_ID is empty: add it under Settings > Secrets and variables > Actions > Variables (docs/deploy.md#sign-in-with-google)."
+            exit 1
+          fi
+          npm run build
+          if [ -n "$VITE_GOOGLE_CLIENT_ID" ] && ! grep -rqF "$VITE_GOOGLE_CLIENT_ID" dist/assets; then
+            echo "::error::The built JS does not contain the Google client id."
+            exit 1
+          fi
 
       # Uploads the ready dist/ as is; the Static Web App does not build anything itself.
       - name: Deploy to Azure Static Web Apps
@@ -76,3 +88,21 @@ jobs:
           app_location: web/dist
           skip_app_build: true
           skip_api_build: true
+
+      # The site must offer the Google button, not «Вхід ще не налаштовано»: the deployed bundle carries the client id.
+      - name: Smoke test sign-in on the deployed site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://ambitious-beach-0b1d13b10.6.azurestaticapps.net' }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID || secrets.VITE_GOOGLE_CLIENT_ID }}
+        run: |
+          expected=$(ls dist/assets/index-*.js | xargs -n1 basename)
+          for attempt in $(seq 1 12); do
+            html=$(curl -fsS "$SITE_URL/" || true)
+            if echo "$html" | grep -qF "$expected"; then break; fi
+            echo "The site does not serve $expected yet (attempt $attempt)"; sleep 10
+          done
+          echo "$html" | grep -qF "$expected" || { echo "::error::The site does not serve the new build $expected"; exit 1; }
+          curl -fsS "$SITE_URL/assets/$expected" | grep -qF "$VITE_GOOGLE_CLIENT_ID" \
+            || { echo "::error::The deployed JS has no Google client id: sign-in would say «Вхід ще не налаштовано»"; exit 1; }
+          echo "The deployed site offers Google sign-in."

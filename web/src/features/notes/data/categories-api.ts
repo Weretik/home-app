@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { moduleKeys } from '../../../platform/query-keys';
+import { moduleKeys } from '../../../platform/query-client';
 
 export type NoteCategoryItem = Schema<'NoteCategoryItem'>;
 

@@ -21,7 +21,11 @@ Next.js storefront.
 | 0013 | [A deep link opens one record: `?gift=<id>`](0013-deep-link-opens-a-record.md)                                                                |
 | 0014 | [The interface is Ukrainian, strings in place, one locale constant](0014-ukrainian-interface.md)                                              |
 | 0015 | [A sign-in gate with the Google button and a bearer token in localStorage](0015-sign-in-gate-with-google-button-and-bearer-token.md)          |
+<<<<<<< HEAD
 | 0017 | [«Про нас»: a section of its own with person tabs, «about me» first](0017-notes-section-person-tabs-me-first.md)                              |
+=======
+| 0016 | [Pages start on the signed-in person](0016-pages-start-on-the-signed-in-person.md)                                                            |
+>>>>>>> origin/claude/project-thread-x3238u
 
 ## Decisions that must have a record
 

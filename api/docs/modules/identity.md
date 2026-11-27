@@ -4,7 +4,8 @@ Sign-in for the family. Masha and Vitaliy sign in with their Google accounts; th
 requires one for every endpoint of every module, except the few listed below. The module was added in
 [ADR 0037](../decisions/0037-google-sign-in-with-server-sessions.md) from the specification
 [specs/identity/001-google-sign-in](../specs/identity/001-google-sign-in/README.md); it ends the open period of
-[ADR 0015](../decisions/0015-expenses-open-until-identity.md).
+[ADR 0015](../decisions/0015-expenses-open-until-identity.md). [Spec 002](../specs/identity/002-who-is-signed-in/README.md)
+adds who the member is in the home ([ADR 0038](../decisions/0038-allowlist-position-says-who-the-member-is.md)).
 
 Code: [`src/Modules/Identity`](../../src/Modules/Identity). Schema: `identity`.
 
@@ -13,7 +14,8 @@ Code: [`src/Modules/Identity`](../../src/Modules/Identity). Schema: `identity`.
 | Concept | Meaning |
 | --- | --- |
 | `Session` | One signed-in device: the SHA-256 of its bearer token, the member's e-mail, name and picture, created, last seen, expires (30 days after the last use, slid at most once an hour), revoked. |
-| `FamilyAllowlist` | The e-mails that may sign in (`Identity:AllowedEmails`), compared trimmed and lower-case. |
+| `FamilyAllowlist` | The e-mails that may sign in (`Identity:AllowedEmails`), compared trimmed and lower-case. Entry 0 is Vitaliy, entry 1 is Masha (`PersonOf`, [ADR 0038](../decisions/0038-allowlist-position-says-who-the-member-is.md)). |
+| `FamilyPerson` | Who a member is in the home: `Vitaliy` or `Maria`, as `person` on `GET /me` and on the sign-in response (null for a later entry). |
 | `MemberProfile` / `FamilyMember` | Who a session belongs to; `FamilyMember` is the form the API returns. |
 
 ## How it works
@@ -60,7 +62,7 @@ All under `/api/identity`, tag `Identity`.
 | --- | --- |
 | `POST /sign-in` (`signIn`) | `{ credential }` → `200 { token, expiresAtUtc, member }`; `401 identity.google_token_invalid`, `403 identity.not_a_member`, `409 identity.not_configured`, `429` |
 | `POST /sign-out` (`signOut`) | `204`; the token stops working at once |
-| `GET /me` (`getCurrentMember`) | `200 { email, name, pictureUrl }` |
+| `GET /me` (`getCurrentMember`) | `200 { email, name, pictureUrl, person }` (person: `Vitaliy`, `Maria` or null, spec 002) |
 
 Every other operation of the API answers `401` with a problem body without a session.
 
@@ -69,7 +71,7 @@ Every other operation of the API answers `401` with a problem body without a ses
 | Setting | Where | Meaning |
 | --- | --- | --- |
 | `Identity:Google:ClientId` | App Service `Identity__Google__ClientId` | the Google OAuth client id (Web application); not a secret. Empty: sign-in answers `409` and the site stays closed. |
-| `Identity:AllowedEmails` | App Service `Identity__AllowedEmails__0`, `__1` | the family's Google e-mails |
+| `Identity:AllowedEmails` | App Service `Identity__AllowedEmails__0`, `__1` | the family's Google e-mails: `__0` Vitaliy, `__1` Masha |
 | `OutboxTick:Key` | App Service, GitHub secret `SCHEDULER_KEY` | also grants the read-only deploy checks |
 
 Setup steps: [deployment](../../../docs/deploy.md#sign-in-with-google).
