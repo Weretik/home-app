@@ -67,6 +67,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `WebPush__PublicKey`, `WebPush__PrivateKey` | the VAPID key pair ([below](#push-notifications)) | for push notifications; without them push is off and the «Сповіщення» page says so |
 | `Identity__Google__ClientId` | the Google OAuth client id ([below](#sign-in-with-google)) | always; without it nobody can sign in and the site stays closed |
 | `Identity__AllowedEmails__0`, `Identity__AllowedEmails__1` | Vitaliy's (`__0`) and Masha's (`__1`) Google e-mails | always; only these may sign in, and the index says who is who (pages start on that person, API ADR 0038). Removing one locks that person out at once |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | written by Azure when Application Insights is attached ([below](#telemetry-and-alerts)) | for telemetry; empty means the API sends none |
 
 Or with one command:
 
@@ -199,6 +200,42 @@ into the App Service as `WebPush__PublicKey` and `WebPush__PrivateKey` (the priv
 Any tool that makes a P-256 key pair in base64url works, for example `npx web-push generate-vapid-keys`. A new pair
 makes every saved subscription useless: each device has to turn push on again. Then on each phone or computer:
 «Сповіщення» → «Сповіщення на цьому пристрої» (on an iPhone first add «Дім» to the home screen and open it from there).
+
+## Telemetry and alerts
+
+Once ([API ADR 0044](../api/docs/decisions/0044-telemetry-in-application-insights.md)); everything here is free.
+
+1. **Application Insights.** App Service `vitaliy-home-api` → Monitoring → Application Insights → **Turn on** →
+   create a new resource in the same region (workspace-based). Azure adds `APPLICATIONINSIGHTS_CONNECTION_STRING` to
+   the environment variables and restarts the app. Leave the agent-based "auto-instrumentation" collection level
+   **off** (the API brings its own OpenTelemetry; both together would double the data).
+2. **Daily cap.** The Application Insights resource → Configure → Usage and estimated costs → **Daily cap** →
+   `0.1` GB, with the e-mail on reaching it. Two people send a few MB a day; the cap only guards against a bug that
+   floods logs.
+3. **Smart detection e-mails.** The Application Insights resource → Alerts → Alert rules → *Failure Anomalies* is
+   there by default. Open its action group *Application Insights Smart Detection* and add your e-mail, so the
+   notice reaches you whatever your Azure role. Smart detection needs a few days of data before it starts.
+4. **Uptime.** In cron-job.org add a job: `GET <API url>/health`, every 5 minutes, *Notify me when the job fails*
+   (and when it recovers). The site is down for the family when this fails.
+
+**Reading the speed targets** (Application Insights → Logs), for the quality targets PERF1 and PERF2:
+
+```kusto
+// PERF1: P95 of API requests on a warm instance, last 7 days
+requests
+| where timestamp > ago(7d) and name !startswith "GET /health"
+| summarize p95_ms = percentile(duration, 95), count() by bin(timestamp, 1d)
+
+// PERF2: the first request after a sleep (no request in the 20 minutes before it)
+requests
+| where timestamp > ago(7d)
+| order by timestamp asc
+| extend gap_min = datetime_diff("minute", timestamp, prev(timestamp))
+| where gap_min > 20
+| summarize p95_ms = percentile(duration, 95), max_ms = max(duration), count()
+```
+
+Write the result into [quality-targets.md](../api/docs/architecture/quality-targets.md) with the date.
 
 ## F1 limits
 

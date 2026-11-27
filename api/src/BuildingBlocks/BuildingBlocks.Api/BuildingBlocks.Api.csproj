@@ -5,6 +5,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
   </ItemGroup>
 

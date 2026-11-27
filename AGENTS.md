@@ -19,7 +19,7 @@ summary for the home page, see [api/docs/modules/gifts.md](api/docs/modules/gift
 with steps, statuses, priorities, editable categories, an archive and a home page summary, replacing the «✅ Список
 дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); gifts with a giver and a buy-by date become
 to-dos and close themselves when the to-do is done; and the Notifications module, the family Telegram bot (morning
-to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
+to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by the cron-job.org scheduler with a GitHub Actions cron as backup ([ADR 0043](api/docs/decisions/0043-external-cron-and-scheduler-heartbeat.md)),
 also sent as Web Push to the devices where push is on,
 see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); the Notes module (what Masha and Vitaliy
 like, dislike and should know about each other, by category, with who wrote each note taken from the session, see
@@ -27,6 +27,9 @@ like, dislike and should know about each other, by category, with who wrote each
 endpoint closed by default ([ADR 0037](api/docs/decisions/0037-google-sign-in-with-server-sessions.md), see
 [api/docs/modules/identity.md](api/docs/modules/identity.md)). Not indexed, no SEO. UI text is Ukrainian ([web ADR 0014](web/docs/decisions/0014-ukrainian-interface.md)); everything else (docs, comments, commits)
 is English.
+
+home-app is also Vitaliy's pet project for architecture practice and AI features (an MCP server first): improvements
+follow an architecture review against the quality targets, one pull request per finding.
 
 ## Project context
 
@@ -40,7 +43,9 @@ not simplify it because the project is small.
   [contract](api/docs/contracts/openapi.json).
 - Web: [README](web/README.md), [architecture](web/docs/architecture.md), [rules](web/docs/rules.md),
   [design rules](web/docs/design.md) (every screen follows them), [specs](web/docs/specs/README.md), [decisions](web/docs/decisions/README.md).
-- Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database), [deployment](docs/deploy.md).
+- Repository-wide: [decisions](docs/decisions/README.md) (structure, hosting, database), [deployment](docs/deploy.md),
+  [quality targets](api/docs/architecture/quality-targets.md) (every review, audit and design starts from them),
+  [architecture reviews](docs/reviews/) (the latest: [2026-11-27, before](docs/reviews/2026-11-27-architecture-before.md)).
 
 A new lasting decision (a module, an external system, a way of running work, hosting, authentication, a state or
 transport approach) gets an ADR in the same change, in the half it belongs to, plus a C4 update for the backend.
@@ -138,7 +143,7 @@ through `src/platform/client/api.ts` from their `*-api.ts`.
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
 transaction go through the outbox, and their handlers are safe to run twice.
 
-**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `DeployCheck__Key`, `Telegram__BotToken`, `WebPush__PublicKey`, `WebPush__PrivateKey`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1` (and
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `DeployCheck__Key`, `Telegram__BotToken`, `WebPush__PublicKey`, `WebPush__PrivateKey`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1`, `APPLICATIONINSIGHTS_CONNECTION_STRING` (set by Azure; telemetry is off without it) (and
 `Expenses__Import__Key` only during an import) come from App Service environment variables; production migrations use
 the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; the scheduler cron uses the GitHub
 secret `SCHEDULER_KEY` (= `OutboxTick__Key`) and the deploy check the secret `DEPLOY_CHECK_KEY` (= `DeployCheck__Key`); locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
