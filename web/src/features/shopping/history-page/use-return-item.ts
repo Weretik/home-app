@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isOnline } from '../../../platform/offline/network-status';
 import { useAddItems, useIdempotencyKey } from '../data/item-writes-api';
 import type { ShoppingItem } from '../data/shopping-api';
 import { describeWriteError } from '../data/write-failure-api';
@@ -23,6 +24,13 @@ export function useReturnItem() {
       departmentId: item.departmentId,
       urgent: false,
     };
+    if (!isOnline()) {
+      // Queued (web ADR 0020): nothing to wait for on this button.
+      setNotice(`Повернеться до списку, коли з’явиться мережа: ${item.name}`);
+      add.mutate({ body, idempotencyKey: idempotency.keyFor(body) });
+      idempotency.renew();
+      return;
+    }
     setReturning(item.id);
     add.mutate(
       { body, idempotencyKey: idempotency.keyFor(body) },

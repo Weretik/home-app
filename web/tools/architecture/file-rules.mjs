@@ -95,17 +95,17 @@ export function noLiteralColours(tree) {
 
 /**
  * One interface language (docs/decisions/0014-ukrainian-interface.md): no locale literal such as `'ru-RU'` or `'uk'`
- * outside `src/platform/locale.ts`; `Intl` and `localeCompare` take `locale` from there. (`'en-CA'`, used only to
+ * outside `src/platform/client/locale.ts`; `Intl` and `localeCompare` take `locale` from there. (`'en-CA'`, used only to
  * build ISO `YYYY-MM-DD` keys, is not an interface language and is allowed.)
  */
 export function oneLocale(tree) {
   const literal = /['"`](?:ru|uk)(?:-[A-Z]{2})?['"`]/;
   return production(tree)
-    .filter((file) => file.path !== 'src/platform/locale.ts')
+    .filter((file) => file.path !== 'src/platform/client/locale.ts')
     .filter((file) => literal.test(file.text))
     .map(
       (file) =>
-        `${file.path}: a locale literal; import \`locale\` from src/platform/locale.ts`,
+        `${file.path}: a locale literal; import \`locale\` from src/platform/client/locale.ts`,
     );
 }
 

@@ -1,10 +1,18 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { audienceLabels, deliveryTitle, formatKyivTime } from '../data/labels';
+import {
+  audienceLabels,
+  channelLabels,
+  deliveryTitle,
+  formatKyivTime,
+} from '../data/labels';
 import type { NotificationsStatus } from '../data/notifications-api';
 import { InfoCard } from './InfoCard';
 
-/** «Останні надсилання» (FR-006): what was planned, to whom, and whether it went out; hidden when there is nothing. */
+/**
+ * «Останні надсилання» (FR-006, notifications 002 FR-108): what was planned, on which channel, to whom, and whether it
+ * went out; hidden when there is nothing.
+ */
 export function DeliveriesCard({ status }: { status: NotificationsStatus }) {
   if (status.deliveries.length === 0) return null;
   return (
@@ -29,6 +37,7 @@ export function DeliveriesCard({ status }: { status: NotificationsStatus }) {
                 {deliveryTitle(delivery.kind, status.schedule)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
+                {channelLabels[delivery.channel]} ·{' '}
                 {audienceLabels[delivery.audience]} ·{' '}
                 {formatKyivTime(delivery.createdAtUtc)}
               </Typography>

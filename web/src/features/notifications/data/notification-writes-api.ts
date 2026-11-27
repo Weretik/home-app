@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import { notificationsKeys, type Audience } from './notifications-api';
 
 function useRefresh() {

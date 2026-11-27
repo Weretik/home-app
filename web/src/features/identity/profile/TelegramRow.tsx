@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
-import type { FamilyPerson } from '../../../platform/member-api';
+import type { FamilyPerson } from '../../../platform/client/member-api';
 import { useTelegramChat } from './profile-api';
 
 /** «Телеграм»: whether the member's private chat with the bot is linked, with a way to the «Телеграм» page. */

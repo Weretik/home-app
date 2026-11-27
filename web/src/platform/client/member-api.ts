@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiCall, type Schema } from '../api-client';
+import { apiCall, type Schema } from '../../api-client';
 import { api } from './api';
 import { moduleKeys } from './query-client';
 

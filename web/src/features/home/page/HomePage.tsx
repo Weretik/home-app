@@ -1,9 +1,9 @@
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
-import TelegramIcon from '@mui/icons-material/Telegram';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import { SectionCard } from './SectionCard';
 import { SummarySwitcher } from './SummarySwitcher';
 import { useSummaryParam } from './use-summary-param';
@@ -16,7 +16,7 @@ const today = new Intl.DateTimeFormat(locale, {
 
 /**
  * Головна: one section's summary at a time, picked with the switcher (`?s=`). Today «Бюджет» and «Подарунки» have one; the
- * others join through `summary-sections.ts`. «Про нас» and the service pages «Стан» and «Телеграм» are linked below
+ * others join through `summary-sections.ts`. «Про нас» and the service pages «Стан» and «Сповіщення» are linked below
  * for phones, which have no side menu.
  */
 export function HomePage() {
@@ -68,9 +68,9 @@ export function HomePage() {
         <SectionCard
           to="/notifications"
           color="secondary"
-          icon={TelegramIcon}
-          title="Телеграм"
-          caption="Бот: чати, розклад, надсилання"
+          icon={NotificationsActiveOutlinedIcon}
+          title="Сповіщення"
+          caption="Push і Telegram: пристрої, чати, розклад"
         />
       </Box>
     </Box>

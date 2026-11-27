@@ -4,7 +4,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import type { NotificationsStatus } from '../data/notifications-api';
 import { NotificationsPage } from './NotificationsPage';
 
@@ -35,6 +35,7 @@ const status = (
   deliveries: [
     {
       kind: 'TodosMorning',
+      channel: 'Telegram',
       audience: 'Vitaliy',
       key: 'TodosMorning:2026-11-27:Vitaliy',
       createdAtUtc: '2026-11-27T06:00:00Z',
@@ -57,6 +58,16 @@ function renderPage(body: NotificationsStatus) {
   vi.stubGlobal(
     'fetch',
     vi.fn((input: Request) => {
+      if (
+        input.method === 'GET' &&
+        input.url.endsWith('/api/notifications/push')
+      )
+        return json({
+          configured: false,
+          publicKey: null,
+          canSubscribe: true,
+          devices: [],
+        });
       if (input.method === 'GET') return json(body);
       writes.push(input);
       return json(undefined, 204);

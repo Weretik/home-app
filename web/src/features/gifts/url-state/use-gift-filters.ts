@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { useSignedInPerson } from '../../../platform/member-api';
+import { useSignedInPerson } from '../../../platform/client/member-api';
 import type { GiftPriority, Recipient } from '../data/gifts-api';
 import { everyoneParam, parseFilters, type GiftFilters } from './gift-filters';
 

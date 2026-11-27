@@ -36,3 +36,9 @@ export function withStatus(
     }),
   };
 }
+
+/** The list after «Прибрати куплене», before the API answers: the bought items leave, the needed ones stay. */
+export const withoutCart = (list: ShoppingList): ShoppingList => ({
+  ...list,
+  items: list.items.filter((item) => item.status !== 'Bought'),
+});

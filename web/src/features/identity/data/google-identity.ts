@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 
 /**
  * The button's language: Google takes only the language part of the interface locale.

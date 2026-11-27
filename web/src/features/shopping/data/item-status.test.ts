@@ -1,4 +1,4 @@
-import { withStatus } from './item-status';
+import { withStatus, withoutCart } from './item-status';
 import type { ShoppingItem, ShoppingList } from './shopping-api';
 
 const item = (over: Partial<ShoppingItem>): ShoppingItem =>
@@ -68,4 +68,12 @@ test('an unknown id or the same status leaves the list as it is', () => {
   expect(
     withStatus(before, { id: 'i1', status: 'Needed', by: 'Maria' }).items[0],
   ).toBe(before.items[0]);
+});
+
+test('clearing the cart drops the bought items and keeps the needed ones', () => {
+  const after = withoutCart(
+    list(item({}), item({ id: 'i2', status: 'Bought', boughtBy: 'Maria' })),
+  );
+
+  expect(after.items.map((row) => row.id)).toEqual(['i1']);
 });

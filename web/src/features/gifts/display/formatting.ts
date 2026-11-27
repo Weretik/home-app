@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 
 const money = new Intl.NumberFormat(locale, {
   style: 'currency',

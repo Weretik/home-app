@@ -190,6 +190,8 @@ makes every saved subscription useless: each device has to turn push on again. T
 - After `/health` shows the new commit, the smoke test also reads the first endpoint of every section (system status,
   expenses summary and budget, shopping, gifts and todos summaries, the notes and their categories, Telegram and push status) and fails the deploy on anything
   but 200 ([ADR 0005](decisions/0005-post-deploy-smoke-reads-every-section.md)). A new section adds its endpoint there.
+- The web deploy checks that the site serves the new build with the Google client id, and the real service worker
+  (`/service-worker.js`, `Cache-Control: no-cache`) and manifest (web ADR 0019), not the SPA fallback page.
 - 60 CPU minutes per day. Plenty for two people, including the scheduler's 96 short calls a day (it also keeps the
   app warm).
 - No deployment slots: a deployment goes straight to production; roll back by re-running the workflow on an older

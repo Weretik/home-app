@@ -2,7 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { ApiError } from '../../../api-client';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { useChange, useRemove, useSave } from './write-hooks-api';
 
 // A query of every kind the Expenses module shows, the home summary among them (features never import each other,

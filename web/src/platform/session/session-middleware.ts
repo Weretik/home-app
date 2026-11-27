@@ -1,4 +1,4 @@
-import type { ApiClient } from '../api-client';
+import type { ApiClient } from '../../api-client';
 import { session } from './session';
 
 type Middleware = Parameters<ApiClient['use']>[0];

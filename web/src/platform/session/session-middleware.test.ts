@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, vi } from 'vitest';
-import { createApiClient } from '../api-client';
+import { createApiClient } from '../../api-client';
 import { session } from './session';
 import { sessionMiddleware } from './session-middleware';
 

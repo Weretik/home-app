@@ -4,7 +4,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../../app/theme/theme';
-import { createQueryClient } from '../../../../platform/query-client';
+import { createQueryClient } from '../../../../platform/client/query-client';
 import { QuickAdd } from './QuickAdd';
 import { useQuickAdd } from './use-quick-add';
 

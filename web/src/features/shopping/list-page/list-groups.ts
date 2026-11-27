@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import type { ShoppingItem } from '../data/shopping-api';
 
 /** One department of the list with its needed items in the order they are picked up. */

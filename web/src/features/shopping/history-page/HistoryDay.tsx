@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import Card from '@mui/material/Card';

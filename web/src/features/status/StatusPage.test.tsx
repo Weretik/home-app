@@ -1,7 +1,7 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
-import { createQueryClient } from '../../platform/query-client';
+import { createQueryClient } from '../../platform/client/query-client';
 import { StatusPage } from './StatusPage';
 
 afterEach(() => vi.unstubAllGlobals());

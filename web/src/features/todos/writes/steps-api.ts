@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import { useTodosRefresh } from './task-writes-api';
 
 const path = (taskId: string, stepId: string) => ({

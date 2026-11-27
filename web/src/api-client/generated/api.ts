@@ -1022,6 +1022,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Web Push for the signed-in person: whether it is configured, the VAPID public key to subscribe with, and the person's devices. */
+        get: operations["getPushStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves this browser's push subscription for the signed-in person; saving the same endpoint again updates it. 409 when push is not configured or the member is not Vitaliy or Maria. */
+        put: operations["savePushSubscription"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/subscriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Removes one of the signed-in person's push devices. 404 when it is not one of theirs. */
+        delete: operations["deletePushSubscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pushes a test message to every device of the signed-in person at once and says how many accepted it. 404 without devices, 409 when push is not configured or every device refused. */
+        post: operations["sendPushTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1135,6 +1203,11 @@ export interface components {
             /** Format: uuid */
             departmentId: string;
         };
+        /**
+         * @description How a planned message reaches its audience (spec notifications/002, R-106).
+         * @enum {unknown}
+         */
+        DeliveryChannel: "Telegram" | "Push";
         /** @description A department as the settings and pickers show it. */
         DepartmentItem: {
             /** Format: uuid */
@@ -1676,9 +1749,10 @@ export interface components {
             /** Format: date-time */
             linkedAtUtc: null | string;
         };
-        /** @description A planned message; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox. */
+        /** @description A planned message on Telegram or push; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox. */
         NotificationDeliveryItem: {
             kind: components["schemas"]["DigestKind"];
+            channel: components["schemas"]["DeliveryChannel"];
             audience: components["schemas"]["Audience"];
             key: string;
             /** Format: date-time */
@@ -1784,6 +1858,32 @@ export interface components {
             detail?: null | string;
             instance?: null | string;
         };
+        /** @description One of the person's devices; the endpoint lets the page recognise the device it runs on. */
+        PushDevice: {
+            /** Format: uuid */
+            id: string;
+            device: null | string;
+            endpoint: string;
+            /** Format: date-time */
+            createdAtUtc: string;
+            /** Format: date-time */
+            lastSeenAtUtc: string;
+        };
+        /**
+         * @description Push for the signed-in person: string? PushStatus.PublicKey (base64url) is what the browser subscribes with, null while
+         *     push is not configured; bool PushStatus.CanSubscribe is false for a member without a person (R-101).
+         */
+        PushStatus: {
+            configured: boolean;
+            publicKey: null | string;
+            canSubscribe: boolean;
+            devices: components["schemas"]["PushDevice"][];
+        };
+        /** @description How many devices accepted the test push. */
+        PushTestResult: {
+            /** Format: int32 */
+            delivered: number;
+        };
         /**
          * @description Whom a gift or a detail is for: Маша, Виталий, or both («Вместе», things for the home).
          * @enum {unknown}
@@ -1803,6 +1903,13 @@ export interface components {
         };
         ReorderShoppingDepartmentsRequest: {
             departmentIds: null | string[];
+        };
+        /** @description A browser's push subscription (`PushSubscription.toJSON()`: endpoint and keys) and a device label. */
+        SavePushSubscriptionRequest: {
+            endpoint: string;
+            p256dh: string;
+            auth: string;
+            device: null | string;
         };
         /**
          * @description Whether a savings movement put money in or took it out; shown in blue and red on the page.
@@ -6463,6 +6570,171 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    getPushStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushStatus"];
+                };
+            };
+        };
+    };
+    savePushSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePushSubscriptionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDevice"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    deletePushSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    sendPushTest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushTestResult"];
                 };
             };
             /** @description Not Found */

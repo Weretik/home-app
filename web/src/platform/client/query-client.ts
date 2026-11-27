@@ -1,12 +1,21 @@
-import { ApiError } from '../api-client';
+import { ApiError } from '../../api-client';
 import { QueryClient } from '@tanstack/react-query';
 
-/** Retries only failures that may pass on their own; a 4xx answer will not change on retry. */
+/** How long unused data stays in memory: as long as it is kept for offline use (web ADR 0020). */
+export const QUERY_GC_TIME = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Retries only failures that may pass on their own; a 4xx answer will not change on retry. Data stays a week, so the
+ * offline cache can show it. Writes fail at once offline (`networkMode: 'always'`) unless they are queued writes
+ * (src/platform/offline), which pause until the network is back.
+ */
 export function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
+      mutations: { networkMode: 'always' },
       queries: {
         staleTime: 30_000,
+        gcTime: QUERY_GC_TIME,
         retry: (failureCount, error) =>
           !(error instanceof ApiError && error.status < 500) &&
           failureCount < 2,

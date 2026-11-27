@@ -45,10 +45,10 @@ export function CartCard({ items, onToggle, onOpen }: CartCardProps) {
         <Button
           size="small"
           startIcon={<CleaningServicesOutlinedIcon />}
-          disabled={clear.isPending}
+          disabled={clear.isSaving}
           onClick={() => clear.mutate()}
         >
-          {clear.isPending ? 'Прибираю…' : 'Прибрати куплене'}
+          {clear.isSaving ? 'Прибираю…' : 'Прибрати куплене'}
         </Button>
       </Box>
       {clear.error && (

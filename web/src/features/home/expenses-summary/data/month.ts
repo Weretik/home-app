@@ -1,4 +1,4 @@
-import { locale } from '../../../../platform/locale';
+import { locale } from '../../../../platform/client/locale';
 
 /** A calendar month the summary shows. `month` is 1–12. */
 export interface Month {

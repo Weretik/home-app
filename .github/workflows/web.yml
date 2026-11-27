@@ -109,3 +109,21 @@ jobs:
           echo "$js" | grep -qF "$VITE_GOOGLE_CLIENT_ID" \
             || { echo "::error::The deployed JS has no Google client id: sign-in would say «Вхід ще не налаштовано»"; exit 1; }
           echo "The deployed site offers Google sign-in."
+
+      # The installed app needs its service worker and manifest (web ADR 0019): a missing file would be answered with
+      # index.html by the SPA fallback and break the update, so both must be the real files.
+      - name: Smoke test the service worker and the manifest
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://ambitious-beach-0b1d13b10.6.azurestaticapps.net' }}
+        run: |
+          sw=$(curl -fsS "$SITE_URL/service-worker.js") || { echo "::error::/service-worker.js is not served"; exit 1; }
+          echo "$sw" | grep -qF "index.html" && ! echo "$sw" | grep -qi "<!doctype html" \
+            || { echo "::error::/service-worker.js is not the built service worker"; exit 1; }
+          headers=$(curl -fsSI "$SITE_URL/service-worker.js")
+          echo "$headers" | grep -qi "cache-control: no-cache" \
+            || { echo "::error::/service-worker.js must be served with Cache-Control: no-cache"; exit 1; }
+          manifest=$(curl -fsS "$SITE_URL/site.webmanifest") || { echo "::error::/site.webmanifest is not served"; exit 1; }
+          echo "$manifest" | grep -qF '"display": "standalone"' \
+            || { echo "::error::/site.webmanifest is not the app manifest"; exit 1; }
+          echo "The service worker and the manifest are served."

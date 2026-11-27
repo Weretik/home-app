@@ -1,6 +1,6 @@
 import type { TodoCategoryItem } from '../data/categories-api';
 import type { TodoCategoryRequest } from '../writes/category-writes-api';
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 
 /** The API limits (R-011). */
 export const MAX_NAME = 50;

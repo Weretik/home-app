@@ -4,9 +4,18 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
-import { createQueryClient } from '../../platform/query-client';
+import { createQueryClient } from '../../platform/client/query-client';
 import { theme } from '../theme/theme';
 import { AppLayout } from './AppLayout';
+
+// The update prompt registers the service worker; tests have none.
+vi.mock('virtual:pwa-register/react', () => ({
+  useRegisterSW: () => ({
+    needRefresh: [false, vi.fn()],
+    offlineReady: [false, vi.fn()],
+    updateServiceWorker: vi.fn(),
+  }),
+}));
 
 const mainSections = ['Головна', 'Бюджет', 'Покупки', 'Справи', 'Подарунки'];
 

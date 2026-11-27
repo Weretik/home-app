@@ -1,5 +1,5 @@
-import { createApiClient } from '../api-client';
-import { sessionMiddleware } from './session-middleware';
+import { createApiClient } from '../../api-client';
+import { sessionMiddleware } from '../session/session-middleware';
 
 /**
  * The typed API client. The API lives on another origin (Azure App Service), so VITE_API_URL is set at build time;

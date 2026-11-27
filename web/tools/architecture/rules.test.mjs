@@ -195,9 +195,11 @@ describe('files', () => {
     ).toHaveLength(1);
   });
 
-  test('the locale only in platform/locale.ts', () => {
+  test('the locale only in platform/client/locale.ts', () => {
     const uk = "export const locale = 'uk-UA';\n";
-    expect(oneLocale(treeOf({ 'src/platform/locale.ts': uk }))).toEqual([]);
+    expect(oneLocale(treeOf({ 'src/platform/client/locale.ts': uk }))).toEqual(
+      [],
+    );
     expect(
       oneLocale(
         treeOf({
@@ -243,14 +245,15 @@ describe('imports', () => {
   test('imports go main → app → features → platform → api-client', () => {
     const ok = treeOf({
       'src/app/root/App.tsx': "import { A } from '../../features/a/A';",
-      'src/features/a/a-api.ts': "import { api } from '../../platform/api';",
-      'src/platform/api.ts': "import { x } from '../api-client';",
+      'src/features/a/a-api.ts':
+        "import { api } from '../../platform/client/api';",
+      'src/platform/client/api.ts': "import { x } from '../../api-client';",
     });
     expect(importDirection(ok)).toEqual([]);
     for (const [path, text] of [
       ['src/features/a/A.tsx', "import { t } from '../../app/theme/theme';"],
       ['src/platform/x.ts', "import { A } from '../features/a/A';"],
-      ['src/api-client/x.ts', "import { api } from '../platform/api';"],
+      ['src/api-client/x.ts', "import { api } from '../platform/client/api';"],
     ])
       expect(importDirection(treeOf({ [path]: text }))).toHaveLength(1);
     expect(
@@ -265,7 +268,7 @@ describe('imports', () => {
 
   test('the API client only from platform/ and *-api.ts, the instance only from *-api.ts', () => {
     const client = "import { apiCall } from '../../api-client';";
-    const instance = "import { api } from '../../platform/api';";
+    const instance = "import { api } from '../../platform/client/api';";
     expect(
       apiClientOnlyFromDataAccess(
         treeOf({ 'src/features/a/a-api.ts': client }),

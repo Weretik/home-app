@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { todayIso } from '../entry-editing/entry-fields';
 import { ExpensesSection } from '../section/ExpensesSection';
 import { ForecastPage } from './ForecastPage';

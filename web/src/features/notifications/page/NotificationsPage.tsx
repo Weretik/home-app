@@ -5,11 +5,15 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { ChatsCard } from '../chats/ChatsCard';
 import { useNotificationsStatus } from '../data/notifications-api';
+import { PushCard } from '../push/PushCard';
 import { BotCard } from './BotCard';
 import { DeliveriesCard } from './DeliveriesCard';
 import { ScheduleCard } from './ScheduleCard';
 
-/** «Телеграм» (notifications 001): the bot, the linked chats, the schedule and the last deliveries. */
+/**
+ * «Сповіщення» (notifications 001, 002): push for this device, the bot, the linked chats, the schedule and the last
+ * deliveries.
+ */
 export function NotificationsPage() {
   const status = useNotificationsStatus();
 
@@ -17,11 +21,11 @@ export function NotificationsPage() {
     <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
       <Box>
         <Typography variant="h4" component="h1">
-          Телеграм
+          Сповіщення
         </Typography>
         <Typography color="text.secondary">
-          Бот надсилає справи, покупки, зведення витрат і нагадування про
-          подарунки
+          Справи, покупки, зведення витрат і нагадування про подарунки в
+          Telegram і push-сповіщеннях
         </Typography>
       </Box>
       {status.isPending ? (
@@ -54,6 +58,7 @@ export function NotificationsPage() {
           }}
         >
           <Box sx={{ display: 'grid', gap: { xs: 2, md: 3 }, minWidth: 0 }}>
+            <PushCard />
             <BotCard status={status.data} />
             <ChatsCard chats={status.data.chats} />
           </Box>

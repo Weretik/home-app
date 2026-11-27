@@ -1,5 +1,5 @@
 import { apiCall, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import {
   ifMatch,
   useChange,

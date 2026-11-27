@@ -2,8 +2,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, vi } from 'vitest';
-import { createQueryClient } from '../../../../platform/query-client';
-import { moduleKeys } from '../../../../platform/query-client';
+import { createQueryClient } from '../../../../platform/client/query-client';
+import { moduleKeys } from '../../../../platform/client/query-client';
 import { useMonthSummary } from './summary-api';
 
 afterEach(() => vi.unstubAllGlobals());

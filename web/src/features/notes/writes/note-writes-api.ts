@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { apiCall, newIdempotencyKey, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import { notesKey } from '../data/notes-api';
 import { isStale } from './failures-api';
 

@@ -5,8 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
-import { session } from '../../../platform/session';
+import { createQueryClient } from '../../../platform/client/query-client';
+import { session } from '../../../platform/session/session';
 import { MemberMenu } from './MemberMenu';
 
 const member = {
