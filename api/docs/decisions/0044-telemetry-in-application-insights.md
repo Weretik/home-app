@@ -20,7 +20,7 @@ database.
 
 Availability: Application Insights standard availability tests are charged per run, so they break COST1. The free
 cron-job.org account (already the scheduler, [ADR 0043](0043-external-cron-and-scheduler-heartbeat.md)) can call
-`/health` every 5 minutes and e-mail on failure.
+`/health` every 15 minutes and e-mail on failure.
 
 ## Decision
 
@@ -34,8 +34,8 @@ Option A.
   metrics yet.
 - No family data is added to telemetry on purpose: request paths, status codes, durations and log messages only.
   Request bodies are never recorded.
-- Alerts, all free: a cron-job.org job on `/health` every 5 minutes with e-mail on failure (outage); Application
-  Insights smart detection e-mails on failure and performance anomalies (errors, slowness); a daily cap of 0.1 GB on
+- Alerts, all free: a cron-job.org job on `/health` every 15 minutes with e-mail after two failures in a row
+  (outage, known within about 30 minutes); a daily cap of 0.1 GB on
   the Application Insights resource (cost). Setup steps: [docs/deploy.md](../../../docs/deploy.md#telemetry-and-alerts).
 - PERF1 and PERF2 are read from the Application Insights `requests` table (queries in the deploy guide) and written
   into the quality targets with a date.
@@ -44,7 +44,9 @@ Option A.
 
 - One more Azure resource (Application Insights with its Log Analytics workspace), still 0 ₴ under the cap.
 - When the daily cap is reached, telemetry stops until the next day; the site keeps working.
-- The `/health` ping every 5 minutes also keeps the free instance warmer, which helps PERF2 and spends a little of the
-  60 CPU minutes a day.
+- The `/health` ping every 15 minutes, with the scheduler ticks, keeps the free instance warm, which helps PERF2 and
+  spends a little of the 60 CPU minutes a day.
+- Smart detection e-mails (errors rising while the site is up) are optional and were not set up on 2026-11-28: the
+  errors are still recorded in Application Insights and read there.
 - Revisit when the data passes 1 GB a month, when an alert is needed that smart detection cannot give (then a paid
   metric alert, about $0.10 a month each), or when the web app needs client-side error tracking.
