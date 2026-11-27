@@ -31,6 +31,11 @@ export function NoteCard({
           p: 2,
           height: '100%',
           display: 'grid',
+          // A button centres its content; the column takes the full width and the text starts on the left.
+          gridTemplateColumns: 'minmax(0, 1fr)',
+          justifyContent: 'stretch',
+          justifyItems: 'stretch',
+          textAlign: 'left',
           gap: 1,
           alignContent: 'start',
         }}
