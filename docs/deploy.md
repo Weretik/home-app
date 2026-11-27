@@ -175,6 +175,21 @@ Once ([ADR 0033](../api/docs/decisions/0033-notifications-module-and-telegram-we
 
 A new token changes the webhook secret; the next tick sets the webhook again.
 
+### Scheduler
+
+GitHub runs the `scheduler.yml` cron late or not at all under load (on 27.11 it ran once overnight), so the main
+scheduler is cron-job.org ([ADR 0043](../api/docs/decisions/0043-external-cron-and-scheduler-heartbeat.md)); the
+GitHub cron stays as a backup. Once, at [cron-job.org](https://cron-job.org) (free account), create two jobs:
+
+| Job | URL | Schedule | Request |
+| --- | --- | --- | --- |
+| Notifications tick | `<API url>/internal/notifications/tick` | every 15 minutes | method `POST`, header `X-Scheduler-Key` = the `OutboxTick__Key` value |
+| Outbox tick | `<API url>/internal/outbox/tick` | every 15 minutes | the same |
+
+Use «Test run» on each: the first answers `200` with `{"configured":true,"webhook":"ok",...}`. Set the request
+timeout to the maximum (the sleeping F1 app can take up to a minute to wake). The «Телеграм» page turns red and the
+deploy prints a warning when no tick came for over an hour.
+
 ## Push notifications
 
 Once ([API ADR 0042](../api/docs/decisions/0042-web-push-next-to-telegram.md)): generate a VAPID key pair and put it

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Notifications.Domain.Chats;
 using Notifications.Domain.Deliveries;
 using Notifications.Domain.Push;
+using Notifications.Domain.Schedule;
 
 namespace Notifications.Application;
 
@@ -18,6 +19,8 @@ public interface INotificationsDbContext : IOutboxPublisher
     DbSet<Delivery> Deliveries { get; }
 
     DbSet<PushSubscription> PushSubscriptions { get; }
+
+    DbSet<SchedulerHeartbeat> Heartbeats { get; }
 
     ChangeTracker ChangeTracker { get; }
 

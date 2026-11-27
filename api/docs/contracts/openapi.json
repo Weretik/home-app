@@ -7673,7 +7673,9 @@
           "botLink",
           "chats",
           "schedule",
-          "deliveries"
+          "deliveries",
+          "lastTickAtUtc",
+          "schedulerSilent"
         ],
         "type": "object",
         "properties": {
@@ -7709,9 +7711,19 @@
             "items": {
               "$ref": "#/components/schemas/NotificationDeliveryItem"
             }
+          },
+          "lastTickAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "schedulerSilent": {
+            "type": "boolean"
           }
         },
-        "description": "Whether the bot token is set, the bot's @username and link, the three chats (linked or not), the schedule and the\nlast ten planned messages."
+        "description": "Whether the bot token is set, the bot's @username and link, the three chats (linked or not), the schedule and the\nlast ten planned messages, and when the scheduler last called the tick (silent when that is more than an hour ago or\nnever, so no digest can go out)."
       },
       "NotificationsTestRequest": {
         "required": [

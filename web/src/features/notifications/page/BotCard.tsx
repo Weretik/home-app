@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import type { NotificationsStatus } from '../data/notifications-api';
+import { formatKyivTime } from '../data/labels';
 import { InfoCard } from './InfoCard';
 
 const steps = [
@@ -16,6 +17,16 @@ const steps = [
 export function BotCard({ status }: { status: NotificationsStatus }) {
   return (
     <InfoCard title="Бот">
+      {status.configured && status.schedulerSilent && (
+        // FR-009: no scheduler call for over an hour, so nothing goes out on time.
+        <Alert severity="error">
+          Планувальник мовчить
+          {status.lastTickAtUtc
+            ? ` з ${formatKyivTime(status.lastTickAtUtc)}`
+            : ': жодного виклику ще не було'}
+          , тож зведення не приходять. Перевірте cron-job.org (docs/deploy.md).
+        </Alert>
+      )}
       {!status.configured ? (
         <Alert severity="warning">
           Бот ще не налаштовано: додайте токен від @BotFather у налаштування{' '}

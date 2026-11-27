@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Notifications.Application.Features.Tick.Commands.RecordTick;
 using Notifications.Application.Features.Tick.Commands.RunTick;
 
 namespace Notifications.Api.Endpoints.Telegram;
@@ -22,7 +23,13 @@ internal static class NotificationsTickEndpoint
     }
 
     private static async Task<IResult> HandleAsync(
-        HttpContext http, IOptions<OutboxTickOptions> options, ISender sender, CancellationToken cancellationToken) =>
-        SchedulerKey.Refusal(http, options.Value.Key)
-            ?? (await sender.Send(new RunTickCommand(), cancellationToken)).ToHttpResult(http);
+        HttpContext http, IOptions<OutboxTickOptions> options, ISender sender, CancellationToken cancellationToken)
+    {
+        if (SchedulerKey.Refusal(http, options.Value.Key) is { } refusal)
+            return refusal;
+
+        // The heartbeat first and on its own, so a failing plan still shows that the scheduler is alive (R-020).
+        await sender.Send(new RecordTickCommand(), cancellationToken);
+        return (await sender.Send(new RunTickCommand(), cancellationToken)).ToHttpResult(http);
+    }
 }

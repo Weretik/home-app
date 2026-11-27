@@ -50,6 +50,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0040 | [Other modules learn who is signed in through Identity.Contracts](0040-current-member-through-identity-contracts.md) |
 | 0041 | [Limit amounts are kept by the period they start in](0041-limit-amounts-kept-by-month.md) (supersedes the past-amount part of 0027) |
 | 0042 | [Web Push with VAPID next to Telegram, sent by the API itself](0042-web-push-next-to-telegram.md) |
+| 0043 | [cron-job.org calls the ticks, GitHub cron is the backup, and the API keeps a heartbeat](0043-external-cron-and-scheduler-heartbeat.md) |
 
 ## Decisions that must have a record
 

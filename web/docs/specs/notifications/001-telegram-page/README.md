@@ -32,6 +32,7 @@ Written from the frontend SDD template (Weretik/obsidian `Templates/frontend-sdd
 | FR-006 | «Последние отправки» card: the last deliveries (kind title from the schedule, audience, planned time, «отправлено» time or «в очереди»); hidden when empty. Times in Kyiv as «27.11 08:15».                                                                                                                                                                                |
 | FR-007 | States: loading skeleton; an error shows the problem message and «Повторить»; writes disable their buttons while pending and show the problem message in a snackbar.                                                                                                                                                                                                       |
 | FR-008 | Works at 360 px without horizontal scroll, both colour schemes, design tokens only.                                                                                                                                                                                                                                                                                        |
+| FR-009 | «Бот» card: when the bot is set up and `schedulerSilent` is true, a red alert «Планувальник мовчить з 27.11, 08:00» (or «жодного виклику ще не було») says digests are not going out and to check cron-job.org (backend R-020, 2026-11-27).                                                                                                                                |
 
 ## Design
 
@@ -70,6 +71,7 @@ notifications/
 | TS-203 | Page: not configured, linked and unlinked chats, schedule, deliveries | Testing Library, mocked fetch           | FR-002…FR-007  |
 | TS-204 | Unlink asks and sends `DELETE`; test sends `POST` and confirms        | Testing Library                         | FR-004         |
 | TS-205 | Route, side menu, home card; docs; structure check                    | `npm run architecture:structure`, tests | FR-001, FR-008 |
+| TS-206 | Page: red alert when the scheduler is silent, none while it ticks     | Testing Library, mocked fetch           | FR-009         |
 
 ## Readiness
 

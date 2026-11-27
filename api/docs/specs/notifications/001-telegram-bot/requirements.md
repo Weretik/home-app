@@ -53,6 +53,7 @@ to open the site to keep track.
 | R-017 | The tick needs the scheduler key (`X-Scheduler-Key` = `OutboxTick:Key`); it also sets the webhook when Telegram reports another url. Without a bot token it plans nothing and reports `configured: false`. |
 | R-018 | A test message from the site goes at once to a linked chat (`404` when not linked, `409` `notifications.not_configured` without a token, `409` `notifications.telegram_failed` when Telegram refuses). |
 | R-019 | All site writes are rate limited (`PublicWrite`). They were anonymous until 2026-11-27; since then they need a signed-in member ([ADR 0037](../../../decisions/0037-google-sign-in-with-server-sessions.md)). |
+| R-020 | Every keyed tick records when it came (one `scheduler_heartbeat` row, written before planning, so a failing plan still counts). The status shows `lastTickAtUtc` and `schedulerSilent` (no tick for over an hour, or never), so a scheduler that stopped calling is visible instead of a quiet morning. Added 2026-11-27 after GitHub ran the `*/15` cron once overnight and the morning digests never went out ([ADR 0043](../../../decisions/0043-external-cron-and-scheduler-heartbeat.md)). |
 
 ## Acceptance scenarios
 

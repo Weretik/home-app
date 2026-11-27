@@ -5,7 +5,8 @@ a reminder to buy a gift two weeks before its date, the evening shopping list, a
 summaries. It replaces the reminders of the old Apps Script bots. The module was added in
 [ADR 0033](../decisions/0033-notifications-module-and-telegram-webhook.md) from the specification
 [specs/notifications/001-telegram-bot](../specs/notifications/001-telegram-bot/README.md); the scheduler is
-[ADR 0034](../decisions/0034-scheduler-github-actions-cron.md), chats are linked as
+[ADR 0034](../decisions/0034-scheduler-github-actions-cron.md) and, since GitHub skipped most runs,
+[ADR 0043](../decisions/0043-external-cron-and-scheduler-heartbeat.md) (cron-job.org first, a heartbeat on the status), chats are linked as
 [ADR 0036](../decisions/0036-telegram-chats-linked-from-telegram.md) describes. Since
 [ADR 0042](../decisions/0042-web-push-next-to-telegram.md) ([specs/notifications/002-web-push](../specs/notifications/002-web-push/README.md))
 every digest is also sent as standard Web Push to the devices where Masha or Vitaliy turned push on; Telegram stays.
@@ -33,7 +34,8 @@ Code: [`src/Modules/Notifications`](../../src/Modules/Notifications). Schema: `n
 | Expenses of the week (Monday–Sunday) and the month so far | Sunday 20:00–23:59 | family group, or both people |
 | Full month summary | last day of the month 20:00–23:59, catch-up on the 1st until 11:59 | family group, or both people |
 
-A message with nothing to say (no tasks for today, an empty list) is not sent. A window that no tick hit is skipped.
+A message with nothing to say (no tasks for today, an empty list) is not sent. A window that no tick hit is skipped. Every keyed tick first records its time (`scheduler_heartbeat`); the status
+reports `schedulerSilent` when no tick came for over an hour, and the «Телеграм» page shows it in red.
 The personal and the common morning messages leave in the same outbox tick, so their order in Telegram is not
 guaranteed. Audit: [notifications/001 audit](../specs/notifications/001-telegram-bot/audit.md).
 
