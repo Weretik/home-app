@@ -26,11 +26,12 @@ src/
                   (docs/design.md)
     shell/        frame/ the layout and header; navigation/ side menu, bottom bar with the «Ще» sheet, the list of
                   sections
-  api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
+  api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, NetworkError, newIdempotencyKey
   platform/
     client/       the API client instance (VITE_API_URL) with the session middleware, the signed-in member and person
                   (member-api.ts, web ADR 0016), the query client with each backend module's query key prefix
-                  (query-client.ts), the interface locale `uk-UA` (locale.ts)
+                  (query-client.ts), the offline mark after a request without an answer (connectivity.ts), the interface locale
+                  `uk-UA` (locale.ts)
     session/      the session token store (session.ts) and the middleware that adds the bearer token and ends the
                   session on a 401 (session-middleware.ts)
     offline/      the IndexedDB cache (query-persistence.ts), queued writes (queued-request.ts, queued-write-api.ts,
@@ -496,11 +497,13 @@ identity/
   (`src/platform/client/query-client.ts`), and every write invalidates that whole prefix, so a page or summary of another
   feature that shows the same module's data refreshes too ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
   Failures with a 4xx status are not retried.
-- Offline (web ADR 0022): the cache of successful reads is kept in IndexedDB (`home-cache`) for 7 days and restored at
+- Offline (web ADR 0022): the cache of every read that has data is kept in IndexedDB (`home-cache`) for 7 days and restored at
   start, versioned by the hash of the API contract and removed on every session change. Writes fail at once offline
   (`networkMode: 'always'`), except the queued writes (`src/platform/offline`): a serialisable request under the key
   `['queued-write', …]` that pauses offline, is kept across a restart and is sent when the network is back; `404`
-  counts as done, `409`/`412` rereads the version and resends once (last write wins). The top bar shows «Офлайн»,
+  counts as done, `409`/`412` rereads the version and resends once (last write wins). A request without an answer is a
+  `NetworkError` with a Ukrainian message and counts the app offline for 15 s (`src/platform/client/connectivity.ts`),
+  so reads keep their data and wait instead of showing an error. The top bar shows «Офлайн»,
   «Очікує: N» and «Не вдалося зберегти: …».
 - The service worker (web ADR 0021, `vite-plugin-pwa`, `injectManifest`) precaches the built shell and answers
   navigations with `index.html`; it never caches the API. A new deploy waits for «Оновити» in the snackbar «Доступна

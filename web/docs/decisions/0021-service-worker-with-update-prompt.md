@@ -1,4 +1,4 @@
-# 0019. A service worker precaches the shell and waits for «Оновити»
+# 0021. A service worker precaches the shell and waits for «Оновити»
 
 Status: accepted, 2026-11-27
 

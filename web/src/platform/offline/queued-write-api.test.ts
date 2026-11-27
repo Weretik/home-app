@@ -4,7 +4,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { afterEach, vi } from 'vitest';
-import { ApiError } from '../../api-client';
+import { ApiError, NetworkError } from '../../api-client';
 import { refusedWrites } from './network-status';
 import type { QueuedRequest } from './queued-request';
 import {
@@ -155,16 +155,18 @@ test('a stale write without a refetch path, or a reread without a version, is re
   });
 });
 
-test('another refusal throws the ApiError; a network failure throws as it is', async () => {
+test('another refusal throws the ApiError; a network failure throws a NetworkError', async () => {
   stubApi(json({ code: 'validation' }, 400));
   await expect(sendQueuedRequest(move)).rejects.toBeInstanceOf(ApiError);
 
   stubApi(new TypeError('Failed to fetch'));
-  await expect(sendQueuedRequest(move)).rejects.toBeInstanceOf(TypeError);
+  await expect(sendQueuedRequest(move)).rejects.toBeInstanceOf(NetworkError);
 });
 
 test('retries a network failure always, a server error three times, a refusal never', () => {
-  expect(retryQueuedWrite(10, new TypeError('Failed to fetch'))).toBe(true);
+  expect(retryQueuedWrite(10, new NetworkError())).toBe(true);
+  // A write that got no answer counts the app offline, so it pauses until the network is back.
+  expect(onlineManager.isOnline()).toBe(false);
   expect(retryQueuedWrite(2, new ApiError(503, {}))).toBe(true);
   expect(retryQueuedWrite(3, new ApiError(503, {}))).toBe(false);
   expect(retryQueuedWrite(0, new ApiError(400, {}))).toBe(false);

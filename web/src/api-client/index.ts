@@ -5,6 +5,7 @@ export {
 } from './client/create-api-client';
 export { apiCall } from './client/api-call';
 export { ApiError } from './client/api-error';
+export { NetworkError, NETWORK_ERROR_MESSAGE } from './client/network-error';
 export { newIdempotencyKey } from './client/idempotency-key';
 export type { components, operations, paths } from './generated/api';
 
