@@ -47,12 +47,18 @@ function renderList(props: Partial<Parameters<typeof GiftList>[0]> = {}) {
 }
 
 describe('GiftList', () => {
-  it('shows a compact row: name and price, then the category and small chips', () => {
-    renderList();
+  it('shows the name alone on the first line, then the price, category, notes and chips', () => {
+    renderList({
+      items: [gift({ notes: 'Чорні', link: 'https://shop.ua/n' })],
+    });
     const row = within(
       screen.getByRole('list', { name: 'Подарунки' }),
     ).getAllByRole('listitem')[0]!;
-    expect(within(row).getByText('Наушники')).toBeInTheDocument();
+    expect(row.firstElementChild).toHaveTextContent(/^Наушники$/);
+    expect(within(row).getByText('Чорні')).toBeInTheDocument();
+    expect(
+      within(row).getByRole('link', { name: 'Відкрити посилання: Наушники' }),
+    ).toHaveAttribute('href', 'https://shop.ua/n');
     expect(within(row).getByText(/^4\s500\s₴$/)).toBeInTheDocument();
     expect(within(row).getByText('Техника')).toBeInTheDocument();
     expect(within(row).getByText('🔥 Дуже хочу')).toBeInTheDocument();

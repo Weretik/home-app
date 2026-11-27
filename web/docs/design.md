@@ -127,8 +127,9 @@ Computer (md, 900px and wider)              Phone (below md)
   the count; a click opens the variant links in a row under the gift), Категория, Приоритет («Список» only), Цена
   (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»), then the quick status button
   («Подарено» or «Вернуть в список», an icon with a tooltip) and «⋮» (Не актуально, Изменить, Удалить).
-- Phone row: the name and the price on the first line, the category under it, then small outlined chips (priority or
-  how it ended, the occasion) and «N вариантов» unfolding the links; every action is in «⋮».
+- Phone row: the name alone on the first line at full width (never squeezed beside the price), then «price ·
+  category», the purchase line and notes (two lines), then one line of small outlined chips (priority or how it ended,
+  the occasion), «Посилання», «N варіантів» unfolding the links and «⋮» at its end with every action.
 - A priority chip is neutral (outlined); «🔥 Очень хочу» is only bolder. Crimson belongs to Маша (see below).
 - A gift price drops «,00» («1 625 ₴») and keeps real kopecks («1 234,50 ₴»); «цена не указана» in
   `text.secondary`, never 0. A person's group sum is rounded («≈ 4 500 ₴»).
