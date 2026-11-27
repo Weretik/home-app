@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Notifications.Application;
 using Notifications.Application.Sending;
 
-namespace IntegrationTests.Api.Notifications;
+namespace IntegrationTests.Api.Notifications.Telegram;
 
 /// <summary>Telegram for the tests: records what the API sends instead of calling the Bot API.</summary>
 internal sealed class FakeTelegramBot : ITelegramBot

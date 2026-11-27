@@ -62,6 +62,7 @@ Portal: App Service `vitaliy-home-api` → Settings → Environment variables:
 | `Expenses__Import__Key` | long random value | normally never: the sheet is imported on a local API and the rows reach production as a SQL script; set it only for a direct import, then delete it ([module page](../api/docs/modules/expenses.md#the-one-time-import-from-the-sheet)) |
 | `OutboxTick__Key` | long random value, equal to the GitHub secret `SCHEDULER_KEY` | for the outbox and the Telegram bot; without it both ticks answer `404` |
 | `Telegram__BotToken` | the token from @BotFather | for the Telegram bot; empty means the bot is off and the webhook answers `404` |
+| `WebPush__PublicKey`, `WebPush__PrivateKey` | the VAPID key pair ([below](#push-notifications)) | for push notifications; without them push is off and the «Сповіщення» page says so |
 | `Identity__Google__ClientId` | the Google OAuth client id ([below](#sign-in-with-google)) | always; without it nobody can sign in and the site stays closed |
 | `Identity__AllowedEmails__0`, `Identity__AllowedEmails__1` | Vitaliy's (`__0`) and Masha's (`__1`) Google e-mails | always; only these may sign in, and the index says who is who (pages start on that person, API ADR 0038). Removing one locks that person out at once |
 
@@ -174,12 +175,20 @@ Once ([ADR 0033](../api/docs/decisions/0033-notifications-module-and-telegram-we
 
 A new token changes the webhook secret; the next tick sets the webhook again.
 
+## Push notifications
+
+Once ([API ADR 0042](../api/docs/decisions/0042-web-push-next-to-telegram.md)): generate a VAPID key pair and put it
+into the App Service as `WebPush__PublicKey` and `WebPush__PrivateKey` (the private key is a secret; never commit it).
+Any tool that makes a P-256 key pair in base64url works, for example `npx web-push generate-vapid-keys`. A new pair
+makes every saved subscription useless: each device has to turn push on again. Then on each phone or computer:
+«Сповіщення» → «Сповіщення на цьому пристрої» (on an iPhone first add «Дім» to the home screen and open it from there).
+
 ## F1 limits
 
 - No Always On: after idle time the first request wakes the app up in 10–30 seconds. The workflow's smoke test allows
   for that.
 - After `/health` shows the new commit, the smoke test also reads the first endpoint of every section (system status,
-  expenses summary and budget, shopping, gifts and todos summaries, the notes and their categories, Telegram status) and fails the deploy on anything
+  expenses summary and budget, shopping, gifts and todos summaries, the notes and their categories, Telegram and push status) and fails the deploy on anything
   but 200 ([ADR 0005](decisions/0005-post-deploy-smoke-reads-every-section.md)). A new section adds its endpoint there.
 - 60 CPU minutes per day. Plenty for two people, including the scheduler's 96 short calls a day (it also keeps the
   app warm).

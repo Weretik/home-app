@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Notifications.Application;
 using Notifications.Infrastructure.Telegram;
 
-namespace IntegrationTests.Api.Notifications;
+namespace IntegrationTests.Api.Notifications.Telegram;
 
 /// <summary>
 /// The real Telegram client of the API, with a token in the BotFather format (digits, a colon, letters) and only the

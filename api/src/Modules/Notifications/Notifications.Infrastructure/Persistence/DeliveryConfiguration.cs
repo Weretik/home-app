@@ -14,6 +14,8 @@ internal sealed class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.Property(d => d.Id).HasColumnName("id").ValueGeneratedNever();
         builder.Property(d => d.Key).HasColumnName("key").HasMaxLength(Delivery.MaxKeyLength).IsRequired();
         builder.Property(d => d.Kind).HasColumnName("kind").HasConversion<string>().HasMaxLength(32);
+        // The migration fills rows planned before push existed with 'Telegram' (spec notifications/002).
+        builder.Property(d => d.Channel).HasColumnName("channel").HasConversion<string>().HasMaxLength(16);
         builder.Property(d => d.Audience).HasColumnName("audience").HasConversion<string>().HasMaxLength(16);
         builder.Property(d => d.ChatId).HasColumnName("chat_id");
         builder.Property(d => d.CreatedAtUtc).HasColumnName("created_at_utc");

@@ -5602,6 +5602,194 @@
           }
         }
       }
+    },
+    "/api/notifications/push": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Web Push for the signed-in person: whether it is configured, the VAPID public key to subscribe with, and the person's devices.",
+        "operationId": "getPushStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/push/subscriptions": {
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Saves this browser's push subscription for the signed-in person; saving the same endpoint again updates it. 409 when push is not configured or the member is not Vitaliy or Maria.",
+        "operationId": "savePushSubscription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePushSubscriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushDevice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/push/subscriptions/{id}": {
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Removes one of the signed-in person's push devices. 404 when it is not one of theirs.",
+        "operationId": "deletePushSubscription",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/push/test": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Pushes a test message to every device of the signed-in person at once and says how many accepted it. 404 without devices, 409 when push is not configured or every device refused.",
+        "operationId": "sendPushTest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushTestResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5915,6 +6103,13 @@
             "format": "uuid"
           }
         }
+      },
+      "DeliveryChannel": {
+        "enum": [
+          "Telegram",
+          "Push"
+        ],
+        "description": "How a planned message reaches its audience (spec notifications/002, R-106)."
       },
       "DepartmentItem": {
         "required": [
@@ -7417,6 +7612,7 @@
       "NotificationDeliveryItem": {
         "required": [
           "kind",
+          "channel",
           "audience",
           "key",
           "createdAtUtc",
@@ -7426,6 +7622,9 @@
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/DigestKind"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/DeliveryChannel"
           },
           "audience": {
             "$ref": "#/components/schemas/Audience"
@@ -7445,7 +7644,7 @@
             "format": "date-time"
           }
         },
-        "description": "A planned message; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox."
+        "description": "A planned message on Telegram or push; DateTimeOffset? NotificationDeliveryItem.SentAtUtc is null while it waits in the outbox."
       },
       "NotificationScheduleItem": {
         "required": [
@@ -7730,6 +7929,83 @@
           }
         }
       },
+      "PushDevice": {
+        "required": [
+          "id",
+          "device",
+          "endpoint",
+          "createdAtUtc",
+          "lastSeenAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "device": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastSeenAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "One of the person's devices; the endpoint lets the page recognise the device it runs on."
+      },
+      "PushStatus": {
+        "required": [
+          "configured",
+          "publicKey",
+          "canSubscribe",
+          "devices"
+        ],
+        "type": "object",
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "publicKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "canSubscribe": {
+            "type": "boolean"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PushDevice"
+            }
+          }
+        },
+        "description": "Push for the signed-in person: string? PushStatus.PublicKey (base64url) is what the browser subscribes with, null while\npush is not configured; bool PushStatus.CanSubscribe is false for a member without a person (R-101)."
+      },
+      "PushTestResult": {
+        "required": [
+          "delivered"
+        ],
+        "type": "object",
+        "properties": {
+          "delivered": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "How many devices accepted the test push."
+      },
       "Recipient": {
         "enum": [
           "Maria",
@@ -7801,6 +8077,33 @@
             }
           }
         }
+      },
+      "SavePushSubscriptionRequest": {
+        "required": [
+          "endpoint",
+          "p256dh",
+          "auth",
+          "device"
+        ],
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          },
+          "p256dh": {
+            "type": "string"
+          },
+          "auth": {
+            "type": "string"
+          },
+          "device": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "A browser's push subscription (`PushSubscription.toJSON()`: endpoint and keys) and a device label."
       },
       "SavingsDirection": {
         "enum": [

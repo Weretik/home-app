@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Notifications.Application;
 using Notifications.Application.Sending;
+using Notifications.Application.Push;
+using Notifications.Infrastructure.Push;
 using Notifications.Infrastructure.Telegram;
 
 namespace Notifications.Infrastructure;
@@ -34,8 +36,14 @@ public static class NotificationsInfrastructureRegistration
             // The request url carries the bot token; the factory's default loggers would write it to the logs.
             .RemoveAllLoggers();
 
+        services.AddOptions<WebPushOptions>().Bind(configuration.GetSection(WebPushOptions.SectionName));
+        services.AddHttpClient<IWebPush, WebPushClient>(client => client.Timeout = TimeSpan.FromSeconds(20))
+            // A push endpoint's path addresses a device; the factory's default loggers would write it to the logs.
+            .RemoveAllLoggers();
+
         services.AddModuleOutbox<NotificationsDbContext>();
         services.AddOutboxMessage<TelegramMessage, TelegramMessageHandler>(TelegramMessage.TypeName);
+        services.AddOutboxMessage<PushMessage, PushMessageHandler>(PushMessage.TypeName);
         return services;
     }
 

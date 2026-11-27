@@ -184,7 +184,8 @@ jobs:
             /api/todos/summary \
             /api/notes/items \
             /api/notes/categories \
-            /api/notifications/status; do
+            /api/notifications/status \
+            /api/notifications/push; do
             code=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 60 \
               -H "X-Scheduler-Key: $SCHEDULER_KEY" "$APP_URL$path" || echo 000)
             echo "$code $path"

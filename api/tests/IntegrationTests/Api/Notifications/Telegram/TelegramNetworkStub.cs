@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
 
-namespace IntegrationTests.Api.Notifications;
+namespace IntegrationTests.Api.Notifications.Telegram;
 
 /// <summary>
 /// The network under the real Telegram client: it records every request url and answers like the Bot API, so a test

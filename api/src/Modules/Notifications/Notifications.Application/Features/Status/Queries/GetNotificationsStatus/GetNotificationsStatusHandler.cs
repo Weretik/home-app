@@ -17,7 +17,7 @@ public sealed class GetNotificationsStatusHandler(INotificationsDbContext db, IT
         var deliveries = await db.Deliveries.AsNoTracking()
             .OrderByDescending(d => d.CreatedAtUtc)
             .Take(DeliveryCount)
-            .Select(d => new NotificationDeliveryItem(d.Kind, d.Audience, d.Key, d.CreatedAtUtc, d.SentAtUtc))
+            .Select(d => new NotificationDeliveryItem(d.Kind, d.Channel, d.Audience, d.Key, d.CreatedAtUtc, d.SentAtUtc))
             .ToListAsync(cancellationToken);
         var username = bot.IsConfigured ? await bot.GetUsernameAsync(cancellationToken) : null;
 

@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Notifications.Application;
 using Notifications.Infrastructure.Telegram;
 
-namespace IntegrationTests.Api.Notifications;
+namespace IntegrationTests.Api.Notifications.Telegram;
 
 /// <summary>
 /// The bot with a token and a recording Telegram, at 08:30 in Kyiv on 2 December 2026: linking from Telegram, the
