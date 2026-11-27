@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import { MemberMenu } from '../../features/identity/member/MemberMenu';
-import { ColorModeMenu } from '../theme/ColorModeMenu';
+import { MemberMenu } from '../../../features/identity/member/MemberMenu';
+import { ColorModeMenu } from '../../theme/ColorModeMenu';
 import { Brand } from './Brand';
-import { SIDE_NAV_WIDE } from './SideNav';
+import { SIDE_NAV_WIDE } from '../navigation/SideNav';
 
 interface TopBarProps {
   menuCollapsed: boolean;

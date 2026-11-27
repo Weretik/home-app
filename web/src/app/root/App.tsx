@@ -25,7 +25,7 @@ import { ArchivePage as TodosArchivePage } from '../../features/todos/archive/Ar
 import { CategoriesSettingsPage } from '../../features/todos/settings/CategoriesSettingsPage';
 import { TodosSection } from '../../features/todos/section/TodosSection';
 import { ActiveTasksPage } from '../../features/todos/task-list/ActiveTasksPage';
-import { AppLayout } from '../shell/AppLayout';
+import { AppLayout } from '../shell/frame/AppLayout';
 
 /** Every route sits behind the sign-in gate; there is no /sign-in route, so the URL survives sign-in. */
 export function App() {
