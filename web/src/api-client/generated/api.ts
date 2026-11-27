@@ -62,7 +62,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Returns the signed-in family member: e-mail, name and Google picture. */
+        /** Returns the signed-in family member: e-mail, name, Google picture and who they are in the home. */
         get: operations["getCurrentMember"];
         put?: never;
         post?: never;
@@ -1122,12 +1122,18 @@ export interface components {
             /** @default false */
             outsideLimits: boolean;
         };
-        /** @description The signed-in member as the web app shows it: e-mail, name and the Google picture. */
+        /**
+         * @description The signed-in member as the web app shows it: e-mail, name, the Google picture, and who they are in the home (null
+         *     for an allowlisted e-mail that is neither Vitaliy nor Maria).
+         */
         FamilyMember: {
             email: string;
             name: string;
             pictureUrl: null | string;
+            person: null | components["schemas"]["FamilyPerson"];
         };
+        /** @enum {unknown} */
+        FamilyPerson: "Vitaliy" | "Maria" | null;
         /** @description A name bought often, in its latest spelling and department; one tap adds it. */
         FrequentItem: {
             name: string;

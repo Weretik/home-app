@@ -1,23 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useSignedInPerson } from '../../../platform/member-api';
 import type { TaskView } from '../data/todos-api';
 import { whenFits, type When } from './date-filter';
-import { whoValues, type TodoFilters, type Who } from './filters';
+import {
+  everyoneParam,
+  resolveWho,
+  type TodoFilters,
+  type Who,
+} from './filters';
 
 const names = ['who', 'category', 'q', 'when', 'from', 'to'] as const;
 type Name = (typeof names)[number];
 
 /**
  * The filters of a task list kept in `?who=&category=&q=&when=&from=&to=`, so a link opens the same list. A `when`
- * the list does not offer (another list's choice) is ignored.
+ * the list does not offer (another list's choice) is ignored. Without `who` the list shows the signed-in person;
+ * «Усі» and «Скинути фільтр» write `who=all` (identity 002 FR-002).
  */
 export function useTodoFilters(view: TaskView = 'active') {
   const [params, setParams] = useSearchParams();
-  const rawWho = params.get('who');
+  const person = useSignedInPerson();
   const rawWhen = (params.get('when') || undefined) as When | undefined;
   const when = whenFits(view, rawWhen) ? rawWhen : undefined;
   const filters: TodoFilters = {
-    who: whoValues.includes(rawWho as Who) ? (rawWho as Who) : undefined,
+    who: resolveWho(params.get('who'), person),
     category: params.get('category') || undefined,
     q: params.get('q') || undefined,
     when,
@@ -43,6 +50,7 @@ export function useTodoFilters(view: TaskView = 'active') {
       (current) => {
         const updated = new URLSearchParams(current);
         for (const name of names) updated.delete(name);
+        updated.set('who', everyoneParam);
         return updated;
       },
       { replace: true },
@@ -50,7 +58,7 @@ export function useTodoFilters(view: TaskView = 'active') {
 
   return {
     filters,
-    setWho: (who: Who | undefined) => set({ who }),
+    setWho: (who: Who | undefined) => set({ who: who ?? everyoneParam }),
     setCategory: (category: string | undefined) => set({ category }),
     setSearch: (q: string | undefined) => set({ q }),
     // A new choice drops the old period's days.

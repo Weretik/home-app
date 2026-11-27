@@ -26,12 +26,26 @@ public sealed class IdentityApiTests(ApiFactory api)
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(ApiFactory.Masha, body.GetProperty("member").GetProperty("email").GetString());
+        Assert.Equal("Maria", body.GetProperty("member").GetProperty("person").GetString());
         Assert.True(body.GetProperty("expiresAtUtc").GetDateTimeOffset() > DateTimeOffset.UtcNow.AddDays(29));
         using var masha = WithToken(body.GetProperty("token").GetString()!);
         var me = await masha.GetFromJsonAsync<JsonElement>("/api/identity/me");
         Assert.Equal(ApiFactory.Masha, me.GetProperty("email").GetString());
         Assert.Contains("Masha", me.GetProperty("name").GetString());
+        Assert.Equal("Maria", me.GetProperty("person").GetString());
         Assert.Equal(HttpStatusCode.OK, (await masha.GetAsync("/api/todos/summary")).StatusCode);
+    }
+
+    [SkippableFact]
+    public async Task Me_SaysWhoTheMemberIsInTheHome()
+    {
+        Skip.If(api.Unavailable is not null, api.Unavailable);
+        using var vitaliy = api.CreateHttpsClient();
+
+        var me = await vitaliy.GetFromJsonAsync<JsonElement>("/api/identity/me");
+
+        Assert.Equal(ApiFactory.Vitaliy, me.GetProperty("email").GetString());
+        Assert.Equal("Vitaliy", me.GetProperty("person").GetString());
     }
 
     [SkippableFact]

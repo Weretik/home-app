@@ -33,8 +33,8 @@ internal static class MemberClaims
     }
 
     /// <summary>The member of a session principal, or null for any other principal (the scheduler).</summary>
-    public static FamilyMember? Member(ClaimsPrincipal principal) =>
+    public static FamilyMember? Member(ClaimsPrincipal principal, FamilyAllowlist family) =>
         principal.FindFirstValue(Email) is { } email
-            ? new FamilyMember(email, principal.FindFirstValue(Name) ?? email, principal.FindFirstValue(Picture))
+            ? FamilyMember.From(new MemberProfile(email, principal.FindFirstValue(Name) ?? email, principal.FindFirstValue(Picture)), family)
             : null;
 }

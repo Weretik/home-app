@@ -2,7 +2,7 @@ using Identity.Application.Features.Members;
 
 namespace UnitTests.Identity;
 
-/// <summary>Spec identity/001: R-002.</summary>
+/// <summary>Spec identity/001: R-002; spec identity/002: R-001.</summary>
 public sealed class FamilyAllowlistTests
 {
     private static readonly FamilyAllowlist Family = new([" Vitaliy@Example.com ", "masha@example.com", "", "  "]);
@@ -30,5 +30,32 @@ public sealed class FamilyAllowlistTests
     {
         Assert.Equal(2, Family.Count);
         Assert.False(new FamilyAllowlist([]).Contains("vitaliy@example.com"));
+    }
+
+    [Fact]
+    public void The_FirstEntry_IsVitaliy_AndTheSecond_IsMaria()
+    {
+        Assert.Equal(FamilyPerson.Vitaliy, Family.PersonOf("VITALIY@example.com "));
+        Assert.Equal(FamilyPerson.Maria, Family.PersonOf("masha@example.com"));
+    }
+
+    [Fact]
+    public void An_EmptyEntry_KeepsItsPlace()
+    {
+        var onlyMasha = new FamilyAllowlist([null, "masha@example.com"]);
+
+        Assert.Equal(FamilyPerson.Maria, onlyMasha.PersonOf("masha@example.com"));
+        Assert.Equal(1, onlyMasha.Count);
+    }
+
+    [Fact]
+    public void A_ThirdEntry_SignsIn_AsNobodyInParticular()
+    {
+        var family = new FamilyAllowlist(["v@example.com", "m@example.com", "guest@example.com"]);
+
+        Assert.True(family.Contains("guest@example.com"));
+        Assert.Null(family.PersonOf("guest@example.com"));
+        Assert.Null(family.PersonOf("stranger@example.com"));
+        Assert.Null(family.PersonOf(null));
     }
 }
