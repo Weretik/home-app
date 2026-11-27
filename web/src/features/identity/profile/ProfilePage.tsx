@@ -1,5 +1,4 @@
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import LogoutIcon from '@mui/icons-material/Logout';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -9,8 +8,9 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 import type { FamilyPerson } from '../../../platform/client/member-api';
-import { useCurrentMember, useSignOut } from '../data/identity-api';
+import { useCurrentMember } from '../data/identity-api';
 import { MemberAvatar } from '../member/MemberAvatar';
+import { SignOutButtons } from './SignOutButtons';
 import { TelegramRow } from './TelegramRow';
 
 const personLabels: Record<FamilyPerson, string> = {
@@ -20,11 +20,10 @@ const personLabels: Record<FamilyPerson, string> = {
 
 /**
  * «Профіль» (identity 002 FR-004): the Google picture and name, the e-mail, who the member is in the home, the
- * Telegram chat, the link to «Про нас» (notes 001 FR-008) and «Вийти». Links to other sections go after Telegram.
+ * Telegram chat, the link to «Про нас» (notes 001 FR-008), «Вийти» and «Вийти на всіх пристроях» (ADR 0046). Links to other sections go after Telegram.
  */
 export function ProfilePage() {
   const { data: member } = useCurrentMember();
-  const signOut = useSignOut();
   const person = member?.person ?? undefined;
 
   return (
@@ -103,17 +102,7 @@ export function ProfilePage() {
           </Box>
         </CardContent>
       </Card>
-      <Box>
-        <Button
-          variant="outlined"
-          color="inherit"
-          startIcon={<LogoutIcon />}
-          disabled={signOut.isPending}
-          onClick={() => signOut.mutate()}
-        >
-          Вийти
-        </Button>
-      </Box>
+      <SignOutButtons />
     </Box>
   );
 }

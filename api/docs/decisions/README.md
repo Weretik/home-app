@@ -53,6 +53,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0043 | [cron-job.org calls the ticks, GitHub cron is the backup, and the API keeps a heartbeat](0043-external-cron-and-scheduler-heartbeat.md) |
 | 0044 | [Telemetry goes to Application Insights through OpenTelemetry, alerts stay free](0044-telemetry-in-application-insights.md) |
 | 0045 | [The deploy check reads with its own key; the scheduler key only runs the ticks](0045-separate-deploy-check-key.md) |
+| 0046 | [A session ends 90 days after sign-in at the latest; a member can sign out everywhere](0046-session-max-age-and-sign-out-everywhere.md) |
 
 ## Decisions that must have a record
 

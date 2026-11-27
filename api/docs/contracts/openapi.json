@@ -141,6 +141,40 @@
         }
       }
     },
+    "/api/identity/sign-out-everywhere": {
+      "post": {
+        "tags": [
+          "Identity"
+        ],
+        "summary": "Ends every session of the signed-in member on every device, this one included.",
+        "operationId": "signOutEverywhere",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/identity/me": {
       "get": {
         "tags": [
