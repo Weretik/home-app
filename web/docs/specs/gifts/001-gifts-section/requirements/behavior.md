@@ -84,7 +84,7 @@ Then the «Список» tab is selected and the wishes show in three blocks «
 person's coloured circle, name, count and sum («2 подарка · ≈ 3 200 ₴»), with Виталий in `primary`, Маша in
 `secondary` and Вместе in `info`
 And within a block the order is the server's (🔥 first, nearest occasion first)
-And each wish is one row (a table row on a computer, a compact row on a phone) with its name, category, priority, the
+And each wish is one row (a table row on a computer, a phone row whose first line is the name alone at full width, with everything else under it) with its name, category, priority, the
 price («1 625 ₴», or «цена не указана»), the occasion with its date when set, a link button when it has a link, and
 the number of variants when it has any
 
