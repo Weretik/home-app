@@ -27,8 +27,10 @@ queued-write-api.ts`). The mutation runs under the key `['queued-write', …]` w
   for that key (they send the request and refresh its module). Features call `useQueuedWrite(toRequest, options)` with
   their own input and keep their optimistic `onMutate`/`onError`.
 - **Which writes.** Ticking a shopping item, adding shopping items (also «Повернути до списку»), «Прибрати куплене»
-  (now optimistic), moving a task (done, cancelled, back), and the quick add of a task. Dialog writes (expenses,
-  gifts, notes, settings, edits) stay plain mutations with `networkMode: 'always'`, so offline they fail at once with
+  (now optimistic), moving a task (done, cancelled, back), the quick add of a task, and adding an expense (amended
+  2026-11-28, [SDD expenses/007](../specs/expenses/007-offline-expense-add/README.md): the dialog closes at once and
+  the expense waits under «Очікують мережі»). Other dialog writes (expense edits and deletes, incomes, the jar,
+  gifts, notes, settings) stay plain mutations with `networkMode: 'always'`, so offline they fail at once with
   the feature's usual message instead of waiting with a dialog open.
 - **Conflicts: last write wins.** `2xx` is done; `404`/`410` counts as done (a deleted record stays deleted, nothing is
   recreated); `409`/`412` with `refetch` reads the record, takes its `version` and sends once more with `If-Match` set
