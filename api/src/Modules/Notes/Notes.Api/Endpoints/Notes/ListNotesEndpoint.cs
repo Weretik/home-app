@@ -23,7 +23,7 @@ internal static class ListNotesEndpoint
     }
 
     private static async Task<IResult> HandleAsync(
-        [FromQuery] Person? about,
+        [FromQuery] NotePerson? about,
         [FromQuery] NoteKind[]? kind,
         [FromQuery] Guid? categoryId,
         [FromQuery] bool? withoutCategory,

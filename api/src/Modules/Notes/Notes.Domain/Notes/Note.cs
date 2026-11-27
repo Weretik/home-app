@@ -19,7 +19,7 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
     }
 
     /// <summary>Whom the note is about (R-001).</summary>
-    public Person About { get; private set; }
+    public NotePerson About { get; private set; }
 
     public NoteKind Kind { get; private set; }
 
@@ -36,10 +36,10 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
     public Guid? CategoryId { get; private set; }
 
     /// <summary>Who wrote the note; null when the member has no person in the household.</summary>
-    public Person? CreatedBy { get; private init; }
+    public NotePerson? CreatedBy { get; private init; }
 
     /// <summary>Who changed the note last; the author until someone edits it.</summary>
-    public Person? UpdatedBy { get; private set; }
+    public NotePerson? UpdatedBy { get; private set; }
 
     public DateTimeOffset CreatedAtUtc { get; private init; }
 
@@ -49,14 +49,14 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
     public uint Version { get; private set; }
 
     public static Result<Note> Create(
-        Person about,
+        NotePerson about,
         NoteKind kind,
         string title,
         string? details,
         string? place,
         bool isImportant,
         Guid? categoryId,
-        Person? createdBy,
+        NotePerson? createdBy,
         DateTimeOffset now)
     {
         var check = Check(title, details, place);
@@ -82,14 +82,14 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
 
     /// <summary>Replaces what a member can edit; the author and the creation time stay, the editor is recorded.</summary>
     public Result Update(
-        Person about,
+        NotePerson about,
         NoteKind kind,
         string title,
         string? details,
         string? place,
         bool isImportant,
         Guid? categoryId,
-        Person? updatedBy,
+        NotePerson? updatedBy,
         DateTimeOffset now)
     {
         var check = Check(title, details, place);

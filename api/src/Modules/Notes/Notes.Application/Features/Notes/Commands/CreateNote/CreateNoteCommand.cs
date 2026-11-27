@@ -11,7 +11,7 @@ namespace Notes.Application.Features.Notes.Commands.CreateNote;
 /// </summary>
 public sealed record CreateNoteCommand(
     string IdempotencyKey,
-    Person About,
+    NotePerson About,
     NoteKind Kind,
     string Title,
     string? Details,

@@ -10,7 +10,7 @@ namespace Notes.Application.Features.Notes.Queries.ListNotes;
 /// <see cref="ListNotesHandler.MaxNotes"/>, no paging.
 /// </summary>
 public sealed record ListNotesQuery(
-    Person? About,
+    NotePerson? About,
     IReadOnlyList<NoteKind> Kinds,
     Guid? CategoryId,
     bool WithoutCategory,

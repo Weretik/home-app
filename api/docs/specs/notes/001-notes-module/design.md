@@ -12,15 +12,15 @@ Follows the module layout of [Todos](../../../modules/todos.md): five projects, 
 classDiagram
     class Note {
         Guid Id  v7
-        Person About
+        NotePerson About
         NoteKind Kind
         string Title
         string? Details
         string? Place
         bool IsImportant
         Guid? CategoryId
-        Person? CreatedBy
-        Person? UpdatedBy
+        NotePerson? CreatedBy
+        NotePerson? UpdatedBy
         DateTimeOffset CreatedAtUtc
         DateTimeOffset UpdatedAtUtc
         uint Version  xmin
@@ -37,8 +37,10 @@ classDiagram
 
 - `Note` and `NoteCategory` are separate aggregates. `Note.Create(...)` and `Note.Update(...)` check R-001…R-005 and
   R-007 and return `Result`; `Update` sets `UpdatedBy` and `UpdatedAtUtc`.
-- `Person` (`Vitaliy`, `Maria`) and `NoteKind` (`Likes`, `Dislikes`, `Fact`) are domain enums stored as text. The kind
-  gets a rank only in queries (Likes 0, Dislikes 1, Fact 2).
+- `NotePerson` (`Vitaliy`, `Maria`) and `NoteKind` (`Likes`, `Dislikes`, `Fact`) are domain enums stored as text. The kind
+  gets a rank only in queries (Likes 0, Dislikes 1, Fact 2). The person enum is `NotePerson`, not `Person`: the
+  OpenAPI document names a schema after the type's simple name, and Expenses, Shopping and Todos already share a
+  `Person` schema (audit AF-001).
 - Domain errors (`NoteErrors`, `CategoryErrors`): `notes.title_invalid`, `notes.details_too_long`,
   `notes.place_too_long`, `notes.note_not_found` (404), `notes.category_not_found` (404),
   `notes.category_name_invalid`, `notes.category_emoji_too_long`, `notes.category_name_taken` (409),
@@ -51,7 +53,7 @@ classDiagram
 `Identity.Api` implements it over `IHttpContextAccessor` and the session claims (scoped); the person comes from the
 allowlist order (`Identity:AllowedEmails:0` is Vitaliy, `:1` is Maria, the identity work's ADR 0038). `null` outside a
 member's request (the scheduler key). `Notes.Application` references `Identity.Contracts` only and maps
-`HouseholdPerson` to its own `Person`; no module reads claims itself.
+`HouseholdPerson` to its own `NotePerson`; no module reads claims itself.
 
 ## Schema `notes`
 
@@ -91,7 +93,7 @@ Category creation takes no `Idempotency-Key`, as in Todos: a repeat hits the uni
 
 - `INotesDbContext` port with `Notes`, `Categories`, `CreateRequests`, `SaveChangesAsync`.
 - `TimeProvider` for the times; `ICurrentMember` for `CreatedBy` / `UpdatedBy`.
-- The list: projection to `NoteItem`, `AsNoTracking`, filters in SQL, search by words as escaped `ILIKE` on
+- The list: projection to `NoteItem`, `AsNoTracking`, filters in SQL, search by words as escaped `LIKE` on
   `lower(title)`, `lower(details)` and `lower(place)` (BuildingBlocks `SearchPattern`), order of R-012 in SQL,
   `Take(1000)`.
 - Every command saves once; a unique index violation on the category name becomes `409`.

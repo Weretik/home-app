@@ -4856,7 +4856,7 @@
             "name": "about",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/Person"
+              "$ref": "#/components/schemas/NotePerson"
             }
           },
           {
@@ -7214,7 +7214,7 @@
             "format": "uuid"
           },
           "about": {
-            "$ref": "#/components/schemas/Person"
+            "$ref": "#/components/schemas/NotePerson"
           },
           "kind": {
             "$ref": "#/components/schemas/NoteKind"
@@ -7262,7 +7262,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/Person"
+                "$ref": "#/components/schemas/NotePerson"
               }
             ]
           },
@@ -7272,7 +7272,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/Person"
+                "$ref": "#/components/schemas/NotePerson"
               }
             ]
           },
@@ -7299,6 +7299,13 @@
         ],
         "description": "What a note says about its person (R-002): «Любить», «Не любить» or a plain «Факт»."
       },
+      "NotePerson": {
+        "enum": [
+          "Vitaliy",
+          "Maria"
+        ],
+        "description": "One of the two people: whom a note is about, who wrote it and who changed it last (R-001, R-008)."
+      },
       "NoteRequest": {
         "required": [
           "about",
@@ -7312,7 +7319,7 @@
         "type": "object",
         "properties": {
           "about": {
-            "$ref": "#/components/schemas/Person"
+            "$ref": "#/components/schemas/NotePerson"
           },
           "kind": {
             "$ref": "#/components/schemas/NoteKind"

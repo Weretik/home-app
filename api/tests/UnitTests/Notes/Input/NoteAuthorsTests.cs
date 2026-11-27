@@ -13,9 +13,9 @@ public sealed class NoteAuthorsTests
     }
 
     [Theory]
-    [InlineData(HouseholdPerson.Vitaliy, Person.Vitaliy)]
-    [InlineData(HouseholdPerson.Maria, Person.Maria)]
-    public void The_Household_Person_BecomesTheNotesPerson(HouseholdPerson household, Person person)
+    [InlineData(HouseholdPerson.Vitaliy, NotePerson.Vitaliy)]
+    [InlineData(HouseholdPerson.Maria, NotePerson.Maria)]
+    public void The_Household_Person_BecomesTheNotesPerson(HouseholdPerson household, NotePerson person)
     {
         Assert.Equal(person, NoteAuthors.Of(new Member(new SignedInMember("a@b.c", "Ім'я", household))));
     }

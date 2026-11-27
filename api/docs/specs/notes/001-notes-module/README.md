@@ -23,7 +23,9 @@ Written from the backend SDD template (Weretik/obsidian `Templates/backend-sdd`)
 
 - Specification: accepted
 - Implementation: backend done (module, migration, endpoints, tests, deploy steps, docs); web in progress
-- Verification: see [tasks](tasks.md#delivery-readiness-filled-before-merge)
+- Verification: final backend audit passed with open Low findings ([audit](audit.md)); build, unit (429),
+  architecture (93) and Notes/Identity integration (93) tests green on 2026-11-27; see
+  [tasks](tasks.md#delivery-readiness-filled-before-merge)
 - Blockers: none
 
 ## Parts
@@ -31,7 +33,7 @@ Written from the backend SDD template (Weretik/obsidian `Templates/backend-sdd`)
 - [Requirements: scope, rules and scenarios](requirements.md)
 - [Design: model, schema, contract](design.md)
 - [Tasks and traceability](tasks.md)
-- Final backend code audit: `audit.md` (written after the implementation)
+- [Final backend code audit](audit.md)
 
 ## Change history
 

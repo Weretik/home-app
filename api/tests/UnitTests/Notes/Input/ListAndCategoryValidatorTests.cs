@@ -12,14 +12,14 @@ public sealed class ListAndCategoryValidatorTests
     private static readonly CreateNoteCategoryValidator CreateCategory = new();
     private static readonly UpdateNoteCategoryValidator UpdateCategory = new();
 
-    private static ListNotesQuery Query(Person? about = null, Guid? categoryId = null, bool withoutCategory = false, string? search = null) =>
+    private static ListNotesQuery Query(NotePerson? about = null, Guid? categoryId = null, bool withoutCategory = false, string? search = null) =>
         new(about, [NoteKind.Likes, NoteKind.Fact], categoryId, withoutCategory, search);
 
     [Fact]
     public void Every_Filter_IsOptional()
     {
         Assert.True(List.Validate(new ListNotesQuery(null, [], null, false, null)).IsValid);
-        Assert.True(List.Validate(Query(Person.Maria, Guid.NewGuid(), search: "агромол")).IsValid);
+        Assert.True(List.Validate(Query(NotePerson.Maria, Guid.NewGuid(), search: "агромол")).IsValid);
         Assert.True(List.Validate(Query(withoutCategory: true)).IsValid);
     }
 
@@ -32,7 +32,7 @@ public sealed class ListAndCategoryValidatorTests
     [Fact]
     public void Unknown_People_OrKinds_AndLongSearches_AreInvalid()
     {
-        Assert.False(List.Validate(Query(about: (Person)9)).IsValid);
+        Assert.False(List.Validate(Query(about: (NotePerson)9)).IsValid);
         Assert.False(List.Validate(new ListNotesQuery(null, [(NoteKind)9], null, false, null)).IsValid);
         Assert.False(List.Validate(Query(search: new string('с', 101))).IsValid);
     }

@@ -7,7 +7,7 @@ namespace Notes.Api.Endpoints.Notes;
 /// session (R-008).
 /// </summary>
 internal sealed record NoteRequest(
-    Person About,
+    NotePerson About,
     NoteKind Kind,
     string Title,
     string? Details,

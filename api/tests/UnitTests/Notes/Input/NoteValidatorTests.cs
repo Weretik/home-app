@@ -15,7 +15,7 @@ public sealed class NoteValidatorTests
     private static CreateNoteCommand NewNote(
         string key = "key-1", NoteKind kind = NoteKind.Likes, string title = "Півонії", string? details = null, string? place = null,
         Guid? categoryId = null) =>
-        new(key, Person.Maria, kind, title, details, place, categoryId, true);
+        new(key, NotePerson.Maria, kind, title, details, place, categoryId, true);
 
     [Fact]
     public void A_Plain_Note_IsValid()
@@ -33,7 +33,7 @@ public sealed class NoteValidatorTests
     public void An_Unknown_Kind_OrPerson_IsInvalid()
     {
         Assert.Contains(Create.Validate(NewNote(kind: (NoteKind)7)).Errors, e => e.PropertyName == "Kind");
-        Assert.Contains(Create.Validate(NewNote() with { About = (Person)5 }).Errors, e => e.PropertyName == "About");
+        Assert.Contains(Create.Validate(NewNote() with { About = (NotePerson)5 }).Errors, e => e.PropertyName == "About");
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class NoteValidatorTests
     [Fact]
     public void An_Edit_OrADelete_NeedsTheVersion()
     {
-        var edit = new UpdateNoteCommand(Guid.NewGuid(), 0, Person.Vitaliy, NoteKind.Dislikes, "Томатний сік", null, null, null, false);
+        var edit = new UpdateNoteCommand(Guid.NewGuid(), 0, NotePerson.Vitaliy, NoteKind.Dislikes, "Томатний сік", null, null, null, false);
 
         Assert.Contains(Update.Validate(edit).Errors, e => e.PropertyName == "Version");
         Assert.True(Update.Validate(edit with { Version = 42 }).IsValid);

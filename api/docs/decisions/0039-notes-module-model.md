@@ -25,7 +25,8 @@ part of the profile. The specification is [specs/notes/001-notes-module](../spec
   `xmin` version in `If-Match` ([0017](0017-row-version-via-xmin-for-edits.md)). Category creates rely on the unique
   name, as in Todos.
 - The list is one query without paging (at most 1000 rows), filtered by person, kind, category and words; the search
-  is `ILIKE` on title, description and place without an index (the hosting forbids `pg_trgm`, hundreds of rows).
+  is a case-insensitive `LIKE` (on lower-cased text) on title, description and place without an index (the hosting
+  forbids `pg_trgm`, hundreds of rows).
 
 ## Consequences
 

@@ -34,7 +34,9 @@ names the test for each rule and the reason for each rule that is review only
 - The HTTP request record belongs to the endpoint and is mapped to the command; the command is not the request.
   **(tested)**
 - A record that travels over HTTP (request or response) has a name no other module uses: the OpenAPI document names a
-  schema by the type's simple name, so two modules' `CategoryItem` would silently become one schema. **(tested)**
+  schema by the type's simple name, so two modules' `CategoryItem` would silently become one schema. The same holds
+  for a public enum of a module (Notes uses `NotePerson`); only `Person` stays shared by Expenses, Shopping and Todos,
+  with the same members in each. **(tested)**
 - Every input has a FluentValidation validator. Validators check shape (required, length, range); the domain checks
   business rules.
 - A command saves once (`SaveChangesAsync` a single time). There are no repositories that save on their own; the
@@ -158,7 +160,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | Writes rate limited and list `429` | `Http/EndpointRulesTests.Every_Write_OptsIntoARateLimit` (allow-list: the keyed outbox tick, ADR 0006; the keyed notifications tick, ADR 0034; the Telegram webhook, ADR 0033), `OpenApiDocumentTests.Every_Write_IsRateLimited_AndLists429` |
 | `Idempotency-Key` on creates, `If-Match` on edits | `OpenApiDocumentTests.Every_Create_TakesAnIdempotencyKey_AndEvery_Edit_TheVersion` (allow-lists: `recordPlannedExpense` without a key, ADR 0028; `renameGiftCategory` without a version, a rename is a target value, ADR 0024; `setShoppingItemStatus` and `reorderShoppingDepartments` without a version, target values, ADR 0031) |
 | Request record ≠ command; one endpoint per file | `OpenApiDocumentTests.Request_Bodies_AreEndpointRequestRecords_NotCommands`, `EndpointRulesTests.An_Endpoint_NeverBindsACommandOrAQuery_FromHttp`, `.A_File_MapsOneEndpoint_AndIsNamedAfterIt` |
-| HTTP records have names no other module uses | `Http/ContractSchemaNameTests.Http_Records_HaveNames_NoOtherModuleUses` |
+| HTTP records and enums have names no other module uses | `Http/ContractSchemaNameTests.Http_Records_HaveNames_NoOtherModuleUses`, `Enums_HaveNames_NoOtherModuleUses`, `Shared_EnumNames_KeepTheSameMembers_InEveryModule` |
 | Numbers are JSON numbers | `OpenApiDocumentTests.Numbers_AreNotAlsoStrings` |
 | OpenAPI committed and current | CI `api.yml`: `git diff --exit-code -- docs/contracts/openapi.json` after the build |
 | No secrets in committed settings; production does not migrate on startup | `Hosting/ConfigurationRulesTests` |

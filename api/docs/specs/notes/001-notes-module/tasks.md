@@ -32,6 +32,8 @@ refactor → affected regression run. Evidence is the CI run of the pull request
   `ModuleBoundaryTests.Only_TheIdentityModule_ReadsClaims`), integration 198 passed, 0 skipped (22 new in
   `IntegrationTests/Api/Notes`; `IdentityProtectionApiTests` now also sweeps `GET /api/notes/items` and
   `/api/notes/categories`). CI evidence: the pull request run.
-- [ ] `openapi.json` regenerated (done: `listNotes` … `deleteNoteCategory`, schemas `NoteItem`, `NoteRequest`,
-  `NoteCategoryItem`, `NoteCategoryRequest`, `NoteCreated`, `NoteKind`), web client regenerated (web half).
-- [ ] Backend code audit done, findings fixed or recorded.
+- [x] `openapi.json` regenerated (`listNotes` … `deleteNoteCategory`, schemas `NoteItem`, `NoteRequest`,
+  `NoteCategoryItem`, `NoteCategoryRequest`, `NoteCreated`, `NoteKind`, `NotePerson`; the person enum renamed from
+  `Person` by audit AF-001). Web client regeneration: web half.
+- [x] Backend code audit done, findings fixed or recorded: [audit](audit.md) (2026-11-27, pass; AF-001 fixed, the
+  rest Low, fixed or accepted).

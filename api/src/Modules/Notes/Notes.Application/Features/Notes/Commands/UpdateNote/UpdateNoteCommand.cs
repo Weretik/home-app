@@ -11,7 +11,7 @@ namespace Notes.Application.Features.Notes.Commands.UpdateNote;
 public sealed record UpdateNoteCommand(
     Guid Id,
     uint Version,
-    Person About,
+    NotePerson About,
     NoteKind Kind,
     string Title,
     string? Details,

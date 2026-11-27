@@ -15,15 +15,15 @@ Code: [`src/Modules/Notes`](../../src/Modules/Notes). Schema: `notes`.
 classDiagram
     class Note {
         Guid Id  v7
-        Person About
+        NotePerson About
         NoteKind Kind
         string Title
         string? Details
         string? Place
         bool IsImportant
         Guid? CategoryId
-        Person? CreatedBy
-        Person? UpdatedBy
+        NotePerson? CreatedBy
+        NotePerson? UpdatedBy
         DateTimeOffset CreatedAtUtc
         DateTimeOffset UpdatedAtUtc
         uint Version  xmin
@@ -40,10 +40,10 @@ classDiagram
 
 - `Note` and `NoteCategory` are separate aggregates. A like and a dislike of the same thing in different shops are two
   notes, so a note stays one statement.
-- Enums, stored as text: `Person` `Vitaliy` · `Maria` (whom the note is about, who wrote it, who changed it last);
+- Enums, stored as text: `NotePerson` `Vitaliy` · `Maria` (whom the note is about, who wrote it, who changed it last);
   `NoteKind` `Likes` (Любить) · `Dislikes` (Не любить) · `Fact` (Факт).
 - `CreatedBy` and `UpdatedBy` are set by the server from the signed-in member (`Identity.Contracts.ICurrentMember`,
-  mapped to `Person` in `Features/Notes/NoteAuthors`); a new note has its author as the last editor too. Both are
+  mapped to `NotePerson` in `Features/Notes/NoteAuthors`); a new note has its author as the last editor too. Both are
   `null` for an allowlisted member who is neither Vitaliy nor Maria.
 
 ## Rules
@@ -76,7 +76,7 @@ must match. No trigram index: the host forbids `pg_trgm` and the table holds hun
 
 | Project | What is there |
 | --- | --- |
-| `Notes.Domain` | `Notes/` (`Note`, `NoteKind`, `Person`, `NoteErrors`), `Categories/` (`NoteCategory`, `CategoryErrors`). No EF Core, no ASP.NET Core. |
+| `Notes.Domain` | `Notes/` (`Note`, `NoteKind`, `NotePerson`, `NoteErrors`), `Categories/` (`NoteCategory`, `CategoryErrors`). No EF Core, no ASP.NET Core. |
 | `Notes.Application` | `INotesDbContext` (the unit of work), `Idempotency/` (`CreateRequest`, `NoteCreated`, the repeat rules), `Features/Notes/NoteAuthors` (the signed-in member's person), one folder per use case under `Features/`. References `Identity.Contracts` and no other module. |
 | `Notes.Infrastructure` | `NotesDbContext` (schema `notes`); configurations in `Persistence/Notes/` (notes, create requests) and `Persistence/Categories/` (categories, `CategorySeed`); migrations in `Persistence/Migrations/`; the development initializer. |
 | `Notes.Api` | `NotesModule` (`AddNotesModule`, `MapNotesModule`), endpoints in `Endpoints/Notes/` and `Endpoints/Categories/`, `NoteVersionHeader` (reads `If-Match`). |
