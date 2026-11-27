@@ -12,6 +12,7 @@ import { ListPage } from './ListPage';
 afterEach(() => {
   vi.unstubAllGlobals();
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 const dairy = {

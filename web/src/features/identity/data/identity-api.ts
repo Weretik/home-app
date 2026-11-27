@@ -1,24 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiCall, type Schema } from '../../../api-client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiCall } from '../../../api-client';
 import { api } from '../../../platform/api';
-import { moduleKeys } from '../../../platform/query-keys';
+import { memberKeys } from '../../../platform/member-api';
 import { session } from '../../../platform/session';
 
-export type FamilyMember = Schema<'FamilyMember'>;
-
-export const identityKeys = {
-  all: moduleKeys.identity,
-  me: [...moduleKeys.identity, 'me'] as const,
-};
-
-/** The signed-in member for the header (`getCurrentMember`); it does not change during a session. */
-export function useCurrentMember() {
-  return useQuery({
-    queryKey: identityKeys.me,
-    queryFn: ({ signal }) => apiCall(api.GET('/api/identity/me', { signal })),
-    staleTime: Infinity,
-  });
-}
+export {
+  useCurrentMember,
+  type FamilyMember,
+} from '../../../platform/member-api';
 
 /**
  * Exchanges Google's ID token for a session (`signIn`) and keeps its token. No Idempotency-Key: a repeat only makes
@@ -33,7 +22,7 @@ export function useSignIn() {
     onSuccess: (signedIn) => {
       session.save(signedIn.token);
       queryClient.clear();
-      queryClient.setQueryData(identityKeys.me, signedIn.member);
+      queryClient.setQueryData(memberKeys.me, signedIn.member);
     },
   });
 }

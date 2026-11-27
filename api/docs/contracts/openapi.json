@@ -146,7 +146,7 @@
         "tags": [
           "Identity"
         ],
-        "summary": "Returns the signed-in family member: e-mail, name and Google picture.",
+        "summary": "Returns the signed-in family member: e-mail, name, Google picture and who they are in the home.",
         "operationId": "getCurrentMember",
         "responses": {
           "200": {
@@ -5478,7 +5478,8 @@
         "required": [
           "email",
           "name",
-          "pictureUrl"
+          "pictureUrl",
+          "person"
         ],
         "type": "object",
         "properties": {
@@ -5493,9 +5494,26 @@
               "null",
               "string"
             ]
+          },
+          "person": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FamilyPerson"
+              }
+            ]
           }
         },
-        "description": "The signed-in member as the web app shows it: e-mail, name and the Google picture."
+        "description": "The signed-in member as the web app shows it: e-mail, name, the Google picture, and who they are in the home (null\nfor an allowlisted e-mail that is neither Vitaliy nor Maria)."
+      },
+      "FamilyPerson": {
+        "enum": [
+          "Vitaliy",
+          "Maria",
+          null
+        ]
       },
       "FrequentItem": {
         "required": [

@@ -165,7 +165,7 @@ test('filters by person and category in the URL without a new request', async ()
     screen.getByRole('button', { name: 'Скинути фільтри' }),
   );
   expect(rows()).toHaveLength(4);
-  expect(search()).toBe('');
+  expect(search()).toBe('?recipient=all');
 });
 
 test('ignores a person or category in the link that does not exist', async () => {

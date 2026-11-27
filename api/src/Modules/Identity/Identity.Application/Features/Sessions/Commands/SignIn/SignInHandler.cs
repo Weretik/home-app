@@ -38,6 +38,6 @@ public sealed class SignInHandler(
         db.Sessions.Add(session);
         await db.SaveChangesAsync(cancellationToken);
 
-        return new IdentitySession(token, session.ExpiresAtUtc, FamilyMember.From(session.Member));
+        return new IdentitySession(token, session.ExpiresAtUtc, FamilyMember.From(session.Member, settings.Members));
     }
 }

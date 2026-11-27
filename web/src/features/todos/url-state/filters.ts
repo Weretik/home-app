@@ -1,3 +1,4 @@
+import type { FamilyPerson } from '../../../platform/member-api';
 import type { Assignee, TaskQuery, TaskView } from '../data/todos-api';
 import { dateQuery, type DateFilter } from './date-filter';
 
@@ -11,6 +12,27 @@ export const whoLabels: Record<Who, string> = {
   vitaliy: 'Віталій',
   shared: 'Спільне',
 };
+
+/** `?who=all`: «Усі» picked by hand, so the list does not fall back to the signed-in person. */
+export const everyoneParam = 'all';
+
+const personWho: Record<FamilyPerson, Who> = {
+  Maria: 'maria',
+  Vitaliy: 'vitaliy',
+};
+
+/**
+ * «Кому» from the URL (identity 002 FR-002): a known value as it is, `all` as everyone, and no param as the signed-in
+ * person (everyone while the member loads or is neither of the two).
+ */
+export function resolveWho(
+  raw: string | null,
+  person: FamilyPerson | undefined,
+): Who | undefined {
+  if (whoValues.includes(raw as Who)) return raw as Who;
+  if (raw === null && person) return personWho[person];
+  return undefined;
+}
 
 /** The filters of a task list as the URL keeps them (FR-002). `category` is an id or `none`. */
 export interface TodoFilters extends DateFilter {
