@@ -1,10 +1,10 @@
-import type { UseMutationResult } from '@tanstack/react-query';
 import { useState } from 'react';
+import { isOnline } from '../../../platform/offline/status/network-status';
 import { describeWriteError } from '../write-data/write-errors-api';
 import {
   useIdempotencyKey,
   type EditedEntry,
-  type SaveInput,
+  type Saver,
 } from '../write-data/write-hooks-api';
 import { isValid, type FieldErrors } from './entry-fields';
 
@@ -15,8 +15,10 @@ interface EntryFormOptions<Values, Body> {
   toBody: (values: Values) => Body;
   /** The entry being changed; undefined for a new one. */
   edit?: EditedEntry;
-  save: UseMutationResult<unknown, Error, SaveInput<Body>>;
+  save: Saver<Body>;
   onSaved: () => void;
+  /** Set when `save` is a queued write: called at once when the write is made offline and waits for the network. */
+  onQueued?: () => void;
 }
 
 /**
@@ -30,6 +32,7 @@ export function useEntryForm<Values extends object, Body>({
   edit,
   save,
   onSaved,
+  onQueued,
 }: EntryFormOptions<Values, Body>) {
   const [values, setValues] = useState(initial);
   const [checked, setChecked] = useState<FieldErrors>({});
@@ -53,6 +56,7 @@ export function useEntryForm<Values extends object, Body>({
     setChecked(errors);
     if (!isValid(errors) || save.isPending) return;
     const body = toBody(values);
+    const queued = onQueued !== undefined && !isOnline();
     save.mutate(
       { body, edit, idempotencyKey: idempotency.keyFor(body) },
       {
@@ -62,6 +66,7 @@ export function useEntryForm<Values extends object, Body>({
         },
       },
     );
+    if (queued) onQueued();
   };
 
   return {

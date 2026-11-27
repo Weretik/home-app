@@ -79,7 +79,7 @@ Priority = (impact + likelihood) × (6 − cost), each scored 1–5; dependencie
 | 1 | F1 telemetry and alerts: Application Insights with a daily cap (free up to 5 GB a month), a free uptime job on `/health` every 15 minutes ([ADR 0044](../../api/docs/decisions/0044-telemetry-in-application-insights.md)) | 3 | 5 | 2 | 32 | now | fixed in #51; smart detection e-mails skipped by Vitaliy, the uptime job covers outages |
 | 2 | F2 two keys: the scheduler key runs the ticks only; a separate read key for the post-deploy smoke stays in GitHub ([ADR 0045](../../api/docs/decisions/0045-separate-deploy-check-key.md)) | 4 | 2 | 1 | 30 | now | fixed in #52 |
 | 3 | F3 required approval for the `production` environment and a database role for migrations only | 5 | 1 | 1 | 30 | risk accepted 2026-11-28 by Vitaliy: one approval click per deploy and a second database role are not worth it for a two-person site; only he can merge to `main` | accepted, revisit when a third person gets write access to the repository or the hosting, or when the database holds data that cannot be re-entered |
-| 4 | F4 offline queue for expenses, reusing `platform/offline/queue` | 3 | 4 | 2 | 28 | now | open |
+| 4 | F4 offline queue for expenses, reusing `platform/offline/queue` ([web SDD expenses/007](../../web/docs/specs/expenses/007-offline-expense-add/README.md)) | 3 | 4 | 2 | 28 | now | fixed in #54 |
 | 5 | F5 a session ends 90 days after sign-in at the latest; "sign out everywhere"; CSP later | 4 | 2 | 2 | 24 | now (CSP later) | open |
 | — | F6 a separate random webhook secret | 3 | 1 | 1 | 20 | later | open |
 | — | F7 decide whether the DDD rules apply here; if yes, write them down and test them | — | — | — | — | later, Vitaliy decides | open |

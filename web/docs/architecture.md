@@ -152,7 +152,8 @@ tabs of one section ([ADR 0006](decisions/0006-section-pages-as-tabs-with-state-
 ```
 expenses/
   data/             expenses-api.ts and savings-api.ts (React Query reads), writes-api.ts (save / delete hooks of
-                    expenses, incomes and savings movements), formatting (signed amounts too), Ukrainian enum labels,
+                    expenses, incomes and savings movements; the queued add of an expense and the expenses waiting for
+                    the network), formatting (signed amounts too), Ukrainian enum labels,
                     months
   write-data/       what every write shares: write-hooks-api.ts (the Writer shape, useSave / useChange / useRemove,
                     If-Match, the Idempotency-Key hook, the module refresh) and write-errors-api.ts (Ukrainian text of
@@ -166,7 +167,7 @@ expenses/
   entry-dialogs/    the add / edit dialog frame, the delete confirmation, the row «⋮» menu (with an optional step of
                     its own), amount, person and category fields
   expense-list/     «Расходы» page: which expenses it shows (use-shown-expenses.ts: month or period, filters, from the
-                    URL), phone list, computer table, the «вне лимитов» chip
+                    URL), phone list, computer table, the «вне лимитов» chip, «Очікують мережі» (expenses added offline)
   expense-filters/  the row above the expenses: category and «Кто» filters, «Период», «Добавить расход»
   expense-editing/  the expense form (values ↔ request, «Не в лимиты») and its dialogs
   income-list/      «Доходы» page: filter, «Добавить доход», phone list, computer table
@@ -203,6 +204,12 @@ expenses/
   (`moduleKeys.expenses`, `['expenses']`): the lists, the budget, the plans and the home summary
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)); a 404 or `expenses.changed_meanwhile` reloads them
   too. Only the queries on screen refetch; the rest refetch when they are shown again.
+- Adding an expense also works offline ([SDD 007](specs/expenses/007-offline-expense-add/README.md), web ADR 0022):
+  the add is a queued write (`useSaveExpense(false)` → `useQueuedWrite(addExpenseRequest)`) with the form's
+  `Idempotency-Key`. Offline the dialog closes at once, a snackbar says «Витрата додасться, коли з’явиться мережа», and
+  the expense is listed under «Очікують мережі» above the list (`usePendingExpenses`: the paused queued writes to
+  `POST /api/expenses`, also after a restart) until it is sent; then the module's queries refresh. A server error is
+  sent again by itself (three times) with the same key. Edits and deletes, incomes and the jar stay online-only.
 - «Налаштування» (`/expenses/settings`, no month picker, not a tab) reads `/api/expenses/budget`. The monthly limit and
   the savings goal are one form saved with the budget's `version` in `If-Match` (empty = 0 = none); spending limits
   are added (`Idempotency-Key`), changed (`If-Match`) and deleted in dialogs like entries. Like every write, a budget

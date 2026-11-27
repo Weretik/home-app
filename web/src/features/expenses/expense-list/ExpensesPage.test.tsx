@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@mui/material/styles';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { onlineManager, QueryClientProvider } from '@tanstack/react-query';
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -16,7 +17,10 @@ import { currentMonth, formatMonth } from '../data/month';
 import { ExpensesSection } from '../section/ExpensesSection';
 import { ExpensesPage } from './ExpensesPage';
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  onlineManager.setOnline(true);
+});
 
 const categories = [
   { id: 'c-food', name: 'Продукты', sortOrder: 1 },
@@ -293,13 +297,13 @@ const dialogClosed = () =>
 const created = () => json({ id: crypto.randomUUID() }, 201);
 const noContent = () => Promise.resolve(new Response(null, { status: 204 }));
 
-test('adds an expense with an Idempotency-Key and keeps the key on a retry', async () => {
+test('adds an expense with an Idempotency-Key and keeps the key when it is sent again', async () => {
   let failFirst = true;
   const { writes, expenseUrls } = renderSection((_, sent) => {
     if (sent.method === 'POST') {
       if (failFirst) {
         failFirst = false;
-        return json({ title: 'Ошибка сервера' }, 500);
+        return json({ title: 'Too many requests' }, 429);
       }
       return created();
     }
@@ -328,7 +332,7 @@ test('adds an expense with an Idempotency-Key and keeps the key on a retry', asy
   );
 
   expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-    'Не вдалося зберегти',
+    'Забагато змін поспіль',
   );
   const listLoads = expenseUrls().length;
   await userEvent.click(
@@ -351,6 +355,79 @@ test('adds an expense with an Idempotency-Key and keeps the key on a retry', asy
   expect(key).toBeTruthy();
   expect(retry!.headers.get('Idempotency-Key')).toBe(key);
   await waitFor(() => expect(expenseUrls().length).toBeGreaterThan(listLoads));
+});
+
+/** Opens «Нова витрата», picks «Дом», types the amount and saves. */
+async function addHomeExpense(amount: string) {
+  await userEvent.click(screen.getByRole('button', { name: 'Додати витрату' }));
+  const dialog = await screen.findByRole('dialog', { name: 'Нова витрата' });
+  await userEvent.click(
+    within(dialog).getByRole('combobox', { name: /Категорія/ }),
+  );
+  await userEvent.click(await screen.findByRole('option', { name: 'Дом' }));
+  await userEvent.type(within(dialog).getByLabelText(/Сума/), amount);
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+}
+
+test('a server error on an add is sent again by itself with the same key', async () => {
+  let failFirst = true;
+  const { writes } = renderSection((_, sent) => {
+    if (sent.method === 'POST') {
+      if (failFirst) {
+        failFirst = false;
+        return json({ title: 'Ошибка сервера' }, 500);
+      }
+      return created();
+    }
+    return json(page([expense()]));
+  });
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
+
+  await addHomeExpense('80');
+
+  await waitFor(() => expect(writes()).toHaveLength(2), { timeout: 4000 });
+  await dialogClosed();
+  const [first, again] = writes();
+  expect(again!.headers.get('Idempotency-Key')).toBe(
+    first!.headers.get('Idempotency-Key'),
+  );
+});
+
+test('offline, an add closes the dialog, says it will be added and is sent when the network is back', async () => {
+  const { writes, expenseUrls } = renderSection((_, sent) =>
+    sent.method === 'POST' ? created() : json(page([expense()])),
+  );
+  await screen.findByRole('list', { name: 'Витрати за місяць' });
+  onlineManager.setOnline(false);
+
+  await addHomeExpense('120');
+
+  await dialogClosed();
+  expect(
+    screen.getByText('Витрата додасться, коли з’явиться мережа'),
+  ).toBeInTheDocument();
+  const waiting = screen.getByRole('list', {
+    name: 'Витрати, що очікують мережі',
+  });
+  expect(within(waiting).getByText(/Дом · 120,00/)).toBeInTheDocument();
+  expect(writes()).toHaveLength(0);
+  const listLoads = expenseUrls().length;
+
+  act(() => onlineManager.setOnline(true));
+
+  await waitFor(() => expect(writes()).toHaveLength(1));
+  expect(writes()[0]!.url.pathname).toBe('/api/expenses');
+  expect(writes()[0]!.headers.get('Idempotency-Key')).toBeTruthy();
+  expect(writes()[0]!.body).toMatchObject({
+    categoryId: 'c-home',
+    amount: 120,
+  });
+  await waitFor(() => expect(expenseUrls().length).toBeGreaterThan(listLoads));
+  expect(
+    screen.queryByRole('list', { name: 'Витрати, що очікують мережі' }),
+  ).not.toBeInTheDocument();
 });
 
 test('edits an expense with its version in If-Match', async () => {

@@ -9,10 +9,13 @@ import { ExpenseDialog } from './ExpenseDialog';
 export function ExpenseEditor({
   editor,
   newDate,
+  onQueued,
 }: {
   editor: EntryEditor<ExpenseItem>;
   /** The date a new expense starts with. */
   newDate: string;
+  /** A new expense was made offline and waits for the network. */
+  onQueued: () => void;
 }) {
   const remove = useDeleteExpense();
   const { state, close } = editor;
@@ -32,6 +35,10 @@ export function ExpenseEditor({
       item={state.mode === 'edit' ? state.item : undefined}
       newDate={newDate}
       onClose={close}
+      onQueued={() => {
+        close();
+        onQueued();
+      }}
     />
   );
 }

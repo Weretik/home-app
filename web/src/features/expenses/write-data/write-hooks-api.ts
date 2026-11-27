@@ -17,6 +17,19 @@ export interface SaveInput<Body> {
   idempotencyKey: string;
 }
 
+/**
+ * What an add / edit form sends through: a plain mutation, or a queued write that waits for the network (web ADR
+ * 0022). `isPending` is false while a queued write waits offline, so the form does not hang on it.
+ */
+export interface Saver<Body> {
+  mutate: (
+    input: SaveInput<Body>,
+    callbacks?: { onSuccess?: () => void; onError?: (error: Error) => void },
+  ) => void;
+  isPending: boolean;
+  error: Error | null;
+}
+
 /** How one kind of entry is added, changed and deleted. */
 export interface Writer<Body> {
   create: (body: Body, idempotencyKey: string) => Promise<unknown>;

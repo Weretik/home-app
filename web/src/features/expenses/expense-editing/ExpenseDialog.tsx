@@ -25,18 +25,29 @@ interface ExpenseDialogProps {
   /** The date a new expense starts with. */
   newDate: string;
   onClose: () => void;
+  /** A new expense made offline waits for the network; the dialog closes and the page says so. */
+  onQueued: () => void;
 }
 
-/** Adds or changes an expense; «Не в ліміти» keeps it out of the limits and the carry-over. */
-export function ExpenseDialog({ item, newDate, onClose }: ExpenseDialogProps) {
+/**
+ * Adds or changes an expense; «Не в ліміти» keeps it out of the limits and the carry-over. A new expense also works
+ * offline (spec expenses/007).
+ */
+export function ExpenseDialog({
+  item,
+  newDate,
+  onClose,
+  onQueued,
+}: ExpenseDialogProps) {
   const outsideHintId = useId();
   const form = useEntryForm({
     initial: expenseFormValues(item, newDate),
     validate: validateExpense,
     toBody: toExpenseRequest,
     edit: item && { id: item.id, version: item.version },
-    save: useSaveExpense(),
+    save: useSaveExpense(item !== undefined),
     onSaved: onClose,
+    onQueued: item ? undefined : onQueued,
   });
   const { values, set, errors } = form;
 
