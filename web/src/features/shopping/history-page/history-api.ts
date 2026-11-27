@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import { shoppingKey } from '../data/shopping-api';
 
 /** History rows per request; the API allows up to 100. */

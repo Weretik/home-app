@@ -1,4 +1,4 @@
-import { useCurrentMember } from '../../../platform/member-api';
+import { useCurrentMember } from '../../../platform/client/member-api';
 
 /**
  * The signed-in person (FR-001), from platform/member-api, never from the identity feature; the partner follows from it

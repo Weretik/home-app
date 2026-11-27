@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { ApiError, newIdempotencyKey } from '../../../api-client';
-import { moduleKeys } from '../../../platform/query-client';
+import { moduleKeys } from '../../../platform/client/query-client';
 
 /** The entry an edit starts from: its id and the version the list showed (sent in If-Match). */
 export interface EditedEntry {

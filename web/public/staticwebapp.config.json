@@ -1,6 +1,23 @@
 {
+  "routes": [
+    {
+      "route": "/service-worker.js",
+      "headers": { "Cache-Control": "no-cache" }
+    },
+    {
+      "route": "/index.html",
+      "headers": { "Cache-Control": "no-cache" }
+    },
+    {
+      "route": "/site.webmanifest",
+      "headers": { "Cache-Control": "no-cache" }
+    }
+  ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*"]
+    "exclude": ["/assets/*", "/service-worker.js", "/site.webmanifest"]
+  },
+  "mimeTypes": {
+    ".webmanifest": "application/manifest+json"
   }
 }

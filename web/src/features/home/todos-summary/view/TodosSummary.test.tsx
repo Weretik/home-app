@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../../app/theme/theme';
-import { createQueryClient } from '../../../../platform/query-client';
+import { createQueryClient } from '../../../../platform/client/query-client';
 import { HomePage } from '../../page/HomePage';
 
 afterEach(() => vi.unstubAllGlobals());

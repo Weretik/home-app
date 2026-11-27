@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { useCurrentMember } from '../../../platform/member-api';
+import { useCurrentMember } from '../../../platform/client/member-api';
 import type { ShoppingPerson } from '../data/shopping-api';
 
 /**

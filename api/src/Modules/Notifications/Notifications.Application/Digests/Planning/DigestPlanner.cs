@@ -35,7 +35,13 @@ public static class DigestPlanner
                 if (Render(slot, audience, inputs, today, site) is { } message)
                 {
                     messages.Add(new PlannedMessage(
-                        Delivery.KeyOf(slot.Kind, slot.Period, audience), slot.Kind, audience, chats[audience], message.Text, message.Buttons));
+                        Delivery.KeyOf(slot.Kind, slot.Period, audience),
+                        slot.Kind,
+                        audience,
+                        chats[audience],
+                        message.Text,
+                        message.Buttons,
+                        PageOf(slot.Kind)));
                 }
             }
         }
@@ -70,7 +76,17 @@ public static class DigestPlanner
             audience,
             chats[audience],
             GiftReminderText.For(gift, today),
-            []);
+            [],
+            $"/gifts?gift={gift.GiftId}");
+
+    /// <summary>The site page a digest is about (spec notifications/002, R-107).</summary>
+    public static string PageOf(DigestKind kind) => kind switch
+    {
+        DigestKind.TodosMorning or DigestKind.TodosCommon => "/todos",
+        DigestKind.ShoppingEvening => "/shopping",
+        DigestKind.ExpensesWeek or DigestKind.ExpensesMonth => "/expenses/forecast",
+        _ => "/gifts",
+    };
 
     private static (string Text, IReadOnlyList<TelegramButton> Buttons)? Plain(string? text) =>
         text is null ? null : (text, []);

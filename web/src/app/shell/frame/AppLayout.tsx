@@ -1,6 +1,8 @@
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { PushSync } from '../../../features/notifications/push/PushSync';
+import { UpdatePrompt } from '../../pwa/UpdatePrompt';
 import { BottomNav } from '../navigation/BottomNav';
 import { SideNav } from '../navigation/SideNav';
 import { TopBar } from './TopBar';
@@ -70,6 +72,8 @@ export function AppLayout() {
         </Box>
       </Box>
       <BottomNav />
+      <UpdatePrompt />
+      <PushSync />
     </Box>
   );
 }

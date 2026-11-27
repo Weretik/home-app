@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { apiCall, newIdempotencyKey, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
+import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
 import { todosKey } from '../data/todos-api';
 import { isStale } from './failures-api';
 
@@ -53,6 +54,24 @@ export function useSaveTask() {
     },
   });
 }
+
+export interface AddTaskInput {
+  body: TodoTaskRequest;
+  idempotencyKey: string;
+}
+
+/** The request of a quick add, with its Idempotency-Key, so a repeat after a lost answer adds one task only. */
+export const addTaskRequest = ({ body, idempotencyKey }: AddTaskInput) => ({
+  method: 'post' as const,
+  path: '/api/todos/tasks',
+  body,
+  headers: { 'Idempotency-Key': idempotencyKey },
+  module: 'todos' as const,
+  label: `справу «${body.title}»`,
+});
+
+/** The quick add of a task: a queued write (web ADR 0022), so offline it waits and is sent when the network is back. */
+export const useAddTask = () => useQueuedWrite(addTaskRequest);
 
 /** Deletes a task for good. */
 export function useDeleteTask() {

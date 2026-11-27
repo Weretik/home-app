@@ -22,7 +22,10 @@ export default tseslint.config(
       // Screens talk to the API only through the typed client (docs/rules.md, "API").
       'no-restricted-globals': [
         'error',
-        { name: 'fetch', message: 'Call the API through src/platform/api.ts.' },
+        {
+          name: 'fetch',
+          message: 'Call the API through src/platform/client/api.ts.',
+        },
       ],
       // No other HTTP client, and the openapi-fetch client is made only in src/api-client (docs/rules.md, "API").
       'no-restricted-imports': [
@@ -31,12 +34,12 @@ export default tseslint.config(
           paths: [
             {
               name: 'axios',
-              message: 'Call the API through src/platform/api.ts.',
+              message: 'Call the API through src/platform/client/api.ts.',
             },
             {
               name: 'openapi-fetch',
               message:
-                'Only src/api-client builds the client; use src/platform/api.ts.',
+                'Only src/api-client builds the client; use src/platform/client/api.ts.',
             },
           ],
         },
@@ -50,5 +53,10 @@ export default tseslint.config(
   {
     files: ['src/api-client/**'],
     rules: { 'no-restricted-imports': 'off' },
+  },
+  // The service worker runs in its own global scope (web ADR 0021).
+  {
+    files: ['src/app/service-worker/service-worker.ts'],
+    languageOptions: { globals: globals.serviceworker },
   },
 );

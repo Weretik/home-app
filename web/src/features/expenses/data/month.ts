@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 
 /** A calendar month, the unit every Expenses page shows. `month` is 1–12. */
 export interface Month {

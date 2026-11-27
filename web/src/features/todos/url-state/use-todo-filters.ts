@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useSignedInPerson } from '../../../platform/member-api';
+import { useSignedInPerson } from '../../../platform/client/member-api';
 import type { TaskView } from '../data/todos-api';
 import { whenFits, type When } from './date-filter';
 import {

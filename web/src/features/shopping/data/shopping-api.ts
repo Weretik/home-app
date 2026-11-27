@@ -4,8 +4,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
-import { moduleKeys } from '../../../platform/query-client';
+import { api } from '../../../platform/client/api';
+import { moduleKeys } from '../../../platform/client/query-client';
+import { queuedWriteKey } from '../../../platform/offline/queued-request';
 
 export type ShoppingItem = Schema<'ShoppingItemView'>;
 export type ShoppingList = Schema<'ShoppingList'>;
@@ -17,8 +18,16 @@ export type ShoppingPerson = ShoppingItem['addedBy'];
 /** Every shopping query starts with this key, so an item write refreshes the list, history, frequent and counts. */
 export const shoppingKey = moduleKeys.shopping;
 export const listKey = [...shoppingKey, 'list'] as const;
-/** The key of the checkbox mutation; polling pauses while one is pending so it cannot undo the optimistic tick. */
-export const statusMutationKey = [...shoppingKey, 'status'] as const;
+/** The checkbox write's own part of its key (after `['queued-write']`). */
+export const statusWriteKey = [...shoppingKey, 'status'] as const;
+/**
+ * The key of the checkbox mutation, a queued write (web ADR 0022); polling pauses while one is pending (also while it
+ * waits offline) so it cannot undo the optimistic tick.
+ */
+export const statusMutationKey = [
+  ...queuedWriteKey,
+  ...statusWriteKey,
+] as const;
 
 /** How often the open list asks for the other person's changes. */
 export const POLL_MS = 20_000;

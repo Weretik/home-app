@@ -71,14 +71,14 @@ export function apiClientOnlyFromDataAccess(tree) {
     );
 }
 
-/** The client instance (`src/platform/api.ts`) is called only from a feature's `*-api.ts`. */
+/** The client instance (`src/platform/client/api.ts`) is called only from a feature's `*-api.ts`. */
 export function clientInstanceOnlyFromDataAccess(tree) {
   return edges(tree)
-    .filter(({ target }) => target === 'src/platform/api')
+    .filter(({ target }) => target === 'src/platform/client/api')
     .filter(({ file }) => !file.name.endsWith('-api.ts'))
     .map(
       ({ file }) =>
-        `${file.path}: imports src/platform/api.ts; call the API from the feature's *-api.ts`,
+        `${file.path}: imports src/platform/client/api.ts; call the API from the feature's *-api.ts`,
     );
 }
 

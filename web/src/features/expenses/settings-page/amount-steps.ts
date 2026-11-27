@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import type { AmountStep } from '../budget-data/budget-api';
 import { formatAmount } from '../data/formatting';
 import { kyivMonthText } from '../data/month';

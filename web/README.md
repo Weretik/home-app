@@ -20,10 +20,11 @@ You need Node.js 22.
 | Dev server on http://localhost:5173 (API on http://localhost:5000) | `cp .env.example .env.local && npm run dev`        |
 | Regenerate the API client after a backend contract change          | `npm run contracts:generate`                       |
 | Check the client matches the contract                              | `npm run contracts:check`                          |
-| Type check, lint, tests                                            | `npm run typecheck`, `npm run lint`, `npm test`    |
+| Type check (app and service worker), lint, tests                   | `npm run typecheck`, `npm run lint`, `npm test`    |
 | Folder, file, naming and import boundary rules                     | `npm run architecture:structure`                   |
 | Code style                                                         | `npm run format:check` (`npm run format` fixes it) |
-| Production build into `dist/`                                      | `npm run build`                                    |
+| Production build into `dist/` (with `service-worker.js`)           | `npm run build`                                    |
+| Try the service worker and offline mode (not in `npm run dev`)     | `npm run build && npm run preview`                 |
 
 ## Environment variables
 

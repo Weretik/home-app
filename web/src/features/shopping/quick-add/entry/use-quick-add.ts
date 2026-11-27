@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isOnline } from '../../../../platform/offline/network-status';
 import {
   useAddItems,
   useIdempotencyKey,
@@ -27,7 +28,8 @@ export function addedMessage(result: AddItemsResult): string {
 
 /**
  * The quick add and its «Скасувати» (R-1, R-2, R-8): one add at a time with an Idempotency-Key per attempt, «Я» as
- * the author; the last result stays for the snackbar until it closes or is undone.
+ * the author; the last result stays for the snackbar until it closes or is undone. Offline the add is queued (web ADR
+ * 0020): the field clears at once and the snackbar says it will be added when the network is back.
  */
 export function useQuickAdd() {
   const [me] = useMe();
@@ -36,6 +38,7 @@ export function useQuickAdd() {
   const idempotency = useIdempotencyKey();
   const [last, setLast] = useState<AddItemsResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [queued, setQueued] = useState(false);
 
   const submit = (
     text: string,
@@ -49,12 +52,19 @@ export function useQuickAdd() {
       urgent: options.urgent ?? false,
     };
     setError(null);
+    const offline = !isOnline();
+    if (offline) {
+      // Queued (FR-006): the field clears at once; the next add of the same text is a new one.
+      onDone?.();
+      setQueued(true);
+    }
     add.mutate(
       { body, idempotencyKey: idempotency.keyFor(body) },
       {
         onSuccess: (result) => {
+          if (offline) return;
           idempotency.renew();
-          setLast(result);
+          setLast(result ?? null);
           onDone?.();
         },
         onError: (failure) => {
@@ -66,6 +76,7 @@ export function useQuickAdd() {
         },
       },
     );
+    if (offline) idempotency.renew();
   };
 
   const undoLast = () => {
@@ -80,9 +91,14 @@ export function useQuickAdd() {
 
   return {
     submit,
-    isPending: add.isPending,
+    isPending: add.isSaving,
     last,
-    dismiss: () => setLast(null),
+    /** An add made offline waits for the network: «Додасться, коли з'явиться мережа». */
+    queued,
+    dismiss: () => {
+      setLast(null);
+      setQueued(false);
+    },
     undoLast,
     error,
     clearError: () => setError(null),

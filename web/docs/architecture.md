@@ -3,7 +3,7 @@
 ```mermaid
 flowchart LR
     contract["api/docs/contracts/openapi.json"] -->|openapi-typescript| client["src/api-client<br/>generated types + openapi-fetch"]
-    client --> platform["src/platform/api.ts<br/>the one client instance"]
+    client --> platform["src/platform/client/api.ts<br/>the one client instance"]
     platform --> features["src/features/*/*-api.ts<br/>React Query hooks"]
     features --> screens["Pages and components"]
     platform -->|"HTTPS, CORS"| api["API"]
@@ -19,16 +19,22 @@ hold the scenarios, the design and the tasks of each one.
 src/
   main.tsx        entry: router and providers
   app/
-    root/         routes and providers (theme, React Query)
+    root/         routes and providers (theme, React Query with its IndexedDB cache)
+    pwa/          the update prompt (use-app-update.ts, UpdatePrompt) and the top bar's offline chip (OfflineStatus)
+    service-worker/ the service worker (own tsconfig) and its pure push rules (push-notification.ts) (web ADR 0021)
     theme/        palette, theme, phone and touch overrides (web ADR 0020), light/dark/system switch
                   (docs/design.md)
     shell/        frame/ the layout and header; navigation/ side menu, bottom bar with the «Ще» sheet, the list of
                   sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
-  platform/       the API client instance (VITE_API_URL) with the session middleware (bearer token, 401 ends the
-                  session), the session token store (session.ts), the signed-in member and person (member-api.ts,
-                  web ADR 0016), the query client with each backend module's query key prefix (query-client.ts), the
-                  interface locale `uk-UA` (locale.ts)
+  platform/
+    client/       the API client instance (VITE_API_URL) with the session middleware, the signed-in member and person
+                  (member-api.ts, web ADR 0016), the query client with each backend module's query key prefix
+                  (query-client.ts), the interface locale `uk-UA` (locale.ts)
+    session/      the session token store (session.ts) and the middleware that adds the bearer token and ends the
+                  session on a 401 (session-middleware.ts)
+    offline/      the IndexedDB cache (query-persistence.ts), queued writes (queued-request.ts, queued-write-api.ts,
+                  use-queued-write.ts), the network state (network-status.ts, use-network-status.ts) (web ADR 0022)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -120,7 +126,7 @@ home/
   «перенос N» (carried in), «→ след. мес. N» (moves on) and «план N» (planned), each only when it is not zero;
   «Прогноз» (expected expenses, planned, the expected result, what stays of the monthly limit, «Открыть план»); who
   spent what; the top five categories. Its query key is `['expenses', 'summary', month]`, under the Expenses prefix
-  (`moduleKeys.expenses` in `src/platform/query-client.ts`), so every write on the Бюджет pages refreshes it
+  (`moduleKeys.expenses` in `src/platform/client/query-client.ts`), so every write on the Бюджет pages refreshes it
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)). «Открыть расходы» opens the same month. A month
   with no entries and no plans shows the empty state.
 - The summary keeps its own labels and formatters: features never import each other. Rules both features show keep
@@ -234,7 +240,8 @@ shopping/
   data/                 shopping-api.ts (the list with 20 s polling, ⭐ Частые, department match, name suggestions),
                         item-writes-api.ts (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo,
                         the shared write hook),
-                        status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Ukrainian text), labels
+                        status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Ukrainian text), labels;
+                        the tick, add and clear cart are queued writes (web ADR 0022)
   section/              ShoppingSection (title with counts, «Я», tabs, gear, <Outlet />), the page list, use-me.ts
   quick-add/
     entry/              the sticky card: field, «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
@@ -258,6 +265,10 @@ shopping/
 - The quick add suggests names from everything ever added (`GET /api/shopping/items/suggestions`, key
   `['shopping', 'suggestions', query]`) for the text after the last `,` `;` or new line, 200 ms after typing pauses;
   a choice replaces only that segment and adds nothing, Enter without a highlighted option adds the text.
+- Offline (web ADR 0022) the tick, the add (quick add, ⭐, «Повернути до списку») and «Прибрати куплене» wait in the
+  queue and are sent in order when the network is back; the list keeps the optimistic change meanwhile and polling
+  pauses (the tick's key `['queued-write', 'shopping', 'status']`). A queued add clears the field at once and says
+  «Додасться, коли з’явиться мережа»; «Прибрати куплене» empties the cart at once and brings it back if refused.
 - History months are local to the browser like the day groups; a month's count is of the loaded rows, «N+ покупок»
   while the next page may hold more of it (no API change).
 
@@ -276,7 +287,7 @@ flowchart LR
     pages --> giftEdit["gift-editing/ + variant-editing/"]
     settings["settings-page/"] --> detail["detail-editing/"] & category["category-editing/"]
     giftEdit & detail & category --> editing["editing/ dialogs, useEditForm"] --> data
-    data --> platform["src/platform/api.ts"]
+    data --> platform["src/platform/client/api.ts"]
 ```
 
 ```
@@ -344,8 +355,8 @@ The family's to-do list «Дела» ([ADR 0011](decisions/0011-todos-grouped-li
 todos/
   data/          todos-api.ts (task list infinite query, one task), categories-api.ts, labels.ts (Ukrainian enums,
                  priority marks), due-date.ts (Kyiv today, due groups, «сегодня / завтра / пн 30.11»)
-  writes/        task-writes-api.ts (create / edit / delete, Idempotency-Key), status-api.ts (optimistic move between
-                 lists, undo), steps-api.ts, category-writes-api.ts, failures-api.ts (Ukrainian text of a failed write)
+  writes/        task-writes-api.ts (create / edit / delete, Idempotency-Key; the queued quick add), status-api.ts
+                 (optimistic move between lists as a queued write, undo), steps-api.ts, category-writes-api.ts, failures-api.ts (Ukrainian text of a failed write)
   section/       TodosSection (title, tabs «Задачи» / «Архив», the gear), the list of pages
   url-state/     the filters (?who=&category=&q=) and their mapping to the API query, the debounced search
   task-filters/  «Кому» chips, the category select, the search field
@@ -373,6 +384,9 @@ todos/
 - The done tick and «Вернуть» are optimistic: the row leaves its list at once and comes back with the reason if the
   write fails. «Отменить» waits for the tick to be saved, reads the task again (the tick changed its version) and
   restores its previous status.
+- Offline (web ADR 0022) the done tick, «Вернуть» and the quick add are queued writes: the row stays gone, the quick
+  add clears its field and says «Додасться, коли з’явиться мережа». A move refused as stale (`409`) reads the task
+  (`GET /api/todos/tasks/{id}`) and is sent once more with its new version: the last write wins.
 - The task dialog edits title, «Кому», «Поставил(а)», status, priority, due date («Сегодня», «Завтра», «На выходных»,
   «Без срока»), category, notes and steps. Edits send the version of the task as the dialog's query holds it now, so
   steps saved meanwhile do not cause a conflict; a 409 reloads the task into the form, a 404 says it is gone.
@@ -388,7 +402,7 @@ bottom bar's «Ще» sheet ([ADR 0019](decisions/0019-phone-more-sheet-in-the-b
 notes/
   data/          notes-api.ts (the list query), categories-api.ts, labels.ts (kinds, people, the quick-add prompt,
                  the card footer), note-groups.ts (cards by category), use-me.ts (the signed-in person from
-                 platform/member-api)
+                 platform/client/member-api)
   writes/        note-writes-api.ts (create with Idempotency-Key, edit / delete with If-Match), category-writes-api.ts,
                  failures-api.ts (Ukrainian text of a failed write)
   section/       NotesSection (title, the person tabs, the gear), NoteTabs, notes-tabs.ts (tab ↔ person, labels)
@@ -454,14 +468,14 @@ identity/
 
 - `SessionGate` wraps every route in `App.tsx`. Without a token the same URL shows the sign-in screen, so the page
   that was opened shows after sign-in; there is no `/sign-in` route.
-- The token is the API's session token, kept in `localStorage` (`home.session`) by `src/platform/session.ts` and read
-  synchronously at start. `src/platform/session-middleware.ts` adds `Authorization: Bearer` to every call of the
+- The token is the API's session token, kept in `localStorage` (`home.session`) by `src/platform/session/session.ts` and read
+  synchronously at start. `src/platform/session/session-middleware.ts` adds `Authorization: Bearer` to every call of the
   client; a `401` to the stored token clears it as expired and the screen says «Сесія закінчилась, увійдіть знову».
   Other tabs follow through the `storage` event.
 - Any change of the session (sign-in, «Вийти», expiry, another tab) clears the whole React Query cache, so no data of
   one session shows in the next. «Вийти» calls `POST /api/identity/sign-out` best effort and signs the device out
   even when it fails.
-- Pages start on the signed-in person (web ADR 0016): `useSignedInPerson()` from `src/platform/member-api.ts` is
+- Pages start on the signed-in person (web ADR 0016): `useSignedInPerson()` from `src/platform/client/member-api.ts` is
   the default of Покупки «Я» (a tap overrides it for the tab), Справи `?who=` and Подарунки `?recipient=` (the URL
   wins; «Усі» writes `all`).
 - The Google client id is the public build variable `VITE_GOOGLE_CLIENT_ID`; without it the screen says «Вхід ще не
@@ -479,10 +493,19 @@ identity/
 ## App
 
 - Server state lives in React Query. Every read of a backend module starts its query key with the module's prefix
-  (`src/platform/query-client.ts`), and every write invalidates that whole prefix, so a page or summary of another
+  (`src/platform/client/query-client.ts`), and every write invalidates that whole prefix, so a page or summary of another
   feature that shows the same module's data refreshes too ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
   Failures with a 4xx status are not retried.
+- Offline (web ADR 0022): the cache of successful reads is kept in IndexedDB (`home-cache`) for 7 days and restored at
+  start, versioned by the hash of the API contract and removed on every session change. Writes fail at once offline
+  (`networkMode: 'always'`), except the queued writes (`src/platform/offline`): a serialisable request under the key
+  `['queued-write', …]` that pauses offline, is kept across a restart and is sent when the network is back; `404`
+  counts as done, `409`/`412` rereads the version and resends once (last write wins). The top bar shows «Офлайн»,
+  «Очікує: N» and «Не вдалося зберегти: …».
+- The service worker (web ADR 0021, `vite-plugin-pwa`, `injectManifest`) precaches the built shell and answers
+  navigations with `index.html`; it never caches the API. A new deploy waits for «Оновити» in the snackbar «Доступна
+  нова версія». It shows the API's push messages and opens their page on a tap.
 - `index.html` has `noindex` and `robots.txt` disallows everything.
-- `public/staticwebapp.config.json` sends unknown paths to `index.html` on Azure Static Web Apps; other static hosts
-  ignore it.
-- UI text is Ukrainian (ADR 0014, one locale in `src/platform/locale.ts`); screens are designed for a phone first. Look, theme and layout: [design rules](design.md).
+- `public/staticwebapp.config.json` sends unknown paths to `index.html` on Azure Static Web Apps and serves
+  `/service-worker.js`, `/index.html` and `/site.webmanifest` with `no-cache`; other static hosts ignore it.
+- UI text is Ukrainian (ADR 0014, one locale in `src/platform/client/locale.ts`); screens are designed for a phone first. Look, theme and layout: [design rules](design.md).

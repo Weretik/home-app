@@ -36,7 +36,7 @@ the same change.
 
 ## API
 
-- Call the API only through the client in `src/platform/api.ts`, from the feature's `<area>-api.ts`; no raw `fetch`,
+- Call the API only through the client in `src/platform/client/api.ts`, from the feature's `<area>-api.ts`; no raw `fetch`,
   Axios or a second `openapi-fetch` client. Outside `src/api-client`, import the client from its index only.
 - Never edit `src/api-client/generated/`; regenerate it with `npm run contracts:generate` after the backend contract
   changes.
@@ -44,10 +44,14 @@ the same change.
 
 ## Writes
 
-- Every mutation disables its submit while pending.
+- Every mutation disables its submit while pending (a queued write while it is `isSaving`: offline it waits without
+  locking the screen).
+- A write that must work offline is a queued write (`useQueuedWrite` from `src/platform/offline`, web ADR 0022): a
+  serialisable request with its module, a Ukrainian label and, for a versioned record, the path to read its version
+  again. Every other write fails at once offline (`networkMode: 'always'`).
 - A write the backend protects with `Idempotency-Key` makes one key per attempt, reuses it on retry, and renews it
   after success or a change of the data.
-- Every read of a backend module starts its query key with the module's prefix (`src/platform/query-client.ts`); every
+- Every read of a backend module starts its query key with the module's prefix (`src/platform/client/query-client.ts`); every
   write to the module invalidates that prefix, so every page and summary showing the module refreshes
   ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
 - A write's type allows only what the API offers: a record that is only changed has no create or delete
@@ -78,37 +82,38 @@ files, imports, app); `tools/architecture/rules.test.mjs` (part of `npm test`) p
 (`.github/workflows/web.yml`) runs every check below on each push and pull request
 ([ADR 0010](decisions/0010-every-rule-has-a-check.md)).
 
-| Rule                                                                             | Check                                                                                                                         |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| SDD first, then code, then audit                                                 | review only: a process, not code; the PR shows the SDD and the audit                                                          |
-| `src/` holds only the entry and the four areas                                   | structure: `srcRootHoldsOnlyTheAreas`                                                                                         |
-| At most six production files per folder (tests, `index.ts`, `generated/` exempt) | structure: `folderShape`                                                                                                      |
-| Files or subfolders, no one-file, empty or wrapper folders                       | structure: `folderShape`                                                                                                      |
-| No dump folder or file names                                                     | structure: `noDumpNames`                                                                                                      |
-| Imports go main → app → features → platform → api-client                         | structure: `importDirection`                                                                                                  |
-| A feature never imports another feature                                          | structure: `featuresAreIsolated`                                                                                              |
-| One component per file, named after it                                           | structure: `oneComponentPerFile`                                                                                              |
-| PascalCase components, kebab-case modules                                        | structure: `fileNames`                                                                                                        |
-| A hook lives in `use-*.ts` or `*-api.ts`                                         | structure: `hookFileNames`                                                                                                    |
-| Component ≤ 150 lines, module ≤ 200                                              | structure: `lineLimits`                                                                                                       |
-| One responsibility per component under the limit                                 | review only: needs judgement (`frontend-code-audit`, signals: several data hooks plus several blocks, logic in a component)   |
-| API client only from `platform/` and `*-api.ts`                                  | structure: `apiClientOnlyFromDataAccess`                                                                                      |
-| The client instance only from `*-api.ts`                                         | structure: `clientInstanceOnlyFromDataAccess`                                                                                 |
-| The API client through its index only                                            | structure: `apiClientThroughItsIndex`                                                                                         |
-| No raw `fetch`, Axios or second `openapi-fetch` client                           | ESLint: `no-restricted-globals` (`fetch`), `no-restricted-imports` (`axios`, `openapi-fetch` outside `src/api-client`)        |
-| `generated/` never edited                                                        | CI: `npm run contracts:check` (regenerates and diffs); Prettier and ESLint ignore it                                          |
-| Problem message shown, field errors under fields                                 | tests: `api-error.spec.ts`, form and page tests (`ExpensesPage.test.tsx`, `SettingsPage.test.tsx`)                            |
-| Submit disabled while pending                                                    | review only: a UI state; covered where a test retries (`ExpensesPage.test.tsx`), not provable for every form by a static rule |
-| One `Idempotency-Key` per attempt, reused on retry                               | tests: `ExpensesPage.test.tsx` (key kept on retry), create tests of every page                                                |
-| Reads under the module prefix, writes refresh the prefix                         | tests: `write-hooks-api.test.tsx`, `summary-api.test.tsx`                                                                     |
-| A change-only write has no create or delete                                      | TypeScript (`npm run typecheck`): `useChange` takes no create or delete                                                       |
-| Server state in React Query                                                      | review only: copies of server data in component state are not mechanically distinguishable from form state                    |
-| Never indexed                                                                    | structure: `neverIndexed` (`index.html`, `public/robots.txt`)                                                                 |
-| Only problems marked in lists                                                    | review only: wording and design judgement                                                                                     |
-| Ukrainian UI text, phone first                                                   | review only: language and layout judgement; page tests query Ukrainian names                                                  |
-| Theme tokens, no literal colours outside `app/theme/`                            | structure: `noLiteralColours`; the rest of [design.md](design.md) is review only                                              |
-| One interface language: locale only from `src/platform/locale.ts` (`uk-UA`)      | structure: `oneLocale`                                                                                                        |
-| Nothing secret in `web/`                                                         | review only: secrets are not recognisable by shape; `.env` and `.env.local` are git-ignored                                   |
-| Pure logic has a test next to it                                                 | structure: `logicHasTests`                                                                                                    |
-| Type check, lint, format, tests, build                                           | CI: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build`                                  |
-| A new lasting decision gets an ADR                                               | review only: whether a decision is lasting needs judgement                                                                    |
+| Rule                                                                               | Check                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| SDD first, then code, then audit                                                   | review only: a process, not code; the PR shows the SDD and the audit                                                                    |
+| `src/` holds only the entry and the four areas                                     | structure: `srcRootHoldsOnlyTheAreas`                                                                                                   |
+| At most six production files per folder (tests, `index.ts`, `generated/` exempt)   | structure: `folderShape`                                                                                                                |
+| Files or subfolders, no one-file, empty or wrapper folders                         | structure: `folderShape`                                                                                                                |
+| No dump folder or file names                                                       | structure: `noDumpNames`                                                                                                                |
+| Imports go main → app → features → platform → api-client                           | structure: `importDirection`                                                                                                            |
+| A feature never imports another feature                                            | structure: `featuresAreIsolated`                                                                                                        |
+| One component per file, named after it                                             | structure: `oneComponentPerFile`                                                                                                        |
+| PascalCase components, kebab-case modules                                          | structure: `fileNames`                                                                                                                  |
+| A hook lives in `use-*.ts` or `*-api.ts`                                           | structure: `hookFileNames`                                                                                                              |
+| Component ≤ 150 lines, module ≤ 200                                                | structure: `lineLimits`                                                                                                                 |
+| One responsibility per component under the limit                                   | review only: needs judgement (`frontend-code-audit`, signals: several data hooks plus several blocks, logic in a component)             |
+| API client only from `platform/` and `*-api.ts`                                    | structure: `apiClientOnlyFromDataAccess`                                                                                                |
+| The client instance only from `*-api.ts`                                           | structure: `clientInstanceOnlyFromDataAccess`                                                                                           |
+| The API client through its index only                                              | structure: `apiClientThroughItsIndex`                                                                                                   |
+| No raw `fetch`, Axios or second `openapi-fetch` client                             | ESLint: `no-restricted-globals` (`fetch`), `no-restricted-imports` (`axios`, `openapi-fetch` outside `src/api-client`)                  |
+| `generated/` never edited                                                          | CI: `npm run contracts:check` (regenerates and diffs); Prettier and ESLint ignore it                                                    |
+| Problem message shown, field errors under fields                                   | tests: `api-error.spec.ts`, form and page tests (`ExpensesPage.test.tsx`, `SettingsPage.test.tsx`)                                      |
+| Submit disabled while pending                                                      | review only: a UI state; covered where a test retries (`ExpensesPage.test.tsx`), not provable for every form by a static rule           |
+| One `Idempotency-Key` per attempt, reused on retry                                 | tests: `ExpensesPage.test.tsx` (key kept on retry), create tests of every page                                                          |
+| Reads under the module prefix, writes refresh the prefix                           | tests: `write-hooks-api.test.tsx`, `summary-api.test.tsx`                                                                               |
+| Queued writes: serialisable request, last write wins, deleted stays deleted        | tests: `queued-write-api.test.ts`, `use-queued-write.test.tsx`, the offline tests of `ListPage.test.tsx` and `ActiveTasksPage.test.tsx` |
+| A change-only write has no create or delete                                        | TypeScript (`npm run typecheck`): `useChange` takes no create or delete                                                                 |
+| Server state in React Query                                                        | review only: copies of server data in component state are not mechanically distinguishable from form state                              |
+| Never indexed                                                                      | structure: `neverIndexed` (`index.html`, `public/robots.txt`)                                                                           |
+| Only problems marked in lists                                                      | review only: wording and design judgement                                                                                               |
+| Ukrainian UI text, phone first                                                     | review only: language and layout judgement; page tests query Ukrainian names                                                            |
+| Theme tokens, no literal colours outside `app/theme/`                              | structure: `noLiteralColours`; the rest of [design.md](design.md) is review only                                                        |
+| One interface language: locale only from `src/platform/client/locale.ts` (`uk-UA`) | structure: `oneLocale`                                                                                                                  |
+| Nothing secret in `web/`                                                           | review only: secrets are not recognisable by shape; `.env` and `.env.local` are git-ignored                                             |
+| Pure logic has a test next to it                                                   | structure: `logicHasTests`                                                                                                              |
+| Type check, lint, format, tests, build                                             | CI: `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`, `npm run build`                                            |
+| A new lasting decision gets an ADR                                                 | review only: whether a decision is lasting needs judgement                                                                              |

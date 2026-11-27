@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
-import { moduleKeys } from '../../../platform/query-client';
+import { api } from '../../../platform/client/api';
+import { moduleKeys } from '../../../platform/client/query-client';
 import { giftKeys, type GiftItem, type GiftStatus } from './gifts-api';
 import { isStale } from './write-errors-api';
 import {

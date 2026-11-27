@@ -1,4 +1,4 @@
-import type { FamilyPerson } from '../../../platform/member-api';
+import type { FamilyPerson } from '../../../platform/client/member-api';
 import type { Assignee, TaskQuery, TaskView } from '../data/todos-api';
 import { dateQuery, type DateFilter } from './date-filter';
 

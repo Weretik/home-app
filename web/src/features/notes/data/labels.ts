@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import type { NoteItem, NoteKind, NotePerson } from './notes-api';
 
 /** The kinds in the order the screens list them, «Любить» first (FR-003). */

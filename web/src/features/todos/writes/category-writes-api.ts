@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiCall, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import { isStale } from './failures-api';
 import { ifMatch, useTodosRefresh, type EditedTask } from './task-writes-api';
 

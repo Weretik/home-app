@@ -1,16 +1,17 @@
 import { ThemeProvider } from '@mui/material/styles';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { onlineManager, QueryClientProvider } from '@tanstack/react-query';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { ShoppingSection } from '../section/ShoppingSection';
 import { ListPage } from './ListPage';
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  onlineManager.setOnline(true);
   localStorage.clear();
   sessionStorage.clear();
 });
@@ -144,10 +145,11 @@ function renderList(options: { items?: unknown[]; failStatus?: boolean } = {}) {
       if (path === '/api/shopping/departments') return json(departments);
     }
     if (path.endsWith('/status')) {
+      // A refusal: a queued write retries a 5xx a few times, a 4xx never.
       if (options.failStatus)
         return json(
-          { title: 'Помилка', detail: 'Сервер упав', status: 500 },
-          500,
+          { title: 'Помилка', detail: 'Сервер відмовив', status: 400 },
+          400,
         );
       const id = path.split('/')[4];
       const { status, by } = entry.body as { status: string; by: string };
@@ -229,6 +231,47 @@ test('a tick moves the item to the cart at once and sends who bought it', async 
   await waitFor(() => expect(writes()).toHaveLength(1));
   expect(writes()[0]!.url.pathname).toBe('/api/shopping/items/milk/status');
   expect(writes()[0]!.body).toEqual({ status: 'Bought', by: 'Vitaliy' });
+});
+
+test('offline, ticks wait in the queue on the screen and are sent in order when the network is back', async () => {
+  const { writes } = renderList();
+  await screen.findByRole('region', { name: /Молочка/ });
+  onlineManager.setOnline(false);
+
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Молоко' }));
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Кефир' }));
+
+  expect(within(group('У кошику')).getByText('Молоко')).toBeInTheDocument();
+  expect(writes()).toHaveLength(0);
+
+  act(() => onlineManager.setOnline(true));
+
+  await waitFor(() => expect(writes()).toHaveLength(2));
+  expect(writes().map((w) => w.url.pathname)).toEqual([
+    '/api/shopping/items/milk/status',
+    '/api/shopping/items/kefir/status',
+  ]);
+});
+
+test('offline, the quick add clears the field at once and says it will be added', async () => {
+  const { writes } = renderList();
+  await screen.findByRole('region', { name: /Молочка/ });
+  onlineManager.setOnline(false);
+  const field = screen.getByRole('combobox', { name: 'Що купити' });
+
+  await userEvent.type(field, 'творог{Enter}');
+
+  expect(field).toHaveValue('');
+  expect(
+    await screen.findByText('Додасться, коли з’явиться мережа'),
+  ).toBeInTheDocument();
+  expect(writes()).toHaveLength(0);
+
+  act(() => onlineManager.setOnline(true));
+
+  await waitFor(() => expect(writes()).toHaveLength(1));
+  expect(writes()[0]!.headers.get('Idempotency-Key')).toBeTruthy();
+  expect(writes()[0]!.body).toMatchObject({ text: 'творог' });
 });
 
 test('a failed tick puts the item back and says why', async () => {

@@ -6,7 +6,7 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import TelegramIcon from '@mui/icons-material/Telegram';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 
 export interface Section {
   path: string;
@@ -34,7 +34,11 @@ export const moreSections: Section[] = [
 /** Service pages: only in the side menu on a computer; on a phone they are linked from the home page. */
 export const serviceSections: Section[] = [
   { path: '/status', label: 'Стан', icon: MonitorHeartOutlinedIcon },
-  { path: '/notifications', label: 'Телеграм', icon: TelegramIcon },
+  {
+    path: '/notifications',
+    label: 'Сповіщення',
+    icon: NotificationsActiveOutlinedIcon,
+  },
 ];
 
 /** The member's own page, reached from the header menu and, on a phone, from «Ще». */

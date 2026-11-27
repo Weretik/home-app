@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import type { ShoppingItem, ShoppingPerson } from './shopping-api';
 
 export const personLabels: Record<ShoppingPerson, string> = {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Notifications.Domain.Chats;
 using Notifications.Domain.Deliveries;
+using Notifications.Domain.Push;
 
 namespace Notifications.Application;
 
@@ -15,6 +16,8 @@ public interface INotificationsDbContext : IOutboxPublisher
     DbSet<LinkedChat> Chats { get; }
 
     DbSet<Delivery> Deliveries { get; }
+
+    DbSet<PushSubscription> PushSubscriptions { get; }
 
     ChangeTracker ChangeTracker { get; }
 

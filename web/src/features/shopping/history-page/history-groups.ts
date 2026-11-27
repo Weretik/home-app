@@ -1,4 +1,4 @@
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 import type { ShoppingItem } from '../data/shopping-api';
 
 export interface HistoryDay {

@@ -49,6 +49,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0039 | [The Notes module and its model](0039-notes-module-model.md) |
 | 0040 | [Other modules learn who is signed in through Identity.Contracts](0040-current-member-through-identity-contracts.md) |
 | 0041 | [Limit amounts are kept by the period they start in](0041-limit-amounts-kept-by-month.md) (supersedes the past-amount part of 0027) |
+| 0042 | [Web Push with VAPID next to Telegram, sent by the API itself](0042-web-push-next-to-telegram.md) |
 
 ## Decisions that must have a record
 

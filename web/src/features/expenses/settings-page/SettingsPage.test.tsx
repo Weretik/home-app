@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { formatAmount } from '../data/formatting';
 import { ExpensesSection } from '../section/ExpensesSection';
 import { SettingsPage } from './SettingsPage';

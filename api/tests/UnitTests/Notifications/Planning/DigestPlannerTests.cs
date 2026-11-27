@@ -56,6 +56,36 @@ public sealed class DigestPlannerTests
     }
 
     [Fact]
+    public void For_Push_WithoutAFamilyEntry_CommonMessagesGoToEachPersonWithADevice()
+    {
+        var pushPeople = new Dictionary<Audience, long> { [Audience.Vitaliy] = 0, [Audience.Maria] = 0 };
+        var inputs = new DigestInputs(
+            Todos: [new OpenTodo(Guid.NewGuid(), "Позвонить маме", TodoAssignee.Maria, Today, false)],
+            Gifts: []);
+
+        var planned = DigestPlanner.Plan(Morning, pushPeople, inputs, Today, Site);
+
+        Assert.Equal(
+            ["TodosMorning:2026-12-02:Maria", "TodosCommon:2026-12-02:Vitaliy", "TodosCommon:2026-12-02:Maria"],
+            planned.Select(m => m.Key));
+        Assert.All(planned, m => Assert.Equal("/todos", m.Page));
+    }
+
+    [Fact]
+    public void A_Gift_Reminder_ForPush_OpensTheGift_AndSkipsAGiverWithoutADevice()
+    {
+        var id = Guid.Parse("0193b6a0-0000-7000-8000-0000000000aa");
+        var gift = new GiftPurchase(id, "Кольцо", GiftParty.Maria, GiftParty.Vitaliy, new DateOnly(2026, 12, 20), "https://web.example/gifts?gift=1");
+        var inputs = new DigestInputs(Todos: [], Gifts: [gift]);
+
+        var reminder = Assert.Single(DigestPlanner.Plan(Morning, new Dictionary<Audience, long> { [Audience.Vitaliy] = 0 }, inputs, Today, Site));
+        var none = DigestPlanner.Plan(Morning, new Dictionary<Audience, long> { [Audience.Maria] = 0 }, inputs, Today, Site);
+
+        Assert.Equal($"/gifts?gift={id}", reminder.Page);
+        Assert.Empty(none);
+    }
+
+    [Fact]
     public void A_Person_MapsToTheirAssignee()
     {
         Assert.Equal(TodoAssignee.Maria, DigestPlanner.Assignee(Audience.Maria));

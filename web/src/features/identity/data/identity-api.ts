@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
-import { memberKeys } from '../../../platform/member-api';
-import { session } from '../../../platform/session';
+import { api } from '../../../platform/client/api';
+import { memberKeys } from '../../../platform/client/member-api';
+import { session } from '../../../platform/session/session';
 
 export {
   useCurrentMember,
   type FamilyMember,
-} from '../../../platform/member-api';
+} from '../../../platform/client/member-api';
 
 /**
  * Exchanges Google's ID token for a session (`signIn`) and keeps its token. No Idempotency-Key: a repeat only makes

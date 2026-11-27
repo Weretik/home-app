@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
-import type { FamilyPerson } from '../../../platform/member-api';
-import { moduleKeys } from '../../../platform/query-client';
+import { api } from '../../../platform/client/api';
+import type { FamilyPerson } from '../../../platform/client/member-api';
+import { moduleKeys } from '../../../platform/client/query-client';
 
 /**
  * The signed-in person's private Telegram chat for the profile (identity 002 FR-005), read from the notifications

@@ -3,8 +3,9 @@ import {
   useQueryClient,
   type InfiniteData,
 } from '@tanstack/react-query';
+import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
 import { apiCall } from '../../../api-client';
-import { api } from '../../../platform/api';
+import { api } from '../../../platform/client/api';
 import {
   fetchTask,
   tasksKey,
@@ -26,6 +27,31 @@ const putStatus = ({ status, ...task }: StatusChange) =>
     }),
   );
 
+const statusLabels: Record<TodoStatus, string> = {
+  Todo: 'повернення справи',
+  InProgress: 'статус «у роботі»',
+  Paused: 'статус «на паузі»',
+  Done: 'позначку «зроблено»',
+  Cancelled: 'скасування справи',
+};
+
+/**
+ * The request of a move: plain data with the version the screen showed, so it waits offline and is sent after a
+ * restart too (web ADR 0022). A stale version (`409`) reads the task again and resends (last write wins).
+ */
+export const moveRequest = ({ id, version, status }: StatusChange) => {
+  const path = `/api/todos/tasks/${encodeURIComponent(id)}`;
+  return {
+    method: 'put' as const,
+    path: `${path}/status`,
+    body: { status },
+    headers: { 'If-Match': String(version) },
+    module: 'todos' as const,
+    label: statusLabels[status],
+    refetch: path,
+  };
+};
+
 type Pages = InfiniteData<TodoTaskList, number>;
 
 const without = (id: string) => (data: Pages | undefined) =>
@@ -43,12 +69,12 @@ const without = (id: string) => (data: Pages | undefined) =>
 /**
  * Moves a task to another list: done or cancelled from the active list, «Повернути» from the archive. Optimistic: the
  * row leaves its list at once and comes back if the write fails (the caller shows why). Everything reloads after.
+ * A queued write: offline the row stays gone and the move is sent when the network is back.
  */
 export function useMoveTask() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: putStatus,
-    onMutate: async (change) => {
+  return useQueuedWrite(moveRequest, {
+    onMutate: async (change: StatusChange) => {
       await queryClient.cancelQueries({ queryKey: tasksKey });
       const before = queryClient.getQueriesData<Pages>({ queryKey: tasksKey });
       queryClient.setQueriesData<Pages>(
@@ -61,7 +87,6 @@ export function useMoveTask() {
       for (const [key, data] of context?.before ?? [])
         queryClient.setQueryData(key, data);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: todosKey }),
   });
 }
 

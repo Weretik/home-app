@@ -1,8 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { apiCall, newIdempotencyKey, type Schema } from '../../../api-client';
-import { api } from '../../../platform/api';
-import { shoppingKey, type ShoppingItem } from './shopping-api';
+import { api } from '../../../platform/client/api';
+import type { QueuedRequest } from '../../../platform/offline/queued-request';
+import { useQueuedWrite } from '../../../platform/offline/use-queued-write';
+import { withoutCart } from './item-status';
+import {
+  listKey,
+  shoppingKey,
+  type ShoppingItem,
+  type ShoppingList,
+} from './shopping-api';
 import { isStale } from './write-failure-api';
 
 export type AddItemsRequest = Schema<'AddShoppingItemsRequest'>;
@@ -44,16 +52,22 @@ export interface AddInput {
   idempotencyKey: string;
 }
 
-/** Adds items from text («молоко, хлеб, яйца 10»); the API splits it, finds departments and merges repeats. */
+/** The request of an add, with its Idempotency-Key, so a repeat after a lost answer adds nothing twice. */
+export const addRequest = ({ body, idempotencyKey }: AddInput) => ({
+  method: 'post' as const,
+  path: '/api/shopping/items',
+  body,
+  headers: { 'Idempotency-Key': idempotencyKey },
+  module: 'shopping' as const,
+  label: `товари «${body.text}»`,
+});
+
+/**
+ * Adds items from text («молоко, хлеб, яйца 10»); the API splits it, finds departments and merges repeats. A queued
+ * write (web ADR 0022): offline it waits and is sent when the network is back; every shopping query refreshes after.
+ */
 export const useAddItems = () =>
-  useShoppingWrite(({ body, idempotencyKey }: AddInput) =>
-    apiCall(
-      api.POST('/api/shopping/items', {
-        params: { header: { 'Idempotency-Key': idempotencyKey } },
-        body,
-      }),
-    ),
-  );
+  useQueuedWrite<AddInput, AddItemsResult>(addRequest);
 
 /** Changes an item's name, quantity, note, department or «Терміново». */
 export const useUpdateItem = () =>
@@ -76,11 +90,32 @@ export const useUndoAdd = () =>
     Promise.all(added.map((item) => deleteItem(item))),
   );
 
-/** «Прибрати куплене»: the whole cart goes to the history. */
-export const useClearCart = () =>
-  useShoppingWrite(() =>
-    apiCall(api.POST('/api/shopping/items/clear-cart', {})),
-  );
+// `void` input: the mutation is called with nothing (`clear.mutate()`).
+const clearCartRequest: (input: void) => QueuedRequest = () => ({
+  method: 'post' as const,
+  path: '/api/shopping/items/clear-cart',
+  module: 'shopping' as const,
+  label: 'прибирання кошика',
+});
+
+/**
+ * «Прибрати куплене»: the whole cart goes to the history. A queued write: the cart leaves the screen at once and comes
+ * back if the server refuses; offline it waits for the network.
+ */
+export function useClearCart() {
+  const queryClient = useQueryClient();
+  return useQueuedWrite(clearCartRequest, {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: listKey });
+      const before = queryClient.getQueryData<ShoppingList>(listKey);
+      if (before) queryClient.setQueryData(listKey, withoutCart(before));
+      return { before };
+    },
+    onError: (_error, _input, context) => {
+      if (context?.before) queryClient.setQueryData(listKey, context.before);
+    },
+  });
+}
 
 /**
  * The Idempotency-Key of an add (docs/rules.md, "Writes"): the same key while the same data is retried, a new one

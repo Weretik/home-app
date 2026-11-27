@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, type ReactNode } from 'react';
-import { session } from '../../../platform/session';
+import { session } from '../../../platform/session/session';
 import { SESSION_EXPIRED_TEXT } from '../data/sign-in-errors';
 import { useSession } from '../data/use-session';
 import { SignInPage } from './SignInPage';

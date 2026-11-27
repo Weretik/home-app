@@ -3,7 +3,7 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { assigneeEmoji, assigneeLabels } from '../data/labels';
 import type { AssigneeCounts } from '../data/todos-summary-api';
-import { locale } from '../../../../platform/locale';
+import { locale } from '../../../../platform/client/locale';
 
 /** «завдання», «завдання», «завдань» after a count. */
 const tasksWord = (count: number) => {

@@ -4,9 +4,18 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { theme } from '../../theme/theme';
 import { AppLayout } from './AppLayout';
+
+// The update prompt registers the service worker; tests have none.
+vi.mock('virtual:pwa-register/react', () => ({
+  useRegisterSW: () => ({
+    needRefresh: [false, vi.fn()],
+    offlineReady: [false, vi.fn()],
+    updateServiceWorker: vi.fn(),
+  }),
+}));
 
 const mainSections = ['Головна', 'Бюджет', 'Покупки', 'Справи', 'Подарунки'];
 
@@ -88,7 +97,7 @@ test('the bottom bar ends with «Ще», which lists every other page', async ()
     within(sheet)
       .getAllByRole('link')
       .map((link) => link.textContent),
-  ).toEqual(['Про нас', 'Стан', 'Телеграм', 'Профіль']);
+  ).toEqual(['Про нас', 'Стан', 'Сповіщення', 'Профіль']);
   expect(within(sheet).getByRole('link', { name: 'Про нас' })).toHaveAttribute(
     'href',
     '/notes',
@@ -109,7 +118,7 @@ test('opening a page from «Ще» closes the sheet', async () => {
   renderAt('/');
 
   await userEvent.click(moreButton());
-  await userEvent.click(screen.getByRole('link', { name: 'Телеграм' }));
+  await userEvent.click(screen.getByRole('link', { name: 'Сповіщення' }));
 
   await waitFor(() =>
     expect(

@@ -1,5 +1,5 @@
 import type { Assignee, Author, TodoPriority, TodoStatus } from './todos-api';
-import { locale } from '../../../platform/locale';
+import { locale } from '../../../platform/client/locale';
 
 /** Ukrainian names of the contract's enums, in the order the screens list them. */
 export const assigneeLabels: Record<Assignee, string> = {

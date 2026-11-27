@@ -1,4 +1,4 @@
-import { locale } from '../../../../platform/locale';
+import { locale } from '../../../../platform/client/locale';
 import type { NameSuggestion } from '../../data/shopping-api';
 
 /** «брали 1 раз», «брали 3 рази», «брали 12 разів»; «ще не брали» for a name never bought. */

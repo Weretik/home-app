@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
-import type { FamilyPerson } from '../../../platform/member-api';
+import type { FamilyPerson } from '../../../platform/client/member-api';
 import { useCurrentMember, useSignOut } from '../data/identity-api';
 import { MemberAvatar } from '../member/MemberAvatar';
 import { TelegramRow } from './TelegramRow';

@@ -52,6 +52,7 @@ public sealed partial class OpenApiDocumentTests
         ["renameGiftCategory"] = "a rename is a target value and a category has no other field to lose (ADR 0024)",
         ["setShoppingItemStatus"] = "a tick is a target value, so two people ticking the same item cannot undo each other (ADR 0031)",
         ["updateTodoTaskStep"] = "a step tick or rename is a target value; quick ticks must never conflict (ADR 0030, R-010)",
+        ["savePushSubscription"] = "an upsert by the browser's endpoint: saving the same subscription again is the point (ADR 0042, R-102)",
         ["reorderShoppingDepartments"] = "the whole order is a target value; a concurrent save still meets the row version (ADR 0031)",
     };
 

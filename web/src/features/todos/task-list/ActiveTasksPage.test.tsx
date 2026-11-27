@@ -1,17 +1,20 @@
 import { ThemeProvider } from '@mui/material/styles';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { onlineManager, QueryClientProvider } from '@tanstack/react-query';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
 import { theme } from '../../../app/theme/theme';
-import { createQueryClient } from '../../../platform/query-client';
+import { createQueryClient } from '../../../platform/client/query-client';
 import { dayHeading } from '../data/day-groups';
 import { addDays, kyivToday } from '../data/due-date';
 import { TodosSection } from '../section/TodosSection';
 import { ActiveTasksPage } from './ActiveTasksPage';
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  onlineManager.setOnline(true);
+});
 
 const today = kyivToday();
 
@@ -344,19 +347,21 @@ test('«Скасувати» waits for the tick to be saved before it restores t
   expect(writes()[1]!.body).toEqual({ status: 'Todo' });
 });
 
-test('brings a ticked task back and says why when it changed elsewhere', async () => {
-  renderPage((s) =>
-    s.method === 'PUT'
-      ? json(
-          {
-            title: 'Conflict',
-            detail: 'Changed.',
-            code: 'todos.changed_meanwhile',
-          },
-          409,
-        )
-      : json(page([task({ title: 'Оплатить свет' })])),
-  );
+test('brings a ticked task back and says why when it changed elsewhere again', async () => {
+  const { writes } = renderPage((s) => {
+    if (s.method === 'PUT')
+      return json(
+        {
+          title: 'Conflict',
+          detail: 'Changed.',
+          code: 'todos.changed_meanwhile',
+        },
+        409,
+      );
+    return s.url.pathname === '/api/todos/tasks'
+      ? json(page([task({ title: 'Оплатить свет' })]))
+      : json(task({ title: 'Оплатить свет', version: 7 }));
+  });
   await screen.findByRole('list', { name: 'Без терміну' });
 
   await userEvent.click(
@@ -369,6 +374,86 @@ test('brings a ticked task back and says why when it changed elsewhere', async (
   expect(
     await screen.findByRole('list', { name: 'Без терміну' }),
   ).toHaveTextContent('Оплатить свет');
+  // Last write wins: the stale tick was read again and sent once more with the new version.
+  expect(writes().map((w) => w.headers.get('If-Match'))).toEqual(['1', '7']);
+});
+
+test('a tick refused as stale is sent again with the task’s new version', async () => {
+  const id = 'task-1';
+  let puts = 0;
+  const { writes } = renderPage((s) => {
+    if (s.method === 'PUT')
+      return ++puts === 1
+        ? json({ title: 'Conflict', code: 'todos.changed_meanwhile' }, 409)
+        : json(task({ id, status: 'Done', version: 8 }));
+    return s.url.pathname === '/api/todos/tasks'
+      ? json(page(puts > 1 ? [] : [task({ id, title: 'Оплатить свет' })]))
+      : json(task({ id, title: 'Оплатить свет', version: 7 }));
+  });
+  await screen.findByRole('list', { name: 'Без терміну' });
+
+  await userEvent.click(
+    screen.getByRole('checkbox', { name: 'Готово: Оплатить свет' }),
+  );
+
+  await waitFor(() => expect(writes()).toHaveLength(2));
+  expect(writes()[1]!.url.pathname).toBe(`/api/todos/tasks/${id}/status`);
+  expect(writes()[1]!.headers.get('If-Match')).toBe('7');
+  expect(writes()[1]!.body).toEqual({ status: 'Done' });
+  expect(screen.queryByText(/змінили в іншому місці/)).not.toBeInTheDocument();
+});
+
+test('offline, a tick waits in the queue with the row gone and is sent when the network is back', async () => {
+  const { writes } = renderPage((s) =>
+    s.method === 'PUT'
+      ? json(task({ status: 'Done', version: 2 }))
+      : json(page([task({ title: 'Оплатить свет' })])),
+  );
+  await screen.findByRole('list', { name: 'Без терміну' });
+  onlineManager.setOnline(false);
+
+  await userEvent.click(
+    screen.getByRole('checkbox', { name: 'Готово: Оплатить свет' }),
+  );
+
+  expect(
+    screen.queryByRole('checkbox', { name: 'Готово: Оплатить свет' }),
+  ).not.toBeInTheDocument();
+  expect(writes()).toHaveLength(0);
+
+  act(() => onlineManager.setOnline(true));
+
+  await waitFor(() => expect(writes()).toHaveLength(1));
+  expect(writes()[0]!.headers.get('If-Match')).toBe('1');
+});
+
+test('offline, the quick add clears the field at once and says it will be added', async () => {
+  const { writes } = renderPage((s) =>
+    s.method === 'POST'
+      ? json(task({ title: 'Купити ліки' }), 201)
+      : json(page([])),
+  );
+  const field = await screen.findByRole('textbox', { name: 'Нова справа' });
+  onlineManager.setOnline(false);
+
+  await userEvent.type(field, 'Купити ліки{Enter}');
+
+  expect(field).toHaveValue('');
+  expect(
+    screen.getByText('Додасться, коли з’явиться мережа'),
+  ).toBeInTheDocument();
+  expect(writes()).toHaveLength(0);
+
+  act(() => onlineManager.setOnline(true));
+
+  await waitFor(() => expect(writes()).toHaveLength(1));
+  expect(writes()[0]!.headers.get('Idempotency-Key')).toBeTruthy();
+  expect(writes()[0]!.body).toMatchObject({ title: 'Купити ліки' });
+  await waitFor(() =>
+    expect(
+      screen.queryByText('Додасться, коли з’явиться мережа'),
+    ).not.toBeInTheDocument(),
+  );
 });
 
 test('says the list is empty, offers to reset a filter and retries an error', async () => {

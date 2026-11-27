@@ -1,4 +1,4 @@
-import { locale } from '../../../../platform/locale';
+import { locale } from '../../../../platform/client/locale';
 import { formatWhole } from './money';
 import type { MonthSummary } from './summary-api';
 

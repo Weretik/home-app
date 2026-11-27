@@ -1,4 +1,4 @@
-import type { FamilyPerson } from '../../../platform/member-api';
+import type { FamilyPerson } from '../../../platform/client/member-api';
 import type { GiftPriority, Recipient } from '../data/gifts-api';
 import { priorities, recipients } from '../display/labels';
 

@@ -20,6 +20,7 @@ with steps, statuses, priorities, editable categories, an archive and a home pag
 дел» sheet, see [api/docs/modules/todos.md](api/docs/modules/todos.md)); gifts with a giver and a buy-by date become
 to-dos and close themselves when the to-do is done; and the Notifications module, the family Telegram bot (morning
 to-dos, gift reminders, the evening shopping list, weekly and monthly expenses summaries, run by a GitHub Actions cron,
+also sent as Web Push to the devices where push is on,
 see [api/docs/modules/notifications.md](api/docs/modules/notifications.md)); the Notes module (what Masha and Vitaliy
 like, dislike and should know about each other, by category, with who wrote each note taken from the session, see
 [api/docs/modules/notes.md](api/docs/modules/notes.md)); the Identity module: Google sign-in for Masha and Vitaliy only (an e-mail allowlist), server sessions, and every
@@ -104,12 +105,12 @@ most 200 (tests and generated code exempt); a longer file is split by responsibi
 
 **Modules:** a module uses another one only through its `Contracts`; `Domain` knows no EF Core or ASP.NET Core; one
 schema per module, no foreign keys across schemas. **Web features** never import each other and reach the API only
-through `src/platform/api.ts` from their `*-api.ts`.
+through `src/platform/client/api.ts` from their `*-api.ts`.
 
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
 transaction go through the outbox, and their handlers are safe to run twice.
 
-**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `Telegram__BotToken`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1` (and
+**Configuration and secrets:** `ConnectionStrings__Database`, `Cors__Origins__0`, `OutboxTick__Key`, `Telegram__BotToken`, `WebPush__PublicKey`, `WebPush__PrivateKey`, `Identity__Google__ClientId`, `Identity__AllowedEmails__0/1` (and
 `Expenses__Import__Key` only during an import) come from App Service environment variables; production migrations use
 the `DATABASE_CONNECTION_STRING` secret of the GitHub `production` environment; the scheduler cron uses the GitHub
 secret `SCHEDULER_KEY` (= `OutboxTick__Key`); locally from `dotnet user-secrets`; in CI from GitHub Actions secrets. Nothing secret in
