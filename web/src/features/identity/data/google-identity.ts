@@ -1,15 +1,17 @@
 import { locale } from '../../../platform/locale';
 
 /**
- * Google Identity Services (web ADR 0015): the «Sign in with Google» button and One Tap. The script is loaded once,
- * only by the sign-in screen; tests put a fake `window.google` in place and never load the real one.
- */
-export const GOOGLE_SCRIPT_URL = 'https://accounts.google.com/gsi/client';
-
-/**
  * The button's language: Google takes only the language part of the interface locale.
  */
 const BUTTON_LOCALE = locale.split('-')[0];
+
+/**
+ * Google Identity Services (web ADR 0015): the «Sign in with Google» button and One Tap. The script is loaded once,
+ * only by the sign-in screen; tests put a fake `window.google` in place and never load the real one. `hl` sets the
+ * language of the button's iframe and One Tap: the `locale` option of `renderButton` alone is not always honoured,
+ * and the button then follows the browser's language (English on an English browser).
+ */
+export const GOOGLE_SCRIPT_URL = `https://accounts.google.com/gsi/client?hl=${BUTTON_LOCALE}`;
 
 interface CredentialResponse {
   credential: string;

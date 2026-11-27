@@ -58,7 +58,7 @@ features/identity/
 - Server state in React Query under a new prefix `moduleKeys.identity = ['identity']`; sign-in and sign-out clear the
   whole cache (`queryClient.clear()`), so one member never sees the previous member's cached data.
 - `signIn` sends no `Idempotency-Key` (backend SDD, "Contract").
-- The Google script is loaded from `https://accounts.google.com/gsi/client` by `google-identity.ts` only on the
+- The Google script is loaded from `https://accounts.google.com/gsi/client?hl=uk` (Ukrainian button and One Tap) by `google-identity.ts` only on the
   sign-in screen; `auto_select` is on, so a returning member on a known device signs in with one tap.
 
 ### Routes and shell
