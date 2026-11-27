@@ -31,4 +31,5 @@ name) and a server-side push rule (branch name restrictions in GitHub rulesets a
 
 - Branch names say what a change is, and the branches of one feature match across repositories.
 - A pull request opened from a wrong name has to be reopened from a renamed branch.
-- Skills and templates that suggest other names (for example `codex/...`) were aligned in Weretik/obsidian.
+- Skills and templates in Weretik/obsidian that suggested other names (for example `codex/...`) are aligned in its
+  own `chore/branch-naming-check` branch.
