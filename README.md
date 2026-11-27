@@ -59,8 +59,12 @@ flowchart LR
   checked by architecture tests on the backend and structure checks on the frontend
   ([ADR 0029](api/docs/decisions/0029-every-rule-checked-by-a-test.md)). This is what keeps AI-assisted changes
   honest: an agent follows [AGENTS.md](AGENTS.md), and CI proves the result.
-- **Specification before code.** Each feature starts as a backend and a frontend SDD, ends with an architecture
-  audit, and every lasting decision is an ADR: 35 for the API, 13 for the web app, 5 for the repository.
+- **Specification before code.** Each feature starts as a backend and a frontend SDD, and every lasting decision is
+  an ADR: 35 for the API, 13 for the web app, 5 for the repository.
+- **Architecture audits with fixes.** Every finished feature gets an architecture audit of modules, layers, contract,
+  data and idempotency; each finding is either fixed with evidence (code, test) or recorded with an owner. Example:
+  [the Expenses audit](api/docs/audits/2026-11-26-expenses-budget-forecast.md) split an oversized handler into pure,
+  unit-tested calculations and added integration tests for the concurrent-edit race.
 
 More: [C4 diagrams](api/docs/architecture/c4.md), [backend architecture](api/docs/architecture/README.md),
 [web architecture](web/docs/architecture.md).
