@@ -140,6 +140,10 @@ test('opens the budget summary first, every section has its summary', async () =
     'href',
     '/status',
   );
+  expect(screen.getByRole('link', { name: /Про нас/ })).toHaveAttribute(
+    'href',
+    '/notes',
+  );
   await screen.findByRole('region', { name: 'Доходи' });
 });
 

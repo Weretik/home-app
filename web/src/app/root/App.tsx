@@ -15,6 +15,9 @@ import { HistoryPage } from '../../features/shopping/history-page/HistoryPage';
 import { ListPage } from '../../features/shopping/list-page/ListPage';
 import { ShoppingSection } from '../../features/shopping/section/ShoppingSection';
 import { SettingsPage as ShoppingSettingsPage } from '../../features/shopping/settings-page/SettingsPage';
+import { NotesPage } from '../../features/notes/note-list/NotesPage';
+import { NotesSection } from '../../features/notes/section/NotesSection';
+import { CategoriesSettingsPage as NoteCategoriesPage } from '../../features/notes/settings/CategoriesSettingsPage';
 import { NotificationsPage } from '../../features/notifications/page/NotificationsPage';
 import { StatusPage } from '../../features/status/StatusPage';
 import { ArchivePage as TodosArchivePage } from '../../features/todos/archive/ArchivePage';
@@ -51,6 +54,10 @@ export function App() {
             <Route index element={<ActiveTasksPage />} />
             <Route path="archive" element={<TodosArchivePage />} />
             <Route path="settings" element={<CategoriesSettingsPage />} />
+          </Route>
+          <Route path="/notes" element={<NotesSection />}>
+            <Route index element={<NotesPage />} />
+            <Route path="settings" element={<NoteCategoriesPage />} />
           </Route>
           <Route path="/status" element={<StatusPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />

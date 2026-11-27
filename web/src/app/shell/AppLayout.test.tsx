@@ -54,10 +54,10 @@ function bottomBarLinks() {
 beforeEach(() => localStorage.clear());
 afterEach(() => vi.unstubAllGlobals());
 
-test('the side menu lists the main sections and the service pages', () => {
+test('the side menu lists the main sections, «Про нас» and the service pages', () => {
   renderAt('/');
 
-  for (const name of [...mainSections, 'Стан'])
+  for (const name of [...mainSections, 'Про нас', 'Стан'])
     expect(within(sideMenu()).getByRole('link', { name })).toBeInTheDocument();
 });
 
@@ -67,6 +67,15 @@ test('the bottom bar lists the five main sections', () => {
   expect(bottomBarLinks().map((link) => link.textContent)).toEqual(
     mainSections,
   );
+});
+
+test('«Про нас» is in the side menu only, the bottom bar keeps five', () => {
+  renderAt('/notes');
+
+  expect(
+    within(sideMenu()).getByRole('link', { name: 'Про нас' }),
+  ).toHaveAttribute('aria-current', 'page');
+  expect(bottomBarLinks()).toHaveLength(5);
 });
 
 test('marks the current section in both menus', () => {

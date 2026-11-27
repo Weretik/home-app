@@ -1,0 +1,210 @@
+import { ThemeProvider } from '@mui/material/styles';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { afterEach, vi } from 'vitest';
+import { theme } from '../../../app/theme/theme';
+import { createQueryClient } from '../../../platform/query-client';
+import { NotesSection } from '../section/NotesSection';
+import { CategoriesSettingsPage } from './CategoriesSettingsPage';
+
+afterEach(() => vi.unstubAllGlobals());
+
+const categories = [
+  {
+    id: 'c-food',
+    name: 'Їжа',
+    emoji: '🍕',
+    sortOrder: 10,
+    version: 1,
+    noteCount: 2,
+  },
+];
+
+const json = (body: unknown, status = 200) =>
+  Promise.resolve(
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  );
+const noContent = () => Promise.resolve(new Response(null, { status: 204 }));
+
+interface Sent {
+  method: string;
+  url: URL;
+  headers: Headers;
+  body: unknown;
+}
+
+function LocationProbe() {
+  return <output data-testid="location">{useLocation().search}</output>;
+}
+
+/** Stubs the API: categories always answer; `answer` handles the rest. */
+function renderPage(
+  answer: (sent: Sent) => Promise<Response>,
+  path = '/notes/settings',
+) {
+  const sent: Sent[] = [];
+  vi.stubGlobal('fetch', async (request: Request) => {
+    const text = await request.text();
+    const entry = {
+      method: request.method,
+      url: new URL(request.url),
+      headers: request.headers,
+      body: text ? JSON.parse(text) : undefined,
+    };
+    sent.push(entry);
+    if (entry.url.pathname === '/api/identity/me')
+      return json({
+        email: 'a@example.com',
+        name: 'A',
+        pictureUrl: null,
+        person: 'Maria',
+      });
+    return answer(entry);
+  });
+  const client = createQueryClient();
+  client.setDefaultOptions({ queries: { retry: false } });
+  render(
+    <ThemeProvider theme={theme}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route path="/notes" element={<NotesSection />}>
+              <Route path="settings" element={<CategoriesSettingsPage />} />
+            </Route>
+          </Routes>
+          <LocationProbe />
+        </MemoryRouter>
+      </QueryClientProvider>
+    </ThemeProvider>,
+  );
+  const writes = () => sent.filter((s) => s.method !== 'GET');
+  return { sent, writes };
+}
+
+const conflict = (code: string, status = 409) =>
+  json({ title: 'Conflict', detail: 'Taken.', code }, status);
+
+test('lists the categories with their note counts and adds one (SC-005)', async () => {
+  let list = categories;
+  const { writes } = renderPage((s) => {
+    if (s.method === 'POST') {
+      list = [
+        ...list,
+        {
+          id: 'c-garden',
+          name: 'Сад',
+          emoji: '🌱',
+          sortOrder: 20,
+          version: 1,
+          noteCount: 0,
+        },
+      ];
+      return json({ id: 'c-garden' }, 201);
+    }
+    return json(list);
+  });
+
+  const rows = await screen.findByRole('list', { name: 'Категорії нотаток' });
+  expect(rows).toHaveTextContent('Їжа');
+  expect(rows).toHaveTextContent('2 нотатки');
+  expect(screen.getByRole('link', { name: 'Налаштування' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Додати категорію' }),
+  );
+  const dialog = await screen.findByRole('dialog', { name: 'Нова категорія' });
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+  expect(within(dialog).getByText('Введіть назву')).toBeInTheDocument();
+  await userEvent.type(
+    within(dialog).getByRole('textbox', { name: /Назва/ }),
+    ' Сад ',
+  );
+  await userEvent.type(
+    within(dialog).getByRole('textbox', { name: 'Емодзі' }),
+    '🌱',
+  );
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+
+  expect(writes()[0]!.body).toEqual({ name: 'Сад', emoji: '🌱' });
+  expect(writes()[0]!.headers.has('Idempotency-Key')).toBe(false);
+  expect(
+    await screen.findByText('немає нотаток', {}, { timeout: 4000 }),
+  ).toBeInTheDocument();
+});
+
+test('renames a category with its version and shows a taken name under the field', async () => {
+  let taken = true;
+  const { writes } = renderPage((s) => {
+    if (s.method === 'PUT') {
+      if (taken) {
+        taken = false;
+        return conflict('notes.category_name_taken');
+      }
+      return noContent();
+    }
+    return json(categories);
+  });
+  await screen.findByRole('list', { name: 'Категорії нотаток' });
+
+  await userEvent.click(screen.getByRole('button', { name: 'Змінити: Їжа' }));
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Змінити категорію',
+  });
+  const name = within(dialog).getByRole('textbox', { name: /Назва/ });
+  await userEvent.clear(name);
+  await userEvent.type(name, 'Ремонт');
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+
+  expect(
+    await within(dialog).findByText('Така назва вже є'),
+  ).toBeInTheDocument();
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Зберегти' }),
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+
+  expect(writes()[1]!.url.pathname).toBe('/api/notes/categories/c-food');
+  expect(writes()[1]!.headers.get('If-Match')).toBe('1');
+  expect(writes()[1]!.body).toEqual({ name: 'Ремонт', emoji: '🍕' });
+});
+
+test('warns how many notes lose a deleted category', async () => {
+  const { writes } = renderPage((s) =>
+    s.method === 'DELETE' ? noContent() : json(categories),
+  );
+  await screen.findByRole('list', { name: 'Категорії нотаток' });
+
+  await userEvent.click(screen.getByRole('button', { name: 'Видалити: Їжа' }));
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Видалити категорію?',
+  });
+  expect(dialog).toHaveTextContent('2 нотатки залишаться без категорії');
+  await userEvent.click(
+    within(dialog).getByRole('button', { name: 'Видалити' }),
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+
+  expect(writes()[0]!.method).toBe('DELETE');
+  expect(writes()[0]!.headers.get('If-Match')).toBe('1');
+});

@@ -33,6 +33,7 @@ src/
     shopping/     the «Покупки» section, the Shopping module (below)
     gifts/        the «Подарки» section, the Gifts module (below)
     todos/        the «Дела» section, the Todos module (below)
+    notes/        the «Про нас» section, the Notes module (below)
     notifications/ the «Телеграм» service page, the Notifications module (below)
     identity/     sign-in with Google: the gate before every route, the member menu in the header (below)
 ```
@@ -61,6 +62,8 @@ folders, the file rules and the import boundaries in CI ([rules and their checks
 | `/todos`             | Задачи: active tasks in due groups, «Кому» / category / search filters, quick add, done with undo                     | `todos/task-list`        |
 | `/todos/archive`     | Архив: done and cancelled tasks, «Вернуть», «Показать ещё»                                                            | `todos/archive`          |
 | `/todos/settings`    | Настройки (the gear next to the tabs): categories with emoji and active count                                         | `todos/settings`         |
+| `/notes`             | Про нас: tabs «Про мене» / «Про Машу» / «Усі», kind, category and search filters, quick add, cards                    | `notes/note-list`        |
+| `/notes/settings`    | Налаштування (the gear next to the tabs): note categories with emoji and note count                                   | `notes/settings`         |
 | `/status`            | Состояние: API and database status                                                                                    | `status`                 |
 | `/notifications`     | Телеграм: the bot, linked chats with «Тест» / «Отвязать», the schedule, the last deliveries                           | `notifications/page`     |
 
@@ -359,6 +362,44 @@ todos/
 - The task dialog edits title, «Кому», «Поставил(а)», status, priority, due date («Сегодня», «Завтра», «На выходных»,
   «Без срока»), category, notes and steps. Edits send the version of the task as the dialog's query holds it now, so
   steps saved meanwhile do not cause a conflict; a 409 reloads the task into the form, a 404 says it is gone.
+
+## Notes (`src/features/notes`)
+
+«Про нас»: what Masha and Vitaliy like, dislike and should know about each other
+([ADR 0017](decisions/0017-notes-section-person-tabs-me-first.md), [SDD](specs/notes/001-notes-section/README.md)). It
+is in the side menu under the main five (`moreSections` in `app/shell/sections.ts`) and linked from the home page for
+phones; the bottom bar keeps five.
+
+```
+notes/
+  data/          notes-api.ts (the list query), categories-api.ts, labels.ts (kinds, people, the quick-add prompt,
+                 the card footer), note-groups.ts (cards by category), use-me.ts (the signed-in person and the partner
+                 from platform/member-api)
+  writes/        note-writes-api.ts (create with Idempotency-Key, edit / delete with If-Match), category-writes-api.ts,
+                 failures-api.ts (Ukrainian text of a failed write)
+  section/       NotesSection (title, the person tabs, the gear), NoteTabs, notes-tabs.ts (tab ↔ person, labels)
+  url-state/     filters.ts (?kind=&category=&q= ↔ the API query), use-note-filters.ts (the tab and the filters, the
+                 debounced search)
+  note-filters/  NoteFilters, KindChips, CategorySelect, SearchField
+  note-list/     NotesPage, NoteGroups, QuickAdd and use-quick-add.ts
+  note-card/     NoteCard, KindMark, PersonAvatar, the card grid
+  note-dialog/   NoteDialog (full screen on a phone, 560 px on a computer), NoteFields, SegmentedField, note-form.ts,
+                 use-note-form.ts
+  feedback/      ListStatus (skeleton cards, empty, error), ResultSnackbar, ConfirmDeleteDialog
+  settings/      «Налаштування»: categories with their note count, add / change dialog, delete with the count of notes
+                 that lose it
+```
+
+- Tabs (`?about=`): `me`, `partner`, `all` for a member with a person (default `me`); `vitaliy`, `maria`, `all` for a
+  member without one (default `all`); a name in a link opens the matching tab for either member. The tabs and the list
+  wait for `/api/identity/me`, so the default tab never jumps.
+- Query keys: `['notes', 'items', query]`, `['notes', 'categories']`; every write invalidates `['notes']`.
+- Filters stay across the tabs; «Скинути фільтри» drops them and keeps the tab. The search reaches the URL 300 ms
+  after typing stops.
+- Quick add creates a note about the tab's person (the person toggle in «Усі»), with the chosen kind and no category;
+  one `Idempotency-Key` per text, renewed after success. The pencil opens the dialog with the typed text.
+- The dialog edits the note as the list holds it now: a 409 reloads the list and the form takes the new version; a
+  404 closes the dialog and says the note was deleted.
 
 ## Notifications (`src/features/notifications`)
 

@@ -1,3 +1,4 @@
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import MonitorHeartOutlinedIcon from '@mui/icons-material/MonitorHeartOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import Box from '@mui/material/Box';
@@ -15,8 +16,8 @@ const today = new Intl.DateTimeFormat(locale, {
 
 /**
  * Головна: one section's summary at a time, picked with the switcher (`?s=`). Today «Бюджет» and «Подарунки» have one; the
- * others join through `summary-sections.ts`. The service pages «Стан» and «Телеграм» are linked below for phones,
- * which have no side menu.
+ * others join through `summary-sections.ts`. «Про нас» and the service pages «Стан» and «Телеграм» are linked below
+ * for phones, which have no side menu.
  */
 export function HomePage() {
   const [active, setActive] = useSummaryParam();
@@ -50,6 +51,13 @@ export function HomePage() {
           },
         }}
       >
+        <SectionCard
+          to="/notes"
+          color="secondary"
+          icon={FavoriteBorderOutlinedIcon}
+          title="Про нас"
+          caption="Що ми любимо, не любимо й варто знати"
+        />
         <SectionCard
           to="/status"
           color="primary"

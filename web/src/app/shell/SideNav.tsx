@@ -7,7 +7,12 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import { NavLink } from 'react-router-dom';
-import { mainSections, serviceSections, type Section } from './sections';
+import {
+  mainSections,
+  moreSections,
+  serviceSections,
+  type Section,
+} from './sections';
 
 export const SIDE_NAV_WIDE = 260;
 export const SIDE_NAV_NARROW = 84;
@@ -108,7 +113,7 @@ export function SideNav({ collapsed }: { collapsed: boolean }) {
         }),
       })}
     >
-      {group('Розділи', mainSections)}
+      {group('Розділи', [...mainSections, ...moreSections])}
       <Divider sx={{ mx: 2 }} />
       {group('Сервіс', serviceSections)}
     </Box>

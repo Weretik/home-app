@@ -24,7 +24,7 @@ second colour. Colours and mood only: no game art, logos or fonts.
   `` `rgba(${theme.vars.palette.primary.mainChannel} / 0.12)` ``). The only exception is the white overlay on the
   highlight cards.
 - Status colours (`success`, `warning`, `error`, `info`) are MUI's defaults and mean only status, never decoration.
-  Two exceptions: a signed amount, where `error` marks money going out (see «Signed amounts»), and «Вместе», whose
+  Three exceptions: the kind mark of a «Про нас» note (see «Note cards»), a signed amount, where `error` marks money going out (see «Signed amounts»), and «Вместе», whose
   person colour is `info` (see «Person colours»).
 - Tints: `0.08` for hover, `0.12` for a selected item or an icon tile, `0.16` for a pressed state.
 
@@ -70,7 +70,8 @@ Computer (md, 900px and wider)              Phone (below md)
 - **Page panel**: `background.default` with rounded top corners. Content starts at the left edge next to the side
   menu (never centred, which leaves a gap on wide screens) and stops at 1600px.
 - Sections are declared once in `src/app/shell/sections.ts`. `mainSections` (at most five) go to both menus;
-  `serviceSections` go only to the side menu, and the home page links to them for phones.
+  `moreSections` («Про нас») and `serviceSections` go only to the side menu, and the home page links to them for
+  phones.
 
 ## Pages
 
@@ -173,6 +174,17 @@ Computer (md, 900px and wider)              Phone (below md)
 - A figure card may have a second caption line for something worth knowing that is not always there («Вне лимитов:
   2 траты на 3 500 ₴»); it is left out, not shown as zero, when there is nothing.
 - Amounts in summary tables and lists have kopecks like every list; only the figure cards round them.
+
+## Note cards
+
+- «Про нас» shows notes as cards in the card grid, grouped under a `subtitle2` heading per category («🍕 Їжа · 3»,
+  «Без категорії» last).
+- The kind mark at the top of a card: the icon in `success` (heart, «Любить»), `error` (crossed circle, «Не
+  любить») or `info` (lightbulb, «Факт») on a 0.12 tint of the same colour, the word in `text.primary` 600, so the
+  contrast holds in both schemes and the colour is never the only hint. These colours mark the kind only there.
+- Then ⭐ when important, and in «Усі» the person circle (Віталій `primary`, Маша `secondary`, with an `aria-label`);
+  the title `subtitle1` 600, the place as a small outlined chip with a shop icon, the description clamped to three
+  lines, and «Маша · 27.11 · змінив Віталій» in `text.secondary`. The whole card opens the dialog.
 
 ## Cards
 
