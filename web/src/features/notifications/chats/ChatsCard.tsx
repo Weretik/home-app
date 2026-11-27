@@ -38,7 +38,7 @@ export function ChatsCard({ chats }: { chats: NotificationChatItem[] }) {
   return (
     <InfoCard
       title="Чаты"
-      caption="Куда бот пишет: каждому лично и в общую группу"
+      caption="Куда бот пишет: каждому лично; общие сводки — в группу, если она есть"
     >
       <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {rows.map((chat, index) => (
