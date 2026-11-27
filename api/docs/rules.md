@@ -88,6 +88,10 @@ names the test for each rule and the reason for each rule that is review only
   handlers are safe to run twice.
 - Work that runs on a schedule is an HTTP endpoint called by an external scheduler, not a background thread.
   **(tested)**
+- A client of an outside system (Telegram) is tested as it runs in production: the real client and its `HttpClient`
+  registration, with only the network stubbed and the request urls checked. Secrets in tests have the real format (a
+  Telegram token has a colon) ([repository ADR 0005](../../docs/decisions/0005-post-deploy-smoke-reads-every-section.md)).
+  **(tested: `NotificationsTelegramHttpTests`)**
 
 ## Host and configuration
 
@@ -156,6 +160,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | No query and no `SaveChanges` in a loop | review only: a loop over an in-memory list is fine, over a query is not; the text cannot tell them apart reliably |
 | Search: words, escaped `LIKE`, trigram index | `UnitTests/BuildingBlocks/SearchPatternTests` for the pattern; the index is review only (migration content) |
 | Migrations keep the previous release working (add first, remove later) | review only: needs judgement on each migration; the deploy runs them as a bundle before the code (ADR 0016) |
+| Outside clients tested for real, secrets in real format | `IntegrationTests/Api/Notifications/NotificationsTelegramHttpTests` (real `TelegramBotClient`, stubbed network, BotFather-format token); post-deploy smoke reads every section (`.github/workflows/api.yml`) |
 | Side effects through the outbox; handlers safe twice | integration tests run each handler through `POST /internal/outbox/tick` (gift ↔ to-do flow, Telegram message); handlers are upserts or status checks (gifts/002 R-007) |
 | A unique violation becomes `Conflict` in the handler | integration tests of each existing race; a new unique index needs its race test (review) |
 | Commands return little; abstraction only for a third case; test first | review only: judgement and process |
