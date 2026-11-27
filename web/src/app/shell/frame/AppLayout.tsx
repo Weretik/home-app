@@ -1,8 +1,8 @@
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { BottomNav } from './BottomNav';
-import { SideNav } from './SideNav';
+import { BottomNav } from '../navigation/BottomNav';
+import { SideNav } from '../navigation/SideNav';
 import { TopBar } from './TopBar';
 
 const COLLAPSED_KEY = 'home.side-nav.collapsed';

@@ -57,7 +57,7 @@ Computer (md, 900px and wider)              Phone (below md)
 |        |   [ card ] [ card ]       |      |  [ card ]        |
 |        |                           |      |  [ card ]        |
 +--------+---------------------------+      +------------------+
-                                            | bottom bar (5)   |
+                                            | bottom bar (5+Ще)|
                                             +------------------+
 ```
 
@@ -65,13 +65,15 @@ Computer (md, 900px and wider)              Phone (below md)
   (computer only), the theme switch on the right.
 - **Side menu** (computer): under the header, 260px wide, groups with a caption («Разделы», «Сервис»). The header
   button collapses it to 84px of icons with tooltips; the choice is remembered (`home.side-nav.collapsed`).
-- **Bottom bar** (phone): the five main sections with icon and label; the active one has a tinted pill behind the
-  icon. It respects the safe area at the bottom.
+- **Bottom bar** (phone): the five main sections and «Ще» with icon and label; the active one has a tinted pill
+  behind the icon. «Ще» opens a bottom sheet with every other page («Про нас», «Стан», «Телеграм», «Профіль») and is
+  the active item while one of them is open ([ADR 0019](decisions/0019-phone-more-sheet-in-the-bottom-bar.md)). It
+  respects the safe area at the bottom.
 - **Page panel**: `background.default` with rounded top corners. Content starts at the left edge next to the side
   menu (never centred, which leaves a gap on wide screens) and stops at 1600px.
-- Sections are declared once in `src/app/shell/sections.ts`. `mainSections` (at most five) go to both menus;
-  `moreSections` («Про нас») and `serviceSections` go only to the side menu, and the home page links to them for
-  phones.
+- Sections are declared once in `src/app/shell/navigation/sections.ts`. `mainSections` (at most five) go to both
+  menus; `moreSections` («Про нас») and `serviceSections` go to the side menu and, with the profile, to the phone's
+  «Ще» sheet (`phoneMoreSections`); the home page links to them too.
 
 ## Pages
 

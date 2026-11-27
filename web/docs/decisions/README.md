@@ -24,6 +24,7 @@ Next.js storefront.
 | 0016 | [Pages start on the signed-in person](0016-pages-start-on-the-signed-in-person.md)                                                            |
 | 0017 | [«Про нас»: a section of its own with person tabs, «about me» first](0017-notes-section-person-tabs-me-first.md)                              |
 | 0018 | [A limit change says from which month it applies](0018-limit-change-applies-from-a-month.md)                                                  |
+| 0019 | [The phone's bottom bar ends with «Ще»: a sheet with every other page](0019-phone-more-sheet-in-the-bottom-bar.md)                            |
 
 ## Decisions that must have a record
 

@@ -21,7 +21,8 @@ src/
   app/
     root/         routes and providers (theme, React Query)
     theme/        palette, theme, light/dark/system switch (docs/design.md)
-    shell/        header, side menu, bottom bar, the list of sections
+    shell/        frame/ the layout and header; navigation/ side menu, bottom bar with the «Ще» sheet, the list of
+                  sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/       the API client instance (VITE_API_URL) with the session middleware (bearer token, 401 ends the
                   session), the session token store (session.ts), the signed-in member and person (member-api.ts,
@@ -379,8 +380,8 @@ todos/
 
 «Про нас»: what Masha and Vitaliy like, dislike and should know about each other
 ([ADR 0017](decisions/0017-notes-section-person-tabs-me-first.md), [SDD](specs/notes/001-notes-section/README.md)). It
-is in the side menu under the main five (`moreSections` in `app/shell/sections.ts`) and linked from the home page for
-phones; the bottom bar keeps five.
+is in the side menu under the main five (`moreSections` in `app/shell/navigation/sections.ts`) and, on a phone, in the
+bottom bar's «Ще» sheet ([ADR 0019](decisions/0019-phone-more-sheet-in-the-bottom-bar.md)) and on the home page.
 
 ```
 notes/
