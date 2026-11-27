@@ -11,6 +11,10 @@ budget with limits and a savings jar, a shared shopping list, to-dos, a gift wis
 family Telegram bot. It is an installable app that works offline, signs in with Google, runs in production on Azure for
 two people and costs $0 in hosting.
 
+It is also a pet project for architecture practice and AI features: every change is measured against the
+[quality targets](api/docs/architecture/quality-targets.md), reviewed before and after
+([architecture reviews](docs/reviews/2026-11-27-architecture-before.md)), and an MCP server is the next AI feature.
+
 It is also a full-size example of how I build business systems: a .NET 10 modular monolith with a React front end,
 a specification before every feature, architecture rules checked by tests in CI, and a typed contract between the
 two halves. Next step: an MCP server, so the home can be managed from Claude.
