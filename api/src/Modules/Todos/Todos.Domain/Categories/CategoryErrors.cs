@@ -14,6 +14,6 @@ public static class CategoryErrors
     public static readonly Error NameTaken = Error.Conflict(
         "todos.category_name_taken", "Категорія з такою назвою вже є.");
 
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(TodoCategoryId id) =>
         Error.NotFound("todos.category_not_found", $"Категорії {id} немає.");
 }

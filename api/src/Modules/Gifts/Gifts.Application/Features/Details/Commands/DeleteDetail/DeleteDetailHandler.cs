@@ -9,7 +9,7 @@ public sealed class DeleteDetailHandler(IGiftsDbContext db) : ICommandHandler<De
 {
     public async ValueTask<Result> Handle(DeleteDetailCommand c, CancellationToken cancellationToken)
     {
-        var deleted = await db.Details.Where(x => x.Id == c.Id).ExecuteDeleteAsync(cancellationToken);
-        return deleted == 0 ? DetailErrors.NotFound(c.Id) : Result.Success();
+        var deleted = await db.Details.Where(x => x.Id == new DetailId(c.Id)).ExecuteDeleteAsync(cancellationToken);
+        return deleted == 0 ? DetailErrors.NotFound(new DetailId(c.Id)) : Result.Success();
     }
 }

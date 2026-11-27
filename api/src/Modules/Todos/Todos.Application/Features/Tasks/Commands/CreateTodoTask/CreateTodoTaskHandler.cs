@@ -22,17 +22,18 @@ public sealed class CreateTodoTaskHandler(ITodosDbContext db, TimeProvider clock
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (c.CategoryId is { } categoryId && !await db.Categories.AnyAsync(x => x.Id == categoryId, cancellationToken))
-            return CategoryErrors.NotFound(categoryId);
+        var categoryId = c.CategoryId is { } value ? new TodoCategoryId(value) : (TodoCategoryId?)null;
+        if (categoryId is { } category && !await db.Categories.AnyAsync(x => x.Id == category, cancellationToken))
+            return CategoryErrors.NotFound(category);
 
         var now = clock.GetUtcNow();
         var created = TodoTask.Create(
-            c.Title, c.Notes, c.Assignee, c.Author, c.Status ?? TodoStatus.Todo, c.Priority, c.DueDate, c.CategoryId, c.Steps, now);
+            c.Title, c.Notes, c.Assignee, c.Author, c.Status ?? TodoStatus.Todo, c.Priority, c.DueDate, categoryId, c.Steps, now);
         if (created.IsFailure)
             return created.Error!;
 
         db.Tasks.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -44,6 +45,6 @@ public sealed class CreateTodoTaskHandler(ITodosDbContext db, TimeProvider clock
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new TodoCreated(created.Value.Id);
+        return new TodoCreated(created.Value.Id.Value);
     }
 }

@@ -17,6 +17,6 @@ internal sealed class TodoCategoryConfiguration : IEntityTypeConfiguration<TodoC
         builder.Property(c => c.Version).IsRowVersion();
         // The unique index on lower(name) is created by the Initial migration in SQL (EF cannot index an expression).
 
-        builder.HasData(CategorySeed.Items.Select(c => new { c.Id, c.Name, c.Emoji, c.SortOrder }));
+        builder.HasData(CategorySeed.Items.Select(c => new { Id = new TodoCategoryId(c.Id), c.Name, c.Emoji, c.SortOrder }));
     }
 }

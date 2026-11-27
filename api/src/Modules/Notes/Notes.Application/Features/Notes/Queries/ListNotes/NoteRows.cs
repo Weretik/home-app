@@ -23,18 +23,18 @@ public static class NoteRows
 
     public static IQueryable<NoteWithCategory> WithCategory(this IQueryable<Note> notes, IQueryable<NoteCategory> categories) =>
         notes
-            .GroupJoin(categories, n => n.CategoryId, c => (Guid?)c.Id, (n, matches) => new { n, matches })
+            .GroupJoin(categories, n => n.CategoryId, c => (NoteCategoryId?)c.Id, (n, matches) => new { n, matches })
             .SelectMany(x => x.matches.DefaultIfEmpty(), (x, c) => new NoteWithCategory { Note = x.n, Category = c });
 
     public static readonly Expression<Func<NoteWithCategory, NoteItem>> ToItem = row => new NoteItem(
-        row.Note.Id,
+        row.Note.Id.Value,
         row.Note.About,
         row.Note.Kind,
         row.Note.Title,
         row.Note.Details,
         row.Note.Place,
         row.Note.IsImportant,
-        row.Note.CategoryId,
+        row.Note.CategoryId.HasValue ? row.Note.CategoryId.Value.Value : null,
         row.Category == null ? null : row.Category.Name,
         row.Category == null ? null : row.Category.Emoji,
         row.Note.CreatedBy,

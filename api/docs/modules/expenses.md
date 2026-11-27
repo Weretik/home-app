@@ -26,15 +26,15 @@ Code: [`src/Modules/Expenses`](../../src/Modules/Expenses). Schema: `expenses`. 
 ```mermaid
 classDiagram
     class Category {
-        Guid Id
+        CategoryId Id
         string Name  unique
         int SortOrder
     }
     class Expense {
-        Guid Id
+        ExpenseId Id
         DateOnly Date
         Payer Payer
-        Guid CategoryId
+        CategoryId CategoryId
         decimal Amount
         PaymentMethod PaymentMethod
         string? Comment
@@ -44,17 +44,17 @@ classDiagram
         uint Version
     }
     class PlannedExpense {
-        Guid Id
+        PlannedExpenseId Id
         DateOnly Month  first day
         string Name
-        Guid CategoryId
+        CategoryId CategoryId
         Payer Payer
         decimal Amount
         DateTimeOffset CreatedAtUtc
         uint Version
     }
     class Income {
-        Guid Id
+        IncomeId Id
         DateOnly Date
         Person Person
         decimal Amount
@@ -64,7 +64,7 @@ classDiagram
         uint Version
     }
     class SavingsMovement {
-        Guid Id
+        SavingsMovementId Id
         DateOnly Date
         Person Person
         decimal Amount  signed
@@ -74,16 +74,16 @@ classDiagram
         uint Version
     }
     class SpendingLimit {
-        Guid Id
+        SpendingLimitId Id
         string Name
         LimitPeriod Period
         AmountHistory Amounts
-        Guid[] CategoryIds
+        CategoryId[] CategoryIds
         int SortOrder
         uint Version
     }
     class BudgetSettings {
-        Guid Id  singleton
+        BudgetSettingsId Id  singleton
         AmountHistory MonthlyLimits
         decimal SavingsGoal
         DateOnly LimitsFrom
@@ -264,7 +264,8 @@ Schema `expenses`, migration history in `expenses.__ef_migrations_history`. Migr
 | `planned_expenses` | `id`, `month` date (first day), `name` (100), `category_id`, `payer` (text enum), `amount` numeric(12,2), `created_at_utc` | `fk_planned_expenses_categories` (restrict), `ix_planned_expenses_month`, `ix_planned_expenses_category_id` |
 
 Enums are stored as their names (`Shared`, `Card`, `Quarter`) so the data reads without the code. Ids are UUID v7
-(the seeded limits and the settings row have fixed ids). `Version` on expenses, incomes, savings movements, planned
+(the seeded limits and the settings row have fixed ids), typed in the code (`ExpenseId`, `CategoryId` …) and stored as
+plain `uuid` ([ADR 0047](../decisions/0047-typed-ids-for-every-entity.md)). `Version` on expenses, incomes, savings movements, planned
 expenses, spending limits and budget settings is PostgreSQL's system column `xmin`, mapped as the row version: it has no column of its
 own and costs no storage.
 

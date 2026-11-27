@@ -11,12 +11,13 @@ public sealed class ReorderDepartmentsHandler(IShoppingDbContext db) : ICommandH
 {
     public async ValueTask<Result> Handle(ReorderDepartmentsCommand c, CancellationToken cancellationToken)
     {
+        var order = c.DepartmentIds.Select(id => new DepartmentId(id)).ToList();
         var departments = await db.Departments.ToDictionaryAsync(d => d.Id, cancellationToken);
-        if (departments.Count != c.DepartmentIds.Count || !c.DepartmentIds.All(departments.ContainsKey))
+        if (departments.Count != order.Count || !order.All(departments.ContainsKey))
             return DepartmentErrors.OrderIncomplete;
 
-        for (var index = 0; index < c.DepartmentIds.Count; index++)
-            departments[c.DepartmentIds[index]].MoveTo((index + 1) * Department.SortStep);
+        for (var index = 0; index < order.Count; index++)
+            departments[order[index]].MoveTo((index + 1) * Department.SortStep);
 
         try
         {

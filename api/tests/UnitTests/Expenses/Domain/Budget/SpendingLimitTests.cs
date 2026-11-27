@@ -1,13 +1,14 @@
 using Expenses.Domain.Budget;
 using Expenses.Domain.Budget.Amounts;
+using Expenses.Domain.Categories;
 
 namespace UnitTests.Expenses.Domain.Budget;
 
 public sealed class SpendingLimitTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 12, 0, 0, TimeSpan.Zero);
-    private static readonly Guid Groceries = Guid.NewGuid();
-    private static readonly Guid Household = Guid.NewGuid();
+    private static readonly CategoryId Groceries = new(Guid.NewGuid());
+    private static readonly CategoryId Household = new(Guid.NewGuid());
     private static readonly DateOnly November = new(2026, 11, 1);
     private static readonly DateOnly December = new(2026, 12, 1);
     private static readonly DateOnly Today = new(2026, 12, 10);
@@ -23,7 +24,7 @@ public sealed class SpendingLimitTests
         Assert.Equal([new AmountStep(AmountHistory.Beginning, 15_000m)], result.Value.Amounts.Steps);
         Assert.Equal([Groceries, Household], result.Value.CategoryIds);
         Assert.Equal(10, result.Value.SortOrder);
-        Assert.NotEqual(Guid.Empty, result.Value.Id);
+        Assert.NotEqual(Guid.Empty, result.Value.Id.Value);
     }
 
     [Theory]
@@ -71,7 +72,7 @@ public sealed class SpendingLimitTests
     {
         var none = SpendingLimit.Create("Кафе", LimitPeriod.Month, 1m, [], 10, Now);
         var twice = SpendingLimit.Create("Кафе", LimitPeriod.Month, 1m, [Groceries, Groceries], 10, Now);
-        var empty = SpendingLimit.Create("Кафе", LimitPeriod.Month, 1m, [Guid.Empty], 10, Now);
+        var empty = SpendingLimit.Create("Кафе", LimitPeriod.Month, 1m, [new CategoryId(Guid.Empty)], 10, Now);
         var missing = SpendingLimit.Create("Кафе", LimitPeriod.Month, 1m, null!, 10, Now);
 
         Assert.Equal("expenses.limit_categories_required", none.Error!.Code);
@@ -202,7 +203,7 @@ public sealed class SpendingLimitTests
     [Fact]
     public void The_CategoryIds_AreACopy_OfTheGivenList()
     {
-        List<Guid> ids = [Groceries];
+        List<CategoryId> ids = [Groceries];
         var limit = SpendingLimit.Create("Еда", LimitPeriod.Month, 100m, ids, 10, Now).Value;
 
         ids.Add(Household);

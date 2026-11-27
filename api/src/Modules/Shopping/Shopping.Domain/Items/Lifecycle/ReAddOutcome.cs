@@ -1,4 +1,4 @@
-namespace Shopping.Domain.Items;
+namespace Shopping.Domain.Items.Lifecycle;
 
 /// <summary>What adding a name again did to the item already in the list.</summary>
 public enum ReAddOutcome

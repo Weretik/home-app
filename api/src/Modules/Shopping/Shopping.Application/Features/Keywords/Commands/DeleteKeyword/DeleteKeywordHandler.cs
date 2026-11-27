@@ -10,9 +10,9 @@ public sealed class DeleteKeywordHandler(IShoppingDbContext db) : ICommandHandle
 {
     public async ValueTask<Result> Handle(DeleteKeywordCommand c, CancellationToken cancellationToken)
     {
-        var keyword = await db.Keywords.FirstOrDefaultAsync(k => k.Id == c.Id, cancellationToken);
+        var keyword = await db.Keywords.FirstOrDefaultAsync(k => k.Id == new DepartmentKeywordId(c.Id), cancellationToken);
         if (keyword is null)
-            return DepartmentErrors.KeywordNotFound(c.Id);
+            return DepartmentErrors.KeywordNotFound(new DepartmentId(c.Id));
         if (keyword.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
 

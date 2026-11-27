@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Categories;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ public sealed class ListExpensesHandler(IExpensesDbContext db) : IQueryHandler<L
 
         var expenses = db.Expenses.AsNoTracking().Where(e => e.Date >= from && e.Date < to);
         if (query.CategoryId is { } categoryId)
-            expenses = expenses.Where(e => e.CategoryId == categoryId);
+            expenses = expenses.Where(e => e.CategoryId == new CategoryId(categoryId));
         if (query.Payer is { } payer)
             expenses = expenses.Where(e => e.Payer == payer);
 
@@ -23,11 +24,11 @@ public sealed class ListExpensesHandler(IExpensesDbContext db) : IQueryHandler<L
             .OrderByDescending(x => x.Expense.Date)
             .ThenByDescending(x => x.Expense.Id)
             .Select(x => new ExpenseItem(
-                x.Expense.Id,
+                x.Expense.Id.Value,
                 x.Expense.Version,
                 x.Expense.Date,
                 x.Expense.Payer,
-                x.Expense.CategoryId,
+                x.Expense.CategoryId.Value,
                 x.CategoryName,
                 x.Expense.Amount,
                 x.Expense.PaymentMethod,

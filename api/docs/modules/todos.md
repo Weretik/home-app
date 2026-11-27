@@ -12,7 +12,7 @@ Code: [`src/Modules/Todos`](../../src/Modules/Todos). Schema: `todos`.
 ```mermaid
 classDiagram
     class TodoTask {
-        Guid Id  v7
+        TodoTaskId Id  v7
         string Title
         string? Notes
         Assignee Assignee
@@ -20,23 +20,23 @@ classDiagram
         TodoStatus Status
         TodoPriority Priority
         DateOnly? DueDate
-        Guid? CategoryId
+        TodoCategoryId? CategoryId
         DateTimeOffset CreatedAtUtc
         DateTimeOffset UpdatedAtUtc
         DateTimeOffset? CompletedAtUtc
         string? ImportKey  unique
         string? SourceKind
-        Guid? SourceId
+        TaskSourceId? SourceId
         uint Version  xmin
     }
     class TaskStep {
-        Guid Id  v7
+        TaskStepId Id  v7
         string Title
         bool IsDone
         int SortOrder
     }
     class TodoCategory {
-        Guid Id
+        TodoCategoryId Id
         string Name  unique (lower)
         string? Emoji
         int SortOrder

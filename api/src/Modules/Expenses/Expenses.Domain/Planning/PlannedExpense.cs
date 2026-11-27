@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 
@@ -10,7 +11,7 @@ namespace Expenses.Domain.Planning;
 /// pays and how much. It always counts toward the limits of its category in the forecast. When the money is spent,
 /// the plan is recorded as a real <see cref="Expense"/> and disappears.
 /// </summary>
-public sealed class PlannedExpense : Entity<Guid>, IAggregateRoot
+public sealed class PlannedExpense : Entity<PlannedExpenseId>, IAggregateRoot
 {
     public const int MaxNameLength = 100;
 
@@ -23,7 +24,7 @@ public sealed class PlannedExpense : Entity<Guid>, IAggregateRoot
 
     public string Name { get; private set; } = string.Empty;
 
-    public Guid CategoryId { get; private set; }
+    public CategoryId CategoryId { get; private set; }
 
     public Payer Payer { get; private set; }
 
@@ -35,14 +36,14 @@ public sealed class PlannedExpense : Entity<Guid>, IAggregateRoot
     public uint Version { get; private set; }
 
     public static Result<PlannedExpense> Create(
-        DateOnly month, string name, Guid categoryId, Payer payer, decimal amount, DateTimeOffset now)
+        DateOnly month, string name, CategoryId categoryId, Payer payer, decimal amount, DateTimeOffset now)
     {
-        var plan = new PlannedExpense { Id = Guid.CreateVersion7(now), CreatedAtUtc = now };
+        var plan = new PlannedExpense { Id = PlannedExpenseId.New(now), CreatedAtUtc = now };
         var set = plan.Update(month, name, categoryId, payer, amount);
         return set.IsFailure ? set.Error! : plan;
     }
 
-    public Result Update(DateOnly month, string name, Guid categoryId, Payer payer, decimal amount)
+    public Result Update(DateOnly month, string name, CategoryId categoryId, Payer payer, decimal amount)
     {
         var check = Result.Combine(
             Result.Ensure(month.Day == 1, PlannedExpenseErrors.MonthInvalid),

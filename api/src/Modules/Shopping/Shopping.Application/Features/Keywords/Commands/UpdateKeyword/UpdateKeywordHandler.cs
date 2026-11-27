@@ -12,19 +12,19 @@ public sealed class UpdateKeywordHandler(IShoppingDbContext db) : ICommandHandle
 {
     public async ValueTask<Result> Handle(UpdateKeywordCommand c, CancellationToken cancellationToken)
     {
-        var keyword = await db.Keywords.FirstOrDefaultAsync(k => k.Id == c.Id, cancellationToken);
+        var keyword = await db.Keywords.FirstOrDefaultAsync(k => k.Id == new DepartmentKeywordId(c.Id), cancellationToken);
         if (keyword is null)
-            return DepartmentErrors.KeywordNotFound(c.Id);
+            return DepartmentErrors.KeywordNotFound(new DepartmentId(c.Id));
         if (keyword.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
-        if (!await db.Departments.AnyAsync(d => d.Id == c.DepartmentId, cancellationToken))
-            return DepartmentErrors.NotFound(c.DepartmentId);
+        if (!await db.Departments.AnyAsync(d => d.Id == new DepartmentId(c.DepartmentId), cancellationToken))
+            return DepartmentErrors.NotFound(new DepartmentId(c.DepartmentId));
 
         var text = NameNormalizer.Normalize(c.Keyword);
-        if (await db.Keywords.AnyAsync(k => k.Keyword == text && k.Id != c.Id, cancellationToken))
+        if (await db.Keywords.AnyAsync(k => k.Keyword == text && k.Id != new DepartmentKeywordId(c.Id), cancellationToken))
             return DepartmentErrors.KeywordTaken;
 
-        var updated = keyword.Update(c.Keyword, c.DepartmentId);
+        var updated = keyword.Update(c.Keyword, new DepartmentId(c.DepartmentId));
         if (updated.IsFailure)
             return updated;
 

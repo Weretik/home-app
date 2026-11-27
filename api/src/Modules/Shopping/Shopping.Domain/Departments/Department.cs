@@ -7,7 +7,7 @@ namespace Shopping.Domain.Departments;
 /// A part of the store («🥦 Овощи и фрукты»). Departments are ordered as the family walks through the store, and
 /// exactly one of them, «Другое», is the fallback for items no keyword matches; it cannot be deleted.
 /// </summary>
-public sealed class Department : Entity<Guid>, IAggregateRoot
+public sealed class Department : Entity<DepartmentId>, IAggregateRoot
 {
     public const int MaxNameLength = 40;
     public const int MaxIconLength = 8;
@@ -36,7 +36,7 @@ public sealed class Department : Entity<Guid>, IAggregateRoot
         if (check.IsFailure)
             return check.Error!;
 
-        return new Department { Id = Guid.CreateVersion7(now), Name = name.Trim(), Icon = CleanIcon(icon), SortOrder = sortOrder };
+        return new Department { Id = DepartmentId.New(now), Name = name.Trim(), Icon = CleanIcon(icon), SortOrder = sortOrder };
     }
 
     public Result Rename(string name, string? icon)

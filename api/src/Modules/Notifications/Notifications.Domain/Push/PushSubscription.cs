@@ -8,7 +8,7 @@ namespace Notifications.Domain.Push;
 /// and the keys the payload is encrypted for. The endpoint is unique, so saving it again refreshes the same row; a
 /// device signed in by the other person moves to that person.
 /// </summary>
-public sealed class PushSubscription : Entity<Guid>, IAggregateRoot
+public sealed class PushSubscription : Entity<PushSubscriptionId>, IAggregateRoot
 {
     public const int MaxEndpointLength = 1000;
     public const int MaxP256dhLength = 200;
@@ -42,7 +42,7 @@ public sealed class PushSubscription : Entity<Guid>, IAggregateRoot
     {
         var subscription = new PushSubscription
         {
-            Id = Guid.CreateVersion7(now),
+            Id = PushSubscriptionId.New(now),
             Endpoint = endpoint,
             CreatedAtUtc = now,
         };

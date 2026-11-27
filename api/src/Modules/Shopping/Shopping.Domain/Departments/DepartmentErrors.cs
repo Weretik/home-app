@@ -31,9 +31,9 @@ public static class DepartmentErrors
     public static readonly Error KeywordTaken =
         Error.Conflict("shopping.keyword_taken", "Таке ключове слово вже є.");
 
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(DepartmentId id) =>
         Error.NotFound("shopping.department_not_found", $"Відділу {id} немає.");
 
-    public static Error KeywordNotFound(Guid id) =>
+    public static Error KeywordNotFound(DepartmentId id) =>
         Error.NotFound("shopping.keyword_not_found", $"Ключового слова {id} немає.");
 }

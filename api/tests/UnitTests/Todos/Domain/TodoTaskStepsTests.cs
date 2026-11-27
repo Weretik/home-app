@@ -1,5 +1,6 @@
 using Todos.Domain.Parties;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace UnitTests.Todos.Domain;
 
@@ -75,8 +76,8 @@ public sealed class TodoTaskStepsTests
     {
         var task = TodoTaskTests.NewTask();
 
-        Assert.Equal("todos.step_not_found", task.UpdateStep(Guid.NewGuid(), "x", true, Now).Error!.Code);
-        Assert.Equal("todos.step_not_found", task.RemoveStep(Guid.NewGuid(), Now).Error!.Code);
+        Assert.Equal("todos.step_not_found", task.UpdateStep(new TaskStepId(Guid.NewGuid()), "x", true, Now).Error!.Code);
+        Assert.Equal("todos.step_not_found", task.RemoveStep(new TaskStepId(Guid.NewGuid()), Now).Error!.Code);
     }
 
     [Fact]

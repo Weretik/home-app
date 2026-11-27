@@ -2,6 +2,7 @@ using Gifts.Contracts;
 using Todos.Application.Integrations.Gifts;
 using Todos.Domain.Parties;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace UnitTests.Todos.Domain;
 
@@ -36,10 +37,10 @@ public sealed class GiftTaskTests
         var task = TodoTask.Create("Купить", null, Assignee.Vitaliy, null, TodoStatus.Todo, TodoPriority.High, null, null, [], Now).Value;
         var gift = Guid.NewGuid();
 
-        Assert.Equal("todos.source_invalid", task.LinkSource("gift", Guid.Empty).Error!.Code);
-        Assert.Equal("todos.source_invalid", task.LinkSource(" ", gift).Error!.Code);
-        Assert.True(task.LinkSource("gift", gift).IsSuccess);
-        Assert.Equal("todos.source_already_set", task.LinkSource("gift", Guid.NewGuid()).Error!.Code);
-        Assert.Equal(("gift", gift), (task.SourceKind, task.SourceId!.Value));
+        Assert.Equal("todos.source_invalid", task.LinkSource("gift", new TaskSourceId(Guid.Empty)).Error!.Code);
+        Assert.Equal("todos.source_invalid", task.LinkSource(" ", new TaskSourceId(gift)).Error!.Code);
+        Assert.True(task.LinkSource("gift", new TaskSourceId(gift)).IsSuccess);
+        Assert.Equal("todos.source_already_set", task.LinkSource("gift", new TaskSourceId(Guid.NewGuid())).Error!.Code);
+        Assert.Equal(("gift", gift), (task.SourceKind, task.SourceId!.Value.Value));
     }
 }

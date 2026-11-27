@@ -4,6 +4,7 @@ using Gifts.Application.Idempotency;
 using Gifts.Domain.Categories;
 using Gifts.Domain.People;
 using Gifts.Domain.Wishlist;
+using Gifts.Domain.Wishlist.Identifiers;
 using Gifts.Infrastructure.Persistence.Wishlist;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +36,7 @@ public sealed class GiftsDbContext(DbContextOptions<GiftsDbContext> options)
         ChangeTracker.DetectChanges();
         var touched = ChangeTracker.Entries<GiftVariant>()
             .Where(v => v.State is EntityState.Added or EntityState.Deleted or EntityState.Modified)
-            .Select(v => v.Property<Guid>(GiftVariantColumns.GiftId).CurrentValue)
+            .Select(v => v.Property<GiftId>(GiftVariantColumns.GiftId).CurrentValue)
             .ToHashSet();
         foreach (var gift in ChangeTracker.Entries<Gift>().Where(g => g.State == EntityState.Unchanged && touched.Contains(g.Entity.Id)))
             gift.Property(g => g.Name).IsModified = true;

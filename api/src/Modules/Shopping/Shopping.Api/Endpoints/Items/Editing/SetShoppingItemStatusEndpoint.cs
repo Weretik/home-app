@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Shopping.Application.Features.Items.Commands.SetItemStatus;
 using Shopping.Application.Features.Items.Views;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Api.Endpoints.Items.Editing;
 

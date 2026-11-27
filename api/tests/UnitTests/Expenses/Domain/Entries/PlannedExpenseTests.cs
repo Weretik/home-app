@@ -1,3 +1,4 @@
+using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 using Expenses.Domain.Planning;
@@ -8,7 +9,7 @@ public sealed class PlannedExpenseTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 12, 0, 0, TimeSpan.Zero);
     private static readonly DateOnly December = new(2026, 12, 1);
-    private static readonly Guid Gifts = Guid.NewGuid();
+    private static readonly CategoryId Gifts = new(Guid.NewGuid());
 
     [Fact]
     public void A_Valid_Plan_IsCreated_WithATrimmedName()
@@ -20,7 +21,7 @@ public sealed class PlannedExpenseTests
         Assert.Equal(December, result.Value.Month);
         Assert.Equal((Gifts, Payer.Shared, 3_000m), (result.Value.CategoryId, result.Value.Payer, result.Value.Amount));
         Assert.Equal(Now, result.Value.CreatedAtUtc);
-        Assert.NotEqual(Guid.Empty, result.Value.Id);
+        Assert.NotEqual(Guid.Empty, result.Value.Id.Value);
     }
 
     [Theory]
@@ -49,7 +50,7 @@ public sealed class PlannedExpenseTests
     public void A_Failed_Update_KeepsTheOldValues()
     {
         var plan = PlannedExpense.Create(December, "Подарки", Gifts, Payer.Shared, 3_000m, Now).Value;
-        var other = Guid.NewGuid();
+        var other = new CategoryId(Guid.NewGuid());
 
         Assert.Equal("expenses.planned_name_required", plan.Update(December, " ", other, Payer.Maria, 10m).Error!.Code);
         Assert.Equal(("Подарки", Gifts, Payer.Shared, 3_000m), (plan.Name, plan.CategoryId, plan.Payer, plan.Amount));
@@ -70,7 +71,7 @@ public sealed class PlannedExpenseTests
         Assert.Equal((paid, Payer.Maria, Gifts, 3_000m, PaymentMethod.Cash, "ярмарка"),
             (expense.Value.Date, expense.Value.Payer, expense.Value.CategoryId, expense.Value.Amount, expense.Value.PaymentMethod, expense.Value.Comment));
         Assert.False(expense.Value.OutsideLimits);
-        Assert.NotEqual(plan.Id, expense.Value.Id);
+        Assert.NotEqual(plan.Id.Value, expense.Value.Id.Value);
     }
 
     [Fact]

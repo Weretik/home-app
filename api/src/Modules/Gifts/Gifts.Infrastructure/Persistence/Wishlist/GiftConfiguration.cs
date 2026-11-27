@@ -1,6 +1,7 @@
 using Gifts.Domain.Categories;
 using Gifts.Domain.People;
 using Gifts.Domain.Wishlist;
+using Gifts.Domain.Wishlist.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -48,7 +49,7 @@ internal sealed class GiftConfiguration : IEntityTypeConfiguration<Gift>
             variants.WithOwner().HasForeignKey(GiftVariantColumns.GiftId).HasConstraintName("fk_gift_variants_gifts");
             variants.HasKey(v => v.Id);
             variants.Property(v => v.Id).HasColumnName("id").ValueGeneratedNever();
-            variants.Property<Guid>(GiftVariantColumns.GiftId).HasColumnName("gift_id");
+            variants.Property<GiftId>(GiftVariantColumns.GiftId).HasColumnName("gift_id");
             variants.Property(v => v.Title).HasColumnName("title").HasMaxLength(Gift.MaxNameLength);
             variants.Property(v => v.Link).HasColumnName("link").HasMaxLength(Gift.MaxLinkLength).IsRequired();
             variants.Property(v => v.Price).HasColumnName("price").HasPrecision(12, 2);

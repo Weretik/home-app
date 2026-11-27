@@ -1,5 +1,6 @@
 using Shopping.Application.Features.Items.Views;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Items.Queries.GetSummary;
 

@@ -53,6 +53,7 @@ database server) live in [../../docs/decisions](../../../docs/decisions/README.m
 | 0043 | [cron-job.org calls the ticks, GitHub cron is the backup, and the API keeps a heartbeat](0043-external-cron-and-scheduler-heartbeat.md) |
 | 0044 | [Telemetry goes to Application Insights through OpenTelemetry, alerts stay free](0044-telemetry-in-application-insights.md) |
 | 0045 | [The deploy check reads with its own key; the scheduler key only runs the ticks](0045-separate-deploy-check-key.md) |
+| 0047 | [Every entity has its own typed id](0047-typed-ids-for-every-entity.md) |
 
 ## Decisions that must have a record
 

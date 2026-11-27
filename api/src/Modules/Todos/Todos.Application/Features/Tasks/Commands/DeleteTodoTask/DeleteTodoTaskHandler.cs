@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Features.Tasks.Commands.DeleteTodoTask;
 
@@ -10,12 +11,12 @@ public sealed class DeleteTodoTaskHandler(ITodosDbContext db) : ICommandHandler<
     public async ValueTask<Result> Handle(DeleteTodoTaskCommand c, CancellationToken cancellationToken)
     {
         // One conditional DELETE; the steps go with the task (ON DELETE CASCADE).
-        var deleted = await db.Tasks.Where(x => x.Id == c.Id && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.Tasks.Where(x => x.Id == new TodoTaskId(c.Id) && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
         if (deleted > 0)
             return Result.Success();
 
-        return await db.Tasks.AnyAsync(x => x.Id == c.Id, cancellationToken)
+        return await db.Tasks.AnyAsync(x => x.Id == new TodoTaskId(c.Id), cancellationToken)
             ? TodoErrors.ChangedMeanwhile
-            : TodoErrors.TaskNotFound(c.Id);
+            : TodoErrors.TaskNotFound(new TodoTaskId(c.Id));
     }
 }

@@ -1,7 +1,7 @@
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
-using Gifts.Application.Idempotency;
 using Gifts.Application.Features.Categories;
+using Gifts.Application.Idempotency;
 using Gifts.Domain.Categories;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,7 @@ public sealed class CreateCategoryHandler(IGiftsDbContext db, TimeProvider clock
             return created.Error!;
 
         db.Categories.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -38,6 +38,6 @@ public sealed class CreateCategoryHandler(IGiftsDbContext db, TimeProvider clock
                 ?? (CategoryNames.IsNameIndex(exception) ? CategoryErrors.NameTaken : IdempotentCreates.KeyReused);
         }
 
-        return new CreatedGiftsEntry(created.Value.Id);
+        return new CreatedGiftsEntry(created.Value.Id.Value);
     }
 }

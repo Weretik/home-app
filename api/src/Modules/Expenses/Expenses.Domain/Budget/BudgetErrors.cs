@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Budget.Identifiers;
 
 namespace Expenses.Domain.Budget;
 
@@ -39,6 +40,6 @@ public static class BudgetErrors
     public static readonly Error LimitAddedMeanwhile =
         Error.Conflict("expenses.limit_added_meanwhile", "Саме в цю мить додали інший ліміт. Спробуйте ще раз.");
 
-    public static Error LimitNotFound(Guid id) =>
+    public static Error LimitNotFound(SpendingLimitId id) =>
         Error.NotFound("expenses.limit_not_found", $"Ліміту {id} немає.");
 }

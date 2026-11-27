@@ -82,7 +82,7 @@ Priority = (impact + likelihood) × (6 − cost), each scored 1–5; dependencie
 | 4 | F4 offline queue for expenses, reusing `platform/offline/queue` ([web SDD expenses/007](../../web/docs/specs/expenses/007-offline-expense-add/README.md)) | 3 | 4 | 2 | 28 | now | fixed in #54 |
 | 5 | F5 a session ends 90 days after sign-in at the latest; "sign out everywhere"; CSP later | 4 | 2 | 2 | 24 | now (CSP later) | open |
 | — | F6 a separate random webhook secret | 3 | 1 | 1 | 20 | later | open |
-| — | F7 decide whether the DDD rules apply here; if yes, write them down and test them | — | — | — | — | later, Vitaliy decides | open |
+| 6 | F7 typed ids: every entity gets its own `readonly record struct` id, no bare `Guid` in the Domain, tested ([ADR 0047](../../api/docs/decisions/0047-typed-ids-for-every-entity.md)) | 2 | 3 | 2 | 20 | now, chosen by Vitaliy on 2026-11-28 | ids fixed in #PRNUM; value objects as `readonly record struct` and marked aggregate roots still open |
 | — | F8 refresh the module map and AGENTS.md | 1 | 5 | 1 | — | now | fixed in #48 |
 
 ## Strengths

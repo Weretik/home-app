@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 using Shopping.Domain.Settings;
 
 namespace Shopping.Application.Features.Items.Views;

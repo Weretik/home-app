@@ -15,9 +15,9 @@ public sealed class DeleteDepartmentHandler(IShoppingDbContext db) : ICommandHan
 {
     public async ValueTask<Result> Handle(DeleteDepartmentCommand c, CancellationToken cancellationToken)
     {
-        var department = await db.Departments.FirstOrDefaultAsync(d => d.Id == c.Id, cancellationToken);
+        var department = await db.Departments.FirstOrDefaultAsync(d => d.Id == new DepartmentId(c.Id), cancellationToken);
         if (department is null)
-            return DepartmentErrors.NotFound(c.Id);
+            return DepartmentErrors.NotFound(new DepartmentId(c.Id));
         if (department.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
         var deletable = department.EnsureDeletable();

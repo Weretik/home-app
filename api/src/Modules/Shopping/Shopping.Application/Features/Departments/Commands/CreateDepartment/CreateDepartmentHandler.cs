@@ -35,7 +35,7 @@ public sealed class CreateDepartmentHandler(IShoppingDbContext db, TimeProvider 
         foreach (var later in departments.Where(d => d.SortOrder >= place))
             later.MoveTo(later.SortOrder + Department.SortStep);
         db.Departments.Add(created.Value);
-        var outcome = new ShoppingCreatedId(created.Value.Id);
+        var outcome = new ShoppingCreatedId(created.Value.Id.Value);
         db.CreateRequests.Add(IdempotentCreates.Record(c.IdempotencyKey, Kind, fingerprint, outcome, now));
         try
         {

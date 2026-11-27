@@ -18,6 +18,6 @@ internal sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departm
         builder.Property(d => d.Version).IsRowVersion();
         builder.HasIndex(d => d.Name).IsUnique().HasDatabaseName("ux_departments_name");
 
-        builder.HasData(DictionarySeed.Departments.Select(d => new { d.Id, d.Name, d.Icon, d.SortOrder, d.IsFallback }));
+        builder.HasData(DictionarySeed.Departments.Select(d => new { Id = new DepartmentId(d.Id), d.Name, d.Icon, d.SortOrder, d.IsFallback }));
     }
 }

@@ -17,7 +17,7 @@ public sealed class CreateTodoCategoryHandler(ITodosDbContext db, TimeProvider c
             return CategoryErrors.NameTaken;
 
         var last = await db.Categories.MaxAsync(x => (int?)x.SortOrder, cancellationToken) ?? 0;
-        var created = TodoCategory.Create(Guid.CreateVersion7(clock.GetUtcNow()), c.Name, c.Emoji, last + 10);
+        var created = TodoCategory.Create(TodoCategoryId.New(clock.GetUtcNow()), c.Name, c.Emoji, last + 10);
         if (created.IsFailure)
             return created.Error!;
 
@@ -32,6 +32,6 @@ public sealed class CreateTodoCategoryHandler(ITodosDbContext db, TimeProvider c
             return CategoryErrors.NameTaken;
         }
 
-        return new TodoCreated(created.Value.Id);
+        return new TodoCreated(created.Value.Id.Value);
     }
 }

@@ -11,12 +11,12 @@ public sealed class DeleteTodoCategoryHandler(ITodosDbContext db) : ICommandHand
     public async ValueTask<Result> Handle(DeleteTodoCategoryCommand c, CancellationToken cancellationToken)
     {
         // One conditional DELETE; the database clears category_id of its tasks (ON DELETE SET NULL).
-        var deleted = await db.Categories.Where(x => x.Id == c.Id && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.Categories.Where(x => x.Id == new TodoCategoryId(c.Id) && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
         if (deleted > 0)
             return Result.Success();
 
-        return await db.Categories.AnyAsync(x => x.Id == c.Id, cancellationToken)
+        return await db.Categories.AnyAsync(x => x.Id == new TodoCategoryId(c.Id), cancellationToken)
             ? TodoErrors.ChangedMeanwhile
-            : CategoryErrors.NotFound(c.Id);
+            : CategoryErrors.NotFound(new TodoCategoryId(c.Id));
     }
 }

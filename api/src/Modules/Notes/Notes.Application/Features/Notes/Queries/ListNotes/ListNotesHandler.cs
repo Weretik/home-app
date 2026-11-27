@@ -2,6 +2,7 @@ using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Notes.Domain.Categories;
 
 namespace Notes.Application.Features.Notes.Queries.ListNotes;
 
@@ -24,7 +25,7 @@ public sealed class ListNotesHandler(INotesDbContext db) : IQueryHandler<ListNot
         }
 
         if (query.CategoryId is { } categoryId)
-            notes = notes.Where(n => n.CategoryId == categoryId);
+            notes = notes.Where(n => n.CategoryId == new NoteCategoryId(categoryId));
         else if (query.WithoutCategory)
             notes = notes.Where(n => n.CategoryId == null);
 

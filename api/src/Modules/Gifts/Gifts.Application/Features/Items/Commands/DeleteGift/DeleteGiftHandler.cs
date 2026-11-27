@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Gifts.Contracts;
 using Gifts.Domain.Wishlist;
+using Gifts.Domain.Wishlist.Identifiers;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +15,12 @@ public sealed class DeleteGiftHandler(IGiftsDbContext db) : ICommandHandler<Dele
 {
     public async ValueTask<Result> Handle(DeleteGiftCommand c, CancellationToken cancellationToken)
     {
-        var gift = await db.Gifts.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var gift = await db.Gifts.FirstOrDefaultAsync(x => x.Id == new GiftId(c.Id), cancellationToken);
         if (gift is null)
-            return GiftErrors.NotFound(c.Id);
+            return GiftErrors.NotFound(new GiftId(c.Id));
 
         if (gift.IsPurchasePlanned)
-            db.Publish(new GiftPurchaseClosed(gift.Id, GiftPurchaseOutcome.Deleted));
+            db.Publish(new GiftPurchaseClosed(gift.Id.Value, GiftPurchaseOutcome.Deleted));
         db.Gifts.Remove(gift);
         try
         {
@@ -28,7 +29,7 @@ public sealed class DeleteGiftHandler(IGiftsDbContext db) : ICommandHandler<Dele
         catch (DbUpdateConcurrencyException)
         {
             // Someone deleted it between the read and the save.
-            return GiftErrors.NotFound(c.Id);
+            return GiftErrors.NotFound(new GiftId(c.Id));
         }
 
         return Result.Success();

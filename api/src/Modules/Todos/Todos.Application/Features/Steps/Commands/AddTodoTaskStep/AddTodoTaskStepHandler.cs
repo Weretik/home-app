@@ -19,7 +19,7 @@ public sealed class AddTodoTaskStepHandler(ITodosDbContext db, TimeProvider cloc
                 if (added.IsFailure)
                     return added.Error!;
 
-                stepId = added.Value.Id;
+                stepId = added.Value.Id.Value;
                 return Result.Success();
             },
             cancellationToken);

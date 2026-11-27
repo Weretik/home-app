@@ -7,7 +7,7 @@ namespace Identity.Domain.Sessions;
 /// lives <see cref="Lifetime"/> after its last use; using it slides the expiry, writing at most once per
 /// <see cref="TouchInterval"/>. Sign-out revokes it.
 /// </summary>
-public sealed class Session : Entity<Guid>, IAggregateRoot
+public sealed class Session : Entity<SessionId>, IAggregateRoot
 {
     public const int TokenHashLength = 64;
     public const int MaxEmailLength = 320;
@@ -45,7 +45,7 @@ public sealed class Session : Entity<Guid>, IAggregateRoot
 
     public static Session Start(string tokenHash, MemberProfile member, DateTimeOffset now) => new()
     {
-        Id = Guid.CreateVersion7(now),
+        Id = SessionId.New(now),
         TokenHash = tokenHash,
         Email = member.Email,
         Name = Cut(member.Name, MaxNameLength) ?? member.Email,

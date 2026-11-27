@@ -30,7 +30,7 @@ public sealed class IncomeAndCategoryTests
     [InlineData("   ")]
     public void A_Category_NeedsAName(string name)
     {
-        var result = Category.Create(Guid.NewGuid(), name, 10);
+        var result = Category.Create(new CategoryId(Guid.NewGuid()), name, 10);
 
         Assert.Equal("expenses.category_name_required", result.Error!.Code);
     }
@@ -38,7 +38,7 @@ public sealed class IncomeAndCategoryTests
     [Fact]
     public void A_Category_Name_IsTrimmed()
     {
-        var result = Category.Create(Guid.NewGuid(), " Продукты ", 10);
+        var result = Category.Create(new CategoryId(Guid.NewGuid()), " Продукты ", 10);
 
         Assert.Equal("Продукты", result.Value.Name);
     }

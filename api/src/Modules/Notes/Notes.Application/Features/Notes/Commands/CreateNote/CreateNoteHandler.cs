@@ -23,17 +23,18 @@ public sealed class CreateNoteHandler(INotesDbContext db, TimeProvider clock, IC
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (c.CategoryId is { } categoryId && !await db.Categories.AnyAsync(x => x.Id == categoryId, cancellationToken))
-            return CategoryErrors.NotFound(categoryId);
+        var categoryId = c.CategoryId is { } value ? new NoteCategoryId(value) : (NoteCategoryId?)null;
+        if (categoryId is { } category && !await db.Categories.AnyAsync(x => x.Id == category, cancellationToken))
+            return CategoryErrors.NotFound(category);
 
         var now = clock.GetUtcNow();
         var created = Note.Create(
-            c.About, c.Kind, c.Title, c.Details, c.Place, c.IsImportant, c.CategoryId, NoteAuthors.Of(member), now);
+            c.About, c.Kind, c.Title, c.Details, c.Place, c.IsImportant, categoryId, NoteAuthors.Of(member), now);
         if (created.IsFailure)
             return created.Error!;
 
         db.Notes.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -45,6 +46,6 @@ public sealed class CreateNoteHandler(INotesDbContext db, TimeProvider clock, IC
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new NoteCreated(created.Value.Id);
+        return new NoteCreated(created.Value.Id.Value);
     }
 }

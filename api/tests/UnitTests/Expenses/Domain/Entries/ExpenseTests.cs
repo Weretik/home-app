@@ -1,3 +1,4 @@
+using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 
@@ -6,7 +7,7 @@ namespace UnitTests.Expenses.Domain.Entries;
 public sealed class ExpenseTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 12, 0, 0, TimeSpan.Zero);
-    private static readonly Guid Groceries = Guid.NewGuid();
+    private static readonly CategoryId Groceries = new(Guid.NewGuid());
 
     [Fact]
     public void A_Valid_Expense_IsCreated_WithATrimmedComment()

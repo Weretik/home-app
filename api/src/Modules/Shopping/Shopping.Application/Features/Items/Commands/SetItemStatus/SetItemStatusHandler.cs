@@ -3,6 +3,7 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Application.Features.Items.Views;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Items.Commands.SetItemStatus;
 
@@ -12,10 +13,10 @@ public sealed class SetItemStatusHandler(IShoppingDbContext db, TimeProvider clo
     public async ValueTask<Result<ShoppingItemView>> Handle(SetItemStatusCommand c, CancellationToken cancellationToken)
     {
         var window = await ItemWindow.ReadAsync(db, clock, cancellationToken);
-        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == c.Id, cancellationToken);
+        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == new ShoppingItemId(c.Id), cancellationToken);
         // History no longer changes: «вернуть в список» is an add.
         if (item is null || !CartWindow.IsInList(item, window.Cutoff))
-            return ShoppingItemErrors.NotFound(c.Id);
+            return ShoppingItemErrors.NotFound(new ShoppingItemId(c.Id));
 
         item.SetStatus(c.Status, c.By, window.Now);
         try

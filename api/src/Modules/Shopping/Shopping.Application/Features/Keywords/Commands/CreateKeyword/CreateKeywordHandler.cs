@@ -18,11 +18,11 @@ public sealed class CreateKeywordHandler(IShoppingDbContext db, TimeProvider clo
         if (await IdempotentCreates.EarlierOutcomeAsync<ShoppingCreatedId>(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (!await db.Departments.AnyAsync(d => d.Id == c.DepartmentId, cancellationToken))
-            return DepartmentErrors.NotFound(c.DepartmentId);
+        if (!await db.Departments.AnyAsync(d => d.Id == new DepartmentId(c.DepartmentId), cancellationToken))
+            return DepartmentErrors.NotFound(new DepartmentId(c.DepartmentId));
 
         var now = clock.GetUtcNow();
-        var created = DepartmentKeyword.Create(c.Keyword, c.DepartmentId, learned: false, now);
+        var created = DepartmentKeyword.Create(c.Keyword, new DepartmentId(c.DepartmentId), learned: false, now);
         if (created.IsFailure)
             return created.Error!;
         var keyword = created.Value.Keyword;
@@ -30,7 +30,7 @@ public sealed class CreateKeywordHandler(IShoppingDbContext db, TimeProvider clo
             return DepartmentErrors.KeywordTaken;
 
         db.Keywords.Add(created.Value);
-        var outcome = new ShoppingCreatedId(created.Value.Id);
+        var outcome = new ShoppingCreatedId(created.Value.Id.Value);
         db.CreateRequests.Add(IdempotentCreates.Record(c.IdempotencyKey, Kind, fingerprint, outcome, now));
         try
         {

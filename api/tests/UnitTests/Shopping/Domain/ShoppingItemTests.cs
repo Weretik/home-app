@@ -1,11 +1,14 @@
+using System;
+using Shopping.Domain.Departments;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace UnitTests.Shopping.Domain;
 
 public sealed class ShoppingItemTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 10, 0, 0, TimeSpan.Zero);
-    private static readonly Guid Dairy = Guid.NewGuid();
+    private static readonly DepartmentId Dairy = new(Guid.NewGuid());
 
     [Fact]
     public void A_NewItem_IsNeeded_WithItsNormalisedName()
@@ -108,7 +111,7 @@ public sealed class ShoppingItemTests
     public void An_Edit_ReplacesTheFields_AndTheNormalisedName()
     {
         var item = New();
-        var other = Guid.NewGuid();
+        var other = new DepartmentId(Guid.NewGuid());
 
         var result = item.Update(" Сливки 10% ", "", " к кофе ", other, urgent: true);
 
@@ -126,7 +129,7 @@ public sealed class ShoppingItemTests
     {
         var item = New();
 
-        var result = item.Update(" ", null, null, Guid.NewGuid(), true);
+        var result = item.Update(" ", null, null, new DepartmentId(Guid.NewGuid()), true);
 
         Assert.Equal("shopping.item_name_required", result.Error!.Code);
         Assert.Equal("Молоко", item.Name);

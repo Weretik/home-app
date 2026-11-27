@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Outbox;
 using Gifts.Domain.Wishlist;
+using Gifts.Domain.Wishlist.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Todos.Contracts;
 
@@ -17,7 +18,7 @@ public sealed class TodoTaskCompletedHandler(IGiftsDbContext db, TimeProvider cl
         if (message.SourceKind != TodoTaskCompleted.GiftSource)
             return;
 
-        var gift = await db.Gifts.FirstOrDefaultAsync(g => g.Id == message.SourceId, cancellationToken);
+        var gift = await db.Gifts.FirstOrDefaultAsync(g => g.Id == new GiftId(message.SourceId), cancellationToken);
         if (gift is null || gift.Status != GiftStatus.Wanted)
             return;
 

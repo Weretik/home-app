@@ -11,14 +11,14 @@ public sealed class UpdateDepartmentHandler(IShoppingDbContext db) : ICommandHan
 {
     public async ValueTask<Result> Handle(UpdateDepartmentCommand c, CancellationToken cancellationToken)
     {
-        var department = await db.Departments.FirstOrDefaultAsync(d => d.Id == c.Id, cancellationToken);
+        var department = await db.Departments.FirstOrDefaultAsync(d => d.Id == new DepartmentId(c.Id), cancellationToken);
         if (department is null)
-            return DepartmentErrors.NotFound(c.Id);
+            return DepartmentErrors.NotFound(new DepartmentId(c.Id));
         if (department.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
 
         var name = c.Name.Trim();
-        if (await db.Departments.AnyAsync(d => d.Name == name && d.Id != c.Id, cancellationToken))
+        if (await db.Departments.AnyAsync(d => d.Name == name && d.Id != new DepartmentId(c.Id), cancellationToken))
             return DepartmentErrors.NameTaken;
 
         var renamed = department.Rename(name, c.Icon);

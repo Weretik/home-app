@@ -69,9 +69,9 @@ public sealed class RunTickHandler(
             var delivery = Delivery.Plan(key, channel, message.Kind, message.Audience, message.ChatId, now);
             db.Deliveries.Add(delivery);
             if (channel == DeliveryChannel.Push)
-                db.Publish(new PushMessage(delivery.Id, message.Audience, PushTexts.For(message)));
+                db.Publish(new PushMessage(delivery.Id.Value, message.Audience, PushTexts.For(message)));
             else
-                db.Publish(new TelegramMessage(delivery.Id, message.ChatId, message.Text, message.Buttons));
+                db.Publish(new TelegramMessage(delivery.Id.Value, message.ChatId, message.Text, message.Buttons));
         }
 
         try

@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using Gifts.Domain.Categories;
 using Gifts.Domain.People;
 using Gifts.Domain.Wishlist;
 
@@ -7,7 +8,7 @@ namespace UnitTests.Gifts.Domain;
 public sealed class GiftTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 12, 0, 0, TimeSpan.Zero);
-    private static readonly Guid Jewellery = Guid.NewGuid();
+    private static readonly CategoryId Jewellery = new(Guid.NewGuid());
 
     private static Result<Gift> Create(
         string name = "Кольцо",

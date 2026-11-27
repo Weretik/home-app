@@ -1,6 +1,8 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Gifts.Domain.Categories;
 using Gifts.Domain.People;
+using Gifts.Domain.Wishlist.Identifiers;
 
 namespace Gifts.Domain.Wishlist;
 
@@ -9,7 +11,7 @@ namespace Gifts.Domain.Wishlist;
 /// (other shops or models, each with a link). It is <see cref="GiftStatus.Wanted"/> until it is gifted or dropped,
 /// then it is in the archive.
 /// </summary>
-public sealed class Gift : Entity<Guid>, IAggregateRoot
+public sealed class Gift : Entity<GiftId>, IAggregateRoot
 {
     public const int MaxNameLength = 200;
     public const int MaxLinkLength = 2000;
@@ -31,7 +33,7 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
 
     public string Name { get; private set; } = string.Empty;
 
-    public Guid CategoryId { get; private set; }
+    public CategoryId CategoryId { get; private set; }
 
     public Priority Priority { get; private set; }
 
@@ -74,7 +76,7 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
     public static Result<Gift> Create(
         Recipient recipient,
         string name,
-        Guid categoryId,
+        CategoryId categoryId,
         Priority priority,
         decimal? price,
         string? link,
@@ -84,7 +86,7 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
         IReadOnlyList<VariantDraft> variants,
         DateTimeOffset now)
     {
-        var gift = new Gift { Id = Guid.CreateVersion7(now), Status = GiftStatus.Wanted, CreatedAtUtc = now };
+        var gift = new Gift { Id = GiftId.New(now), Status = GiftStatus.Wanted, CreatedAtUtc = now };
         var set = gift.Update(recipient, name, categoryId, priority, price, link, occasion, occasionDate, notes, variants, now);
         return set.IsFailure ? set.Error! : gift;
     }
@@ -96,7 +98,7 @@ public sealed class Gift : Entity<Guid>, IAggregateRoot
     public Result Update(
         Recipient recipient,
         string name,
-        Guid categoryId,
+        CategoryId categoryId,
         Priority priority,
         decimal? price,
         string? link,

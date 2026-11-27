@@ -17,12 +17,12 @@ public sealed class ListPlannedExpensesHandler(IExpensesDbContext db)
             .OrderBy(x => x.Plan.Name)
             .ThenBy(x => x.Plan.Id)
             .Select(x => new PlannedExpenseItem(
-                x.Plan.Id,
+                x.Plan.Id.Value,
                 x.Plan.Version,
                 x.Plan.Month.Year,
                 x.Plan.Month.Month,
                 x.Plan.Name,
-                x.Plan.CategoryId,
+                x.Plan.CategoryId.Value,
                 x.CategoryName,
                 x.Plan.Payer,
                 x.Plan.Amount))

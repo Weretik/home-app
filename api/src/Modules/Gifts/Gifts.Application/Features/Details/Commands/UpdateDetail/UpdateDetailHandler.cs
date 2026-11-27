@@ -9,9 +9,9 @@ public sealed class UpdateDetailHandler(IGiftsDbContext db) : ICommandHandler<Up
 {
     public async ValueTask<Result> Handle(UpdateDetailCommand c, CancellationToken cancellationToken)
     {
-        var detail = await db.Details.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var detail = await db.Details.FirstOrDefaultAsync(x => x.Id == new DetailId(c.Id), cancellationToken);
         if (detail is null)
-            return DetailErrors.NotFound(c.Id);
+            return DetailErrors.NotFound(new DetailId(c.Id));
         if (detail.Version != c.Version)
             return DetailErrors.ChangedMeanwhile;
 

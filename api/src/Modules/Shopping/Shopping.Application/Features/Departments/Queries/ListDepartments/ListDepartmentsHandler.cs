@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Departments.Queries.ListDepartments;
 
@@ -23,7 +24,7 @@ public sealed class ListDepartmentsHandler(IShoppingDbContext db)
 
         return departments
             .Select(d => new DepartmentItem(
-                d.Id, d.Name, d.Icon, d.SortOrder, d.IsFallback, keywords.GetValueOrDefault(d.Id), needed.GetValueOrDefault(d.Id), d.Version))
+                d.Id.Value, d.Name, d.Icon, d.SortOrder, d.IsFallback, keywords.GetValueOrDefault(d.Id), needed.GetValueOrDefault(d.Id), d.Version))
             .ToList();
     }
 }

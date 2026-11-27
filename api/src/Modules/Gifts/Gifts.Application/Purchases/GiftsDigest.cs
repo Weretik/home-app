@@ -16,6 +16,6 @@ public sealed class GiftsDigest(IGiftsDbContext db, GiftLinks links) : IGiftsDig
             .Select(g => new { g.Id, g.Name, g.Recipient, Giver = g.Giver!.Value, BuyBy = g.BuyBy!.Value })
             .ToListAsync(cancellationToken);
 
-        return [.. rows.Select(g => new GiftPurchase(g.Id, g.Name, g.Recipient.ToParty(), g.Giver.ToParty(), g.BuyBy, links.For(g.Id)))];
+        return [.. rows.Select(g => new GiftPurchase(g.Id.Value, g.Name, g.Recipient.ToParty(), g.Giver.ToParty(), g.BuyBy, links.For(g.Id.Value)))];
     }
 }

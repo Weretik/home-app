@@ -10,13 +10,13 @@ namespace Shopping.Application.Features.Dictionary;
 /// </summary>
 public sealed class DepartmentDictionary
 {
-    private DepartmentDictionary(IReadOnlyDictionary<Guid, Department> departments, DepartmentMatcher matcher)
+    private DepartmentDictionary(IReadOnlyDictionary<DepartmentId, Department> departments, DepartmentMatcher matcher)
     {
         Departments = departments;
         Matcher = matcher;
     }
 
-    public IReadOnlyDictionary<Guid, Department> Departments { get; }
+    public IReadOnlyDictionary<DepartmentId, Department> Departments { get; }
 
     public DepartmentMatcher Matcher { get; }
 

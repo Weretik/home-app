@@ -16,7 +16,7 @@ Code: [`src/Modules/Shopping`](../../src/Modules/Shopping). Schema: `shopping`.
 ```mermaid
 classDiagram
     class Department {
-        Guid Id
+        DepartmentId Id
         string Name  unique
         string Icon
         int SortOrder
@@ -24,20 +24,20 @@ classDiagram
         uint Version
     }
     class DepartmentKeyword {
-        Guid Id
+        DepartmentKeywordId Id
         string Keyword  unique, normalised
-        Guid DepartmentId
+        DepartmentId DepartmentId
         bool Learned
         DateTimeOffset CreatedAtUtc
         uint Version
     }
     class ShoppingItem {
-        Guid Id
+        ShoppingItemId Id
         string Name
         string NormalizedName
         string? Quantity
         string? Note
-        Guid DepartmentId
+        DepartmentId DepartmentId
         bool Urgent
         ShoppingItemStatus Status
         Person AddedBy
@@ -49,7 +49,7 @@ classDiagram
         uint Version
     }
     class ShoppingSettings {
-        Guid Id  singleton
+        ShoppingSettingsId Id  singleton
         int CartKeepHours
         int FrequentDays
         uint Version

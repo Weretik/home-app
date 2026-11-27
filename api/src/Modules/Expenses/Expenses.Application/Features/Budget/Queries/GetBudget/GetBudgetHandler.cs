@@ -29,7 +29,7 @@ public sealed class GetBudgetHandler(IExpensesDbContext db, TimeProvider clock) 
             settings.SavingsGoal,
             settings.LimitsFrom,
             limits.Select(l => new SpendingLimitItem(
-                l.Id, l.Version, l.Name, l.Period, l.AmountFor(LimitCarryOver.PeriodStart(l.Period, today)), l.Amounts.Steps, l.CategoryIds))
+                l.Id.Value, l.Version, l.Name, l.Period, l.AmountFor(LimitCarryOver.PeriodStart(l.Period, today)), l.Amounts.Steps, l.CategoryIds.Select(id => id.Value).ToList()))
                 .ToList());
     }
 }

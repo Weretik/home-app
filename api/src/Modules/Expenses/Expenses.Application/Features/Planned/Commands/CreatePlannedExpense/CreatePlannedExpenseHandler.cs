@@ -19,16 +19,16 @@ public sealed class CreatePlannedExpenseHandler(IExpensesDbContext db, TimeProvi
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
-            return CategoryErrors.NotFoundById(c.CategoryId);
+        if (!await db.Categories.AnyAsync(x => x.Id == new CategoryId(c.CategoryId), cancellationToken))
+            return CategoryErrors.NotFoundById(new CategoryId(c.CategoryId));
 
         var now = clock.GetUtcNow();
-        var created = PlannedExpense.Create(new DateOnly(c.Year, c.Month, 1), c.Name, c.CategoryId, c.Payer, c.Amount, now);
+        var created = PlannedExpense.Create(new DateOnly(c.Year, c.Month, 1), c.Name, new CategoryId(c.CategoryId), c.Payer, c.Amount, now);
         if (created.IsFailure)
             return created.Error!;
 
         db.PlannedExpenses.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -40,6 +40,6 @@ public sealed class CreatePlannedExpenseHandler(IExpensesDbContext db, TimeProvi
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new CreatedEntry(created.Value.Id);
+        return new CreatedEntry(created.Value.Id.Value);
     }
 }

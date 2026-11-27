@@ -7,7 +7,7 @@ namespace Todos.Domain.Categories;
 /// A group of tasks such as «Дом» or «Ремонт». Categories are data the family adds, renames and deletes; the name
 /// is unique without regard to case. Deleting one leaves its tasks without a category.
 /// </summary>
-public sealed class TodoCategory : Entity<Guid>, IAggregateRoot
+public sealed class TodoCategory : Entity<TodoCategoryId>, IAggregateRoot
 {
     public const int MaxNameLength = 50;
     public const int MaxEmojiLength = 8;
@@ -27,7 +27,7 @@ public sealed class TodoCategory : Entity<Guid>, IAggregateRoot
     /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
     public uint Version { get; private set; }
 
-    public static Result<TodoCategory> Create(Guid id, string name, string? emoji, int sortOrder)
+    public static Result<TodoCategory> Create(TodoCategoryId id, string name, string? emoji, int sortOrder)
     {
         var check = Check(name, emoji);
         if (check.IsFailure)

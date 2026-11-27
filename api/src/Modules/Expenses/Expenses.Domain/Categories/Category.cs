@@ -7,7 +7,7 @@ namespace Expenses.Domain.Categories;
 /// What an expense was for. Categories are data, not a fixed list: the family renames, adds and merges them, as
 /// they did in the old «Справочник» sheet. The name is unique and is shown in Russian as typed.
 /// </summary>
-public sealed class Category : Entity<Guid>, IAggregateRoot
+public sealed class Category : Entity<CategoryId>, IAggregateRoot
 {
     public const int MaxNameLength = 100;
 
@@ -20,7 +20,7 @@ public sealed class Category : Entity<Guid>, IAggregateRoot
     /// <summary>The position in lists and pickers, as in the old sheet.</summary>
     public int SortOrder { get; private set; }
 
-    public static Result<Category> Create(Guid id, string name, int sortOrder)
+    public static Result<Category> Create(CategoryId id, string name, int sortOrder)
     {
         var check = CheckName(name);
         if (check.IsFailure)

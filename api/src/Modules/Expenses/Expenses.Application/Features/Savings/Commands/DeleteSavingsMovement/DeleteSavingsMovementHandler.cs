@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Savings;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ public sealed class DeleteSavingsMovementHandler(IExpensesDbContext db) : IComma
 {
     public async ValueTask<Result> Handle(DeleteSavingsMovementCommand c, CancellationToken cancellationToken)
     {
-        var deleted = await db.SavingsMovements.Where(x => x.Id == c.Id).ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.SavingsMovements.Where(x => x.Id == new SavingsMovementId(c.Id)).ExecuteDeleteAsync(cancellationToken);
         return deleted == 0 ? EntryErrors.NotFound("savings_movement", c.Id) : Result.Success();
     }
 }

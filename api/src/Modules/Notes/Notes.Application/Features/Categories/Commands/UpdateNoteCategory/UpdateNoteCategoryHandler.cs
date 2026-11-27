@@ -11,14 +11,14 @@ public sealed class UpdateNoteCategoryHandler(INotesDbContext db) : ICommandHand
 {
     public async ValueTask<Result> Handle(UpdateNoteCategoryCommand c, CancellationToken cancellationToken)
     {
-        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == new NoteCategoryId(c.Id), cancellationToken);
         if (category is null)
-            return CategoryErrors.NotFound(c.Id);
+            return CategoryErrors.NotFound(new NoteCategoryId(c.Id));
         if (category.Version != c.Version)
             return NoteErrors.ChangedMeanwhile;
 
         var name = c.Name.Trim().ToLowerInvariant();
-        if (await db.Categories.AnyAsync(x => x.Id != c.Id && x.Name.ToLower() == name, cancellationToken))
+        if (await db.Categories.AnyAsync(x => x.Id != new NoteCategoryId(c.Id) && x.Name.ToLower() == name, cancellationToken))
             return CategoryErrors.NameTaken;
 
         var renamed = category.Rename(c.Name, c.Emoji);

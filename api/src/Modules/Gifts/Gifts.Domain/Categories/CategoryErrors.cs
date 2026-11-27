@@ -16,6 +16,6 @@ public static class CategoryErrors
     public static readonly Error InUse =
         Error.Conflict("gifts.category_in_use", "Цю категорію мають подарунки; спершу перенесіть їх в іншу категорію.");
 
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(CategoryId id) =>
         Error.NotFound("gifts.category_not_found", $"Категорії подарунків {id} немає.");
 }

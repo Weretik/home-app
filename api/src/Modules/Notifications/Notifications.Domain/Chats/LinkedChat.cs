@@ -7,7 +7,7 @@ namespace Notifications.Domain.Chats;
 /// or adding the bot to a group) and unlinked on the site; unique indexes keep one chat per audience and one audience
 /// per chat (ADR 0036).
 /// </summary>
-public sealed class LinkedChat : Entity<Guid>, IAggregateRoot
+public sealed class LinkedChat : Entity<LinkedChatId>, IAggregateRoot
 {
     public const int MaxTitleLength = 200;
 
@@ -27,7 +27,7 @@ public sealed class LinkedChat : Entity<Guid>, IAggregateRoot
 
     public static LinkedChat Link(Audience audience, long chatId, string? title, DateTimeOffset now) => new()
     {
-        Id = Guid.CreateVersion7(now),
+        Id = LinkedChatId.New(now),
         Audience = audience,
         ChatId = chatId,
         Title = Shorten(title),

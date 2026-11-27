@@ -12,17 +12,18 @@ public sealed class UpdateNoteHandler(INotesDbContext db, TimeProvider clock, IC
 {
     public async ValueTask<Result> Handle(UpdateNoteCommand c, CancellationToken cancellationToken)
     {
-        var note = await db.Notes.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var note = await db.Notes.FirstOrDefaultAsync(x => x.Id == new NoteId(c.Id), cancellationToken);
         if (note is null)
-            return NoteErrors.NoteNotFound(c.Id);
+            return NoteErrors.NoteNotFound(new NoteId(c.Id));
         if (note.Version != c.Version)
             return NoteErrors.ChangedMeanwhile;
 
-        if (c.CategoryId is { } categoryId && !await db.Categories.AnyAsync(x => x.Id == categoryId, cancellationToken))
-            return CategoryErrors.NotFound(categoryId);
+        var categoryId = c.CategoryId is { } value ? new NoteCategoryId(value) : (NoteCategoryId?)null;
+        if (categoryId is { } category && !await db.Categories.AnyAsync(x => x.Id == category, cancellationToken))
+            return CategoryErrors.NotFound(category);
 
         var updated = note.Update(
-            c.About, c.Kind, c.Title, c.Details, c.Place, c.IsImportant, c.CategoryId, NoteAuthors.Of(member), clock.GetUtcNow());
+            c.About, c.Kind, c.Title, c.Details, c.Place, c.IsImportant, categoryId, NoteAuthors.Of(member), clock.GetUtcNow());
         if (updated.IsFailure)
             return updated;
 

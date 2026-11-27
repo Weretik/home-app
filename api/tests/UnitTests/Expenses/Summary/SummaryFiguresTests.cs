@@ -1,6 +1,7 @@
 using Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 using Expenses.Domain.Budget;
 using Expenses.Domain.Budget.Amounts;
+using Expenses.Domain.Categories;
 
 namespace UnitTests.Expenses.Summary;
 
@@ -10,15 +11,15 @@ namespace UnitTests.Expenses.Summary;
 /// </summary>
 public sealed class SummaryFiguresTests
 {
-    private static readonly Guid Pets = Guid.NewGuid();
-    private static readonly Guid Groceries = Guid.NewGuid();
+    private static readonly CategoryId Pets = new(Guid.NewGuid());
+    private static readonly CategoryId Groceries = new(Guid.NewGuid());
     private static readonly DateOnly LimitsFrom = new(2026, 11, 1);
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 10, 0, 0, TimeSpan.Zero);
 
-    private static SpendingLimit Limit(LimitPeriod period, decimal amount, Guid category) =>
+    private static SpendingLimit Limit(LimitPeriod period, decimal amount, CategoryId category) =>
         SpendingLimit.Create("limit", period, amount, [category], 10, Now).Value;
 
-    private static CategoryMonthAmount Row(Guid category, int year, int month, decimal amount) =>
+    private static CategoryMonthAmount Row(CategoryId category, int year, int month, decimal amount) =>
         new(category, new DateOnly(year, month, 1), amount);
 
     [Fact]

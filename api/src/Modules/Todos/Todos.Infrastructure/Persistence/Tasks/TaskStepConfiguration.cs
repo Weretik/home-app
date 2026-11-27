@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Infrastructure.Persistence.Tasks;
 
@@ -11,7 +12,7 @@ internal sealed class TaskStepConfiguration : IEntityTypeConfiguration<TaskStep>
         builder.ToTable("task_steps");
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).HasColumnName("id").ValueGeneratedNever();
-        builder.Property<Guid>("TaskId").HasColumnName("task_id");
+        builder.Property<TodoTaskId>("TaskId").HasColumnName("task_id");
         builder.Property(s => s.Title).HasColumnName("title").HasMaxLength(TodoTask.MaxTitleLength).IsRequired();
         builder.Property(s => s.IsDone).HasColumnName("is_done");
         builder.Property(s => s.SortOrder).HasColumnName("sort_order");

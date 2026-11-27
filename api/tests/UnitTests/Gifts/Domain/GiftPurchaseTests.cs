@@ -1,5 +1,6 @@
 using Gifts.Application.Purchases;
 using Gifts.Contracts;
+using Gifts.Domain.Categories;
 using Gifts.Domain.People;
 using Gifts.Domain.Wishlist;
 
@@ -12,7 +13,7 @@ public sealed class GiftPurchaseTests
     private static readonly GiftLinks Links = new("https://web.example/");
 
     private static Gift Ring() =>
-        Gift.Create(Recipient.Maria, "Кольцо", Guid.NewGuid(), Priority.High, null, null, null, null, null, [], Now).Value;
+        Gift.Create(Recipient.Maria, "Кольцо", new CategoryId(Guid.NewGuid()), Priority.High, null, null, null, null, null, [], Now).Value;
 
     [Fact]
     public void A_Gift_IsPlanned_WhenWanted_WithAGiverAndABuyByDate()
@@ -64,7 +65,7 @@ public sealed class GiftPurchaseTests
 
         gift.ChangeStatus(status, status == GiftStatus.Gifted ? Today : null, Today);
 
-        Assert.Equal(new GiftPurchaseClosed(gift.Id, outcome), PurchasePlan.Change(before, gift, Links));
+        Assert.Equal(new GiftPurchaseClosed(gift.Id.Value, outcome), PurchasePlan.Change(before, gift, Links));
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public sealed class GiftPurchaseTests
 
         gift.PlanPurchase(null, new DateOnly(2026, 12, 20));
 
-        Assert.Equal(new GiftPurchaseClosed(gift.Id, GiftPurchaseOutcome.Unplanned), PurchasePlan.Change(before, gift, Links));
+        Assert.Equal(new GiftPurchaseClosed(gift.Id.Value, GiftPurchaseOutcome.Unplanned), PurchasePlan.Change(before, gift, Links));
         Assert.Null(PurchasePlan.Change(null, gift, Links));
     }
 }

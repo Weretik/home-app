@@ -1,5 +1,7 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Categories;
+using Expenses.Domain.Entries.Identifiers;
 using Expenses.Domain.Parties;
 
 namespace Expenses.Domain.Entries;
@@ -8,7 +10,7 @@ namespace Expenses.Domain.Entries;
 /// Money spent: one row of the old «Расходы» sheet. It belongs to a category of the same module and is booked to a
 /// person or to the household (<see cref="Payer"/>).
 /// </summary>
-public sealed class Expense : Entity<Guid>, IAggregateRoot
+public sealed class Expense : Entity<ExpenseId>, IAggregateRoot
 {
     private Expense()
     {
@@ -18,7 +20,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
 
     public Payer Payer { get; private set; }
 
-    public Guid CategoryId { get; private set; }
+    public CategoryId CategoryId { get; private set; }
 
     public decimal Amount { get; private set; }
 
@@ -43,7 +45,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
     public static Result<Expense> Create(
         DateOnly date,
         Payer payer,
-        Guid categoryId,
+        CategoryId categoryId,
         decimal amount,
         PaymentMethod paymentMethod,
         string? comment,
@@ -57,7 +59,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
 
         return new Expense
         {
-            Id = Guid.CreateVersion7(now),
+            Id = ExpenseId.New(now),
             Date = date,
             Payer = payer,
             CategoryId = categoryId,
@@ -74,7 +76,7 @@ public sealed class Expense : Entity<Guid>, IAggregateRoot
     public Result Update(
         DateOnly date,
         Payer payer,
-        Guid categoryId,
+        CategoryId categoryId,
         decimal amount,
         PaymentMethod paymentMethod,
         string? comment,

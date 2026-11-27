@@ -12,6 +12,6 @@ public static class TaskCompletion
     public static void PublishIfCompleted(ITodosDbContext db, TodoTask task, TodoStatus statusBefore)
     {
         if (statusBefore != TodoStatus.Done && task.Status == TodoStatus.Done && task is { SourceKind: { } kind, SourceId: { } id })
-            db.Publish(new TodoTaskCompleted(task.Id, kind, id));
+            db.Publish(new TodoTaskCompleted(task.Id.Value, kind, id.Value));
     }
 }

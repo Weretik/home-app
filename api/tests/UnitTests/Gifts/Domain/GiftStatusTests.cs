@@ -1,4 +1,5 @@
 using Gifts.Application;
+using Gifts.Domain.Categories;
 using Gifts.Domain.People;
 using Gifts.Domain.Wishlist;
 using Microsoft.Extensions.Time.Testing;
@@ -11,7 +12,7 @@ public sealed class GiftStatusTests
     private static readonly DateOnly Today = new(2026, 11, 26);
 
     private static Gift NewGift() =>
-        Gift.Create(Recipient.Vitaliy, "Наушники", Guid.NewGuid(), Priority.Normal, 3_000m, null, null, null, null, [], Now).Value;
+        Gift.Create(Recipient.Vitaliy, "Наушники", new CategoryId(Guid.NewGuid()), Priority.Normal, 3_000m, null, null, null, null, [], Now).Value;
 
     [Fact]
     public void Gifted_WithoutADay_IsGivenToday()

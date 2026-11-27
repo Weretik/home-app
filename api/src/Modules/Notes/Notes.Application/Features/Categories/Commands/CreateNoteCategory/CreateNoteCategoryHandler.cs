@@ -17,7 +17,7 @@ public sealed class CreateNoteCategoryHandler(INotesDbContext db, TimeProvider c
             return CategoryErrors.NameTaken;
 
         var last = await db.Categories.MaxAsync(x => (int?)x.SortOrder, cancellationToken) ?? 0;
-        var created = NoteCategory.Create(Guid.CreateVersion7(clock.GetUtcNow()), c.Name, c.Emoji, last + 10);
+        var created = NoteCategory.Create(NoteCategoryId.New(clock.GetUtcNow()), c.Name, c.Emoji, last + 10);
         if (created.IsFailure)
             return created.Error!;
 
@@ -32,6 +32,6 @@ public sealed class CreateNoteCategoryHandler(INotesDbContext db, TimeProvider c
             return CategoryErrors.NameTaken;
         }
 
-        return new NoteCreated(created.Value.Id);
+        return new NoteCreated(created.Value.Id.Value);
     }
 }

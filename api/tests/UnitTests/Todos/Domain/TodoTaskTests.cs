@@ -1,3 +1,5 @@
+using System;
+using Todos.Domain.Categories;
 using Todos.Domain.Parties;
 using Todos.Domain.Tasks;
 
@@ -114,7 +116,7 @@ public sealed class TodoTaskTests
     public void Update_ReplacesTheFields_AndAppliesTheStatusRules()
     {
         var task = NewTask();
-        var category = Guid.NewGuid();
+        var category = new TodoCategoryId(Guid.NewGuid());
 
         var result = task.Update(" Новое ", " заметка ", Assignee.Shared, null, TodoStatus.Done, TodoPriority.Low,
             new DateOnly(2026, 12, 1), category, Now.AddHours(3));

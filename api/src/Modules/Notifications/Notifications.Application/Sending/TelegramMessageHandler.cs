@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Outbox;
 using Microsoft.EntityFrameworkCore;
+using Notifications.Domain.Deliveries;
 
 namespace Notifications.Application.Sending;
 
@@ -15,7 +16,7 @@ public sealed class TelegramMessageHandler(INotificationsDbContext db, ITelegram
         await bot.SendAsync(message.ChatId, message.Text, message.Buttons, cancellationToken);
         var now = clock.GetUtcNow();
         await db.Deliveries
-            .Where(d => d.Id == message.DeliveryId)
+            .Where(d => d.Id == new DeliveryId(message.DeliveryId))
             .ExecuteUpdateAsync(s => s.SetProperty(d => d.SentAtUtc, (DateTimeOffset?)now), cancellationToken);
     }
 }

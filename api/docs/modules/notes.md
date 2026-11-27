@@ -14,14 +14,14 @@ Code: [`src/Modules/Notes`](../../src/Modules/Notes). Schema: `notes`.
 ```mermaid
 classDiagram
     class Note {
-        Guid Id  v7
+        NoteId Id  v7
         NotePerson About
         NoteKind Kind
         string Title
         string? Details
         string? Place
         bool IsImportant
-        Guid? CategoryId
+        NoteCategoryId? CategoryId
         NotePerson? CreatedBy
         NotePerson? UpdatedBy
         DateTimeOffset CreatedAtUtc
@@ -29,7 +29,7 @@ classDiagram
         uint Version  xmin
     }
     class NoteCategory {
-        Guid Id
+        NoteCategoryId Id
         string Name  unique (lower)
         string? Emoji
         int SortOrder

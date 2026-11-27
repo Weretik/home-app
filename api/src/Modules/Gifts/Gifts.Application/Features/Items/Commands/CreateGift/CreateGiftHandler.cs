@@ -23,12 +23,12 @@ public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock, Gi
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
-            return CategoryErrors.NotFound(c.CategoryId);
+        if (!await db.Categories.AnyAsync(x => x.Id == new CategoryId(c.CategoryId), cancellationToken))
+            return CategoryErrors.NotFound(new CategoryId(c.CategoryId));
 
         var now = clock.GetUtcNow();
         var created = Gift.Create(
-            c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants, now);
+            c.Recipient, c.Name, new CategoryId(c.CategoryId), c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants, now);
         if (created.IsFailure)
             return created.Error!;
         var planned = created.Value.PlanPurchase(c.Giver, c.BuyBy);
@@ -37,7 +37,7 @@ public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock, Gi
 
         db.Gifts.Add(created.Value);
         PurchasePlan.Publish(db, null, created.Value, links);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -49,6 +49,6 @@ public sealed class CreateGiftHandler(IGiftsDbContext db, TimeProvider clock, Gi
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new CreatedGiftsEntry(created.Value.Id);
+        return new CreatedGiftsEntry(created.Value.Id.Value);
     }
 }

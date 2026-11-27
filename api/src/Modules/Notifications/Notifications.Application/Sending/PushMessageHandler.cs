@@ -1,6 +1,8 @@
 using BuildingBlocks.Application.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Notifications.Application.Push;
+using Notifications.Domain.Deliveries;
+using Notifications.Domain.Push;
 
 namespace Notifications.Application.Sending;
 
@@ -16,20 +18,20 @@ public sealed class PushMessageHandler(INotificationsDbContext db, IWebPush push
     {
         var devices = await db.PushSubscriptions.AsNoTracking()
             .Where(s => s.Person == message.Person)
-            .Select(s => new PushTarget(s.Id, s.Endpoint, s.P256dh, s.Auth))
+            .Select(s => new PushTarget(s.Id.Value, s.Endpoint, s.P256dh, s.Auth))
             .ToListAsync(cancellationToken);
 
         if (devices.Count > 0)
         {
             var results = await push.SendAsync(devices, message.Payload, cancellationToken);
-            var gone = results.Where(r => r.Outcome == PushOutcome.Gone).Select(r => r.SubscriptionId).ToList();
+            var gone = results.Where(r => r.Outcome == PushOutcome.Gone).Select(r => new PushSubscriptionId(r.SubscriptionId)).ToList();
             if (gone.Count > 0)
                 await db.PushSubscriptions.Where(s => gone.Contains(s.Id)).ExecuteDeleteAsync(cancellationToken);
         }
 
         var now = clock.GetUtcNow();
         await db.Deliveries
-            .Where(d => d.Id == message.DeliveryId)
+            .Where(d => d.Id == new DeliveryId(message.DeliveryId))
             .ExecuteUpdateAsync(s => s.SetProperty(d => d.SentAtUtc, (DateTimeOffset?)now), cancellationToken);
     }
 }

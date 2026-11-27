@@ -1,4 +1,5 @@
 using Gifts.Contracts;
+using Todos.Domain.Categories;
 using Todos.Domain.Parties;
 using Todos.Domain.Tasks;
 
@@ -8,7 +9,7 @@ namespace Todos.Application.Integrations.Gifts;
 public static class GiftTask
 {
     /// <summary>The seeded category «🛍️ Покупки» (Todos CategorySeed); a deleted category leaves the task without one.</summary>
-    public static readonly Guid ShoppingCategoryId = new("0193b6a0-0000-7000-8000-000000000070");
+    public static readonly TodoCategoryId ShoppingCategoryId = new(new Guid("0193b6a0-0000-7000-8000-000000000070"));
 
     private const string Prefix = "🎁 Купити подарунок: ";
 

@@ -1,11 +1,12 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Expenses.Domain.Entries.Identifiers;
 using Expenses.Domain.Parties;
 
 namespace Expenses.Domain.Entries;
 
 /// <summary>Money received by one of the two people: one row of the old «Доходы» sheet. Incomes have no category.</summary>
-public sealed class Income : Entity<Guid>, IAggregateRoot
+public sealed class Income : Entity<IncomeId>, IAggregateRoot
 {
     private Income()
     {
@@ -36,7 +37,7 @@ public sealed class Income : Entity<Guid>, IAggregateRoot
 
         return new Income
         {
-            Id = Guid.CreateVersion7(now),
+            Id = IncomeId.New(now),
             Date = date,
             Person = person,
             Amount = amount,

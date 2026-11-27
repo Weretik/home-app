@@ -7,6 +7,7 @@ using Shopping.Application.Features.Items.Views;
 using Shopping.Application.Idempotency;
 using Shopping.Domain.Departments;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 using Shopping.Domain.Parsing;
 
 namespace Shopping.Application.Features.Items.Commands.AddItems;
@@ -32,8 +33,9 @@ public sealed class AddItemsHandler(IShoppingDbContext db, TimeProvider clock)
         if (parsed.Count > ShoppingItem.MaxItemsPerAdd)
             return ShoppingItemErrors.TooManyItems;
 
-        if (c.DepartmentId is { } chosen && !await db.Departments.AnyAsync(d => d.Id == chosen, cancellationToken))
-            return DepartmentErrors.NotFound(chosen);
+        var chosen = c.DepartmentId is { } value ? new DepartmentId(value) : (DepartmentId?)null;
+        if (chosen is { } department && !await db.Departments.AnyAsync(d => d.Id == department, cancellationToken))
+            return DepartmentErrors.NotFound(department);
 
         var window = await ItemWindow.ReadAsync(db, clock, cancellationToken);
         var names = parsed.Select(p => NameNormalizer.Normalize(p.Name)).Distinct().ToList();
@@ -58,19 +60,19 @@ public sealed class AddItemsHandler(IShoppingDbContext db, TimeProvider clock)
             if (same is not null)
             {
                 if (same.AddAgain(item.Quantity, c.Urgent, c.AddedBy, window.Now) == ReAddOutcome.Updated)
-                    AddOnce(updated, same.Id, added, restored);
+                    AddOnce(updated, same.Id.Value, added, restored);
                 else
-                    AddOnce(restored, same.Id, added, updated);
+                    AddOnce(restored, same.Id.Value, added, updated);
             }
             else
             {
-                var departmentId = c.DepartmentId ?? dictionary!.Matcher.Match(item.Name);
+                var departmentId = chosen ?? dictionary!.Matcher.Match(item.Name);
                 var created = ShoppingItem.Create(item.Name, item.Quantity, null, departmentId, c.Urgent, c.AddedBy, window.Now);
                 if (created.IsFailure)
                     return created.Error!;
                 db.Items.Add(created.Value);
                 inList.Add(created.Value);
-                added.Add(created.Value.Id);
+                added.Add(created.Value.Id.Value);
             }
         }
 

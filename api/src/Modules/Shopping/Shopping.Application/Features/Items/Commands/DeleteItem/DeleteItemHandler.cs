@@ -9,9 +9,9 @@ public sealed class DeleteItemHandler(IShoppingDbContext db) : ICommandHandler<D
 {
     public async ValueTask<Result> Handle(DeleteItemCommand c, CancellationToken cancellationToken)
     {
-        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == c.Id, cancellationToken);
+        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == new ShoppingItemId(c.Id), cancellationToken);
         if (item is null)
-            return ShoppingItemErrors.NotFound(c.Id);
+            return ShoppingItemErrors.NotFound(new ShoppingItemId(c.Id));
         if (item.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
 

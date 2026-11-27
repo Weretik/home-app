@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Application.Features.Items.Views;
+using Shopping.Domain.Departments;
 
 namespace Shopping.Application.Features.Items.Queries.ListFrequent;
 
@@ -18,7 +19,7 @@ public sealed class ListFrequentHandler(IShoppingDbContext db, TimeProvider cloc
 
         return top
             .Select(f => new FrequentItem(
-                f.Name, f.DepartmentId, departments[f.DepartmentId].Name, departments[f.DepartmentId].Icon, f.TimesBought, f.LastBoughtAtUtc))
+                f.Name, f.DepartmentId, departments[new DepartmentId(f.DepartmentId)].Name, departments[new DepartmentId(f.DepartmentId)].Icon, f.TimesBought, f.LastBoughtAtUtc))
             .ToList();
     }
 }

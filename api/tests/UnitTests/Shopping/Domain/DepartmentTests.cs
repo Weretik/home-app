@@ -1,3 +1,4 @@
+using System;
 using Shopping.Domain.Departments;
 
 namespace UnitTests.Shopping.Domain;
@@ -42,7 +43,7 @@ public sealed class DepartmentTests
     [Fact]
     public void Keywords_AreStoredNormalised()
     {
-        var keyword = DepartmentKeyword.Create(" Зубн  Паст ", Guid.NewGuid(), learned: false, Now).Value;
+        var keyword = DepartmentKeyword.Create(" Зубн  Паст ", new DepartmentId(Guid.NewGuid()), learned: false, Now).Value;
 
         Assert.Equal("зубн паст", keyword.Keyword);
         Assert.False(keyword.Learned);
@@ -53,16 +54,16 @@ public sealed class DepartmentTests
     [InlineData("   ", "shopping.keyword_too_short")]
     public void Keywords_HaveTwoTo60Characters(string text, string error)
     {
-        Assert.Equal(error, DepartmentKeyword.Create(text, Guid.NewGuid(), false, Now).Error!.Code);
-        Assert.Equal("shopping.keyword_too_long", DepartmentKeyword.Create(new string('я', 61), Guid.NewGuid(), false, Now).Error!.Code);
+        Assert.Equal(error, DepartmentKeyword.Create(text, new DepartmentId(Guid.NewGuid()), false, Now).Error!.Code);
+        Assert.Equal("shopping.keyword_too_long", DepartmentKeyword.Create(new string('я', 61), new DepartmentId(Guid.NewGuid()), false, Now).Error!.Code);
         Assert.False(DepartmentKeyword.IsValid(text));
     }
 
     [Fact]
     public void Learning_MovesTheKeyword_AndMarksItLearned()
     {
-        var keyword = DepartmentKeyword.Create("штуковина", Guid.NewGuid(), false, Now).Value;
-        var grocery = Guid.NewGuid();
+        var keyword = DepartmentKeyword.Create("штуковина", new DepartmentId(Guid.NewGuid()), false, Now).Value;
+        var grocery = new DepartmentId(Guid.NewGuid());
 
         keyword.Learn(grocery);
 

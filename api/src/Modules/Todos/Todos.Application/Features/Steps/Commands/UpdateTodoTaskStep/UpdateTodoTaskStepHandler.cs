@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Mediator;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Features.Steps.Commands.UpdateTodoTaskStep;
 
@@ -8,5 +9,5 @@ public sealed class UpdateTodoTaskStepHandler(ITodosDbContext db, TimeProvider c
 {
     public async ValueTask<Result> Handle(UpdateTodoTaskStepCommand c, CancellationToken cancellationToken) =>
         await StepChanges.ApplyAsync(
-            db, c.TaskId, task => task.UpdateStep(c.StepId, c.Title, c.IsDone, clock.GetUtcNow()), cancellationToken);
+            db, c.TaskId, task => task.UpdateStep(new TaskStepId(c.StepId), c.Title, c.IsDone, clock.GetUtcNow()), cancellationToken);
 }

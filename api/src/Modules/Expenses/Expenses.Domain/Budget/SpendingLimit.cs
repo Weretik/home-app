@@ -1,6 +1,8 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Budget.Amounts;
+using Expenses.Domain.Budget.Identifiers;
+using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 
 namespace Expenses.Domain.Budget;
@@ -11,11 +13,11 @@ namespace Expenses.Domain.Budget;
 /// limit. The amount is kept by the period it starts in (<see cref="Amounts"/>), so a change applies from a chosen
 /// period on and earlier periods keep theirs.
 /// </summary>
-public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
+public sealed class SpendingLimit : Entity<SpendingLimitId>, IAggregateRoot
 {
     public const int MaxNameLength = 100;
 
-    private List<Guid> _categoryIds = [];
+    private List<CategoryId> _categoryIds = [];
 
     private SpendingLimit()
     {
@@ -28,7 +30,7 @@ public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
     /// <summary>The amounts by the period they start in; read one with <see cref="AmountFor"/>.</summary>
     public AmountHistory Amounts { get; private set; } = AmountHistory.Start(0);
 
-    public IReadOnlyList<Guid> CategoryIds => _categoryIds;
+    public IReadOnlyList<CategoryId> CategoryIds => _categoryIds;
 
     /// <summary>The position in lists, smallest first.</summary>
     public int SortOrder { get; private set; }
@@ -37,13 +39,13 @@ public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
     public uint Version { get; private set; }
 
     public static Result<SpendingLimit> Create(
-        string name, LimitPeriod period, decimal amount, IReadOnlyCollection<Guid> categoryIds, int sortOrder, DateTimeOffset now)
+        string name, LimitPeriod period, decimal amount, IReadOnlyCollection<CategoryId> categoryIds, int sortOrder, DateTimeOffset now)
     {
         var check = Check(name, amount, categoryIds);
         if (check.IsFailure)
             return check.Error!;
 
-        var limit = new SpendingLimit { Id = Guid.CreateVersion7(now) };
+        var limit = new SpendingLimit { Id = SpendingLimitId.New(now) };
         limit.Apply(name, period, AmountHistory.Start(amount), categoryIds, sortOrder);
         return limit;
     }
@@ -60,7 +62,7 @@ public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
         string name,
         LimitPeriod period,
         decimal amount,
-        IReadOnlyCollection<Guid> categoryIds,
+        IReadOnlyCollection<CategoryId> categoryIds,
         int sortOrder,
         DateOnly? amountFrom,
         DateOnly today)
@@ -89,16 +91,16 @@ public sealed class SpendingLimit : Entity<Guid>, IAggregateRoot
         return (start, start.AddMonths(LimitCarryOver.Months(Period)));
     }
 
-    private static Result Check(string name, decimal amount, IReadOnlyCollection<Guid> categoryIds) =>
+    private static Result Check(string name, decimal amount, IReadOnlyCollection<CategoryId> categoryIds) =>
         Result.Combine(
             Result.Ensure(!string.IsNullOrWhiteSpace(name), BudgetErrors.NameRequired),
             Result.Ensure(name is null || name.Trim().Length <= MaxNameLength, BudgetErrors.NameTooLong),
             Result.Ensure(IsMoney(amount) && amount > 0, BudgetErrors.AmountInvalid),
             Result.Ensure(
-                categoryIds is { Count: > 0 } && categoryIds.Distinct().Count() == categoryIds.Count && !categoryIds.Contains(Guid.Empty),
+                categoryIds is { Count: > 0 } && categoryIds.Distinct().Count() == categoryIds.Count && !categoryIds.Contains(default),
                 BudgetErrors.CategoriesRequired));
 
-    private void Apply(string name, LimitPeriod period, AmountHistory amounts, IReadOnlyCollection<Guid> categoryIds, int sortOrder)
+    private void Apply(string name, LimitPeriod period, AmountHistory amounts, IReadOnlyCollection<CategoryId> categoryIds, int sortOrder)
     {
         Name = name.Trim();
         Period = period;

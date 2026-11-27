@@ -1,6 +1,7 @@
-using Expenses.Application;
 using BuildingBlocks.Domain.Results;
+using Expenses.Application;
 using Expenses.Domain.Budget;
+using Expenses.Domain.Budget.Identifiers;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ public sealed class DeleteSpendingLimitHandler(IExpensesDbContext db) : ICommand
 {
     public async ValueTask<Result> Handle(DeleteSpendingLimitCommand c, CancellationToken cancellationToken)
     {
-        var deleted = await db.SpendingLimits.Where(x => x.Id == c.Id).ExecuteDeleteAsync(cancellationToken);
-        return deleted == 0 ? BudgetErrors.LimitNotFound(c.Id) : Result.Success();
+        var deleted = await db.SpendingLimits.Where(x => x.Id == new SpendingLimitId(c.Id)).ExecuteDeleteAsync(cancellationToken);
+        return deleted == 0 ? BudgetErrors.LimitNotFound(new SpendingLimitId(c.Id)) : Result.Success();
     }
 }
