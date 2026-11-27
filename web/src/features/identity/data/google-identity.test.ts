@@ -103,3 +103,7 @@ test('after a sign-out stops the automatic sign-in and One Tap', () => {
   );
   expect(id.prompt).not.toHaveBeenCalled();
 });
+
+test('asks Google for the Ukrainian button and One Tap', () => {
+  expect(new URL(GOOGLE_SCRIPT_URL).searchParams.get('hl')).toBe('uk');
+});
