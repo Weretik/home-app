@@ -110,7 +110,7 @@ jobs:
             || { echo "::error::The deployed JS has no Google client id: sign-in would say «Вхід ще не налаштовано»"; exit 1; }
           echo "The deployed site offers Google sign-in."
 
-      # The installed app needs its service worker and manifest (web ADR 0019): a missing file would be answered with
+      # The installed app needs its service worker and manifest (web ADR 0021): a missing file would be answered with
       # index.html by the SPA fallback and break the update, so both must be the real files.
       - name: Smoke test the service worker and the manifest
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

@@ -37,7 +37,7 @@ const statusLabels: Record<TodoStatus, string> = {
 
 /**
  * The request of a move: plain data with the version the screen showed, so it waits offline and is sent after a
- * restart too (web ADR 0020). A stale version (`409`) reads the task again and resends (last write wins).
+ * restart too (web ADR 0022). A stale version (`409`) reads the task again and resends (last write wins).
  */
 export const moveRequest = ({ id, version, status }: StatusChange) => {
   const path = `/api/todos/tasks/${encodeURIComponent(id)}`;

@@ -9,7 +9,7 @@ import {
   type ShoppingList,
 } from './shopping-api';
 
-/** The request of a tick: plain data, so it waits offline and is sent after a restart too (web ADR 0020). */
+/** The request of a tick: plain data, so it waits offline and is sent after a restart too (web ADR 0022). */
 export const statusRequest = ({ id, status, by }: StatusChange) => ({
   method: 'put' as const,
   path: `/api/shopping/items/${encodeURIComponent(id)}/status`,
@@ -21,7 +21,7 @@ export const statusRequest = ({ id, status, by }: StatusChange) => ({
 /**
  * Ticks or unticks an item at once (web ADR 0012): the cached list changes before the request, goes back when the
  * request fails, and reloads either way. The API makes a repeat harmless, so the checkbox is never locked. Offline the
- * tick waits in the queue and stays on the screen (web ADR 0020).
+ * tick waits in the queue and stays on the screen (web ADR 0022).
  */
 export function useSetItemStatus() {
   const queryClient = useQueryClient();

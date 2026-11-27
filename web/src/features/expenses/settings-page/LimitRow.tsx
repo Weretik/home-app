@@ -17,8 +17,9 @@ interface LimitRowProps extends RowHandlers<SpendingLimitItem> {
 }
 
 /**
- * One spending limit: its name and categories as chips, today's amount per month or quarter (with since when and the
- * amount before, once it changed, and a change saved ahead), and the «⋮» menu.
+ * One spending limit, stacked so nothing is squeezed on a phone (spec platform/002, R-M-002): the name with «⋮»,
+ * then today's amount per month or quarter (with since when and the amount before, once it changed, and a change
+ * saved ahead), then the categories as chips.
  */
 export function LimitRow({
   limit,
@@ -34,48 +35,60 @@ export function LimitRow({
   return (
     <ListItem
       divider={divider}
-      sx={{ alignItems: 'flex-start', gap: 2, py: 1.5 }}
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) auto',
+        alignItems: 'start',
+        columnGap: 1,
+        rowGap: 0.75,
+        py: 1.5,
+        pr: 1,
+      }}
     >
-      <Box sx={{ flex: 1, minWidth: 0, display: 'grid', gap: 1 }}>
-        <Typography sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
-          {limit.name}
+      <Typography sx={{ fontWeight: 600, overflowWrap: 'anywhere', pt: 1 }}>
+        {limit.name}
+      </Typography>
+      <RowActions
+        label={`${limit.name}, ${formatAmount(limit.amount)}`}
+        onEdit={() => onEdit(limit)}
+        onDelete={() => onDelete(limit)}
+      />
+      <Box sx={{ gridColumn: '1 / -1' }}>
+        <Typography
+          component="span"
+          sx={{
+            fontWeight: 600,
+            fontVariantNumeric: 'tabular-nums',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {formatAmount(limit.amount)}
+        </Typography>{' '}
+        <Typography component="span" variant="body2" color="text.secondary">
+          {limitPeriodLabels[limit.period]}
         </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-          {limit.categoryIds.map((id) => (
-            <Chip key={id} size="small" label={categoryNames.get(id) ?? '…'} />
-          ))}
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Box sx={{ textAlign: 'right' }}>
+        {captions.map((caption) => (
           <Typography
-            sx={{
-              fontWeight: 600,
-              whiteSpace: 'nowrap',
-              fontVariantNumeric: 'tabular-nums',
-            }}
+            key={caption}
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block' }}
           >
-            {formatAmount(limit.amount)}
+            {caption}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {limitPeriodLabels[limit.period]}
-          </Typography>
-          {captions.map((caption) => (
-            <Typography
-              key={caption}
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: 'block' }}
-            >
-              {caption}
-            </Typography>
-          ))}
-        </Box>
-        <RowActions
-          label={`${limit.name}, ${formatAmount(limit.amount)}`}
-          onEdit={() => onEdit(limit)}
-          onDelete={() => onDelete(limit)}
-        />
+        ))}
+      </Box>
+      <Box
+        sx={{
+          gridColumn: '1 / -1',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.75,
+        }}
+      >
+        {limit.categoryIds.map((id) => (
+          <Chip key={id} size="small" label={categoryNames.get(id) ?? '…'} />
+        ))}
       </Box>
     </ListItem>
   );

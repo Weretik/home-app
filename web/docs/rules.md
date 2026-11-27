@@ -46,7 +46,7 @@ the same change.
 
 - Every mutation disables its submit while pending (a queued write while it is `isSaving`: offline it waits without
   locking the screen).
-- A write that must work offline is a queued write (`useQueuedWrite` from `src/platform/offline`, web ADR 0020): a
+- A write that must work offline is a queued write (`useQueuedWrite` from `src/platform/offline`, web ADR 0022): a
   serialisable request with its module, a Ukrainian label and, for a versioned record, the path to read its version
   again. Every other write fails at once offline (`networkMode: 'always'`).
 - A write the backend protects with `Idempotency-Key` makes one key per attempt, reuses it on retry, and renews it

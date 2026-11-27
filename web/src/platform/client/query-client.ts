@@ -1,7 +1,7 @@
 import { ApiError } from '../../api-client';
 import { QueryClient } from '@tanstack/react-query';
 
-/** How long unused data stays in memory: as long as it is kept for offline use (web ADR 0020). */
+/** How long unused data stays in memory: as long as it is kept for offline use (web ADR 0022). */
 export const QUERY_GC_TIME = 7 * 24 * 60 * 60 * 1000;
 
 /**

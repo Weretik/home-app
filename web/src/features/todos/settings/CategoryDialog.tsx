@@ -6,6 +6,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
+import type { Theme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useId, useState, type FormEvent } from 'react';
 import type { TodoCategoryItem } from '../data/categories-api';
 import { describeWriteError, firstMessages } from '../writes/failures-api';
@@ -59,15 +61,23 @@ export function CategoryDialog({
     helperText: errors[name],
   });
 
+  const isPhone = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+
   return (
     <Dialog
       open
       fullWidth
       maxWidth="xs"
+      fullScreen={isPhone}
       onClose={save.isPending ? undefined : onClose}
       aria-labelledby={titleId}
     >
-      <Box component="form" noValidate onSubmit={submit}>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={submit}
+        sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}
+      >
         <DialogTitle id={titleId}>
           {item ? 'Змінити категорію' : 'Нова категорія'}
         </DialogTitle>

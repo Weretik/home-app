@@ -23,7 +23,7 @@ export interface QueuedWriteOptions<Input, Output, Context> {
 }
 
 /**
- * A write that waits for the network (web ADR 0020): the feature calls `mutate(input)` with its own input; the
+ * A write that waits for the network (web ADR 0022): the feature calls `mutate(input)` with its own input; the
  * mutation is persisted with the serialisable request `toRequest(input)` so it is sent also after a restart. Offline
  * it pauses; `isSaving` is false then, so the screen does not wait on it. A refusal of a write made offline is also
  * recorded for the top bar's snackbar.

@@ -46,10 +46,16 @@ export function ProfilePage() {
           >
             <MemberAvatar member={member} size={72} />
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="h6" component="p" noWrap>
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{ overflowWrap: 'anywhere' }}
+              >
                 {member ? member.name : <Skeleton width={160} />}
               </Typography>
-              <Typography noWrap sx={{ color: 'text.secondary' }}>
+              <Typography
+                sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}
+              >
                 {member ? member.email : <Skeleton width={200} />}
               </Typography>
             </Box>
@@ -80,7 +86,7 @@ export function ProfilePage() {
               flexWrap: 'wrap',
             }}
           >
-            <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
               <Typography>Про нас</Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Що ми любимо, не любимо й варто знати одне про одного

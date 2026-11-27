@@ -1,7 +1,7 @@
 import type { moduleKeys } from '../client/query-client';
 
 /**
- * A write that waits for the network (web ADR 0020): plain data, so it is kept in IndexedDB with the paused mutation
+ * A write that waits for the network (web ADR 0022): plain data, so it is kept in IndexedDB with the paused mutation
  * and sent after a restart without the screen that made it.
  */
 export interface QueuedRequest {

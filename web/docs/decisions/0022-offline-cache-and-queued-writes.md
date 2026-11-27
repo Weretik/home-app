@@ -2,7 +2,7 @@
 
 Status: accepted, 2026-11-27
 
-Specification: [web SDD platform/002](../specs/platform/002-pwa-offline/README.md). Builds on web ADR 0009 (a write
+Specification: [web SDD platform/003](../specs/platform/003-pwa-offline/README.md). Builds on web ADR 0009 (a write
 refreshes its module), 0011 and 0012 (optimistic ticks), 0015 (the cache is cleared on every session change).
 
 ## Context

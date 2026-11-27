@@ -1,11 +1,11 @@
 import { ThemeProvider } from '@mui/material/styles';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, vi } from 'vitest';
-import { createQueryClient } from '../../platform/client/query-client';
-import { theme } from '../theme/theme';
+import { createQueryClient } from '../../../platform/client/query-client';
+import { theme } from '../../theme/theme';
 import { AppLayout } from './AppLayout';
 
 // The update prompt registers the service worker; tests have none.
@@ -78,13 +78,54 @@ test('the bottom bar lists the five main sections', () => {
   );
 });
 
-test('«Про нас» is in the side menu only, the bottom bar keeps five', () => {
+function bottomBar() {
+  const bar = document.querySelector('nav[aria-label="Розділи"]');
+  if (!(bar instanceof HTMLElement)) throw new Error('No bottom bar');
+  return bar;
+}
+
+const moreButton = () =>
+  within(bottomBar()).getByRole('button', { name: 'Ще', hidden: true });
+
+test('the bottom bar ends with «Ще», which lists every other page', async () => {
+  renderAt('/');
+
+  await userEvent.click(moreButton());
+
+  const sheet = screen.getByRole('list', { name: 'Ще розділи' });
+  expect(
+    within(sheet)
+      .getAllByRole('link')
+      .map((link) => link.textContent),
+  ).toEqual(['Про нас', 'Стан', 'Сповіщення', 'Профіль']);
+  expect(within(sheet).getByRole('link', { name: 'Про нас' })).toHaveAttribute(
+    'href',
+    '/notes',
+  );
+});
+
+test('a page from «Ще» marks «Ще» in the bottom bar and the page in the side menu', () => {
   renderAt('/notes');
 
   expect(
     within(sideMenu()).getByRole('link', { name: 'Про нас' }),
   ).toHaveAttribute('aria-current', 'page');
+  expect(moreButton()).toHaveClass('Mui-selected');
   expect(bottomBarLinks()).toHaveLength(5);
+});
+
+test('opening a page from «Ще» closes the sheet', async () => {
+  renderAt('/');
+
+  await userEvent.click(moreButton());
+  await userEvent.click(screen.getByRole('link', { name: 'Сповіщення' }));
+
+  await waitFor(() =>
+    expect(
+      screen.queryByRole('list', { name: 'Ще розділи' }),
+    ).not.toBeInTheDocument(),
+  );
+  expect(moreButton()).toHaveClass('Mui-selected');
 });
 
 test('marks the current section in both menus', () => {

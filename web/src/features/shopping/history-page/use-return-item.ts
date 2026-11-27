@@ -25,7 +25,7 @@ export function useReturnItem() {
       urgent: false,
     };
     if (!isOnline()) {
-      // Queued (web ADR 0020): nothing to wait for on this button.
+      // Queued (web ADR 0022): nothing to wait for on this button.
       setNotice(`Повернеться до списку, коли з’явиться мережа: ${item.name}`);
       add.mutate({ body, idempotencyKey: idempotency.keyFor(body) });
       idempotency.renew();

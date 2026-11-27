@@ -64,7 +64,7 @@ export const addRequest = ({ body, idempotencyKey }: AddInput) => ({
 
 /**
  * Adds items from text («молоко, хлеб, яйца 10»); the API splits it, finds departments and merges repeats. A queued
- * write (web ADR 0020): offline it waits and is sent when the network is back; every shopping query refreshes after.
+ * write (web ADR 0022): offline it waits and is sent when the network is back; every shopping query refreshes after.
  */
 export const useAddItems = () =>
   useQueuedWrite<AddInput, AddItemsResult>(addRequest);

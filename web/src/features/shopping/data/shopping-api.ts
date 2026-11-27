@@ -21,7 +21,7 @@ export const listKey = [...shoppingKey, 'list'] as const;
 /** The checkbox write's own part of its key (after `['queued-write']`). */
 export const statusWriteKey = [...shoppingKey, 'status'] as const;
 /**
- * The key of the checkbox mutation, a queued write (web ADR 0020); polling pauses while one is pending (also while it
+ * The key of the checkbox mutation, a queued write (web ADR 0022); polling pauses while one is pending (also while it
  * waits offline) so it cannot undo the optimistic tick.
  */
 export const statusMutationKey = [

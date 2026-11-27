@@ -15,7 +15,7 @@ import { useAddTask, useIdempotencyKey } from '../writes/task-writes-api';
 /**
  * «Нова справа…» on top of the list (FR-003): Enter or «Додати» adds a task for `assignee`, Звичайна, without a date;
  * the field clears and keeps focus. The pencil opens the full form with the typed title. Offline the add is queued
- * (web ADR 0020): the field clears at once and says when it will be added.
+ * (web ADR 0022): the field clears at once and says when it will be added.
  */
 export function QuickAdd({
   assignee,

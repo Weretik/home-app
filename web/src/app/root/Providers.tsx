@@ -19,7 +19,7 @@ function createClient() {
 }
 
 /**
- * React Query with its cache kept in IndexedDB (web ADR 0020): the data last seen shows offline, and the queued writes
+ * React Query with its cache kept in IndexedDB (web ADR 0022): the data last seen shows offline, and the queued writes
  * restored after a restart are sent again. A new session forgets the kept cache, like the in-memory one (ADR 0015).
  */
 export function Providers({ children }: { children: ReactNode }) {

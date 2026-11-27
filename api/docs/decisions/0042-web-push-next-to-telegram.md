@@ -6,7 +6,7 @@ Specification: [SDD notifications/002 — Web Push](../specs/notifications/002-w
 
 ## Context
 
-The site became an installable PWA (web ADR 0019, 0020). Vitaliy asked that everything the Telegram bot sends also
+The site became an installable PWA (web ADR 0021, 0022). Vitaliy asked that everything the Telegram bot sends also
 arrives as a push notification, while Telegram keeps working for now. Everything must stay free, and the API runs
 on an App Service F1 without background threads (ADR 0034).
 

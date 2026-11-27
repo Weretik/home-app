@@ -24,7 +24,7 @@ export function CategorySelect({
       value={known ? (value ?? '') : ''}
       disabled={categories.isPending}
       onChange={(event) => onChange(event.target.value || undefined)}
-      sx={{ minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 200px' } }}
+      sx={{ minWidth: 0, flex: { xs: '1 1 40%', sm: '0 1 200px' } }}
       slotProps={{
         select: { displayEmpty: true },
         inputLabel: { shrink: true },

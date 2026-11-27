@@ -14,9 +14,9 @@ import {
 } from './push-notification';
 
 /**
- * The service worker (web ADR 0019). It precaches the built shell, answers every navigation with the cached
+ * The service worker (web ADR 0021). It precaches the built shell, answers every navigation with the cached
  * index.html, and shows the API's push messages. API calls go to another origin and are never cached here; the data
- * offline comes from the React Query cache in IndexedDB (web ADR 0020). A new version waits until the update prompt
+ * offline comes from the React Query cache in IndexedDB (web ADR 0022). A new version waits until the update prompt
  * sends SKIP_WAITING.
  */
 declare const self: ServiceWorkerGlobalScope & {

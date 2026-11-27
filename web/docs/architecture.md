@@ -21,9 +21,11 @@ src/
   app/
     root/         routes and providers (theme, React Query with its IndexedDB cache)
     pwa/          the update prompt (use-app-update.ts, UpdatePrompt) and the top bar's offline chip (OfflineStatus)
-    service-worker/ the service worker (own tsconfig) and its pure push rules (push-notification.ts) (web ADR 0019)
-    theme/        palette, theme, light/dark/system switch (docs/design.md)
-    shell/        header, side menu, bottom bar, the list of sections
+    service-worker/ the service worker (own tsconfig) and its pure push rules (push-notification.ts) (web ADR 0021)
+    theme/        palette, theme, phone and touch overrides (web ADR 0020), light/dark/system switch
+                  (docs/design.md)
+    shell/        frame/ the layout and header; navigation/ side menu, bottom bar with the «Ще» sheet, the list of
+                  sections
   api-client/     generated/ types (never edited), client/ createApiClient, apiCall, ApiError, newIdempotencyKey
   platform/
     client/       the API client instance (VITE_API_URL) with the session middleware, the signed-in member and person
@@ -32,7 +34,7 @@ src/
     session/      the session token store (session.ts) and the middleware that adds the bearer token and ends the
                   session on a 401 (session-middleware.ts)
     offline/      the IndexedDB cache (query-persistence.ts), queued writes (queued-request.ts, queued-write-api.ts,
-                  use-queued-write.ts), the network state (network-status.ts, use-network-status.ts) (web ADR 0020)
+                  use-queued-write.ts), the network state (network-status.ts, use-network-status.ts) (web ADR 0022)
   features/
     home/         Главная: the section summaries and their switcher
     status/       API and database status page
@@ -239,7 +241,7 @@ shopping/
                         item-writes-api.ts (add with Idempotency-Key, edit / delete with If-Match, clear cart, undo,
                         the shared write hook),
                         status-api.ts (the optimistic tick), item-status.ts, write-failure-api.ts (Ukrainian text), labels;
-                        the tick, add and clear cart are queued writes (web ADR 0020)
+                        the tick, add and clear cart are queued writes (web ADR 0022)
   section/              ShoppingSection (title with counts, «Я», tabs, gear, <Outlet />), the page list, use-me.ts
   quick-add/
     entry/              the sticky card: field, «Срочно», department preview, ⭐ chips, the undo snackbar, use-quick-add
@@ -263,7 +265,7 @@ shopping/
 - The quick add suggests names from everything ever added (`GET /api/shopping/items/suggestions`, key
   `['shopping', 'suggestions', query]`) for the text after the last `,` `;` or new line, 200 ms after typing pauses;
   a choice replaces only that segment and adds nothing, Enter without a highlighted option adds the text.
-- Offline (web ADR 0020) the tick, the add (quick add, ⭐, «Повернути до списку») and «Прибрати куплене» wait in the
+- Offline (web ADR 0022) the tick, the add (quick add, ⭐, «Повернути до списку») and «Прибрати куплене» wait in the
   queue and are sent in order when the network is back; the list keeps the optimistic change meanwhile and polling
   pauses (the tick's key `['queued-write', 'shopping', 'status']`). A queued add clears the field at once and says
   «Додасться, коли з’явиться мережа»; «Прибрати куплене» empties the cart at once and brings it back if refused.
@@ -382,7 +384,7 @@ todos/
 - The done tick and «Вернуть» are optimistic: the row leaves its list at once and comes back with the reason if the
   write fails. «Отменить» waits for the tick to be saved, reads the task again (the tick changed its version) and
   restores its previous status.
-- Offline (web ADR 0020) the done tick, «Вернуть» and the quick add are queued writes: the row stays gone, the quick
+- Offline (web ADR 0022) the done tick, «Вернуть» and the quick add are queued writes: the row stays gone, the quick
   add clears its field and says «Додасться, коли з’явиться мережа». A move refused as stale (`409`) reads the task
   (`GET /api/todos/tasks/{id}`) and is sent once more with its new version: the last write wins.
 - The task dialog edits title, «Кому», «Поставил(а)», status, priority, due date («Сегодня», «Завтра», «На выходных»,
@@ -393,8 +395,8 @@ todos/
 
 «Про нас»: what Masha and Vitaliy like, dislike and should know about each other
 ([ADR 0017](decisions/0017-notes-section-person-tabs-me-first.md), [SDD](specs/notes/001-notes-section/README.md)). It
-is in the side menu under the main five (`moreSections` in `app/shell/sections.ts`) and linked from the home page for
-phones; the bottom bar keeps five.
+is in the side menu under the main five (`moreSections` in `app/shell/navigation/sections.ts`) and, on a phone, in the
+bottom bar's «Ще» sheet ([ADR 0019](decisions/0019-phone-more-sheet-in-the-bottom-bar.md)) and on the home page.
 
 ```
 notes/
@@ -494,13 +496,13 @@ identity/
   (`src/platform/client/query-client.ts`), and every write invalidates that whole prefix, so a page or summary of another
   feature that shows the same module's data refreshes too ([ADR 0009](decisions/0009-writes-refresh-their-backend-module.md)).
   Failures with a 4xx status are not retried.
-- Offline (web ADR 0020): the cache of successful reads is kept in IndexedDB (`home-cache`) for 7 days and restored at
+- Offline (web ADR 0022): the cache of successful reads is kept in IndexedDB (`home-cache`) for 7 days and restored at
   start, versioned by the hash of the API contract and removed on every session change. Writes fail at once offline
   (`networkMode: 'always'`), except the queued writes (`src/platform/offline`): a serialisable request under the key
   `['queued-write', …]` that pauses offline, is kept across a restart and is sent when the network is back; `404`
   counts as done, `409`/`412` rereads the version and resends once (last write wins). The top bar shows «Офлайн»,
   «Очікує: N» and «Не вдалося зберегти: …».
-- The service worker (web ADR 0019, `vite-plugin-pwa`, `injectManifest`) precaches the built shell and answers
+- The service worker (web ADR 0021, `vite-plugin-pwa`, `injectManifest`) precaches the built shell and answers
   navigations with `index.html`; it never caches the API. A new deploy waits for «Оновити» in the snackbar «Доступна
   нова версія». It shows the API's push messages and opens their page on a tap.
 - `index.html` has `noindex` and `robots.txt` disallows everything.

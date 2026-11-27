@@ -2,7 +2,7 @@
 
 Status: accepted, 2026-11-27
 
-Specification: [web SDD platform/002](../specs/platform/002-pwa-offline/README.md); push payload:
+Specification: [web SDD platform/003](../specs/platform/003-pwa-offline/README.md); push payload:
 [api notifications/002](../../../api/docs/specs/notifications/002-web-push/README.md).
 
 ## Context
@@ -18,7 +18,7 @@ loses a half-filled form.
   `/service-worker.js`) with the Workbox precache manifest injected at build time. It precaches the built shell (HTML,
   JS, CSS, fonts, icons, the manifest), cleans outdated caches, and answers every navigation with the cached
   `index.html` (`NavigationRoute`), so client routes open offline. API calls go to another origin and are never cached
-  by the service worker; the data offline is web ADR 0020.
+  by the service worker; the data offline is web ADR 0022.
 - `registerType: 'prompt'`, `injectRegister: false`: the app registers the worker itself through
   `virtual:pwa-register/react` (`src/app/pwa/use-app-update.ts`) and checks for a new deploy every hour. A waiting
   version shows the snackbar «Доступна нова версія · Оновити»; the tap sends `SKIP_WAITING` and reloads. Nothing reloads

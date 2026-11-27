@@ -70,7 +70,7 @@ export const addTaskRequest = ({ body, idempotencyKey }: AddTaskInput) => ({
   label: `справу «${body.title}»`,
 });
 
-/** The quick add of a task: a queued write (web ADR 0020), so offline it waits and is sent when the network is back. */
+/** The quick add of a task: a queued write (web ADR 0022), so offline it waits and is sent when the network is back. */
 export const useAddTask = () => useQueuedWrite(addTaskRequest);
 
 /** Deletes a task for good. */

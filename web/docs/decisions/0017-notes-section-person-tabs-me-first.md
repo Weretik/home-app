@@ -1,6 +1,6 @@
 # 0017. «Про нас»: a section of its own with person tabs, «about me» first
 
-Status: accepted, 2026-11-27
+Status: accepted, 2026-11-27; the phone menu part superseded by [0019](0019-phone-more-sheet-in-the-bottom-bar.md)
 
 ## Context
 

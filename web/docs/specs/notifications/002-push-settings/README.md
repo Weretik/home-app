@@ -7,7 +7,7 @@
 - **Owner:** Vitaliy · **Created:** 2026-11-27 · **Updated:** 2026-11-27
 - **Backend SDD:** [api notifications/002 — Web Push](../../../../../api/docs/specs/notifications/002-web-push/README.md)
   (`getPushStatus`, `savePushSubscription`, `deletePushSubscription`, `sendPushTest`)
-- **Related:** [platform/002 — PWA](../../platform/002-pwa-offline/README.md) (service worker that shows the pushes),
+- **Related:** [platform/003 — PWA](../../platform/003-pwa-offline/README.md) (service worker that shows the pushes),
   [001 — Telegram page](../001-telegram-page/README.md)
 
 Every message of the family bot now also comes as a push notification to the devices where the person turned it on.
@@ -17,7 +17,7 @@ test and lists the person's devices; the Telegram cards stay as they are.
 ## State
 
 - Specification: accepted · Implementation: done · Verification: local checks green, audit in
-  [../../platform/002-pwa-offline/audit.md](../../platform/002-pwa-offline/audit.md) · Blockers: VAPID keys in the
+  [../../platform/003-pwa-offline/audit.md](../../platform/003-pwa-offline/audit.md) · Blockers: VAPID keys in the
   App Service settings (until then the card says push is not set up)
 
 ## Requirements and behaviour
@@ -67,4 +67,4 @@ notifications/
 
 - [x] Behaviour and states defined; contract taken from the backend SDD.
 - [x] Delivery: typecheck, lint, tests, structure check, build green locally; CI on the pull request.
-- [x] Final frontend code audit: [platform 002 audit](../../platform/002-pwa-offline/audit.md#notifications-002--push-settings-same-audit-pass).
+- [x] Final frontend code audit: [platform 003 audit](../../platform/003-pwa-offline/audit.md#notifications-002--push-settings-same-audit-pass).

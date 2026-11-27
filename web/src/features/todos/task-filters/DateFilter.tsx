@@ -4,7 +4,7 @@ import type { TaskView } from '../data/todos-api';
 import { whenLabels, whenOptions, whenTitles } from '../url-state/date-filter';
 import type { useTodoFilters } from '../url-state/use-todo-filters';
 
-const fieldSx = { minWidth: 0, flex: { xs: '1 1 100%', sm: '0 1 180px' } };
+const fieldSx = { minWidth: 0, flex: { xs: '1 1 40%', sm: '0 1 180px' } };
 
 /**
  * «Термін» on the active list, «Коли зроблено» in the archive (FR-002, FR-006): a select of quick choices and, for

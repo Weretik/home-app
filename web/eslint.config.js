@@ -54,7 +54,7 @@ export default tseslint.config(
     files: ['src/api-client/**'],
     rules: { 'no-restricted-imports': 'off' },
   },
-  // The service worker runs in its own global scope (web ADR 0019).
+  // The service worker runs in its own global scope (web ADR 0021).
   {
     files: ['src/app/service-worker/service-worker.ts'],
     languageOptions: { globals: globals.serviceworker },

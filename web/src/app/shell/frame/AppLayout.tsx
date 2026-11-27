@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { PushSync } from '../../features/notifications/push/PushSync';
-import { UpdatePrompt } from '../pwa/UpdatePrompt';
-import { BottomNav } from './BottomNav';
-import { SideNav } from './SideNav';
+import { PushSync } from '../../../features/notifications/push/PushSync';
+import { UpdatePrompt } from '../../pwa/UpdatePrompt';
+import { BottomNav } from '../navigation/BottomNav';
+import { SideNav } from '../navigation/SideNav';
 import { TopBar } from './TopBar';
 
 const COLLAPSED_KEY = 'home.side-nav.collapsed';

@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
-// The offline cache's version (web ADR 0020): a new API contract drops the data kept in IndexedDB.
+// The offline cache's version (web ADR 0022): a new API contract drops the data kept in IndexedDB.
 const contractHash = createHash('sha256')
   .update(
     readFileSync(new URL('./src/api-client/generated/api.ts', import.meta.url)),
@@ -16,7 +16,7 @@ export default defineConfig({
   define: { __API_CONTRACT_HASH__: JSON.stringify(contractHash) },
   plugins: [
     react(),
-    // The service worker (web ADR 0019): our own file with the precache manifest injected, registered from the
+    // The service worker (web ADR 0021): our own file with the precache manifest injected, registered from the
     // update prompt, never reloading on its own; public/site.webmanifest stays the manifest.
     VitePWA({
       strategies: 'injectManifest',

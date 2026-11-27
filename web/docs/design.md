@@ -57,7 +57,7 @@ Computer (md, 900px and wider)              Phone (below md)
 |        |   [ card ] [ card ]       |      |  [ card ]        |
 |        |                           |      |  [ card ]        |
 +--------+---------------------------+      +------------------+
-                                            | bottom bar (5)   |
+                                            | bottom bar (5+Ще)|
                                             +------------------+
 ```
 
@@ -65,13 +65,15 @@ Computer (md, 900px and wider)              Phone (below md)
   (computer only), the theme switch on the right.
 - **Side menu** (computer): under the header, 260px wide, groups with a caption («Разделы», «Сервис»). The header
   button collapses it to 84px of icons with tooltips; the choice is remembered (`home.side-nav.collapsed`).
-- **Bottom bar** (phone): the five main sections with icon and label; the active one has a tinted pill behind the
-  icon. It respects the safe area at the bottom.
+- **Bottom bar** (phone): the five main sections and «Ще» with icon and label; the active one has a tinted pill
+  behind the icon. «Ще» opens a bottom sheet with every other page («Про нас», «Стан», «Телеграм», «Профіль») and is
+  the active item while one of them is open ([ADR 0019](decisions/0019-phone-more-sheet-in-the-bottom-bar.md)). It
+  respects the safe area at the bottom.
 - **Page panel**: `background.default` with rounded top corners. Content starts at the left edge next to the side
   menu (never centred, which leaves a gap on wide screens) and stops at 1600px.
-- Sections are declared once in `src/app/shell/sections.ts`. `mainSections` (at most five) go to both menus;
-  `moreSections` («Про нас») and `serviceSections` go only to the side menu, and the home page links to them for
-  phones.
+- Sections are declared once in `src/app/shell/navigation/sections.ts`. `mainSections` (at most five) go to both
+  menus; `moreSections` («Про нас») and `serviceSections` go to the side menu and, with the profile, to the phone's
+  «Ще» sheet (`phoneMoreSections`); the home page links to them too.
 
 ## Pages
 
@@ -79,6 +81,20 @@ Computer (md, 900px and wider)              Phone (below md)
 - Spacing: `gap` of 2 (16px) on a phone, 3 (24px) on a computer, between blocks and between cards.
 - Grids: one column on a phone, two from `sm`, three from `lg` where cards are small.
 - A page starts with its title (`h4` as `h1`); the shell shows no extra page header.
+
+## Phone and touch
+
+Most use is the installed app on an Android phone ([ADR 0020](decisions/0020-phone-touch-targets-and-keyboard.md)).
+
+- Tap targets are at least 44px on a touch screen. The theme does it (`src/app/theme/phone-overrides.ts`, only under
+  `(pointer: coarse)`): icon and toggle buttons grow to 44px, buttons to 40px with an invisible 44px hit area, small
+  controls in dense rows keep their look with the same hit area. A screen never sets its own touch sizes.
+- A phone row never puts a name in a narrow column next to other content. Title, amount and «⋮» share the first line;
+  the details take the whole width under them (`expenses/month-view/CompactRow.tsx`); a row with more to say stacks.
+- Filters on a phone pair up two per row (selects, search) so the list starts in the first screen.
+- Every add or edit dialog is full screen below `sm`. The page shrinks above the keyboard
+  (`interactive-widget=resizes-content`) and the bottom bar hides while a text field has focus.
+- Section tabs on a phone have no minimum width; scroll arrows show only when there is more to scroll to.
 
 ## Sections with several pages and month lists
 
@@ -98,7 +114,8 @@ Computer (md, 900px and wider)              Phone (below md)
   list loads nothing.
 - Amounts are formatted as hryvnias with two decimals («95 024,00 ₴»), right-aligned and in tabular figures.
 - A month list starts with its filters and the add button («Добавить расход») on one row, then the list in a card.
-  Below `md` the list is compact (title, a caption line, the amount on the right); from `md` it is a small table.
+  Below `md` the list is compact (title, amount and «⋮» on the first line, the caption lines under them across the
+  whole row); from `md` it is a small table.
   More rows load with «Показать ещё». Lists show no month total card; totals belong to a summary page.
 - An empty month says «За этот месяц записей нет»; an empty filtered list offers «Сбросить фильтр». An error shows
   the reason and «Повторить».
@@ -127,8 +144,9 @@ Computer (md, 900px and wider)              Phone (below md)
   the count; a click opens the variant links in a row under the gift), Категория, Приоритет («Список» only), Цена
   (right, tabular), Повод (occasion and date) or Итог («Подарено 26 ноября 2026», «Не актуально»), then the quick status button
   («Подарено» or «Вернуть в список», an icon with a tooltip) and «⋮» (Не актуально, Изменить, Удалить).
-- Phone row: the name and the price on the first line, the category under it, then small outlined chips (priority or
-  how it ended, the occasion) and «N вариантов» unfolding the links; every action is in «⋮».
+- Phone row: the name alone on the first line at full width (never squeezed beside the price), then «price ·
+  category», the purchase line and notes (two lines), then one line of small outlined chips (priority or how it ended,
+  the occasion), «Посилання», «N варіантів» unfolding the links and «⋮» at its end with every action.
 - A priority chip is neutral (outlined); «🔥 Очень хочу» is only bolder. Crimson belongs to Маша (see below).
 - A gift price drops «,00» («1 625 ₴») and keeps real kopecks («1 234,50 ₴»); «цена не указана» in
   `text.secondary`, never 0. A person's group sum is rounded («≈ 4 500 ₴»).

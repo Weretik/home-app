@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import CardGiftcardOutlinedIcon from '@mui/icons-material/CardGiftcardOutlined';
 import ChecklistOutlinedIcon from '@mui/icons-material/ChecklistOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
@@ -40,9 +41,23 @@ export const serviceSections: Section[] = [
   },
 ];
 
+/** The member's own page, reached from the header menu and, on a phone, from «Ще». */
+export const profileSection: Section = {
+  path: '/profile',
+  label: 'Профіль',
+  icon: AccountCircleOutlinedIcon,
+};
+
+/** What the phone's «Ще» sheet lists: every page that is not in the bottom bar (web ADR 0019). */
+export const phoneMoreSections: Section[] = [
+  ...moreSections,
+  ...serviceSections,
+  profileSection,
+];
+
 /** The section a path belongs to, for the bottom bar and the page title. */
 export function sectionOf(pathname: string): Section | undefined {
-  return [...mainSections, ...moreSections, ...serviceSections].find((s) =>
+  return [...mainSections, ...phoneMoreSections].find((s) =>
     s.path === '/' ? pathname === '/' : pathname.startsWith(s.path),
   );
 }

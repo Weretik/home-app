@@ -6,8 +6,8 @@
 - **Architecture source:** [architecture](../../../architecture.md), [rules](../../../rules.md), [design rules](../../../design.md)
 - **Status:** accepted for delivery
 - **Owner:** Vitaliy · **Created:** 2026-11-27 · **Updated:** 2026-11-27
-- **Decisions:** [web ADR 0019](../../../decisions/0019-service-worker-with-update-prompt.md) (service worker, precached
-  shell, update prompt), [web ADR 0020](../../../decisions/0020-offline-cache-and-queued-writes.md) (IndexedDB cache,
+- **Decisions:** [web ADR 0021](../../../decisions/0021-service-worker-with-update-prompt.md) (service worker, precached
+  shell, update prompt), [web ADR 0022](../../../decisions/0022-offline-cache-and-queued-writes.md) (IndexedDB cache,
   queued writes, last write wins)
 - **Backend SDD:** [api notifications/002 — Web Push](../../../../../api/docs/specs/notifications/002-web-push/README.md)
   (the push payload the service worker shows)

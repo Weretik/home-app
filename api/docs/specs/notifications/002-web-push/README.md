@@ -8,7 +8,7 @@
 - **Created:** 2026-11-27 · **Updated:** 2026-11-27
 - **Decisions:** [ADR 0042](../../../decisions/0042-web-push-next-to-telegram.md) (standard Web Push with VAPID, no
   Firebase; subscriptions per member; a delivery per channel)
-- **Frontend SDD:** [web platform/002 — installable app, offline data and queued writes](../../../../../web/docs/specs/platform/002-pwa-offline/README.md),
+- **Frontend SDD:** [web platform/003 — installable app, offline data and queued writes](../../../../../web/docs/specs/platform/003-pwa-offline/README.md),
   [web notifications/002 — push settings](../../../../../web/docs/specs/notifications/002-push-settings/README.md)
 
 On 2026-11-27 Vitaliy asked to make «Дім» a full PWA and to send everything the Telegram bot sends as push
