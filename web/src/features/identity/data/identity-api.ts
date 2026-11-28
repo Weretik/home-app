@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiCall } from '../../../api-client';
+import { ApiError, apiCall } from '../../../api-client';
 import { api } from '../../../platform/client/api';
 import { memberKeys } from '../../../platform/client/member-api';
 import { session } from '../../../platform/session/session';
@@ -44,6 +44,27 @@ export function useSignOut() {
     onSettled: () => {
       session.clear('signed-out');
       queryClient.clear();
+    },
+  });
+}
+
+/**
+ * «Вийти на всіх пристроях» (ADR 0046): ends every session of the member on the server, then forgets this device's
+ * token and clears the cache. Unlike «Вийти» it is not best effort: if the server did not confirm, the other devices
+ * may still be signed in, so the error is shown and nothing is forgotten. A `401` means this session had already
+ * ended, so this device signs out too.
+ */
+export function useSignOutEverywhere() {
+  const queryClient = useQueryClient();
+  const forget = () => {
+    session.clear('signed-out');
+    queryClient.clear();
+  };
+  return useMutation({
+    mutationFn: () => apiCall(api.POST('/api/identity/sign-out-everywhere')),
+    onSuccess: forget,
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 401) forget();
     },
   });
 }

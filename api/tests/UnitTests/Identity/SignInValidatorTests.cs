@@ -1,5 +1,6 @@
 using Identity.Application.Features.Sessions.Commands.SignIn;
 using Identity.Application.Features.Sessions.Commands.SignOut;
+using Identity.Application.Features.Sessions.Commands.SignOutEverywhere;
 
 namespace UnitTests.Identity;
 
@@ -27,5 +28,9 @@ public sealed class SignInValidatorTests
     {
         Assert.False(new SignOutValidator().Validate(new SignOutCommand("")).IsValid);
         Assert.True(new SignOutValidator().Validate(new SignOutCommand("token")).IsValid);
+        Assert.False(new SignOutEverywhereValidator().Validate(new SignOutEverywhereCommand("")).IsValid);
+        Assert.False(new SignOutEverywhereValidator()
+            .Validate(new SignOutEverywhereCommand(new string('t', 257))).IsValid);
+        Assert.True(new SignOutEverywhereValidator().Validate(new SignOutEverywhereCommand("token")).IsValid);
     }
 }

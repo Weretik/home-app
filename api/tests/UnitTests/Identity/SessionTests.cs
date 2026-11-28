@@ -2,7 +2,7 @@ using Identity.Domain.Sessions;
 
 namespace UnitTests.Identity;
 
-/// <summary>Spec identity/001: R-004, R-005, R-007, R-012.</summary>
+/// <summary>Spec identity/001: R-004, R-005, R-007, R-012; ADR 0046 (90 days at most).</summary>
 public sealed class SessionTests
 {
     private static readonly DateTimeOffset Start = new(2026, 11, 27, 9, 0, 0, TimeSpan.Zero);
@@ -55,6 +55,33 @@ public sealed class SessionTests
         Assert.Equal(later, session.LastSeenAtUtc);
         Assert.Equal(later + Session.Lifetime, session.ExpiresAtUtc);
         Assert.True(session.IsActiveAt(Start.AddDays(45)));
+    }
+
+    [Fact]
+    public void A_SessionInRegularUse_EndsNinetyDaysAfterTheSignIn()
+    {
+        var session = NewSession();
+        for (var day = 1; day <= 89; day++)
+            session.Touch(Start.AddDays(day));
+
+        Assert.Equal(Start + Session.MaxAge, session.ExpiresAtUtc);
+        Assert.True(session.IsActiveAt(Start.AddDays(90).AddMinutes(-1)));
+        Assert.False(session.IsActiveAt(Start.AddDays(90)));
+        Assert.False(session.Touch(Start.AddDays(90)));
+    }
+
+    [Fact]
+    public void An_OldSession_SlidBeforeTheLimit_EndsAtTheLimitToo()
+    {
+        var session = NewSession();
+        session.Touch(Start.AddDays(25));
+        session.Touch(Start.AddDays(50));
+        session.Touch(Start.AddDays(75));
+
+        Assert.Equal(Start + Session.MaxAge, session.ExpiresAtUtc);
+        Assert.False(session.IsActiveAt(Start.AddDays(91)));
+        Assert.False(session.IsStaleAt(Start.AddDays(119)));
+        Assert.True(session.IsStaleAt(Start.AddDays(121)));
     }
 
     [Fact]
