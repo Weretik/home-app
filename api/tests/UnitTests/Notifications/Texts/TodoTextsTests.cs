@@ -40,14 +40,31 @@ public sealed class TodoTextsTests
     }
 
     [Fact]
-    public void The_Common_Message_CountsPerPerson_AndListsTheOverdue()
+    public void The_Common_Message_InAGroup_ListsEveryActiveTask_PerAssignee()
     {
         var text = TodoTexts.Common(Active, Today, "https://web.example/todos")!;
 
-        Assert.Contains("Відкрито: Віталій — 3, Маша — 1, Спільне — 1", text);
-        Assert.Contains("• Оплатить &lt;свет&gt; — Віталій, з 30.11", text);
-        Assert.EndsWith("<a href=\"https://web.example/todos\">Відкрити справи</a>", text);
-        Assert.Contains("Прострочених немає", TodoTexts.Common([Active[1]], Today, "u")!);
+        Assert.Equal(
+            "📋 <b>Справи родини</b>\n\n"
+            + "👤 <b>Віталій</b> (3)\n• 🔴 ❗ Оплатить &lt;свет&gt; — з 30.11\n• Забрать посылку — сьогодні\n• Через неделю — до 09.12\n\n"
+            + "👤 <b>Маша</b> (1)\n• Без срока\n\n"
+            + "👥 <b>Спільні</b> (1)\n• Вынести мусор — сьогодні\n\n"
+            + "<a href=\"https://web.example/todos\">Відкрити справи</a>",
+            text);
         Assert.Null(TodoTexts.Common([], Today, "u"));
+    }
+
+    [Fact]
+    public void The_Common_Message_InAPersonsChat_ListsOnlyTheirAndSharedTasks()
+    {
+        var vitaliy = TodoTexts.Common(Active, Today, "u", TodoAssignee.Vitaliy)!;
+        var maria = TodoTexts.Common(Active, Today, "u", TodoAssignee.Maria)!;
+
+        Assert.StartsWith("📋 <b>Усі відкриті справи</b>\n\n👤 <b>Мої</b> (3)\n", vitaliy);
+        Assert.Contains("👥 <b>Спільні</b> (1)", vitaliy);
+        Assert.DoesNotContain("Без срока", vitaliy);
+        Assert.Contains("👤 <b>Мої</b> (1)\n• Без срока", maria);
+        Assert.DoesNotContain("Оплатить", maria);
+        Assert.Null(TodoTexts.Common([Active[3]], Today, "u", TodoAssignee.Vitaliy));
     }
 }

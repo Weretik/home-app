@@ -18,6 +18,7 @@ refactor → affected regression run. Evidence is the CI run of the pull request
 | NT-009 | Scheduler workflow (cron every 15 minutes: notifications tick, then outbox tick) | `.github/workflows/scheduler.yml` | CI (manual dispatch) | R-017 |
 | NT-010 | Docs: module page, ADRs 0033–0035, C4, deploy, AGENTS.md | `api/docs`, `docs/deploy.md` | review | — |
 | NT-011 | Scheduler heartbeat: `RecordTick` before `RunTick`, migration `SchedulerHeartbeat`, status fields, deploy warning, cron-job.org as the main scheduler | `Features/Tick/`, `Features/Status/`, `api.yml`, `docs/deploy.md` | unit (`SchedulerHeartbeat.IsSilent`) + integration (tick then status) | R-020 |
+| NT-012 | Common to-do message as a full list; in a private chat only the person's and the shared tasks | `Digests/Texts/TodoTexts.cs`, `Digests/Planning/DigestPlanner.cs` | unit (`TodoTextsTests`, `DigestPlannerTests`) | R-009 |
 
 ## Readiness
 

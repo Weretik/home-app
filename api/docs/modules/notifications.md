@@ -28,7 +28,7 @@ Code: [`src/Modules/Notifications`](../../src/Modules/Notifications). Schema: `n
 | Message | When | To |
 | --- | --- | --- |
 | Personal to-dos: overdue and today's, then shared ones, with «✅» buttons | every day 08:00–11:59 | each linked person |
-| Common to-dos: open per person, everything overdue | every day 08:00–11:59 | family group, or both people |
+| Common to-dos: every open task in full; in a private chat only the person's and the shared ones | every day 08:00–11:59 | family group, or both people |
 | Gift reminder with the link to the gift | 0–14 days before the gift's buy-by date, 08:00–11:59, once per date | the giver (both for «Разом»), else the group |
 | Shopping list by department (only when not empty) | every day 18:00–21:59 | family group, or both people |
 | Expenses of the week (Monday–Sunday) and the month so far | Sunday 20:00–23:59 | family group, or both people |

@@ -56,7 +56,7 @@ public static class DigestPlanner
             DigestKind.TodosMorning when inputs.Todos is { } todos =>
                 TodoTexts.Morning(Assignee(audience), TextFormat.Address(audience.ToString()), todos, today),
             DigestKind.TodosCommon when inputs.Todos is { } todos =>
-                Plain(TodoTexts.Common(todos, today, site.Page("todos"))),
+                Plain(TodoTexts.Common(todos, today, site.Page("todos"), audience == Audience.Family ? null : Assignee(audience))),
             DigestKind.ShoppingEvening when inputs.Shopping is { } items =>
                 Plain(ShoppingText.For(items, site.Page("shopping"))),
             DigestKind.ExpensesWeek when inputs is { Week: { } week, WeekMonth: { } month } =>

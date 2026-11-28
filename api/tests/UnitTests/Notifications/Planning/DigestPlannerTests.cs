@@ -66,7 +66,7 @@ public sealed class DigestPlannerTests
         var planned = DigestPlanner.Plan(Morning, pushPeople, inputs, Today, Site);
 
         Assert.Equal(
-            ["TodosMorning:2026-12-02:Maria", "TodosCommon:2026-12-02:Vitaliy", "TodosCommon:2026-12-02:Maria"],
+            ["TodosMorning:2026-12-02:Maria", "TodosCommon:2026-12-02:Maria"],
             planned.Select(m => m.Key));
         Assert.All(planned, m => Assert.Equal("/todos", m.Page));
     }
