@@ -473,7 +473,8 @@ identity/
   sign-in/  SessionGate (the app or the sign-in screen), SignInPage, GoogleButton and use-google-button.ts (loading,
             retry)
   member/   MemberMenu (avatar button, name, e-mail, «Профіль», «Вийти»), MemberAvatar (Google picture or the first letter)
-  profile/  ProfilePage (`/profile`: member, «У домі», Telegram, «Вийти»), TelegramRow, profile-api.ts (the person's chat
+  profile/  ProfilePage (`/profile`: member, «У домі», Telegram), SignOutButtons («Вийти», «Вийти на всіх пристроях» with a
+            confirmation, api ADR 0046), TelegramRow, profile-api.ts (the person's chat
             from getNotificationsStatus)
 ```
 

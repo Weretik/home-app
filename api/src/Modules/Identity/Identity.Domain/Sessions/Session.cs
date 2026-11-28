@@ -5,7 +5,8 @@ namespace Identity.Domain.Sessions;
 /// <summary>
 /// One signed-in device of a family member (ADR 0037). The token itself is never stored, only its hash. A session
 /// lives <see cref="Lifetime"/> after its last use; using it slides the expiry, writing at most once per
-/// <see cref="TouchInterval"/>. Sign-out revokes it.
+/// <see cref="TouchInterval"/>, but never past <see cref="MaxAge"/> after the sign-in (ADR 0046), so a stolen token in
+/// regular use still ends. Sign-out revokes it; «sign out everywhere» revokes every session of the member.
 /// </summary>
 public sealed class Session : Entity<SessionId>, IAggregateRoot
 {
@@ -16,6 +17,9 @@ public sealed class Session : Entity<SessionId>, IAggregateRoot
 
     public static readonly TimeSpan Lifetime = TimeSpan.FromDays(30);
     public static readonly TimeSpan TouchInterval = TimeSpan.FromHours(1);
+
+    /// <summary>The longest a session lives, counted from the sign-in, however often it is used (ADR 0046).</summary>
+    public static readonly TimeSpan MaxAge = TimeSpan.FromDays(90);
 
     /// <summary>How long an ended session is kept before a sign-in of its member deletes it (R-012).</summary>
     public static readonly TimeSpan KeepEnded = TimeSpan.FromDays(30);
@@ -55,12 +59,19 @@ public sealed class Session : Entity<SessionId>, IAggregateRoot
         ExpiresAtUtc = now + Lifetime,
     };
 
-    public bool IsActiveAt(DateTimeOffset now) => RevokedAtUtc is null && now < ExpiresAtUtc;
+    /// <summary>The moment the session ends at the latest, however often it is used.</summary>
+    public DateTimeOffset EndsAtLatestUtc => CreatedAtUtc + MaxAge;
+
+    public bool IsActiveAt(DateTimeOffset now) =>
+        RevokedAtUtc is null && now < ExpiresAtUtc && now < EndsAtLatestUtc;
 
     /// <summary>Ended (revoked or expired) more than <see cref="KeepEnded"/> before <paramref name="now"/>.</summary>
-    public bool IsStaleAt(DateTimeOffset now) => (RevokedAtUtc ?? ExpiresAtUtc) + KeepEnded < now;
+    public bool IsStaleAt(DateTimeOffset now) => (RevokedAtUtc ?? Min(ExpiresAtUtc, EndsAtLatestUtc)) + KeepEnded < now;
 
-    /// <summary>Slides the expiry when the last recorded use is older than <see cref="TouchInterval"/>.</summary>
+    /// <summary>
+    /// Slides the expiry when the last recorded use is older than <see cref="TouchInterval"/>, never past
+    /// <see cref="EndsAtLatestUtc"/>.
+    /// </summary>
     /// <returns>Whether anything changed and needs saving.</returns>
     public bool Touch(DateTimeOffset now)
     {
@@ -68,12 +79,14 @@ public sealed class Session : Entity<SessionId>, IAggregateRoot
             return false;
 
         LastSeenAtUtc = now;
-        ExpiresAtUtc = now + Lifetime;
+        ExpiresAtUtc = Min(now + Lifetime, EndsAtLatestUtc);
         return true;
     }
 
     /// <summary>Ends the session; a second call keeps the first time.</summary>
     public void Revoke(DateTimeOffset now) => RevokedAtUtc ??= now;
+
+    private static DateTimeOffset Min(DateTimeOffset a, DateTimeOffset b) => a < b ? a : b;
 
     private static string? Cut(string? value, int max)
     {

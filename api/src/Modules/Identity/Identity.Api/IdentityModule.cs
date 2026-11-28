@@ -46,6 +46,7 @@ public static class IdentityModule
             .WithTags("Identity")
             .MapSignIn()
             .MapSignOut()
+            .MapSignOutEverywhere()
             .MapGetCurrentMember();
         return endpoints;
     }

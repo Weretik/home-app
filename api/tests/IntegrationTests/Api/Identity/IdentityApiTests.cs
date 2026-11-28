@@ -101,6 +101,25 @@ public sealed class IdentityApiTests(ApiFactory api)
     }
 
     [SkippableFact]
+    public async Task Sign_Out_Everywhere_EndsEverySessionOfTheMember_AndNoOtherMembers()
+    {
+        Skip.If(api.Unavailable is not null, api.Unavailable);
+        using var laptop = WithToken(await api.SignInAsync(ApiFactory.Masha));
+        using var phone = WithToken(await api.SignInAsync(ApiFactory.Masha));
+        using var vitaliy = api.CreateHttpsClient();
+
+        var response = await phone.PostAsync("/api/identity/sign-out-everywhere", null);
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await phone.GetAsync("/api/identity/me")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await laptop.GetAsync("/api/identity/me")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await vitaliy.GetAsync("/api/identity/me")).StatusCode);
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            (await phone.PostAsync("/api/identity/sign-out-everywhere", null)).StatusCode);
+    }
+
+    [SkippableFact]
     public async Task An_ExpiredSession_IsRefused_AndAnActiveOne_Slides()
     {
         Skip.If(api.Unavailable is not null, api.Unavailable);
