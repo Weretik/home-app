@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Modeling;
+using Gifts.Domain.Wishlist.Identifiers;
 
 namespace Gifts.Domain.Wishlist;
 
@@ -6,7 +7,7 @@ namespace Gifts.Domain.Wishlist;
 /// One more place or model of the same gift, with its own link (the sheet kept them in the notes). It belongs to its
 /// <see cref="Gift"/>: it is created, replaced and deleted only through the gift.
 /// </summary>
-public sealed class GiftVariant : Entity<Guid>
+public sealed class GiftVariant : Entity<GiftVariantId>
 {
     private GiftVariant()
     {
@@ -23,7 +24,7 @@ public sealed class GiftVariant : Entity<Guid>
 
     internal static GiftVariant From(VariantDraft draft, int position, DateTimeOffset now) => new()
     {
-        Id = Guid.CreateVersion7(now),
+        Id = GiftVariantId.New(now),
         Title = Gift.Normalize(draft.Title),
         Link = draft.Link.Trim(),
         Price = draft.Price,

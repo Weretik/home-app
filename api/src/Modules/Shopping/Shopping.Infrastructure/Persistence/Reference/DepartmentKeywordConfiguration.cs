@@ -25,7 +25,7 @@ internal sealed class DepartmentKeywordConfiguration : IEntityTypeConfiguration<
 
         builder.HasData(DictionarySeed.Keywords.Select(k => new
         {
-            k.Id, k.Keyword, k.DepartmentId, Learned = false, CreatedAtUtc = DictionarySeed.SeededAtUtc,
+            Id = new DepartmentKeywordId(k.Id), k.Keyword, DepartmentId = new DepartmentId(k.DepartmentId), Learned = false, CreatedAtUtc = DictionarySeed.SeededAtUtc,
         }));
     }
 }

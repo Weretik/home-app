@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
+using Shopping.Domain.Items;
 
-namespace Shopping.Domain.Items;
+namespace Shopping.Domain.Items.Lifecycle;
 
 /// <summary>
 /// Where an item is, computed from its data and the current time, never stored: it is in the list while needed, or

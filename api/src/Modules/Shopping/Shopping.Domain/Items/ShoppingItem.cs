@@ -1,5 +1,7 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Shopping.Domain.Departments;
+using Shopping.Domain.Items.Lifecycle;
 using Shopping.Domain.Parsing;
 
 namespace Shopping.Domain.Items;
@@ -8,7 +10,7 @@ namespace Shopping.Domain.Items;
 /// One thing to buy: a row of the old «Список» sheet, and after it is bought and leaves the cart, a row of
 /// «История». The same name may be in history many times but is in the list once (re-adding updates or revives it).
 /// </summary>
-public sealed class ShoppingItem : Entity<Guid>, IAggregateRoot
+public sealed class ShoppingItem : Entity<ShoppingItemId>, IAggregateRoot
 {
     public const int MaxNameLength = ItemTextParser.MaxNameLength;
     public const int MaxQuantityLength = ItemTextParser.MaxQuantityLength;
@@ -30,7 +32,7 @@ public sealed class ShoppingItem : Entity<Guid>, IAggregateRoot
 
     public string? Note { get; private set; }
 
-    public Guid DepartmentId { get; private set; }
+    public DepartmentId DepartmentId { get; private set; }
 
     /// <summary>«Срочно»: shown first in its department.</summary>
     public bool Urgent { get; private set; }
@@ -58,7 +60,7 @@ public sealed class ShoppingItem : Entity<Guid>, IAggregateRoot
         string name,
         string? quantity,
         string? note,
-        Guid departmentId,
+        DepartmentId departmentId,
         bool urgent,
         Person addedBy,
         DateTimeOffset now,
@@ -70,7 +72,7 @@ public sealed class ShoppingItem : Entity<Guid>, IAggregateRoot
 
         return new ShoppingItem
         {
-            Id = Guid.CreateVersion7(now),
+            Id = ShoppingItemId.New(now),
             Name = name.Trim(),
             NormalizedName = NameNormalizer.Normalize(name),
             Quantity = Clean(quantity),
@@ -85,7 +87,7 @@ public sealed class ShoppingItem : Entity<Guid>, IAggregateRoot
     }
 
     /// <summary>The edit dialog: replaces name, quantity, note, department and the urgent flag.</summary>
-    public Result Update(string name, string? quantity, string? note, Guid departmentId, bool urgent)
+    public Result Update(string name, string? quantity, string? note, DepartmentId departmentId, bool urgent)
     {
         var check = Check(name, quantity, note);
         if (check.IsFailure)

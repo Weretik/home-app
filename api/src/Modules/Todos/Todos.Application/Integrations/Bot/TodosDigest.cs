@@ -18,6 +18,6 @@ public sealed class TodosDigest(ITodosDbContext db) : ITodosDigest
             .Select(t => new { t.Id, t.Title, t.Assignee, t.DueDate, t.Priority })
             .ToListAsync(cancellationToken);
 
-        return [.. rows.Select(t => new OpenTodo(t.Id, t.Title, Enum.Parse<TodoAssignee>(t.Assignee.ToString()), t.DueDate, t.Priority == TodoPriority.Urgent))];
+        return [.. rows.Select(t => new OpenTodo(t.Id.Value, t.Title, Enum.Parse<TodoAssignee>(t.Assignee.ToString()), t.DueDate, t.Priority == TodoPriority.Urgent))];
     }
 }

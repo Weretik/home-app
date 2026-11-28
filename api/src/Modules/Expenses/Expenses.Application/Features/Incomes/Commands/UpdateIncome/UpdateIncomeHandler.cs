@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Entries.Identifiers;
 using Expenses.Domain.Parties;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ public sealed class UpdateIncomeHandler(IExpensesDbContext db) : ICommandHandler
 {
     public async ValueTask<Result> Handle(UpdateIncomeCommand c, CancellationToken cancellationToken)
     {
-        var entry = await db.Incomes.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var entry = await db.Incomes.FirstOrDefaultAsync(x => x.Id == new IncomeId(c.Id), cancellationToken);
         if (entry is null)
             return EntryErrors.NotFound("income", c.Id);
         if (entry.Version != c.Version)

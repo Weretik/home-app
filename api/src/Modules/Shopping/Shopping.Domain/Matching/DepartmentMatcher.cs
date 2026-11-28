@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Shopping.Domain.Departments;
 using Shopping.Domain.Parsing;
 
 namespace Shopping.Domain.Matching;
@@ -13,9 +14,9 @@ public sealed partial class DepartmentMatcher
 {
     public const int ExactScore = 1000;
 
-    private readonly IReadOnlyList<(string Keyword, string[] Parts, Guid DepartmentId)> _rules;
+    private readonly IReadOnlyList<(string Keyword, string[] Parts, DepartmentId DepartmentId)> _rules;
 
-    public DepartmentMatcher(IEnumerable<KeywordRule> rules, Guid fallbackDepartmentId)
+    public DepartmentMatcher(IEnumerable<KeywordRule> rules, DepartmentId fallbackDepartmentId)
     {
         FallbackDepartmentId = fallbackDepartmentId;
         _rules = rules
@@ -25,14 +26,14 @@ public sealed partial class DepartmentMatcher
             .ToList();
     }
 
-    public Guid FallbackDepartmentId { get; }
+    public DepartmentId FallbackDepartmentId { get; }
 
-    public Guid Match(string name)
+    public DepartmentId Match(string name)
     {
         var normalized = NameNormalizer.Normalize(name);
         var words = WordSeparators().Split(normalized).Where(w => w.Length > 0).ToArray();
 
-        Guid? best = null;
+        DepartmentId? best = null;
         var bestScore = 0;
         foreach (var (keyword, parts, departmentId) in _rules)
         {

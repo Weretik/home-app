@@ -19,6 +19,6 @@ public static class DetailErrors
     public static readonly Error ChangedMeanwhile = Error.Conflict(
         "gifts.changed_meanwhile", "Тим часом цей нюанс хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(DetailId id) =>
         Error.NotFound("gifts.detail_not_found", $"Нюансу {id} немає.");
 }

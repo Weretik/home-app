@@ -3,6 +3,7 @@ using Gifts.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Todos.Contracts;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Integrations.Gifts;
 
@@ -15,7 +16,7 @@ public sealed class GiftPurchaseClosedHandler(ITodosDbContext db, TimeProvider c
     public async Task HandleAsync(GiftPurchaseClosed message, CancellationToken cancellationToken)
     {
         var task = await db.Tasks.FirstOrDefaultAsync(
-            t => t.SourceKind == TodoTaskCompleted.GiftSource && t.SourceId == message.GiftId, cancellationToken);
+            t => t.SourceKind == TodoTaskCompleted.GiftSource && t.SourceId == new TaskSourceId(message.GiftId), cancellationToken);
         if (task is null || task.IsArchived)
             return;
 

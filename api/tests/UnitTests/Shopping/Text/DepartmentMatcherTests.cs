@@ -1,3 +1,5 @@
+using System;
+using Shopping.Domain.Departments;
 using Shopping.Domain.Matching;
 
 namespace UnitTests.Shopping.Text;
@@ -5,12 +7,12 @@ namespace UnitTests.Shopping.Text;
 /// <summary>The rules of the bot's <c>deptOf_</c>, on a small dictionary taken from «Справочник».</summary>
 public sealed class DepartmentMatcherTests
 {
-    private static readonly Guid Vegetables = Guid.NewGuid();
-    private static readonly Guid Dairy = Guid.NewGuid();
-    private static readonly Guid Grocery = Guid.NewGuid();
-    private static readonly Guid Hygiene = Guid.NewGuid();
-    private static readonly Guid Chemistry = Guid.NewGuid();
-    private static readonly Guid Other = Guid.NewGuid();
+    private static readonly DepartmentId Vegetables = new(Guid.NewGuid());
+    private static readonly DepartmentId Dairy = new(Guid.NewGuid());
+    private static readonly DepartmentId Grocery = new(Guid.NewGuid());
+    private static readonly DepartmentId Hygiene = new(Guid.NewGuid());
+    private static readonly DepartmentId Chemistry = new(Guid.NewGuid());
+    private static readonly DepartmentId Other = new(Guid.NewGuid());
 
     private static readonly DepartmentMatcher Matcher = new(
     [
@@ -85,7 +87,7 @@ public sealed class DepartmentMatcherTests
         Assert.Equal(Dairy, matcher.Match("Сыр плавленый"));
     }
 
-    private static Guid Department(string name) => name switch
+    private static DepartmentId Department(string name) => name switch
     {
         nameof(Vegetables) => Vegetables,
         nameof(Dairy) => Dairy,

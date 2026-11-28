@@ -1,3 +1,4 @@
+using Shopping.Domain.Departments;
 using Shopping.Domain.Matching;
 using Shopping.Infrastructure.Persistence.Reference;
 
@@ -10,8 +11,8 @@ public sealed class DictionarySeedTests
         DictionarySeed.Keywords
             .OrderBy(k => DictionarySeed.Departments.Single(d => d.Id == k.DepartmentId).SortOrder)
             .ThenBy(k => k.Keyword, StringComparer.Ordinal)
-            .Select(k => new KeywordRule(k.Keyword, k.DepartmentId)),
-        DictionarySeed.Departments.Single(d => d.IsFallback).Id);
+            .Select(k => new KeywordRule(k.Keyword, new DepartmentId(k.DepartmentId))),
+        new DepartmentId(DictionarySeed.Departments.Single(d => d.IsFallback).Id));
 
     [Fact]
     public void The_Sheet_Has13Departments_InStoreOrder_WithOneFallback_Last()
@@ -60,6 +61,6 @@ public sealed class DictionarySeedTests
     {
         var id = Matcher.Match(name);
 
-        Assert.Equal(department, DictionarySeed.Departments.Single(d => d.Id == id).Name);
+        Assert.Equal(department, DictionarySeed.Departments.Single(d => d.Id == id.Value).Name);
     }
 }

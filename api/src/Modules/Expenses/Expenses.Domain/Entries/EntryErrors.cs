@@ -29,7 +29,7 @@ public static class EntryErrors
     public static readonly Error ChangedMeanwhile = Error.Conflict(
         "expenses.changed_meanwhile", "Тим часом цей запис хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
-    public static Error NotFound(string what, Guid id) =>
+    public static Error NotFound<TId>(string what, TId id) where TId : struct =>
         Error.NotFound($"expenses.{what}_not_found", $"Немає {Genitive(what)} {id}.");
 
     /// <summary>The record kind in the genitive, for <see cref="NotFound"/>.</summary>

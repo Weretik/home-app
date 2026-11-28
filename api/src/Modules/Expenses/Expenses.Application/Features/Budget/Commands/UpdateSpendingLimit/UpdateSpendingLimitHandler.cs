@@ -1,6 +1,7 @@
-using Expenses.Application;
 using BuildingBlocks.Domain.Results;
+using Expenses.Application;
 using Expenses.Domain.Budget;
+using Expenses.Domain.Budget.Identifiers;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Mediator;
@@ -12,16 +13,17 @@ public sealed class UpdateSpendingLimitHandler(IExpensesDbContext db, TimeProvid
 {
     public async ValueTask<Result> Handle(UpdateSpendingLimitCommand c, CancellationToken cancellationToken)
     {
-        var limit = await db.SpendingLimits.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var categoryIds = c.CategoryIds.Select(id => new CategoryId(id)).ToList();
+        var limit = await db.SpendingLimits.FirstOrDefaultAsync(x => x.Id == new SpendingLimitId(c.Id), cancellationToken);
         if (limit is null)
-            return BudgetErrors.LimitNotFound(c.Id);
+            return BudgetErrors.LimitNotFound(new SpendingLimitId(c.Id));
         if (limit.Version != c.Version)
             return EntryErrors.ChangedMeanwhile;
 
-        if (await BudgetCategories.FirstMissingAsync(db, c.CategoryIds, cancellationToken) is { } missing)
+        if (await BudgetCategories.FirstMissingAsync(db, categoryIds, cancellationToken) is { } missing)
             return CategoryErrors.NotFoundById(missing);
 
-        var updated = limit.Update(c.Name, c.Period, c.Amount, c.CategoryIds, limit.SortOrder, c.AmountFrom, clock.TodayInKyiv());
+        var updated = limit.Update(c.Name, c.Period, c.Amount, categoryIds, limit.SortOrder, c.AmountFrom, clock.TodayInKyiv());
         if (updated.IsFailure)
             return updated;
 

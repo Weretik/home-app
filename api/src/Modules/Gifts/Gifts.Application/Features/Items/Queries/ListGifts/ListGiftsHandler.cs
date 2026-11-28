@@ -32,11 +32,11 @@ public sealed class ListGiftsHandler(IGiftsDbContext db) : IQueryHandler<ListGif
 
         var items = await ordered
             .Select(x => new GiftItem(
-                x.Gift.Id,
+                x.Gift.Id.Value,
                 x.Gift.Version,
                 x.Gift.Recipient,
                 x.Gift.Name,
-                x.Gift.CategoryId,
+                x.Gift.CategoryId.Value,
                 x.CategoryName,
                 x.Gift.Priority,
                 x.Gift.Price,
@@ -48,7 +48,7 @@ public sealed class ListGiftsHandler(IGiftsDbContext db) : IQueryHandler<ListGif
                 x.Gift.Notes,
                 x.Gift.Variants
                     .OrderBy(v => v.SortOrder)
-                    .Select(v => new GiftVariantItem(v.Id, v.Title, v.Link, v.Price))
+                    .Select(v => new GiftVariantItem(v.Id.Value, v.Title, v.Link, v.Price))
                     .ToList(),
                 x.Gift.CreatedAtUtc,
                 x.Gift.Giver,

@@ -2,6 +2,7 @@ using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Shopping.Domain.Departments;
 using Shopping.Domain.Parsing;
 
 namespace Shopping.Application.Features.Keywords.Queries.ListKeywords;
@@ -17,14 +18,14 @@ public sealed class ListKeywordsHandler(IShoppingDbContext db)
     {
         var keywords = db.Keywords.AsNoTracking();
         if (query.DepartmentId is { } departmentId)
-            keywords = keywords.Where(k => k.DepartmentId == departmentId);
+            keywords = keywords.Where(k => k.DepartmentId == new DepartmentId(departmentId));
         foreach (var pattern in SearchPattern.ContainsEachWord(NameNormalizer.Normalize(query.Search)))
             keywords = keywords.Where(k => EF.Functions.Like(k.Keyword, pattern, SearchPattern.EscapeCharacter));
 
         return await keywords
             .Join(db.Departments.AsNoTracking(), k => k.DepartmentId, d => d.Id, (k, d) => new { k, d })
             .OrderBy(x => x.k.Keyword)
-            .Select(x => new KeywordItem(x.k.Id, x.k.Keyword, x.k.DepartmentId, x.d.Name, x.d.Icon, x.k.Learned, x.k.Version))
+            .Select(x => new KeywordItem(x.k.Id.Value, x.k.Keyword, x.k.DepartmentId.Value, x.d.Name, x.d.Icon, x.k.Learned, x.k.Version))
             .ToListAsync(cancellationToken);
     }
 }

@@ -26,7 +26,7 @@ public sealed class ListSavingsMovementsHandler(IExpensesDbContext db)
             .OrderByDescending(m => m.Date)
             .ThenByDescending(m => m.Id)
             .Select(m => new SavingsMovementItem(
-                m.Id,
+                m.Id.Value,
                 m.Version,
                 m.Date,
                 m.Person,

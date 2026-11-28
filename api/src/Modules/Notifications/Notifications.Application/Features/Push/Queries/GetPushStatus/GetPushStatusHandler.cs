@@ -18,7 +18,7 @@ public sealed class GetPushStatusHandler(INotificationsDbContext db, IWebPush pu
             : await db.PushSubscriptions.AsNoTracking()
                 .Where(s => s.Person == person)
                 .OrderByDescending(s => s.LastSeenAtUtc)
-                .Select(s => new PushDevice(s.Id, s.Device, s.Endpoint, s.CreatedAtUtc, s.LastSeenAtUtc))
+                .Select(s => new PushDevice(s.Id.Value, s.Device, s.Endpoint, s.CreatedAtUtc, s.LastSeenAtUtc))
                 .ToListAsync(cancellationToken);
         return new PushStatus(push.IsConfigured, push.PublicKey, person is not null, devices);
     }

@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Modeling;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Domain.Tasks;
 
@@ -6,7 +7,7 @@ namespace Todos.Domain.Tasks;
 /// One line of a task's checklist. It lives inside its <see cref="TodoTask"/> and changes only through the task's
 /// methods, so the task's version moves with every step change.
 /// </summary>
-public sealed class TaskStep : Entity<Guid>
+public sealed class TaskStep : Entity<TaskStepId>
 {
     private TaskStep()
     {
@@ -20,7 +21,7 @@ public sealed class TaskStep : Entity<Guid>
     public int SortOrder { get; private init; }
 
     internal static TaskStep Create(string title, int sortOrder, DateTimeOffset now) =>
-        new() { Id = Guid.CreateVersion7(now), Title = title, SortOrder = sortOrder };
+        new() { Id = TaskStepId.New(now), Title = title, SortOrder = sortOrder };
 
     internal void Change(string title, bool isDone)
     {

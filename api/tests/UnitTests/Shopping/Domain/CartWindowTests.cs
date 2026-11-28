@@ -1,4 +1,6 @@
+using Shopping.Domain.Departments;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace UnitTests.Shopping.Domain;
 
@@ -61,7 +63,7 @@ public sealed class CartWindowTests
 
     private static ShoppingItem Bought(DateTimeOffset? boughtAt)
     {
-        var item = ShoppingItem.Create("Хлеб", null, null, Guid.NewGuid(), false, Person.Vitaliy, Now.AddDays(-1)).Value;
+        var item = ShoppingItem.Create("Хлеб", null, null, new DepartmentId(Guid.NewGuid()), false, Person.Vitaliy, Now.AddDays(-1)).Value;
         if (boughtAt is { } at)
             item.SetStatus(ShoppingItemStatus.Bought, Person.Maria, at);
         return item;

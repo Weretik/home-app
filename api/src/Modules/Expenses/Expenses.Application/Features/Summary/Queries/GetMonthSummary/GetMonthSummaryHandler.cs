@@ -91,7 +91,7 @@ public sealed class GetMonthSummaryHandler(IExpensesDbContext db, TimeProvider c
         var top = monthByCategory
             .OrderByDescending(x => x.Value)
             .Take(TopCategoryCount)
-            .Select(x => new CategoryAmount(x.Key, names.GetValueOrDefault(x.Key, string.Empty), x.Value))
+            .Select(x => new CategoryAmount(x.Key.Value, names.GetValueOrDefault(x.Key, string.Empty), x.Value))
             .ToList();
 
         var usages = limits

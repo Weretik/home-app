@@ -7,7 +7,7 @@ namespace Notes.Domain.Categories;
 /// A group of notes such as «Їжа» or «Квіти» (R-011). Categories are data the family adds, renames and deletes; the
 /// name is unique without regard to case. Deleting one leaves its notes without a category (R-006).
 /// </summary>
-public sealed class NoteCategory : Entity<Guid>, IAggregateRoot
+public sealed class NoteCategory : Entity<NoteCategoryId>, IAggregateRoot
 {
     public const int MaxNameLength = 50;
     public const int MaxEmojiLength = 8;
@@ -27,7 +27,7 @@ public sealed class NoteCategory : Entity<Guid>, IAggregateRoot
     /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
     public uint Version { get; private set; }
 
-    public static Result<NoteCategory> Create(Guid id, string name, string? emoji, int sortOrder)
+    public static Result<NoteCategory> Create(NoteCategoryId id, string name, string? emoji, int sortOrder)
     {
         var check = Check(name, emoji);
         if (check.IsFailure)

@@ -24,7 +24,7 @@ public sealed record PurchasePlan(string Name, Recipient Recipient, Recipient Gi
         {
             return after == before
                 ? null
-                : new GiftPurchasePlanned(gift.Id, after.Name, after.Recipient.ToParty(), after.Giver.ToParty(), after.BuyBy, links.For(gift.Id));
+                : new GiftPurchasePlanned(gift.Id.Value, after.Name, after.Recipient.ToParty(), after.Giver.ToParty(), after.BuyBy, links.For(gift.Id.Value));
         }
 
         if (before is null)
@@ -36,7 +36,7 @@ public sealed record PurchasePlan(string Name, Recipient Recipient, Recipient Gi
             GiftStatus.Dropped => GiftPurchaseOutcome.Dropped,
             _ => GiftPurchaseOutcome.Unplanned,
         };
-        return new GiftPurchaseClosed(gift.Id, outcome);
+        return new GiftPurchaseClosed(gift.Id.Value, outcome);
     }
 
     /// <summary>Publishes the event of <see cref="Change"/>, if there is one.</summary>

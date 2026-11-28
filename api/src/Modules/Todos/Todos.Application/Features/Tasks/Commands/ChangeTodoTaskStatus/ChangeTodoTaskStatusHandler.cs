@@ -3,6 +3,7 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Todos.Application.Integrations;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Features.Tasks.Commands.ChangeTodoTaskStatus;
 
@@ -11,9 +12,9 @@ public sealed class ChangeTodoTaskStatusHandler(ITodosDbContext db, TimeProvider
 {
     public async ValueTask<Result> Handle(ChangeTodoTaskStatusCommand c, CancellationToken cancellationToken)
     {
-        var task = await db.Tasks.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var task = await db.Tasks.FirstOrDefaultAsync(x => x.Id == new TodoTaskId(c.Id), cancellationToken);
         if (task is null)
-            return TodoErrors.TaskNotFound(c.Id);
+            return TodoErrors.TaskNotFound(new TodoTaskId(c.Id));
         if (task.Version != c.Version)
             return TodoErrors.ChangedMeanwhile;
 

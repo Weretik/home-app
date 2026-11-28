@@ -1,6 +1,6 @@
-using Expenses.Application;
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Domain.Results;
+using Expenses.Application;
 using Expenses.Application.Idempotency;
 using Expenses.Domain.Budget;
 using Expenses.Domain.Categories;
@@ -23,21 +23,22 @@ public sealed class CreateSpendingLimitHandler(IExpensesDbContext db, TimeProvid
 
     public async ValueTask<Result<CreatedEntry>> Handle(CreateSpendingLimitCommand c, CancellationToken cancellationToken)
     {
+        var categoryIds = c.CategoryIds.Select(id => new CategoryId(id)).ToList();
         var fingerprint = IdempotentCreates.Fingerprint(new object?[] { c.Name, c.Period, c.Amount, c.CategoryIds });
         if (await IdempotentCreates.EarlierResultAsync(db, c.IdempotencyKey, Kind, fingerprint, cancellationToken) is { } earlier)
             return earlier;
 
-        if (await BudgetCategories.FirstMissingAsync(db, c.CategoryIds, cancellationToken) is { } missing)
+        if (await BudgetCategories.FirstMissingAsync(db, categoryIds, cancellationToken) is { } missing)
             return CategoryErrors.NotFoundById(missing);
 
         var last = await db.SpendingLimits.MaxAsync(l => (int?)l.SortOrder, cancellationToken) ?? 0;
         var now = clock.GetUtcNow();
-        var created = SpendingLimit.Create(c.Name, c.Period, c.Amount, c.CategoryIds, last + 10, now);
+        var created = SpendingLimit.Create(c.Name, c.Period, c.Amount, categoryIds, last + 10, now);
         if (created.IsFailure)
             return created.Error!;
 
         db.SpendingLimits.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -52,6 +53,6 @@ public sealed class CreateSpendingLimitHandler(IExpensesDbContext db, TimeProvid
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new CreatedEntry(created.Value.Id);
+        return new CreatedEntry(created.Value.Id.Value);
     }
 }

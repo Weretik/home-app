@@ -3,6 +3,7 @@ using BuildingBlocks.Domain.Results;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Todos.Application.Features.Tasks.Reading;
+using Todos.Domain.Categories;
 
 namespace Todos.Application.Features.Tasks.Queries.ListTodoTasks;
 
@@ -20,7 +21,7 @@ public sealed class ListTodoTasksHandler(ITodosDbContext db) : IQueryHandler<Lis
         }
 
         if (query.CategoryId is { } categoryId)
-            tasks = tasks.Where(t => t.CategoryId == categoryId);
+            tasks = tasks.Where(t => t.CategoryId == new TodoCategoryId(categoryId));
         else if (query.WithoutCategory)
             tasks = tasks.Where(t => t.CategoryId == null);
 

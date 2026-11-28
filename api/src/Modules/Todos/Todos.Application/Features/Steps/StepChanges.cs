@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Microsoft.EntityFrameworkCore;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Features.Steps;
 
@@ -23,9 +24,9 @@ internal static class StepChanges
     {
         for (var attempt = 1; ; attempt++)
         {
-            var task = await db.Tasks.Include(t => t.Steps).FirstOrDefaultAsync(t => t.Id == taskId, cancellationToken);
+            var task = await db.Tasks.Include(t => t.Steps).FirstOrDefaultAsync(t => t.Id == new TodoTaskId(taskId), cancellationToken);
             if (task is null)
-                return TodoErrors.TaskNotFound(taskId);
+                return TodoErrors.TaskNotFound(new TodoTaskId(taskId));
 
             var changed = change(task);
             if (changed.IsFailure)

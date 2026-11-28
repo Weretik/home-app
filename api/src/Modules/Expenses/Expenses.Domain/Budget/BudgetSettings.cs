@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Budget.Amounts;
+using Expenses.Domain.Budget.Identifiers;
 
 namespace Expenses.Domain.Budget;
 
@@ -9,9 +10,9 @@ namespace Expenses.Domain.Budget;
 /// for the savings jar and the day limits start carrying overspend. There is exactly one row, with
 /// <see cref="SingletonId"/>.
 /// </summary>
-public sealed class BudgetSettings : Entity<Guid>, IAggregateRoot
+public sealed class BudgetSettings : Entity<BudgetSettingsId>, IAggregateRoot
 {
-    public static readonly Guid SingletonId = new("5b0f3a2e-1c4d-4e8a-9f6b-2d7c8e9a0b1c");
+    public static readonly BudgetSettingsId SingletonId = new(new Guid("5b0f3a2e-1c4d-4e8a-9f6b-2d7c8e9a0b1c"));
 
     /// <summary>The start of the old «Бюджет» sheet's carry-over (its «Справочник!H2»), used until someone changes it.</summary>
     public static readonly DateOnly SheetLimitsFrom = new(2026, 11, 1);

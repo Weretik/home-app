@@ -4,7 +4,7 @@ using BuildingBlocks.Domain.Results;
 namespace Shopping.Domain.Settings;
 
 /// <summary>The module's settings; exactly one row, with <see cref="SingletonId"/>, created by the first migration.</summary>
-public sealed class ShoppingSettings : Entity<Guid>, IAggregateRoot
+public sealed class ShoppingSettings : Entity<ShoppingSettingsId>, IAggregateRoot
 {
     public const int DefaultCartKeepHours = 3;
     public const int MinCartKeepHours = 1;
@@ -13,7 +13,7 @@ public sealed class ShoppingSettings : Entity<Guid>, IAggregateRoot
     public const int MinFrequentDays = 30;
     public const int MaxFrequentDays = 730;
 
-    public static readonly Guid SingletonId = new("7d1c4f0a-3b2e-4c55-9a1d-6e8f0b2c4a17");
+    public static readonly ShoppingSettingsId SingletonId = new(new Guid("7d1c4f0a-3b2e-4c55-9a1d-6e8f0b2c4a17"));
 
     private ShoppingSettings()
     {

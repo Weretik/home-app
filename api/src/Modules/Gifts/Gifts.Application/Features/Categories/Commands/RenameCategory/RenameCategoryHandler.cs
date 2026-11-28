@@ -10,9 +10,9 @@ public sealed class RenameCategoryHandler(IGiftsDbContext db) : ICommandHandler<
 {
     public async ValueTask<Result> Handle(RenameCategoryCommand c, CancellationToken cancellationToken)
     {
-        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == new CategoryId(c.Id), cancellationToken);
         if (category is null)
-            return CategoryErrors.NotFound(c.Id);
+            return CategoryErrors.NotFound(new CategoryId(c.Id));
 
         var renamed = category.Rename(c.Name);
         if (renamed.IsFailure)

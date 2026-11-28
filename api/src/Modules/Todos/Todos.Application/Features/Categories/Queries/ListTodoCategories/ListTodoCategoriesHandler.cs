@@ -16,7 +16,7 @@ public sealed class ListTodoCategoriesHandler(ITodosDbContext db)
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
             .Select(c => new TodoCategoryItem(
-                c.Id, c.Name, c.Emoji, c.SortOrder, c.Version, active.Count(t => t.CategoryId == c.Id)))
+                c.Id.Value, c.Name, c.Emoji, c.SortOrder, c.Version, active.Count(t => t.CategoryId == c.Id)))
             .ToListAsync(cancellationToken);
 
         return items;

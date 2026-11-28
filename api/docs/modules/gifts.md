@@ -14,10 +14,10 @@ Code: [`src/Modules/Gifts`](../../src/Modules/Gifts). Schema: `gifts`.
 ```mermaid
 classDiagram
     class Gift {
-        Guid Id
+        GiftId Id
         Recipient Recipient
         string Name
-        Guid CategoryId
+        CategoryId CategoryId
         Priority Priority
         decimal? Price
         string? Link
@@ -32,19 +32,19 @@ classDiagram
         uint Version
     }
     class GiftVariant {
-        Guid Id
+        GiftVariantId Id
         string? Title
         string Link
         decimal? Price
         int SortOrder
     }
     class Category {
-        Guid Id
+        CategoryId Id
         string Name  unique
         int SortOrder
     }
     class Detail {
-        Guid Id
+        DetailId Id
         Recipient Recipient
         string Label
         string Value

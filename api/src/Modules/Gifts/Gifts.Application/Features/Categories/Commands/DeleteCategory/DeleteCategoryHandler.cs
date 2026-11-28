@@ -13,10 +13,10 @@ public sealed class DeleteCategoryHandler(IGiftsDbContext db) : ICommandHandler<
 {
     public async ValueTask<Result> Handle(DeleteCategoryCommand c, CancellationToken cancellationToken)
     {
-        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var category = await db.Categories.FirstOrDefaultAsync(x => x.Id == new CategoryId(c.Id), cancellationToken);
         if (category is null)
-            return CategoryErrors.NotFound(c.Id);
-        if (await db.Gifts.AnyAsync(g => g.CategoryId == c.Id, cancellationToken))
+            return CategoryErrors.NotFound(new CategoryId(c.Id));
+        if (await db.Gifts.AnyAsync(g => g.CategoryId == new CategoryId(c.Id), cancellationToken))
             return CategoryErrors.InUse;
 
         db.Categories.Remove(category);
@@ -26,7 +26,7 @@ public sealed class DeleteCategoryHandler(IGiftsDbContext db) : ICommandHandler<
         }
         catch (DbUpdateConcurrencyException)
         {
-            return CategoryErrors.NotFound(c.Id);
+            return CategoryErrors.NotFound(new CategoryId(c.Id));
         }
         catch (DbUpdateException)
         {

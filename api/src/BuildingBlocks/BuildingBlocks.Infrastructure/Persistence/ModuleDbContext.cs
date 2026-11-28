@@ -1,3 +1,4 @@
+using System.Reflection;
 using BuildingBlocks.Application.Persistence;
 using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 using BuildingBlocks.Infrastructure.Outbox.Storage;
@@ -11,7 +12,9 @@ namespace BuildingBlocks.Infrastructure.Persistence;
 /// <summary>
 /// The base of every module DbContext: the module keeps its tables in its own schema, and a unique index
 /// violation comes out as <see cref="UniqueConstraintViolationException"/>. A module that publishes messages turns on
-/// <see cref="HasOutbox"/>, which maps the shared outbox table into its schema, and calls <see cref="Publish"/>.
+/// <see cref="HasOutbox"/>, which maps the shared outbox table into its schema, and calls <see cref="Publish"/>. The
+/// typed ids of the module's Domain (<c>&lt;Module&gt;.Domain</c> beside <c>&lt;Module&gt;.Infrastructure</c>) are mapped
+/// to their <c>uuid</c> values by <see cref="TypedIdConventions"/>.
 /// </summary>
 public abstract class ModuleDbContext(DbContextOptions options, string schema) : DbContext(options)
 {
@@ -41,6 +44,19 @@ public abstract class ModuleDbContext(DbContextOptions options, string schema) :
         {
             throw new UniqueConstraintViolationException(postgres.ConstraintName, exception);
         }
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
+        configurationBuilder.AddTypedIds(DomainAssembly());
+
+    /// <summary>The Domain assembly of the module whose DbContext derives straight from this class.</summary>
+    private Assembly DomainAssembly()
+    {
+        var module = GetType();
+        while (module.BaseType != typeof(ModuleDbContext))
+            module = module.BaseType!;
+        var name = module.Assembly.GetName().Name!;
+        return Assembly.Load(name[..name.LastIndexOf('.')] + ".Domain");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

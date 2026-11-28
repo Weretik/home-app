@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Domain.Tasks;
 
@@ -32,9 +33,9 @@ public static class TodoErrors
     public static readonly Error ChangedMeanwhile = Error.Conflict(
         "todos.changed_meanwhile", "Тим часом це хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
-    public static Error TaskNotFound(Guid id) =>
+    public static Error TaskNotFound(TodoTaskId id) =>
         Error.NotFound("todos.task_not_found", $"Завдання {id} немає.");
 
-    public static Error StepNotFound(Guid id) =>
+    public static Error StepNotFound(TaskStepId id) =>
         Error.NotFound("todos.step_not_found", $"У цьому завданні немає кроку {id}.");
 }

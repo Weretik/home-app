@@ -19,10 +19,10 @@ public static class KeywordLearning
         var existing = await db.Keywords.FirstOrDefaultAsync(k => k.Keyword == normalizedName, cancellationToken);
         if (existing is not null)
         {
-            existing.Learn(departmentId);
+            existing.Learn(new DepartmentId(departmentId));
             return;
         }
 
-        db.Keywords.Add(DepartmentKeyword.Create(normalizedName, departmentId, learned: true, now).Value);
+        db.Keywords.Add(DepartmentKeyword.Create(normalizedName, new DepartmentId(departmentId), learned: true, now).Value);
     }
 }

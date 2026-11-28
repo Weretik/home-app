@@ -20,7 +20,7 @@ public sealed class GetGiftsSummaryHandler(IGiftsDbContext db, TimeProvider cloc
         var gifts = await db.Gifts.AsNoTracking()
             .Where(g => g.Status != GiftStatus.Dropped)
             .Select(g => new SummaryRow(
-                g.Id, g.Recipient, g.Name, g.Priority, g.Price, g.Link, g.Status, g.Occasion, g.OccasionDate, g.CreatedAtUtc))
+                g.Id.Value, g.Recipient, g.Name, g.Priority, g.Price, g.Link, g.Status, g.Occasion, g.OccasionDate, g.CreatedAtUtc))
             .ToListAsync(cancellationToken);
         var details = await ListDetailsHandler.ReadAllAsync(db, cancellationToken);
 

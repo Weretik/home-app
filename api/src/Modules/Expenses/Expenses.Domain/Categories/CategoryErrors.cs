@@ -13,6 +13,6 @@ public static class CategoryErrors
     public static Error NotFound(string name) =>
         Error.NotFound("expenses.category_not_found", $"Категорії «{name}» немає.");
 
-    public static Error NotFoundById(Guid id) =>
+    public static Error NotFoundById(CategoryId id) =>
         Error.NotFound("expenses.category_not_found", $"Категорії {id} немає.");
 }

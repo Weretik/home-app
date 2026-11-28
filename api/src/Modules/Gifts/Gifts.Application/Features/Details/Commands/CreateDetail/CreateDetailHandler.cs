@@ -25,7 +25,7 @@ public sealed class CreateDetailHandler(IGiftsDbContext db, TimeProvider clock)
             return created.Error!;
 
         db.Details.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -36,6 +36,6 @@ public sealed class CreateDetailHandler(IGiftsDbContext db, TimeProvider clock)
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new CreatedGiftsEntry(created.Value.Id);
+        return new CreatedGiftsEntry(created.Value.Id.Value);
     }
 }

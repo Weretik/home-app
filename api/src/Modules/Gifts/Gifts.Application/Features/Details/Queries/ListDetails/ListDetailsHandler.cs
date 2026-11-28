@@ -17,7 +17,7 @@ public sealed class ListDetailsHandler(IGiftsDbContext db) : IQueryHandler<ListD
     {
         var details = await db.Details
             .AsNoTracking()
-            .Select(d => new GiftDetailItem(d.Id, d.Version, d.Recipient, d.Label, d.Value, d.SortOrder))
+            .Select(d => new GiftDetailItem(d.Id.Value, d.Version, d.Recipient, d.Label, d.Value, d.SortOrder))
             .ToListAsync(cancellationToken);
 
         return [.. details.OrderBy(d => d.Recipient).ThenBy(d => d.SortOrder).ThenBy(d => d.Label, StringComparer.Ordinal)];

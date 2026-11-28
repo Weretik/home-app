@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Domain.Departments;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Items.Views;
 
@@ -18,7 +19,7 @@ public static class ItemViews
     public static ShoppingItemView ToView(ItemRow row) => ToView(row.Item, row.Department);
 
     public static ShoppingItemView ToView(ShoppingItem i, Department d) =>
-        new(i.Id, i.Name, i.Quantity, i.Note, i.DepartmentId, d.Name, d.Icon, d.SortOrder, i.Urgent, i.Status,
+        new(i.Id.Value, i.Name, i.Quantity, i.Note, i.DepartmentId.Value, d.Name, d.Icon, d.SortOrder, i.Urgent, i.Status,
             i.AddedBy, i.AddedAtUtc, i.BoughtBy, i.BoughtAtUtc, i.Version);
 
     /// <summary>The items with these ids, in the order of the ids; ids that no longer exist are left out.</summary>
@@ -28,7 +29,8 @@ public static class ItemViews
         if (ids.Count == 0)
             return [];
 
-        var rows = await Rows(db, db.Items.Where(i => ids.Contains(i.Id))).ToListAsync(cancellationToken);
+        var itemIds = ids.Select(id => new ShoppingItemId(id)).ToList();
+        var rows = await Rows(db, db.Items.Where(i => itemIds.Contains(i.Id))).ToListAsync(cancellationToken);
         var views = rows.Select(ToView).ToDictionary(v => v.Id);
         return ids.Where(views.ContainsKey).Select(id => views[id]).ToList();
     }

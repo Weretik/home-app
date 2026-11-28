@@ -14,7 +14,7 @@ public sealed class ListCategoriesHandler(IExpensesDbContext db)
             .AsNoTracking()
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
-            .Select(c => new CategoryItem(c.Id, c.Name, c.SortOrder))
+            .Select(c => new CategoryItem(c.Id.Value, c.Name, c.SortOrder))
             .ToListAsync(cancellationToken);
 
         return items;

@@ -26,7 +26,7 @@ public sealed class CreateSavingsMovementHandler(IExpensesDbContext db, TimeProv
             return created.Error!;
 
         db.SavingsMovements.Add(created.Value);
-        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id, now));
+        db.CreateRequests.Add(new CreateRequest(c.IdempotencyKey, Kind, fingerprint, created.Value.Id.Value, now));
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -38,6 +38,6 @@ public sealed class CreateSavingsMovementHandler(IExpensesDbContext db, TimeProv
                 ?? IdempotentCreates.KeyReused;
         }
 
-        return new CreatedEntry(created.Value.Id);
+        return new CreatedEntry(created.Value.Id.Value);
     }
 }

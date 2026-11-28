@@ -9,7 +9,7 @@ namespace Expenses.Domain.Savings;
 /// Money put into the savings jar (a positive amount) or taken out of it (a negative amount): one row of the old
 /// «Копилка» sheet. The balance of the jar is the sum of all movements; it is never stored.
 /// </summary>
-public sealed class SavingsMovement : Entity<Guid>, IAggregateRoot
+public sealed class SavingsMovement : Entity<SavingsMovementId>, IAggregateRoot
 {
     private SavingsMovement()
     {
@@ -42,7 +42,7 @@ public sealed class SavingsMovement : Entity<Guid>, IAggregateRoot
 
         return new SavingsMovement
         {
-            Id = Guid.CreateVersion7(now),
+            Id = SavingsMovementId.New(now),
             Date = date,
             Person = person,
             Amount = amount,

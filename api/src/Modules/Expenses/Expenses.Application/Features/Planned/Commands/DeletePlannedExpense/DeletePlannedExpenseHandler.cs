@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Planning;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ public sealed class DeletePlannedExpenseHandler(IExpensesDbContext db) : IComman
 {
     public async ValueTask<Result> Handle(DeletePlannedExpenseCommand c, CancellationToken cancellationToken)
     {
-        var deleted = await db.PlannedExpenses.Where(x => x.Id == c.Id).ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.PlannedExpenses.Where(x => x.Id == new PlannedExpenseId(c.Id)).ExecuteDeleteAsync(cancellationToken);
         return deleted == 0 ? EntryErrors.NotFound("planned_expense", c.Id) : Result.Success();
     }
 }

@@ -16,7 +16,7 @@ public sealed class DeletePushSubscriptionHandler(INotificationsDbContext db, IC
         var person = PushPeople.Of(member);
         var subscription = person is null
             ? null
-            : await db.PushSubscriptions.FirstOrDefaultAsync(s => s.Id == c.Id && s.Person == person, cancellationToken);
+            : await db.PushSubscriptions.FirstOrDefaultAsync(s => s.Id == new PushSubscriptionId(c.Id) && s.Person == person, cancellationToken);
         if (subscription is null)
             return PushErrors.DeviceNotFound;
 

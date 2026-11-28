@@ -1,6 +1,7 @@
 using Expenses.Application.Features.Summary.Report;
 using Expenses.Domain.Budget;
 using Expenses.Domain.Budget.Amounts;
+using Expenses.Domain.Categories;
 
 namespace Expenses.Application.Features.Summary.Queries.GetMonthSummary;
 
@@ -38,7 +39,7 @@ internal static class SummaryFigures
             ? (int)decimal.Round((spent + carriedIn) / amount * 100, MidpointRounding.AwayFromZero)
             : 0;
         return new LimitUsage(
-            limit.Id,
+            limit.Id.Value,
             limit.Name,
             limit.Period,
             start,
@@ -93,7 +94,7 @@ internal static class SummaryFigures
         today >= start && today < end ? end.DayNumber - today.DayNumber : null;
 
     /// <summary>The spending of the categories that match, per month.</summary>
-    private static Dictionary<DateOnly, decimal> Monthly(IEnumerable<CategoryMonthAmount> rows, Func<Guid, bool> counts) =>
+    private static Dictionary<DateOnly, decimal> Monthly(IEnumerable<CategoryMonthAmount> rows, Func<CategoryId, bool> counts) =>
         rows.Where(x => counts(x.CategoryId))
             .GroupBy(x => x.Month)
             .ToDictionary(g => g.Key, g => g.Sum(x => x.Amount));

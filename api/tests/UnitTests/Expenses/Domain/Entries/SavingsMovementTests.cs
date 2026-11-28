@@ -1,3 +1,4 @@
+using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
 using Expenses.Domain.Parties;
 using Expenses.Domain.Savings;
@@ -61,8 +62,8 @@ public sealed class SavingsMovementTests
     [Fact]
     public void An_Expense_Update_RejectsANonPositiveAmount_AndKeepsTheOldValues()
     {
-        var expense = Expense.Create(Day, Payer.Shared, Guid.NewGuid(), 100m, PaymentMethod.Card, "АТБ", Now).Value;
-        var category = Guid.NewGuid();
+        var expense = Expense.Create(Day, Payer.Shared, new CategoryId(Guid.NewGuid()), 100m, PaymentMethod.Card, "АТБ", Now).Value;
+        var category = new CategoryId(Guid.NewGuid());
 
         Assert.Equal("expenses.amount_not_positive",
             expense.Update(Day, Payer.Maria, category, -1m, PaymentMethod.Cash, null, false).Error!.Code);

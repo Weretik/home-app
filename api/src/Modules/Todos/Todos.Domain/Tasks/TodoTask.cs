@@ -1,6 +1,8 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Todos.Domain.Categories;
 using Todos.Domain.Parties;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Domain.Tasks;
 
@@ -9,7 +11,7 @@ namespace Todos.Domain.Tasks;
 /// carry a checklist of <see cref="TaskStep"/>s, and moves between active and archived statuses at any time.
 /// Every change, steps included, sets <see cref="UpdatedAtUtc"/>, so the row is written and its version changes.
 /// </summary>
-public sealed class TodoTask : Entity<Guid>, IAggregateRoot
+public sealed class TodoTask : Entity<TodoTaskId>, IAggregateRoot
 {
     public const int MaxTitleLength = 200;
     public const int MaxNotesLength = 4000;
@@ -41,7 +43,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
 
     public DateOnly? DueDate { get; private set; }
 
-    public Guid? CategoryId { get; private set; }
+    public TodoCategoryId? CategoryId { get; private set; }
 
     public DateTimeOffset CreatedAtUtc { get; private init; }
 
@@ -60,7 +62,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
     public string? SourceKind { get; private set; }
 
     /// <summary>The id of that record in its module, stored as a plain value (no foreign key across schemas).</summary>
-    public Guid? SourceId { get; private set; }
+    public TaskSourceId? SourceId { get; private set; }
 
     /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
     public uint Version { get; private set; }
@@ -80,7 +82,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
         TodoStatus status,
         TodoPriority priority,
         DateOnly? dueDate,
-        Guid? categoryId,
+        TodoCategoryId? categoryId,
         IReadOnlyCollection<string> steps,
         DateTimeOffset now,
         string? importKey = null)
@@ -95,7 +97,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
 
         var task = new TodoTask
         {
-            Id = Guid.CreateVersion7(now),
+            Id = TodoTaskId.New(now),
             Title = title.Trim(),
             Notes = NormalizeNotes(notes),
             Assignee = assignee,
@@ -124,7 +126,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
         TodoStatus status,
         TodoPriority priority,
         DateOnly? dueDate,
-        Guid? categoryId,
+        TodoCategoryId? categoryId,
         DateTimeOffset now)
     {
         var check = Check(title, notes, dueDate);
@@ -154,11 +156,11 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
     }
 
     /// <summary>Records which record of another module the task was made for; only once, on a task without one.</summary>
-    public Result LinkSource(string kind, Guid id)
+    public Result LinkSource(string kind, TaskSourceId id)
     {
         if (SourceKind is not null)
             return TodoErrors.SourceAlreadySet;
-        if (string.IsNullOrWhiteSpace(kind) || kind.Length > MaxSourceKindLength || id == Guid.Empty)
+        if (string.IsNullOrWhiteSpace(kind) || kind.Length > MaxSourceKindLength || id == default)
             return TodoErrors.SourceInvalid;
 
         SourceKind = kind;
@@ -181,7 +183,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
     }
 
     /// <summary>Renames a step and ticks or unticks it.</summary>
-    public Result UpdateStep(Guid stepId, string title, bool isDone, DateTimeOffset now)
+    public Result UpdateStep(TaskStepId stepId, string title, bool isDone, DateTimeOffset now)
     {
         var step = _steps.FirstOrDefault(s => s.Id == stepId);
         if (step is null)
@@ -194,7 +196,7 @@ public sealed class TodoTask : Entity<Guid>, IAggregateRoot
         return Result.Success();
     }
 
-    public Result RemoveStep(Guid stepId, DateTimeOffset now)
+    public Result RemoveStep(TaskStepId stepId, DateTimeOffset now)
     {
         var step = _steps.FirstOrDefault(s => s.Id == stepId);
         if (step is null)

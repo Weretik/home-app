@@ -8,7 +8,7 @@ namespace Notifications.Domain.Deliveries;
 /// with <c>push:</c> in front for push) is unique, so a repeated or parallel tick cannot plan the same message twice
 /// (R-007, R-106). The outbox sends it and sets <see cref="SentAtUtc"/>.
 /// </summary>
-public sealed class Delivery : Entity<Guid>, IAggregateRoot
+public sealed class Delivery : Entity<DeliveryId>, IAggregateRoot
 {
     public const int MaxKeyLength = 200;
 
@@ -35,7 +35,7 @@ public sealed class Delivery : Entity<Guid>, IAggregateRoot
     public static Delivery Plan(
         string key, DeliveryChannel channel, DigestKind kind, Audience audience, long chatId, DateTimeOffset now) => new()
     {
-        Id = Guid.CreateVersion7(now),
+        Id = DeliveryId.New(now),
         Key = key,
         Channel = channel,
         Kind = kind,

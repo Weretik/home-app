@@ -2,7 +2,9 @@ using BuildingBlocks.Application.Outbox;
 using Gifts.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Todos.Contracts;
+using Todos.Domain.Categories;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Integrations.Gifts;
 
@@ -19,14 +21,14 @@ public sealed class GiftPurchasePlannedHandler(ITodosDbContext db, TimeProvider 
         var title = GiftTask.Title(message.GiftName, message.Recipient);
         var assignee = GiftTask.AssigneeOf(message.Giver);
         var task = await db.Tasks.FirstOrDefaultAsync(
-            t => t.SourceKind == TodoTaskCompleted.GiftSource && t.SourceId == message.GiftId, cancellationToken);
+            t => t.SourceKind == TodoTaskCompleted.GiftSource && t.SourceId == new TaskSourceId(message.GiftId), cancellationToken);
 
         if (task is null)
         {
             var created = TodoTask.Create(
                 title, GiftTask.Notes(message.Link), assignee, null, TodoStatus.Todo, TodoPriority.High, message.BuyBy,
                 await ShoppingCategoryAsync(cancellationToken), [], now);
-            if (created.IsFailure || created.Value.LinkSource(TodoTaskCompleted.GiftSource, message.GiftId).IsFailure)
+            if (created.IsFailure || created.Value.LinkSource(TodoTaskCompleted.GiftSource, new TaskSourceId(message.GiftId)).IsFailure)
                 return; // Cannot happen: the title is cut to fit and the date comes from a valid gift.
             db.Tasks.Add(created.Value);
         }
@@ -41,6 +43,6 @@ public sealed class GiftPurchasePlannedHandler(ITodosDbContext db, TimeProvider 
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Guid?> ShoppingCategoryAsync(CancellationToken cancellationToken) =>
+    private async Task<TodoCategoryId?> ShoppingCategoryAsync(CancellationToken cancellationToken) =>
         await db.Categories.AnyAsync(c => c.Id == GiftTask.ShoppingCategoryId, cancellationToken) ? GiftTask.ShoppingCategoryId : null;
 }

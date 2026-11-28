@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Results;
+using Gifts.Domain.Wishlist.Identifiers;
 
 namespace Gifts.Domain.Wishlist;
 
@@ -47,6 +48,6 @@ public static class GiftErrors
     public static readonly Error ChangedMeanwhile = Error.Conflict(
         "gifts.changed_meanwhile", "Тим часом це хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(GiftId id) =>
         Error.NotFound("gifts.gift_not_found", $"Подарунка {id} немає.");
 }

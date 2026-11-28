@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Todos.Contracts;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Integrations.Bot;
 
@@ -17,7 +18,7 @@ public sealed class TodoCompletion(ITodosDbContext db, TimeProvider clock) : ITo
     {
         for (var attempt = 1; ; attempt++)
         {
-            var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId, cancellationToken);
+            var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == new TodoTaskId(taskId), cancellationToken);
             if (task is null)
                 return TodoCompletionOutcome.NotFound;
             if (task.IsArchived)

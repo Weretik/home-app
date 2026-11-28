@@ -6,6 +6,7 @@ using Shopping.Application.Features.Dictionary;
 using Shopping.Application.Features.Items.Views;
 using Shopping.Domain.Departments;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Items.Commands.UpdateItem;
 
@@ -15,22 +16,22 @@ public sealed class UpdateItemHandler(IShoppingDbContext db, TimeProvider clock)
     public async ValueTask<Result<ShoppingItemView>> Handle(UpdateItemCommand c, CancellationToken cancellationToken)
     {
         var window = await ItemWindow.ReadAsync(db, clock, cancellationToken);
-        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == c.Id, cancellationToken);
+        var item = await db.Items.FirstOrDefaultAsync(i => i.Id == new ShoppingItemId(c.Id), cancellationToken);
         if (item is null || !CartWindow.IsInList(item, window.Cutoff))
-            return ShoppingItemErrors.NotFound(c.Id);
+            return ShoppingItemErrors.NotFound(new ShoppingItemId(c.Id));
         if (item.Version != c.Version)
             return ShoppingItemErrors.ChangedMeanwhile;
 
-        var department = await db.Departments.AsNoTracking().FirstOrDefaultAsync(d => d.Id == c.DepartmentId, cancellationToken);
+        var department = await db.Departments.AsNoTracking().FirstOrDefaultAsync(d => d.Id == new DepartmentId(c.DepartmentId), cancellationToken);
         if (department is null)
-            return DepartmentErrors.NotFound(c.DepartmentId);
+            return DepartmentErrors.NotFound(new DepartmentId(c.DepartmentId));
 
         var moved = item.DepartmentId != department.Id;
         var updated = item.Update(c.Name, c.Quantity, c.Note, department.Id, c.Urgent);
         if (updated.IsFailure)
             return updated.Error!;
         if (moved && !department.IsFallback)
-            await KeywordLearning.LearnAsync(db, item.NormalizedName, department.Id, window.Now, cancellationToken);
+            await KeywordLearning.LearnAsync(db, item.NormalizedName, department.Id.Value, window.Now, cancellationToken);
 
         try
         {

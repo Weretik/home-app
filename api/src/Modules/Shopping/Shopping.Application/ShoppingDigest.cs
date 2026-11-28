@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Contracts;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application;
 

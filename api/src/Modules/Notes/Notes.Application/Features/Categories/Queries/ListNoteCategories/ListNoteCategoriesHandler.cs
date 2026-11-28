@@ -14,7 +14,7 @@ public sealed class ListNoteCategoriesHandler(INotesDbContext db)
         var items = await db.Categories.AsNoTracking()
             .OrderBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
-            .Select(c => new NoteCategoryItem(c.Id, c.Name, c.Emoji, c.SortOrder, c.Version, notes.Count(n => n.CategoryId == c.Id)))
+            .Select(c => new NoteCategoryItem(c.Id.Value, c.Name, c.Emoji, c.SortOrder, c.Version, notes.Count(n => n.CategoryId == c.Id)))
             .ToListAsync(cancellationToken);
 
         return items;

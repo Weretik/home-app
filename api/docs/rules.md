@@ -15,6 +15,12 @@ names the test for each rule and the reason for each rule that is review only
   **(tested)**
 - `Host.Api` holds composition only and references only module `Api` projects and shared infrastructure. **(tested)**
 - Domain properties have no public setters; state changes through methods that check the rules. **(tested)**
+- Every entity has its own id type, `public readonly record struct <Entity>Id(Guid Value)`, beside it (or in the
+  aggregate's `Identifiers/` folder past six files), and every reference inside the module uses that type; the Domain
+  holds no bare `Guid`. `Contracts`, commands, queries and HTTP records keep the plain `Guid`: the handler wraps it
+  (`new NoteId(c.Id)`), a query compares typed ids and unwraps `.Value` only in the final projection.
+  `ModuleDbContext` maps the ids to `uuid` columns by convention ([ADR 0047](decisions/0047-typed-ids-for-every-entity.md)).
+  **(tested)**
 - Folders follow features and aggregates, never kinds of classes: `Features/Products/Commands/CreateProduct/`, not
   `Handlers/` or `Services/`. Names such as `Shared`, `Common`, `Helpers`, `Utils`, `Services`, `Entities` are not
   allowed as folders. **(tested)**
@@ -139,6 +145,7 @@ push. "Review only" rules are checked by the audit of each feature.
 | Host validates scopes and the build in every environment | `HostRulesTests.The_Host_ValidatesScopesAndTheBuild_InEveryEnvironment`; every integration test boots the host with it |
 | No background threads; scheduled work is an HTTP endpoint | `HostRulesTests.Nothing_RunsInTheBackground` (allow-list: `DatabaseStartup`, a development-only startup step) |
 | No public setters in `Domain` | `Boundaries/DomainEncapsulationTests.Domain_Properties_HaveNoPublicSetters` |
+| Typed ids: each entity its own id type, no bare `Guid` in `Domain` | `Boundaries/TypedIdTests.Every_Entity_HasItsOwnTypedId`, `.Entities_DoNotShare_AnIdType`, `.The_Domain_HoldsNoBareGuid`; the mapping keeps the schema (`DataOwnershipTests.The_Migrations_MatchTheModel`) |
 | One schema per module, only own types, no FK across schemas | `Boundaries/DataOwnershipTests.A_Module_MapsOnlyItsOwnTypes_InItsOwnSchema` |
 | Migrations match the model | `DataOwnershipTests.The_Migrations_MatchTheModel` |
 | At most six code files per folder | `Structure/FolderRulesTests.A_Folder_HoldsAtMostSixCodeFiles` (`src`, `tests`) |

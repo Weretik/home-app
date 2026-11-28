@@ -17,6 +17,6 @@ public static class NoteErrors
     public static readonly Error ChangedMeanwhile = Error.Conflict(
         "notes.changed_meanwhile", "Тим часом це хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
-    public static Error NoteNotFound(Guid id) =>
+    public static Error NoteNotFound(NoteId id) =>
         Error.NotFound("notes.note_not_found", $"Нотатки {id} немає.");
 }

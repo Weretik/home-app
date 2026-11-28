@@ -7,7 +7,7 @@ namespace Gifts.Domain.People;
 /// Something worth knowing when choosing a gift for someone («нюансы»): Маша's ring size, shoe size, necklace length.
 /// Edited only in the settings of the gifts section; the home summary shows them.
 /// </summary>
-public sealed class Detail : Entity<Guid>, IAggregateRoot
+public sealed class Detail : Entity<DetailId>, IAggregateRoot
 {
     public const int MaxLabelLength = 100;
     public const int MaxValueLength = 200;
@@ -32,7 +32,7 @@ public sealed class Detail : Entity<Guid>, IAggregateRoot
 
     public static Result<Detail> Create(Recipient recipient, string label, string value, int sortOrder, DateTimeOffset now)
     {
-        var detail = new Detail { Id = Guid.CreateVersion7(now), SortOrder = sortOrder };
+        var detail = new Detail { Id = DetailId.New(now), SortOrder = sortOrder };
         var set = detail.Update(recipient, label, value);
         return set.IsFailure ? set.Error! : detail;
     }

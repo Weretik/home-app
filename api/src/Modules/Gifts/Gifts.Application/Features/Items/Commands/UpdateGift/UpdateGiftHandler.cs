@@ -2,6 +2,7 @@ using BuildingBlocks.Domain.Results;
 using Gifts.Application.Purchases;
 using Gifts.Domain.Categories;
 using Gifts.Domain.Wishlist;
+using Gifts.Domain.Wishlist.Identifiers;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,18 +12,18 @@ public sealed class UpdateGiftHandler(IGiftsDbContext db, TimeProvider clock, Gi
 {
     public async ValueTask<Result> Handle(UpdateGiftCommand c, CancellationToken cancellationToken)
     {
-        var gift = await db.Gifts.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var gift = await db.Gifts.FirstOrDefaultAsync(x => x.Id == new GiftId(c.Id), cancellationToken);
         if (gift is null)
-            return GiftErrors.NotFound(c.Id);
+            return GiftErrors.NotFound(new GiftId(c.Id));
         if (gift.Version != c.Version)
             return GiftErrors.ChangedMeanwhile;
 
-        if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
-            return CategoryErrors.NotFound(c.CategoryId);
+        if (!await db.Categories.AnyAsync(x => x.Id == new CategoryId(c.CategoryId), cancellationToken))
+            return CategoryErrors.NotFound(new CategoryId(c.CategoryId));
 
         var before = PurchasePlan.Of(gift);
         var updated = gift.Update(
-            c.Recipient, c.Name, c.CategoryId, c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants,
+            c.Recipient, c.Name, new CategoryId(c.CategoryId), c.Priority, c.Price, c.Link, c.Occasion, c.OccasionDate, c.Notes, c.Variants,
             clock.GetUtcNow());
         if (updated.IsFailure)
             return updated;

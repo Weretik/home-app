@@ -1,3 +1,5 @@
+using System;
+using Notes.Domain.Categories;
 using Notes.Domain.Notes;
 
 namespace UnitTests.Notes.Domain;
@@ -25,7 +27,7 @@ public sealed class NoteTests
         Assert.Equal(NotePerson.Vitaliy, note.UpdatedBy);
         Assert.Equal(Now, note.CreatedAtUtc);
         Assert.Equal(Now, note.UpdatedAtUtc);
-        Assert.NotEqual(Guid.Empty, note.Id);
+        Assert.NotEqual(Guid.Empty, note.Id.Value);
     }
 
     [Fact]
@@ -68,7 +70,7 @@ public sealed class NoteTests
     public void Update_ReplacesTheFields_KeepsTheAuthor_AndRecordsTheEditor()
     {
         var note = Milk();
-        var category = Guid.NewGuid();
+        var category = new NoteCategoryId(Guid.NewGuid());
         var later = Now.AddHours(2);
 
         var result = note.Update(NotePerson.Maria, NoteKind.Likes, "Молоко", null, " Агромол ", true, category, NotePerson.Maria, later);

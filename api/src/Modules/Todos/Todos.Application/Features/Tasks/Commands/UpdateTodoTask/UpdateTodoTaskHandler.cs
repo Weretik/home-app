@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Todos.Application.Integrations;
 using Todos.Domain.Categories;
 using Todos.Domain.Tasks;
+using Todos.Domain.Tasks.Identifiers;
 
 namespace Todos.Application.Features.Tasks.Commands.UpdateTodoTask;
 
@@ -11,18 +12,19 @@ public sealed class UpdateTodoTaskHandler(ITodosDbContext db, TimeProvider clock
 {
     public async ValueTask<Result> Handle(UpdateTodoTaskCommand c, CancellationToken cancellationToken)
     {
-        var task = await db.Tasks.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var task = await db.Tasks.FirstOrDefaultAsync(x => x.Id == new TodoTaskId(c.Id), cancellationToken);
         if (task is null)
-            return TodoErrors.TaskNotFound(c.Id);
+            return TodoErrors.TaskNotFound(new TodoTaskId(c.Id));
         if (task.Version != c.Version)
             return TodoErrors.ChangedMeanwhile;
 
-        if (c.CategoryId is { } categoryId && !await db.Categories.AnyAsync(x => x.Id == categoryId, cancellationToken))
-            return CategoryErrors.NotFound(categoryId);
+        var categoryId = c.CategoryId is { } value ? new TodoCategoryId(value) : (TodoCategoryId?)null;
+        if (categoryId is { } category && !await db.Categories.AnyAsync(x => x.Id == category, cancellationToken))
+            return CategoryErrors.NotFound(category);
 
         var before = task.Status;
         var updated = task.Update(
-            c.Title, c.Notes, c.Assignee, c.Author, c.Status, c.Priority, c.DueDate, c.CategoryId, clock.GetUtcNow());
+            c.Title, c.Notes, c.Assignee, c.Author, c.Status, c.Priority, c.DueDate, categoryId, clock.GetUtcNow());
         if (updated.IsFailure)
             return updated;
         TaskCompletion.PublishIfCompleted(db, task, before);

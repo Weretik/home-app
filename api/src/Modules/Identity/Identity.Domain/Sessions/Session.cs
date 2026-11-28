@@ -8,7 +8,7 @@ namespace Identity.Domain.Sessions;
 /// <see cref="TouchInterval"/>, but never past <see cref="MaxAge"/> after the sign-in (ADR 0046), so a stolen token in
 /// regular use still ends. Sign-out revokes it; «sign out everywhere» revokes every session of the member.
 /// </summary>
-public sealed class Session : Entity<Guid>, IAggregateRoot
+public sealed class Session : Entity<SessionId>, IAggregateRoot
 {
     public const int TokenHashLength = 64;
     public const int MaxEmailLength = 320;
@@ -49,7 +49,7 @@ public sealed class Session : Entity<Guid>, IAggregateRoot
 
     public static Session Start(string tokenHash, MemberProfile member, DateTimeOffset now) => new()
     {
-        Id = Guid.CreateVersion7(now),
+        Id = SessionId.New(now),
         TokenHash = tokenHash,
         Email = member.Email,
         Name = Cut(member.Name, MaxNameLength) ?? member.Email,

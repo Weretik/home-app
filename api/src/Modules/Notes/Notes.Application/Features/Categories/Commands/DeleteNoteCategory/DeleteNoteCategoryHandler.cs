@@ -11,12 +11,12 @@ public sealed class DeleteNoteCategoryHandler(INotesDbContext db) : ICommandHand
     public async ValueTask<Result> Handle(DeleteNoteCategoryCommand c, CancellationToken cancellationToken)
     {
         // One conditional DELETE; the database clears category_id of its notes (ON DELETE SET NULL).
-        var deleted = await db.Categories.Where(x => x.Id == c.Id && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
+        var deleted = await db.Categories.Where(x => x.Id == new NoteCategoryId(c.Id) && x.Version == c.Version).ExecuteDeleteAsync(cancellationToken);
         if (deleted > 0)
             return Result.Success();
 
-        return await db.Categories.AnyAsync(x => x.Id == c.Id, cancellationToken)
+        return await db.Categories.AnyAsync(x => x.Id == new NoteCategoryId(c.Id), cancellationToken)
             ? NoteErrors.ChangedMeanwhile
-            : CategoryErrors.NotFound(c.Id);
+            : CategoryErrors.NotFound(new NoteCategoryId(c.Id));
     }
 }

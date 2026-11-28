@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Application.Features.Items.Views;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 using Shopping.Domain.Parsing;
 
 namespace Shopping.Application.Features.Items.Queries.ListSuggestions;
@@ -80,7 +81,7 @@ public sealed class ListSuggestionsHandler(IShoppingDbContext db, TimeProvider c
             {
                 var row = latest[t.Key];
                 return new NameSuggestion(
-                    row.Name, row.DepartmentId, row.DepartmentName, row.DepartmentIcon, t.Times, t.Last, inList.Contains(t.Key));
+                    row.Name, row.DepartmentId.Value, row.DepartmentName, row.DepartmentIcon, t.Times, t.Last, inList.Contains(t.Key));
             })
             .ToList();
     }

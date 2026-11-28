@@ -9,7 +9,7 @@ namespace Shopping.Domain.Departments;
 /// Stored normalised and unique. <see cref="Learned"/> keywords were made when a person moved an item to another
 /// department; the exact normalised name is learned then.
 /// </summary>
-public sealed class DepartmentKeyword : Entity<Guid>, IAggregateRoot
+public sealed class DepartmentKeyword : Entity<DepartmentKeywordId>, IAggregateRoot
 {
     public const int MinKeywordLength = 2;
     public const int MaxKeywordLength = 60;
@@ -23,7 +23,7 @@ public sealed class DepartmentKeyword : Entity<Guid>, IAggregateRoot
 
     public string Keyword { get; private set; } = string.Empty;
 
-    public Guid DepartmentId { get; private set; }
+    public DepartmentId DepartmentId { get; private set; }
 
     public bool Learned { get; private set; }
 
@@ -32,7 +32,7 @@ public sealed class DepartmentKeyword : Entity<Guid>, IAggregateRoot
     /// <summary>Changes on every save (PostgreSQL <c>xmin</c>); an edit based on an older version is refused.</summary>
     public uint Version { get; private set; }
 
-    public static Result<DepartmentKeyword> Create(string keyword, Guid departmentId, bool learned, DateTimeOffset now)
+    public static Result<DepartmentKeyword> Create(string keyword, DepartmentId departmentId, bool learned, DateTimeOffset now)
     {
         var normalized = NameNormalizer.Normalize(keyword);
         var check = Check(normalized);
@@ -41,14 +41,14 @@ public sealed class DepartmentKeyword : Entity<Guid>, IAggregateRoot
 
         return new DepartmentKeyword
         {
-            Id = Guid.CreateVersion7(now), Keyword = normalized, DepartmentId = departmentId, Learned = learned, CreatedAtUtc = now,
+            Id = DepartmentKeywordId.New(now), Keyword = normalized, DepartmentId = departmentId, Learned = learned, CreatedAtUtc = now,
         };
     }
 
     /// <summary>Whether a text can be a keyword at all (a learned name that is too long or too short is not learned).</summary>
     public static bool IsValid(string keyword) => Check(NameNormalizer.Normalize(keyword)).IsSuccess;
 
-    public Result Update(string keyword, Guid departmentId)
+    public Result Update(string keyword, DepartmentId departmentId)
     {
         var normalized = NameNormalizer.Normalize(keyword);
         var check = Check(normalized);
@@ -61,7 +61,7 @@ public sealed class DepartmentKeyword : Entity<Guid>, IAggregateRoot
     }
 
     /// <summary>A person put an item with exactly this name into a department: the keyword points there now.</summary>
-    public void Learn(Guid departmentId)
+    public void Learn(DepartmentId departmentId)
     {
         DepartmentId = departmentId;
         Learned = true;

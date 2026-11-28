@@ -16,6 +16,6 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(c => c.SortOrder).HasColumnName("sort_order");
         builder.HasIndex(c => c.Name).IsUnique().HasDatabaseName(CategoryNames.UniqueIndex);
 
-        builder.HasData(CategorySeed.Items.Select(c => new { c.Id, c.Name, c.SortOrder }));
+        builder.HasData(CategorySeed.Items.Select(c => new { Id = new CategoryId(c.Id), c.Name, c.SortOrder }));
     }
 }

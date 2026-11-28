@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Domain.Items;
+using Shopping.Domain.Items.Lifecycle;
 
 namespace Shopping.Application.Features.Items.Views;
 
@@ -39,7 +40,7 @@ public static class FrequentStatistics
             .ToDictionary(g => g.Key, g => g.MaxBy(i => i.BoughtAtUtc)!);
 
         return top
-            .Select(t => new FrequentName(latest[t.Name].Name, latest[t.Name].DepartmentId, t.Times, t.Last!.Value))
+            .Select(t => new FrequentName(latest[t.Name].Name, latest[t.Name].DepartmentId.Value, t.Times, t.Last!.Value))
             .ToList();
     }
 }

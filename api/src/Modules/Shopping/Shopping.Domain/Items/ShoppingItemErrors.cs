@@ -26,6 +26,6 @@ public static class ShoppingItemErrors
         "shopping.changed_meanwhile", "Тим часом це хтось змінив або видалив; оновіть сторінку й спробуйте ще раз.");
 
     /// <summary>A missing item, and an item that is history (it can no longer change), answer the same.</summary>
-    public static Error NotFound(Guid id) =>
+    public static Error NotFound(ShoppingItemId id) =>
         Error.NotFound("shopping.item_not_found", $"Товару {id} немає в списку.");
 }

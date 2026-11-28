@@ -20,7 +20,7 @@ public sealed class ListIncomesHandler(IExpensesDbContext db) : IQueryHandler<Li
         var page = await incomes
             .OrderByDescending(i => i.Date)
             .ThenByDescending(i => i.Id)
-            .Select(i => new IncomeItem(i.Id, i.Version, i.Date, i.Person, i.Amount, i.Comment))
+            .Select(i => new IncomeItem(i.Id.Value, i.Version, i.Date, i.Person, i.Amount, i.Comment))
             .ToPagedListAsync(query.Page, query.PageSize, cancellationToken);
 
         return new IncomeList(page.Items, page.Page, page.PageSize, page.TotalCount, total);

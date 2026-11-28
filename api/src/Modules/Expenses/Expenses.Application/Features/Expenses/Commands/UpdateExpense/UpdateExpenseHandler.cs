@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Expenses.Domain.Categories;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Entries.Identifiers;
 using Expenses.Domain.Parties;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +12,16 @@ public sealed class UpdateExpenseHandler(IExpensesDbContext db) : ICommandHandle
 {
     public async ValueTask<Result> Handle(UpdateExpenseCommand c, CancellationToken cancellationToken)
     {
-        var entry = await db.Expenses.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var entry = await db.Expenses.FirstOrDefaultAsync(x => x.Id == new ExpenseId(c.Id), cancellationToken);
         if (entry is null)
             return EntryErrors.NotFound("expense", c.Id);
         if (entry.Version != c.Version)
             return EntryErrors.ChangedMeanwhile;
 
-        if (!await db.Categories.AnyAsync(x => x.Id == c.CategoryId, cancellationToken))
-            return CategoryErrors.NotFoundById(c.CategoryId);
+        if (!await db.Categories.AnyAsync(x => x.Id == new CategoryId(c.CategoryId), cancellationToken))
+            return CategoryErrors.NotFoundById(new CategoryId(c.CategoryId));
 
-        var updated = entry.Update(c.Date, c.Payer, c.CategoryId, c.Amount, c.PaymentMethod, c.Comment, c.OutsideLimits);
+        var updated = entry.Update(c.Date, c.Payer, new CategoryId(c.CategoryId), c.Amount, c.PaymentMethod, c.Comment, c.OutsideLimits);
         if (updated.IsFailure)
             return updated;
 

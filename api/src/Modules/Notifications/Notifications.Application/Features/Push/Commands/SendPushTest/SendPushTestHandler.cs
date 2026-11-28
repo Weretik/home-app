@@ -25,13 +25,13 @@ public sealed class SendPushTestHandler(INotificationsDbContext db, IWebPush pus
 
         var devices = await db.PushSubscriptions.AsNoTracking()
             .Where(s => s.Person == person)
-            .Select(s => new PushTarget(s.Id, s.Endpoint, s.P256dh, s.Auth))
+            .Select(s => new PushTarget(s.Id.Value, s.Endpoint, s.P256dh, s.Auth))
             .ToListAsync(cancellationToken);
         if (devices.Count == 0)
             return PushErrors.NoDevices;
 
         var results = await push.TrySendAsync(devices, Payload, cancellationToken);
-        var gone = results.Where(r => r.Outcome == PushOutcome.Gone).Select(r => r.SubscriptionId).ToList();
+        var gone = results.Where(r => r.Outcome == PushOutcome.Gone).Select(r => new PushSubscriptionId(r.SubscriptionId)).ToList();
         if (gone.Count > 0)
             await db.PushSubscriptions.Where(s => gone.Contains(s.Id)).ExecuteDeleteAsync(cancellationToken);
 

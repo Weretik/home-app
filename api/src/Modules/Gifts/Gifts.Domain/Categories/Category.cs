@@ -7,7 +7,7 @@ namespace Gifts.Domain.Categories;
 /// What kind of gift it is («Техника», «Украшения» …). Categories are data the family edits in settings; the name is
 /// unique and shown as typed.
 /// </summary>
-public sealed class Category : Entity<Guid>, IAggregateRoot
+public sealed class Category : Entity<CategoryId>, IAggregateRoot
 {
     public const int MaxNameLength = 100;
 
@@ -22,7 +22,7 @@ public sealed class Category : Entity<Guid>, IAggregateRoot
 
     public static Result<Category> Create(string name, int sortOrder, DateTimeOffset now)
     {
-        var category = new Category { Id = Guid.CreateVersion7(now), SortOrder = sortOrder };
+        var category = new Category { Id = CategoryId.New(now), SortOrder = sortOrder };
         var renamed = category.Rename(name);
         return renamed.IsFailure ? renamed.Error! : category;
     }

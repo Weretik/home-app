@@ -11,7 +11,7 @@ public sealed class UpdateSavingsMovementHandler(IExpensesDbContext db) : IComma
 {
     public async ValueTask<Result> Handle(UpdateSavingsMovementCommand c, CancellationToken cancellationToken)
     {
-        var entry = await db.SavingsMovements.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var entry = await db.SavingsMovements.FirstOrDefaultAsync(x => x.Id == new SavingsMovementId(c.Id), cancellationToken);
         if (entry is null)
             return EntryErrors.NotFound("savings_movement", c.Id);
         if (entry.Version != c.Version)

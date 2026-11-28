@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Modeling;
 using BuildingBlocks.Domain.Results;
+using Notes.Domain.Categories;
 
 namespace Notes.Domain.Notes;
 
@@ -8,7 +9,7 @@ namespace Notes.Domain.Notes;
 /// with an optional description, place or brand and category. Both members read and change every note; who wrote it
 /// and who changed it last come from the signed-in member, never from the request (R-008).
 /// </summary>
-public sealed class Note : Entity<Guid>, IAggregateRoot
+public sealed class Note : Entity<NoteId>, IAggregateRoot
 {
     public const int MaxTitleLength = 200;
     public const int MaxDetailsLength = 2000;
@@ -33,7 +34,7 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
     /// <summary>Important notes come first inside their category (R-007).</summary>
     public bool IsImportant { get; private set; }
 
-    public Guid? CategoryId { get; private set; }
+    public NoteCategoryId? CategoryId { get; private set; }
 
     /// <summary>Who wrote the note; null when the member has no person in the household.</summary>
     public NotePerson? CreatedBy { get; private init; }
@@ -55,7 +56,7 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
         string? details,
         string? place,
         bool isImportant,
-        Guid? categoryId,
+        NoteCategoryId? categoryId,
         NotePerson? createdBy,
         DateTimeOffset now)
     {
@@ -65,7 +66,7 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
 
         return new Note
         {
-            Id = Guid.CreateVersion7(now),
+            Id = NoteId.New(now),
             About = about,
             Kind = kind,
             Title = title.Trim(),
@@ -88,7 +89,7 @@ public sealed class Note : Entity<Guid>, IAggregateRoot
         string? details,
         string? place,
         bool isImportant,
-        Guid? categoryId,
+        NoteCategoryId? categoryId,
         NotePerson? updatedBy,
         DateTimeOffset now)
     {

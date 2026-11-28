@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain.Results;
 using Expenses.Application.Idempotency;
 using Expenses.Domain.Entries;
+using Expenses.Domain.Planning;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ public sealed class RecordPlannedExpenseHandler(IExpensesDbContext db, TimeProvi
 {
     public async ValueTask<Result<CreatedEntry>> Handle(RecordPlannedExpenseCommand c, CancellationToken cancellationToken)
     {
-        var plan = await db.PlannedExpenses.FirstOrDefaultAsync(x => x.Id == c.Id, cancellationToken);
+        var plan = await db.PlannedExpenses.FirstOrDefaultAsync(x => x.Id == new PlannedExpenseId(c.Id), cancellationToken);
         if (plan is null)
             return EntryErrors.NotFound("planned_expense", c.Id);
         if (plan.Version != c.Version)
@@ -33,6 +34,6 @@ public sealed class RecordPlannedExpenseHandler(IExpensesDbContext db, TimeProvi
             return EntryErrors.ChangedMeanwhile;
         }
 
-        return new CreatedEntry(expense.Value.Id);
+        return new CreatedEntry(expense.Value.Id.Value);
     }
 }

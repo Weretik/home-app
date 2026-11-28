@@ -137,7 +137,8 @@ most 200 (tests and generated code exempt); a longer file is split by responsibi
 `npm run architecture:structure`).
 
 **Modules:** a module uses another one only through its `Contracts`; `Domain` knows no EF Core or ASP.NET Core; one
-schema per module, no foreign keys across schemas. **Web features** never import each other and reach the API only
+schema per module, no foreign keys across schemas. Every entity has its own typed id (`readonly record struct NoteId(Guid Value)`) and the
+Domain holds no bare `Guid`; commands, contracts and HTTP records keep `Guid` ([ADR 0047](api/docs/decisions/0047-typed-ids-for-every-entity.md)). **Web features** never import each other and reach the API only
 through `src/platform/client/api.ts` from their `*-api.ts`.
 
 **Repeats and side effects:** creates that must not run twice take an `Idempotency-Key`; side effects outside the
