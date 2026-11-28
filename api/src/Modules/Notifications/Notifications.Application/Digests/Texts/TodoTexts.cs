@@ -37,29 +37,53 @@ public static class TodoTexts
         return (text.ToString().TrimEnd(), buttons);
     }
 
-    /// <summary>The common message: active tasks per assignee and everything overdue. Null when nothing is active.</summary>
-    public static string? Common(IReadOnlyList<OpenTodo> active, DateOnly today, string todosUrl)
+    /// <summary>
+    /// The common message: every active task, in full, grouped by assignee (overdue first, then by date). In a
+    /// person's own chat only their tasks and the shared ones, never the other person's (R-009). Null when there is
+    /// nothing to list.
+    /// </summary>
+    public static string? Common(IReadOnlyList<OpenTodo> active, DateOnly today, string todosUrl, TodoAssignee? person = null)
     {
-        if (active.Count == 0)
+        (TodoAssignee Assignee, string Heading)[] groups = person is { } me
+            ? [(me, "👤 <b>Мої</b>"), (TodoAssignee.Shared, "👥 <b>Спільні</b>")]
+            :
+            [
+                (TodoAssignee.Vitaliy, "👤 <b>Віталій</b>"),
+                (TodoAssignee.Maria, "👤 <b>Маша</b>"),
+                (TodoAssignee.Shared, "👥 <b>Спільні</b>"),
+            ];
+        var listed = groups
+            .Select(g => (g.Heading, Tasks: active
+                .Where(t => t.Assignee == g.Assignee)
+                .OrderBy(t => t.DueDate ?? DateOnly.MaxValue)
+                .ThenByDescending(t => t.Urgent)
+                .ToList()))
+            .Where(g => g.Tasks.Count > 0)
+            .ToList();
+        if (listed.Count == 0)
             return null;
 
-        var text = new StringBuilder("📋 <b>Справи родини</b>\n");
-        var counts = new[] { TodoAssignee.Vitaliy, TodoAssignee.Maria, TodoAssignee.Shared }
-            .Select(a => $"{TextFormat.Person(a.ToString())} — {active.Count(t => t.Assignee == a)}");
-        text.Append("Відкрито: ").Append(string.Join(", ", counts)).Append('\n');
-
-        var overdue = active.Where(t => t.DueDate < today).ToList();
-        if (overdue.Count == 0)
-            text.Append("\nПрострочених немає 👍\n");
-        else
+        var text = new StringBuilder(person is null ? "📋 <b>Справи родини</b>\n" : "📋 <b>Усі відкриті справи</b>\n");
+        foreach (var (heading, tasks) in listed)
         {
-            text.Append("\n🔴 <b>Прострочено</b>\n");
-            TextFormat.AppendLines(text, [.. overdue.Select(t =>
-                $"• {TextFormat.Escape(t.Title)} — {TextFormat.Person(t.Assignee.ToString())}, з {TextFormat.Day(t.DueDate!.Value)}")]);
+            text.Append('\n').Append(heading).Append(" (").Append(tasks.Count).Append(")\n");
+            TextFormat.AppendLines(text, [.. tasks.Select(t => CommonLine(t, today))]);
         }
 
         text.Append('\n').Append(TextFormat.Link(todosUrl, "Відкрити справи"));
         return text.ToString();
+    }
+
+    private static string CommonLine(OpenTodo task, DateOnly today)
+    {
+        var title = $"{(task.Urgent ? "❗ " : string.Empty)}{TextFormat.Escape(task.Title)}";
+        return task.DueDate switch
+        {
+            { } due when due < today => $"• 🔴 {title} — з {TextFormat.Day(due)}",
+            { } due when due == today => $"• {title} — сьогодні",
+            { } due => $"• {title} — до {TextFormat.Day(due)}",
+            null => $"• {title}",
+        };
     }
 
     private static void AppendSection(StringBuilder text, string heading, IReadOnlyList<OpenTodo> tasks, DateOnly today)
